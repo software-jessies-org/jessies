@@ -20,12 +20,12 @@ final class PTextAreaRenderer {
     
     private PTextArea textArea;
     private Graphics2D g;
-    private FontMetrics metrics;
+    private FontMetrics plainFontMetrics;
     
-    PTextAreaRenderer(PTextArea textArea, Graphics2D g, FontMetrics metrics) {
+    PTextAreaRenderer(PTextArea textArea, Graphics2D g) {
         this.textArea = textArea;
         this.g = g;
-        this.metrics = metrics;
+        this.plainFontMetrics = textArea.getFontMetrics(Font.PLAIN);
     }
     
     void render() {
@@ -57,11 +57,13 @@ final class PTextAreaRenderer {
                 g.fillRect(bounds.x, bounds.y, paintableBackgroundWidth, bounds.height);
             }
             
+            final Font plainFont = textArea.getFont();
+            
             // Work out which lines we need to paint.
             final int maxSplitLine = textArea.getSplitLineCount() - 1;
             Insets insets = textArea.getInsets();
-            int minLine = (bounds.y - insets.top) / metrics.getHeight();
-            int maxLine = (bounds.y - insets.top + bounds.height) / metrics.getHeight();
+            int minLine = (bounds.y - insets.top) / plainFontMetrics.getHeight();
+            int maxLine = (bounds.y - insets.top + bounds.height) / plainFontMetrics.getHeight();
             minLine = Math.max(0, Math.min(maxSplitLine, minLine));
             maxLine = Math.max(0, Math.min(maxSplitLine, maxLine));
             
@@ -69,7 +71,7 @@ final class PTextAreaRenderer {
             paintHighlights(minLine, maxLine);
             
             // Paint the text.
-            g.setFont(textArea.getFont());
+            g.setFont(plainFont);
             int startX = insets.left;
             int startY = textArea.getBaseline(minLine);
             if (disabledGtk) {
@@ -99,13 +101,13 @@ final class PTextAreaRenderer {
             if (segment.getOffset() == caretOffset && segment.isNewline() == false) {
                 paintCaret(x, baseline);
             } else if (segment.getOffset() <= caretOffset && segment.getEnd() > caretOffset) {
-                int caretX = x + segment.getDisplayWidth(metrics, x, caretOffset - segment.getOffset());
+                int caretX = x + segment.getDisplayWidth(x, caretOffset - segment.getOffset());
                 paintCaret(caretX, baseline);
             }
-            x += segment.getDisplayWidth(metrics, x);
+            x += segment.getDisplayWidth(x);
             if (segment.isNewline()) {
                 x = startX;
-                baseline += metrics.getHeight();
+                baseline += plainFontMetrics.getHeight();
                 line++;
                 if (line > maxLine) {
                     break;
@@ -125,7 +127,7 @@ final class PTextAreaRenderer {
         int whiteBackgroundWidth = bounds.width;
         int rightHandMarginColumn = textArea.getRightHandMarginColumn();
         if (rightHandMarginColumn != PTextArea.NO_MARGIN) {
-            int offset = metrics.stringWidth("n") * rightHandMarginColumn + textArea.getInsets().left;
+            int offset = plainFontMetrics.stringWidth("n") * rightHandMarginColumn + textArea.getInsets().left;
             g.setColor(MARGIN_BOUNDARY_COLOR);
             g.drawLine(offset, bounds.y, offset, bounds.y + bounds.height);
             g.setColor(MARGIN_OUTSIDE_COLOR);
@@ -159,8 +161,8 @@ final class PTextAreaRenderer {
             return;
         }
         g.setColor(Color.RED);
-        int yTop = y - metrics.getMaxAscent();
-        int yBottom = y + metrics.getMaxDescent() - 1;
+        int yTop = y - plainFontMetrics.getMaxAscent();
+        int yBottom = y + plainFontMetrics.getMaxDescent() - 1;
         g.drawLine(x, yTop + 1, x, yBottom - 1);
         g.drawLine(x, yTop + 1, x + 1, yTop);
         g.drawLine(x, yTop + 1, x - 1, yTop);

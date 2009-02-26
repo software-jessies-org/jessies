@@ -28,8 +28,8 @@ public class UnprintableCharacterTextSegment extends PTextSegment {
      * characters in length).
      */
     @Override
-    public int getCharOffset(FontMetrics metrics, int startX, int x) {
-        final int charOffset = super.getCharOffset(metrics, startX, x);
+    public int getCharOffset(int startX, int x) {
+        final int charOffset = super.getCharOffset(startX, x);
         final int extra = (charOffset % 6 >= 3) ? 1 : 0;
         return (charOffset / 6) + extra;
     }

@@ -30,8 +30,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     private List<SplitLine> splitLines;
     
     // We cache the FontMetrics for readability rather than performance.
-    private FontMetrics metrics;
-    private int[] widthCache;
+    private final FontMetrics[] metrics = new FontMetrics[3];
+    private final PTabSegment SINGLE_TAB = new PTabSegment(this, 0, 1);
     
     private PHighlightManager highlights = new PHighlightManager();
     private PTextStyler textStyler = new PPlainTextStyler(this);
@@ -345,7 +345,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         }
         
         Point point = getViewCoordinates(getCoordinates(offset));
-        scrollRectToVisible(new Rectangle(point.x - 1, point.y - metrics.getMaxAscent(), 3, metrics.getHeight()));
+        scrollRectToVisible(new Rectangle(point.x - 1, point.y - metrics[Font.PLAIN].getMaxAscent(), 3, getLineHeight()));
     }
     
     /**
@@ -607,11 +607,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     }
     
     private void cacheFontMetrics() {
-        metrics = getFontMetrics(getFont());
-        widthCache = new int[MAX_CACHED_CHAR];
-        for (int i = 0; i < MAX_CACHED_CHAR; i++) {
-            widthCache[i] = metrics.charWidth(i);
-        }
+        metrics[Font.PLAIN] = getFontMetrics(getFont());
+        metrics[Font.BOLD] = getFontMetrics(getFont().deriveFont(Font.BOLD));
+        metrics[Font.ITALIC] = getFontMetrics(getFont().deriveFont(Font.ITALIC));
     }
     
     public void addHighlight(PHighlight highlight) {
@@ -711,9 +709,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             int charOffset = 0;
             int x = insets.left;
             for (PLineSegment segment : getLineSegmentsForSplitLine(lineIndex)) {
-                int width = segment.getDisplayWidth(metrics, x);
+                int width = segment.getDisplayWidth(x);
                 if (x + width > point.x) {
-                    charOffset += segment.getCharOffset(metrics, x, point.x);
+                    charOffset += segment.getCharOffset(x, point.x);
                     return new PCoordinates(lineIndex, charOffset);
                 }
                 charOffset += segment.getModelTextLength();
@@ -737,7 +735,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
      */
     private int getLineIndexAtLocation(Point point) {
         final int maxLineIndex = splitLines.size() - 1;
-        int lineIndex = (point.y - getInsets().top) / metrics.getHeight();
+        int lineIndex = (point.y - getInsets().top) / getLineHeight();
         if (lineIndex > maxLineIndex) {
             point.x = Integer.MAX_VALUE;
         }
@@ -751,7 +749,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             generateLineWrappings();
             int x = getInsets().left;
             for (PLineSegment segment : getLineSegmentsForSplitLine(getLineIndexAtLocation(point))) {
-                int width = segment.getDisplayWidth(metrics, x);
+                int width = segment.getDisplayWidth(x);
                 if (x + width > point.x) {
                     return segment;
                 }
@@ -935,11 +933,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             int charOffset = 0;
             for (PLineSegment segment : getLineSegmentsForSplitLine(coordinates.getLineIndex())) {
                 if (coordinates.getCharOffset() <= charOffset + segment.getModelTextLength()) {
-                    x += segment.getDisplayWidth(metrics, x, coordinates.getCharOffset() - charOffset);
+                    x += segment.getDisplayWidth(x, coordinates.getCharOffset() - charOffset);
                     return new Point(x, baseline);
                 }
                 charOffset += segment.getModelTextLength();
-                x += segment.getDisplayWidth(metrics, x);
+                x += segment.getDisplayWidth(x);
             }
             return new Point(x, baseline);
         } finally {
@@ -969,19 +967,23 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             return;
         }
         Point point = getViewCoordinates(getCoordinates(caret.getStartIndex()));
-        repaint(point.x - 1, point.y - metrics.getMaxAscent(), 3, metrics.getMaxAscent() + metrics.getMaxDescent());
+        repaint(point.x - 1, point.y - metrics[Font.PLAIN].getMaxAscent(), 3, metrics[Font.PLAIN].getMaxAscent() + metrics[Font.PLAIN].getMaxDescent());
     }
     
     public int getLineTop(int lineIndex) {
-        return lineIndex * metrics.getHeight() + getInsets().top;
+        return lineIndex * getLineHeight() + getInsets().top;
     }
     
     public int getLineHeight() {
-        return metrics.getHeight();
+        return metrics[Font.PLAIN].getHeight();
+    }
+    
+    public FontMetrics getFontMetrics(int fontFlags) {
+        return metrics[fontFlags];
     }
     
     public int getBaseline(int lineIndex) {
-        return lineIndex * metrics.getHeight() + metrics.getMaxAscent() + getInsets().top;
+        return lineIndex * getLineHeight() + metrics[Font.PLAIN].getMaxAscent() + getInsets().top;
     }
     
     public void paintComponent(Graphics oldGraphics) {
@@ -989,7 +991,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         try {
             generateLineWrappings();
             
-            PTextAreaRenderer renderer = new PTextAreaRenderer(this, (Graphics2D) oldGraphics, metrics);
+            PTextAreaRenderer renderer = new PTextAreaRenderer(this, (Graphics2D) oldGraphics);
             renderer.render();
         } finally {
             getLock().relinquishReadLock();
@@ -1137,7 +1139,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     private void updateHeight() {
         Dimension size = getSize();
         Insets insets = getInsets();
-        size.height = metrics.getHeight() * splitLines.size() + insets.top + insets.bottom;
+        size.height = getLineHeight() * splitLines.size() + insets.top + insets.bottom;
         setSize(size);
         setPreferredSize(size);
     }
@@ -1253,22 +1255,20 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
      * there's at least this much space for the wrap mark.
      */
     private int getMinimumWrapMarkWidth() {
-        return widthCache['W'];
+        return metrics[Font.PLAIN].charWidth('W');
     }
     
     private int addCharWidth(int x, char ch) {
         // FIXME: this is a hack, and doesn't generalize to arbitrary PTextSegments for which getViewText and getCharSequence (that is, the model text) return different strings. I tried to rewrite the wrapping code to use getLineSegments. setLineWidth is easy, but addSplitLines is pretty difficult because you need to keep track of the two strings and the correspondence between offsets in them, or rewrite it completely to work on the text segments itself. This code has been known broken since at least 2005-06, so another special case is better than nothing.
         if (ch == '\t') {
-            return x + PTabSegment.SINGLE_TAB.getDisplayWidth(metrics, x);
+            return x + SINGLE_TAB.getDisplayWidth(x);
         } else if (ch < ' ' || ch == '\u007f') {
             // FIXME: we could cache these, since there are so few.
             StringBuilder chars = new StringBuilder(6);
             StringUtilities.appendUnicodeEscape(chars, ch);
-            return x + metrics.stringWidth(chars.toString());
-        } else if (ch < MAX_CACHED_CHAR) {
-            return x + widthCache[(int) ch];
+            return x + metrics[Font.PLAIN].stringWidth(chars.toString());
         } else {
-            return x + metrics.charWidth(ch);
+            return x + metrics[Font.PLAIN].charWidth(ch);
         }
     }
     
@@ -1334,14 +1334,14 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     }
     
     public int getScrollableUnitIncrement(Rectangle visible, int orientation, int direction) {
-        return metrics.getHeight();
+        return getLineHeight();
     }
     
     public Dimension getPreferredSize() {
         Dimension result = super.getPreferredSize();
         Insets insets = getInsets();
         if (columnCount != 0) {
-            result.width = Math.max(result.width, columnCount * metrics.charWidth('m') + insets.left + insets.right);
+            result.width = Math.max(result.width, columnCount * metrics[Font.PLAIN].charWidth('m') + insets.left + insets.right);
         }
         if (rowCount != 0) {
             result.height = Math.max(result.height, rowCount * getLineHeight() + insets.top + insets.bottom);

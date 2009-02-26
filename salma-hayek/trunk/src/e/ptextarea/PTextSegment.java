@@ -27,22 +27,31 @@ public class PTextSegment extends PAbstractSegment {
     }
     
     @Override
-    public int getCharOffset(FontMetrics metrics, int startX, int x) {
-        return GuiUtilities.getCharOffset(metrics, startX, x, getViewText().toCharArray());
+    public int getCharOffset(int startX, int x) {
+        return GuiUtilities.getCharOffset(getFontMetrics(), startX, x, getViewText().toCharArray());
     }
     
     @Override
     public void paint(Graphics2D g, int x, int yBaseline) {
-        g.drawString(getViewText(), x, yBaseline);
+        final int fontFlags = style.getFontFlags();
+        if (fontFlags == Font.PLAIN) {
+            g.drawString(getViewText(), x, yBaseline);
+        } else {
+            final Font normalFont = g.getFont();
+            g.setFont(normalFont.deriveFont(fontFlags));
+            g.drawString(getViewText(), x, yBaseline);
+            g.setFont(normalFont);
+        }
+        
         if (style.isUnderlined()) {
             paintUnderline(g, x, yBaseline);
         }
     }
     
     private void paintUnderline(Graphics2D g, int x, int yBaseline) {
-        FontMetrics metrics = g.getFontMetrics();
+        final FontMetrics metrics = getFontMetrics();
         yBaseline += Math.min(2, metrics.getMaxDescent());
-        int width = getDisplayWidth(metrics, x);
+        int width = getDisplayWidth(x);
         g.drawLine(x, yBaseline, x + width, yBaseline);
     }
     
