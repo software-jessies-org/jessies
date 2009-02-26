@@ -53,19 +53,19 @@ public interface PLineSegment {
     public boolean isHardNewline();
     
     /** Returns the width of this text in pixels, when painted from the given X position in pixels. */
-    public int getDisplayWidth(FontMetrics metrics, int startX);
+    public int getDisplayWidth(int startX);
     
     /**
      * Returns the width between the start of this segment, and the given character offset within
      * the segment, when painted from the given X position, measured in pixels.
      */
-    public int getDisplayWidth(FontMetrics metrics, int startX, int charOffset);
+    public int getDisplayWidth(int startX, int charOffset);
     
     /**
      * Returns the character offset from the start of this segment which is nearest to the given
      * 'x' position when this segment is drawn from the given startX position, measured in pixels.
      */
-    public int getCharOffset(FontMetrics metrics, int startX, int x);
+    public int getCharOffset(int startX, int x);
     
     /**
      * Paints the text into the given location.

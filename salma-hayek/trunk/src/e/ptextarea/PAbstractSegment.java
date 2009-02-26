@@ -55,15 +55,19 @@ public abstract class PAbstractSegment implements PLineSegment {
         return false;
     }
     
-    public int getDisplayWidth(FontMetrics metrics, int startX) {
-        return metrics.stringWidth(getViewText());
+    protected FontMetrics getFontMetrics() {
+        return textArea.getFontMetrics(style.getFontFlags());
     }
     
-    public int getDisplayWidth(FontMetrics metrics, int startX, int charOffset) {
-        return subSegment(0, charOffset).getDisplayWidth(metrics, startX);
+    public int getDisplayWidth(int startX) {
+        return getFontMetrics().stringWidth(getViewText());
     }
     
-    public abstract int getCharOffset(FontMetrics metrics, int startX, int x);
+    public int getDisplayWidth(int startX, int charOffset) {
+        return subSegment(0, charOffset).getDisplayWidth(startX);
+    }
+    
+    public abstract int getCharOffset(int startX, int x);
     
     public abstract void paint(Graphics2D g, int x, int yBaseline);
     

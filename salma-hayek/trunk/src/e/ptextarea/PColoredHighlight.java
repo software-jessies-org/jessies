@@ -42,7 +42,7 @@ public abstract class PColoredHighlight extends PHighlight {
                 if (segment.isNewline()) {
                     return result;
                 }
-                result += segment.getDisplayWidth(textArea.getFontMetrics(textArea.getFont()), result);
+                result += segment.getDisplayWidth(result);
             }
             return textArea.getWidth() - textArea.getInsets().right;
         }

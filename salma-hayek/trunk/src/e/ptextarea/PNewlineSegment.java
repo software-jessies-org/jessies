@@ -32,19 +32,19 @@ public class PNewlineSegment extends PAbstractSegment {
     }
     
     @Override
-    public int getDisplayWidth(FontMetrics metrics, int startX) {
+    public int getDisplayWidth(int startX) {
         // Might need to cope with being as wide as the available space on screen if we move dotted
         // line painting in here.
         return 0;
     }
     
     @Override
-    public int getDisplayWidth(FontMetrics metrics, int startX, int charOffset) {
-        return subSegment(0, charOffset).getDisplayWidth(metrics, startX);
+    public int getDisplayWidth(int startX, int charOffset) {
+        return subSegment(0, charOffset).getDisplayWidth(startX);
     }
     
     @Override
-    public int getCharOffset(FontMetrics metrics, int startX, int x) {
+    public int getCharOffset(int startX, int x) {
         return 0;
     }
     
