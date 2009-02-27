@@ -555,9 +555,11 @@ public class TerminalModel {
 	public void moveCursorHorizontally(int xDiff) {
 		int charOffset = cursorPosition.getCharOffset() + xDiff;
 		int lineIndex = cursorPosition.getLineIndex();
-		while (charOffset < 0) {
-			TextLine lineAbove = getTextLine(--lineIndex);
-			charOffset += lineAbove.length();
+		// Test cases:
+		// /bin/echo -e 'hello\n\bhello'
+		// /bin/echo -e 'hello\n\033[1Dhello'
+		if (charOffset < 0) {
+			charOffset = 0;
 		}
 		// Constraining charOffset here stops line editing working properly on Titan serial consoles.
 		//charOffset = Math.min(charOffset, width - 1);
