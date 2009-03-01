@@ -13,10 +13,17 @@ import e.util.*;
  * FIXME: if the companion field gets updated, should we try to update the pathname field?
  */
 public class FilenameChooserField extends JPanel implements ActionListener {
-    private int fileChooserMode;
+    private final int fileChooserMode;
     
-    /** We create this one, to hold the user's chosen pathname. */
-    private JTextField pathnameField = new JTextField("", 40);
+    /**
+     * We create a field to hold the user's chosen pathname.
+     * Changes to this cause real-time updates to the companion field.
+     */
+    private ETextField pathnameField = new ETextField("", 40) {
+        @Override public void textChanged() {
+            updateCompanionNameField();
+        }
+    };
     
     /** We're (optionally) given this one, if we're supposed to update another field with the chosen leafname. */
     private JTextField companionNameField;
@@ -63,26 +70,20 @@ public class FilenameChooserField extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         JFileChooser chooser = new JFileChooser();
         chooser.setFileSelectionMode(fileChooserMode);
-        // JFileChooser.DIRECTORIES_ONLY);
         chooser.setCurrentDirectory(FileUtilities.fileFromString(pathnameField.getText()));
         
         int result = chooser.showDialog(null, "Choose");
         if (result == JFileChooser.APPROVE_OPTION) {
-            File file = chooser.getSelectedFile();
-            updateFilenameField(file);
-            updateCompanionNameField(file);
+            pathnameField.setText(FileUtilities.getUserFriendlyName(chooser.getSelectedFile()));
         }
     }
     
-    private void updateFilenameField(File file) {
-        pathnameField.setText(FileUtilities.getUserFriendlyName(file));
-    }
-    
-    private void updateCompanionNameField(File file) {
+    private void updateCompanionNameField() {
         if (companionNameField == null) {
             return; // A name field is optional, so we might not have one to play with.
         }
         
+        final File file = FileUtilities.fileFromString(pathnameField.getText());
         companionNameField.setText(file.getName());
     }
 }
