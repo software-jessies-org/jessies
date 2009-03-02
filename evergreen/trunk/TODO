@@ -351,11 +351,8 @@ BUILDING
 
 + neilb suggests having the whole command in the "Set Build Target" dialog. defaulting to what we normally construct. empty string automatically replaced? or a "reset to default" button? alternatively, others have suggested adding a field that specifies a build host, and build commands are then prefixed with "ssh build-host ".
 
-+ possibly also add a "test" command to go with the "build" command. 
-
 + maybe all in a Workspace > Properties dialog, along with the title and directory (currently in "Edit Workspace")?
 
-+ lose the errors window and open a new window for each build started. warn if the user tries to start two builds in the same workspace (but allow them to override), or possibly just warn if they start two builds from the same root (or overlapping roots)?
 
 
 
