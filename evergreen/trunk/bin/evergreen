@@ -28,10 +28,12 @@ class Evergreen
             shouldBlock = true
         end
         
-        # Translate vi line number specifications.
-        if ARGV[0] =~ /^\+(\d+)$/
+        shouldAddWorkspace = false
+        if ARGV[0] == "--add-workspace"
             ARGV.shift()
-            ARGV[0] = "#{ARGV[0]}:#$1"
+            workspace_root = ARGV.shift()
+            workspace_name = ARGV.shift()
+            shouldAddWorkspace = true
         end
         
         dot_directory = ENV["EVERGREEN_DOT_DIRECTORY"]
@@ -49,6 +51,17 @@ class Evergreen
         serverPortPathname = Pathname.new(dot_directory) + "edit-server-port"
         # InAppClient's constructor stops anyone else from reading the .secret file.
         client = InAppClient.new(serverPortPathname)
+        
+        if shouldAddWorkspace
+            exit(client.trySendCommand("addWorkspace\t#{File.expand_path(workspace_root)}\t#{workspace_name}") ? 0 : 1)
+        end
+        
+        # Translate vi line number specifications.
+        if ARGV[0] =~ /^\+(\d+)$/
+            ARGV.shift()
+            ARGV[0] = "#{ARGV[0]}:#$1"
+        end
+        
         filename = ARGV[0]
         if filename != nil && client.trySendCommand("#{shouldBlock ? 'openAndBlock' : 'open'} #{File.expand_path(filename)}")
             exit(0)

@@ -5,12 +5,34 @@ import java.awt.EventQueue;
 import java.awt.event.*;
 import java.io.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.regex.*;
 
 public final class EditServer {
     private Evergreen editor;
     
     public EditServer(Evergreen editor) {
         this.editor = editor;
+    }
+    
+    public void addWorkspace(PrintWriter out, String line) throws Exception {
+        System.err.println(line);
+        Matcher m = Pattern.compile("^addWorkspace\t(.+)\t(.+)$").matcher(line);
+        if (!m.matches()) {
+            out.println("Syntax error.");
+            return;
+        }
+        final String workspaceRoot = m.group(1);
+        final String workspaceName = m.group(2);
+        
+        final WorkspaceProperties workspaceProperties = new WorkspaceProperties();
+        workspaceProperties.name = workspaceName;
+        workspaceProperties.rootDirectory = workspaceRoot;
+        
+        EventQueue.invokeAndWait(new Runnable() {
+            public void run() {
+                editor.createWorkspace(workspaceProperties);
+            }
+        });
     }
     
     public void open(PrintWriter out, String line) {
