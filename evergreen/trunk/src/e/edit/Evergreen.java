@@ -479,10 +479,6 @@ public class Evergreen {
             showAlert("Couldn't remove workspace", "There's no workspace selected.");
             return;
         }
-        if (getWorkspaces().length == 1) {
-            showAlert("Couldn't remove workspace", "The last workspace cannot be removed.");
-            return;
-        }
         String question = "Do you really want Evergreen to forget the workspace \"" + workspace.getTitle() + "\"?";
         question += " No files will be removed: the workspace's contents will be left on disk.";
         if (workspace.isEmpty() == false) {
