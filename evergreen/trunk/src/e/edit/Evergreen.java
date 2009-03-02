@@ -483,13 +483,6 @@ public class Evergreen {
             return;
         }
         
-        String question = "Do you really want Evergreen to forget the workspace \"" + workspace.getTitle() + "\"?";
-        question += " No files will be removed: the workspace's contents will be left on disk.";
-        boolean remove = askQuestion("Remove workspace?", question, "Remove");
-        if (remove == false) {
-            return;
-        }
-        
         tabbedPane.remove(workspace);
         workspaceConfigurationDidChange();
         workspace.dispose();
