@@ -61,10 +61,11 @@ public class FilenameChooserField extends JPanel implements ActionListener {
     }
     
     private JButton makeButton() {
-        String label = GuiUtilities.isMacOs() ? "Choose..." : "Browse...";
-        JButton result = new JButton(label);
-        result.addActionListener(this);
-        return result;
+        final String label = GuiUtilities.isMacOs() ? "Choose..." : "Browse...";
+        final JButton button = new JButton(label);
+        button.addActionListener(this);
+        button.setFocusable(false); // Tabbing over this button in Evergreen's "Add Workspace" dialog is annoying.
+        return button;
     }
     
     public void actionPerformed(ActionEvent e) {
