@@ -75,8 +75,8 @@ public class Workspace extends JPanel {
         return title;
     }
     
-    public void setTitle(String title) {
-        this.title = title;
+    public void setTitle(String newTitle) {
+        this.title = newTitle;
         updateTabForWorkspace();
     }
     
@@ -112,8 +112,8 @@ public class Workspace extends JPanel {
         return rootDirectory;
     }
     
-    public void setRootDirectory(String rootDirectory) {
-        this.rootDirectory = FileUtilities.getUserFriendlyName(rootDirectory);
+    public void setRootDirectory(String newRootDirectory) {
+        this.rootDirectory = FileUtilities.getUserFriendlyName(newRootDirectory);
         try {
             this.canonicalRootDirectory = FileUtilities.fileFromString(rootDirectory).getCanonicalPath() + File.separator;
         } catch (IOException ex) {
@@ -388,8 +388,8 @@ public class Workspace extends JPanel {
         }
     }
     
-    public void setInitialFiles(List<Evergreen.InitialFile> initialFiles) {
-        this.initialFiles = initialFiles;
+    public void setInitialFiles(List<Evergreen.InitialFile> newInitialFiles) {
+        this.initialFiles = newInitialFiles;
         updateTabForWorkspace();
     }
     
