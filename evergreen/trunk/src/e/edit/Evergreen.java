@@ -478,11 +478,13 @@ public class Evergreen {
             showAlert("Couldn't remove workspace", "There's no workspace selected.");
             return;
         }
+        if (workspace.getDirtyTextWindows().length > 0) {
+            showAlert("Couldn't remove workspace", "The workspace has unsaved files.<p>Please deal with them and try again.");
+            return;
+        }
+        
         String question = "Do you really want Evergreen to forget the workspace \"" + workspace.getTitle() + "\"?";
         question += " No files will be removed: the workspace's contents will be left on disk.";
-        if (workspace.isEmpty() == false) {
-            question += " Open windows will be moved to the next best workspace.";
-        }
         boolean remove = askQuestion("Remove workspace?", question, "Remove");
         if (remove == false) {
             return;
