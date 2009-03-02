@@ -669,10 +669,6 @@ public class Evergreen {
         }
         
         workspace.setInitialFiles(initialFiles);
-        final File rootDirectory = FileUtilities.fileFromString(workspace.getRootDirectory());
-        if (rootDirectory.exists() == false || rootDirectory.isDirectory() == false) {
-            tabbedPane.setForegroundAt(tabbedPane.indexOfComponent(workspace), Color.RED);
-        }
         return workspace;
     }
     

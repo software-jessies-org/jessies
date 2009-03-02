@@ -33,10 +33,13 @@ public class Workspace extends JPanel {
     
     public Workspace(String title, final String rootDirectory) {
         super(new BorderLayout());
+        
+        initFileList();
+        
         setTitle(title);
-        this.fileList = new WorkspaceFileList(this);
         setRootDirectory(rootDirectory);
-        this.buildTarget = "";
+        setBuildTarget("");
+        
         add(leftColumn, BorderLayout.CENTER);
         leftColumn.addContainerListener(new ContainerListener() {
             public void componentAdded(ContainerEvent e) {
@@ -46,6 +49,15 @@ public class Workspace extends JPanel {
                 componentCountChanged();
             }
             private void componentCountChanged() {
+                updateTabForWorkspace();
+            }
+        });
+    }
+    
+    private void initFileList() {
+        this.fileList = new WorkspaceFileList(this);
+        fileList.addFileListListener(new WorkspaceFileList.Listener() {
+            public void fileListStateChanged(boolean newState) {
                 updateTabForWorkspace();
             }
         });
@@ -76,12 +88,18 @@ public class Workspace extends JPanel {
     private void updateTabForWorkspace() {
         JTabbedPane tabbedPane = (JTabbedPane) SwingUtilities.getAncestorOfClass(JTabbedPane.class, this);
         if (tabbedPane != null) {
+            final File rootDirectory = FileUtilities.fileFromString(getRootDirectory());
+            final boolean rootDirectoryValid = rootDirectory.exists() && rootDirectory.isDirectory();
+            final int openFileCount = leftColumn.getTextWindows().length + getInitialFileCount();
+            
             String title = getTitle();
-            int windowCount = leftColumn.getTextWindows().length + getInitialFileCount();
-            if (windowCount > 0) {
-                title += " (" + windowCount + ")";
+            if (openFileCount > 0) {
+                title += " (" + openFileCount + ")";
             }
-            tabbedPane.setTitleAt(tabbedPane.indexOfComponent(this), title);
+            
+            final int tabIndex = tabbedPane.indexOfComponent(this);
+            tabbedPane.setForegroundAt(tabIndex, rootDirectoryValid ? Color.BLACK : Color.RED);
+            tabbedPane.setTitleAt(tabIndex, title);
         }
     }
     
@@ -102,6 +120,7 @@ public class Workspace extends JPanel {
             Log.warn("Failed to cache canonical root directory for workspace \"" + title + "\" with new root \"" + rootDirectory + "\"", ex);
         }
         fileList.rootDidChange();
+        updateTabForWorkspace();
     }
     
     /**
