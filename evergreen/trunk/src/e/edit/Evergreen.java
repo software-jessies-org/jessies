@@ -454,15 +454,14 @@ public class Evergreen {
         // Remove any empty workspace with the given name.
         if (existingWorkspace != null) {
             tabbedPane.remove(existingWorkspace);
-            // The workspace is empty, therefore there is no need to moveFilesToBestWorkspaces.
-            reorganizeWorkspacesAfterConfigurationChange();
+            workspaceConfigurationDidChange();
             existingWorkspace.dispose();
         }
         
         final Workspace workspace = new Workspace(properties.name, properties.rootDirectory);
         workspace.setBuildTarget(properties.buildTarget);
         addWorkspaceToTabbedPane(workspace);
-        reorganizeWorkspacesAfterConfigurationChange();
+        workspaceConfigurationDidChange();
         return workspace;
     }
     
@@ -473,12 +472,6 @@ public class Evergreen {
             }
         }
         return null;
-    }
-    
-    private void moveFilesToBestWorkspaces() {
-        for (Workspace workspace : getWorkspaces()) {
-            workspace.moveFilesToBestWorkspaces();
-        }
     }
     
     public void removeWorkspace(Workspace workspace) {
@@ -501,25 +494,28 @@ public class Evergreen {
         }
         
         tabbedPane.remove(workspace);
-        workspace.moveFilesToBestWorkspaces();
-        reorganizeWorkspacesAfterConfigurationChange();
+        workspaceConfigurationDidChange();
         workspace.dispose();
     }
     
     /**
-     * Writes out the workspace list on a new thread to avoid disk access on
-     * the event dispatch thread. Any code that adds or removes workspaces
-     * should invoke this method. Annoyingly, JTabbedPane doesn't make such
+     * Writes out the workspace list on a new thread to avoid disk access on the EDT.
+     * Any code that adds, alters, or removes a workspace must invoke this method.
+     * Annoyingly, JTabbedPane (which we use as the workspace container) doesn't make such
      * changes observable, so it's down to us to be careful.
      */
-    public void reorganizeWorkspacesAfterConfigurationChange() {
+    public void workspaceConfigurationDidChange() {
         Thread thread = new Thread(new Runnable() {
             public void run() {
                 rememberState();
             }
         });
         thread.start();
-        moveFilesToBestWorkspaces();
+        
+        // Make sure every file is on the most suitable workspace.
+        for (Workspace workspace : getWorkspaces()) {
+            workspace.moveFilesToBestWorkspaces();
+        }
         
         // Re-sort the tabs.
         final Workspace[] workspaces = getWorkspaces();

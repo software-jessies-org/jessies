@@ -33,7 +33,7 @@ public class EditWorkspaceAction extends AbstractAction {
             workspace.setTitle(properties.name);
             workspace.setRootDirectory(properties.rootDirectory);
             workspace.setBuildTarget(properties.buildTarget);
-            Evergreen.getInstance().reorganizeWorkspacesAfterConfigurationChange();
+            Evergreen.getInstance().workspaceConfigurationDidChange();
         }
     }
 }
