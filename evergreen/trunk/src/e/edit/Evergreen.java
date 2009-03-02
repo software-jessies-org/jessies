@@ -454,7 +454,6 @@ public class Evergreen {
         // Remove any empty workspace with the given name.
         if (existingWorkspace != null) {
             tabbedPane.remove(existingWorkspace);
-            workspaceConfigurationDidChange();
             existingWorkspace.dispose();
         }
         
