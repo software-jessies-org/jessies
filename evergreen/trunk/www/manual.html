@@ -228,6 +228,14 @@
 
 <p>The <tt>--block</tt> option makes the <tt>evergreen</tt> command wait until the user closes the file that was opened. This is useful if you're trying to have a program call on Evergreen to edit a file, for example by setting the EDITOR environment variable. Another command, <tt>edit-and-block</tt> is provided for use with crontab(1), which is too stupid to cope with an editor that takes arguments.
 
+<h3><a name="cli-add-workspace">Adding a Workspace</a></h3>
+
+<p>Use <tt>evergreen --add-workspace <i>root</i> <i>name</i></tt> to add a workspace with the given root directory and name.
+
+<h3><a name="cli-remove-workspace">Removing a Workspace</a></h3>
+
+<p>Use <tt>evergreen --remove-workspace <i>name</i></tt> to remove the workspace with the given name.
+
 <h2><a name="documentation">Documentation</a></h2>
 
 <p>The "Documentation" menu contains links to various bits of useful documentation on the web, that will open in your regular browser.
