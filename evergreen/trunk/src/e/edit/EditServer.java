@@ -15,8 +15,7 @@ public final class EditServer {
     }
     
     public void addWorkspace(PrintWriter out, String line) throws Exception {
-        System.err.println(line);
-        Matcher m = Pattern.compile("^addWorkspace\t(.+)\t(.+)$").matcher(line);
+        Matcher m = Pattern.compile("^addWorkspace (.+)\t(.+)$").matcher(line);
         if (!m.matches()) {
             out.println("Syntax error.");
             return;
@@ -31,6 +30,16 @@ public final class EditServer {
         EventQueue.invokeAndWait(new Runnable() {
             public void run() {
                 editor.createWorkspace(workspaceProperties);
+            }
+        });
+    }
+    
+    public void removeWorkspace(PrintWriter out, String line) throws Exception {
+        final String workspaceName = line.substring("removeWorkspace ".length());
+        
+        EventQueue.invokeAndWait(new Runnable() {
+            public void run() {
+                editor.removeWorkspace(editor.findWorkspaceByName(workspaceName));
             }
         });
     }

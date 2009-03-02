@@ -445,35 +445,34 @@ public class Evergreen {
     }
 
     public Workspace createWorkspace(WorkspaceProperties properties) {
-        boolean noNonEmptyWorkspaceOfThisNameExists = removeWorkspaceByName(properties.name);
-        if (noNonEmptyWorkspaceOfThisNameExists == false) {
+        // Ensure no non-empty workspace with the given name exists.
+        final Workspace existingWorkspace = findWorkspaceByName(properties.name);
+        if (existingWorkspace != null && !existingWorkspace.isEmpty()) {
             showAlert("Couldn't create workspace", "A non-empty workspace with the name \"" + properties.name + "\" already exists.");
             return null;
         }
-        Workspace workspace = new Workspace(properties.name, properties.rootDirectory);
+        // Remove any empty workspace with the given name.
+        if (existingWorkspace != null) {
+            tabbedPane.remove(existingWorkspace);
+            // The workspace is empty, therefore there is no need to moveFilesToBestWorkspaces.
+            reorganizeWorkspacesAfterConfigurationChange();
+            existingWorkspace.dispose();
+        }
+        
+        final Workspace workspace = new Workspace(properties.name, properties.rootDirectory);
         workspace.setBuildTarget(properties.buildTarget);
         addWorkspaceToTabbedPane(workspace);
         reorganizeWorkspacesAfterConfigurationChange();
         return workspace;
     }
     
-    /**
-     * Removes any workspaces with the given name. Returns false if there was a workspace,
-     * but it couldn't be removed because it had open files, true otherwise.
-     */
-    public boolean removeWorkspaceByName(String name) {
+    public Workspace findWorkspaceByName(String name) {
         for (Workspace workspace : getWorkspaces()) {
             if (workspace.getTitle().equals(name)) {
-                if (workspace.isEmpty() == false) {
-                    return false;
-                }
-                tabbedPane.remove(workspace);
-                // The workspace is empty, therefore there is no need to moveFilesToBestWorkspaces.
-                reorganizeWorkspacesAfterConfigurationChange();
-                workspace.dispose();
+                return workspace;
             }
         }
-        return true;
+        return null;
     }
     
     private void moveFilesToBestWorkspaces() {

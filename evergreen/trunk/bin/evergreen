@@ -36,6 +36,13 @@ class Evergreen
             shouldAddWorkspace = true
         end
         
+        shouldRemoveWorkspace = false
+        if ARGV[0] == "--remove-workspace"
+            ARGV.shift()
+            workspace_name = ARGV.shift()
+            shouldRemoveWorkspace = true
+        end
+        
         dot_directory = ENV["EVERGREEN_DOT_DIRECTORY"]
         if dot_directory == nil
             dot_directory = "#{home}/.e.edit.Edit"
@@ -53,7 +60,9 @@ class Evergreen
         client = InAppClient.new(serverPortPathname)
         
         if shouldAddWorkspace
-            exit(client.trySendCommand("addWorkspace\t#{File.expand_path(workspace_root)}\t#{workspace_name}") ? 0 : 1)
+            exit(client.trySendCommand("addWorkspace #{File.expand_path(workspace_root)}\t#{workspace_name}") ? 0 : 1)
+        elsif shouldRemoveWorkspace
+            exit(client.trySendCommand("removeWorkspace #{workspace_name}") ? 0 : 1)
         end
         
         # Translate vi line number specifications.
