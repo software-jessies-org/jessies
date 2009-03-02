@@ -61,7 +61,7 @@ public class FileAlterationMonitor {
     private synchronized void checkFileTimes() {
         for (FileDetails fileDetails : files) {
             long newTime = fileDetails.file.lastModified();
-            if (fileDetails.lastModified < newTime) {
+            if (fileDetails.lastModified != newTime) {
                 fileDetails.lastModified = newTime;
                 fireFileTouched(fileDetails);
             }
