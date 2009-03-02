@@ -60,10 +60,10 @@ class InAppClient
   end
   
   def trySendCommand(command)
-    File.open(@serverPortPathname) { |f| f.read() =~ /^(.+):(\d+)$/ }
+    IO.read(@serverPortPathname) =~ /^(.+):(\d+)$/
     host = @host != nil ? @host : $1
     port = $2.to_i()
-    secret = @secretPathname.open() { |file| file.read() }
+    secret = IO.read(@secretPathname)
     require "net/telnet"
     telnet = Net::Telnet.new("Host" => host, "Port" => port, "Telnetmode" => false)
     telnet.puts(secret)
