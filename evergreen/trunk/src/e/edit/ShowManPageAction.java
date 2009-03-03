@@ -32,7 +32,7 @@ public class ShowManPageAction extends ETextAction {
                         Advisor.getInstance().setDocumentationVisible();
                         Advisor.getInstance().setDocumentationText(content);
                     } else {
-                        Evergreen.getInstance().showAlert("Can't show man page", "No man page called '" + manPageName + "' found.");
+                        Evergreen.getInstance().showAlert("Can't show man page", "No man page called \"" + manPageName + "\" found.");
                     }
                 }
             });
