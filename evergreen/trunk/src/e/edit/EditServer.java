@@ -36,10 +36,15 @@ public final class EditServer {
     
     public void closeWorkspace(PrintWriter out, String line) throws Exception {
         final String workspaceName = line.substring("closeWorkspace ".length());
+        final Workspace workspace = editor.findWorkspaceByName(workspaceName);
+        if (workspace == null) {
+            out.println("There is no workspace called '" + workspaceName + "'.");
+            return;
+        }
         
         EventQueue.invokeAndWait(new Runnable() {
             public void run() {
-                editor.closeWorkspace(editor.findWorkspaceByName(workspaceName));
+                editor.closeWorkspace(workspace);
             }
         });
     }
