@@ -20,7 +20,7 @@ public class EvergreenTabbedPane extends TabbedPane {
         actions.add(new RescanWorkspaceAction(workspace));
         actions.add(null);
         actions.add(new EditWorkspaceAction(workspace));
-        actions.add(new RemoveWorkspaceAction(workspace));
+        actions.add(new CloseWorkspaceAction(workspace));
     }
     
     @Override public String getToolTipTextAt(int index) {
