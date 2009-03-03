@@ -25,16 +25,6 @@ public class ETextField extends JTextField implements DocumentListener {
     
     public ETextField(Document doc, String text, int columns) {
         super(doc, text, columns);
-        addKeyListener(new KeyAdapter() {
-            public void keyReleased(KeyEvent e) {
-                JDialog dialog = (JDialog) SwingUtilities.getAncestorOfClass(JDialog.class, ETextField.this);
-                int keyCode = e.getKeyCode();
-                if (keyCode == KeyEvent.VK_ESCAPE) {
-                    dialog.setVisible(false);
-                    e.consume();
-                }
-            }
-        });
         getDocument().addDocumentListener(this);
     }
     
