@@ -1,6 +1,7 @@
 package e.edit;
 
 import e.gui.*;
+import e.util.*;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.tree.*;
@@ -55,7 +56,7 @@ public class TagsPanel extends JPanel {
     
     public void showError(String error) {
         JLabel label = new JLabel("<html><body>" + error);
-        label.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        label.setBorder(GuiUtilities.createEmptyBorder(4));
         label.setOpaque(true);
         setVisibleComponent(label);
     }
