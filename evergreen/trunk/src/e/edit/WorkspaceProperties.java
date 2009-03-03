@@ -16,16 +16,17 @@ public class WorkspaceProperties {
     
     public boolean showWorkspacePropertiesDialog(String dialogTitle, String buttonTitle) {
         JTextField nameField = new JTextField("", 40);
-        if (name != null) {
-            nameField.setText(name);
-        }
         
         FilenameChooserField filenameChooserField = new FilenameChooserField(JFileChooser.DIRECTORIES_ONLY);
+        // If the caller didn't supply a name, setPathname will set a useful default.
+        filenameChooserField.setCompanionNameField(nameField);
         if (rootDirectory != null) {
             filenameChooserField.setPathname(rootDirectory);
         }
-        // The ordering is important - we don't want filenameChooseField to change nameField when we call setPathname.
-        filenameChooserField.setCompanionNameField(nameField);
+        // If the caller supplied a name, that should trump setPathname.
+        if (name != null) {
+            nameField.setText(name);
+        }
         
         JTextField buildTargetField = new JTextField("", 40);
         if (buildTarget != null) {
