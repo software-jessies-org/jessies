@@ -484,6 +484,9 @@ public class Evergreen {
         }
         
         tabbedPane.remove(workspace);
+        // Now that the workspace has been removed from the tabbedPane which forms the workspace index,
+        // the best workspace for any remaining files will be elsewhere.
+        workspace.moveFilesToBestWorkspaces();
         workspaceConfigurationDidChange();
         workspace.dispose();
     }
