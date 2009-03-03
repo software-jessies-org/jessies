@@ -10,8 +10,12 @@ import javax.swing.*;
 /**
  * Combines a pathname text field with a button that opens a file system browser.
  * This is a common feature in a number of systems, and can be implemented just once.
+ * 
+ * FIXME: auto-completion in the text field would be great. Apple use a timer and the tab key, but we might have other fields in the same dialog.
  */
 public class FilenameChooserField extends JPanel {
+    // FIXME: we could use this to check whether the current pathname is suitable, and maybe turn the text red if not.
+    // FIXME: we would probably also need to know whether the field was for existing files/directories or new ones (and disable the check in the latter case).
     private final int fileChooserMode;
     
     /**
@@ -24,7 +28,9 @@ public class FilenameChooserField extends JPanel {
         }
     };
     
-    /** We're (optionally) given this one, if we're supposed to update another field with the chosen leafname. */
+    // We're (optionally) given this one, if we're supposed to update another field with the chosen leafname.
+    // FIXME: own this ourselves, and offer addActionListener or something to be informed of changes?
+    // FIXME: move the whole "companion" thing out into Evergreen, on the assumption that there will never be another user?
     private JTextField companionNameField;
     
     /**
@@ -42,6 +48,7 @@ public class FilenameChooserField extends JPanel {
     public String getPathname() {
         // Protect Windows users against accidental use of '/', which will probably mostly work, but is likely to lead to confusion.
         // FIXME: what use is the second call to replace?
+        // FIXME: do this rewriting as the user types?
         return pathnameField.getText().replace('/', File.separatorChar).replace('\\', File.separatorChar);
     }
     
