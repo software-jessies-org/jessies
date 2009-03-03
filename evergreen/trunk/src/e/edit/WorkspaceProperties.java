@@ -40,9 +40,7 @@ public class WorkspaceProperties {
         formPanel.addRow("Build Target:", buildTargetField);
         
         while (form.show(buttonTitle)) {
-            String pathname = filenameChooserField.getPathname();
-            // Protect Windows users against accidental use of '/', which will probably mostly work, but is likely to lead to confusion.
-            pathname = pathname.replace('/', File.separatorChar).replace('\\', File.separatorChar);
+            final String pathname = filenameChooserField.getPathname();
             if (checkPathnameIsDirectory(pathname)) {
                 name = nameField.getText();
                 if (name.trim().length() == 0) {
