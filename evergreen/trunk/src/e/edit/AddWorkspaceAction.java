@@ -15,7 +15,7 @@ public class AddWorkspaceAction extends AbstractAction {
     
     public void actionPerformed(ActionEvent e) {
         WorkspaceProperties properties = new WorkspaceProperties();
-        properties.name = "";
+        properties.name = null;
         properties.rootDirectory = null;
         properties.buildTarget = null;
         Workspace workspace = Evergreen.getInstance().getCurrentWorkspace();
@@ -30,9 +30,6 @@ public class AddWorkspaceAction extends AbstractAction {
                     String pathWithinWorkspace = friendlyDirectory.substring(prefixCharsToSkip);
                     // When adding a workspace which overlaps an existing one, choose a name that will sort close to but after the current workspace.
                     properties.name = workspace.getTitle() + " " + pathWithinWorkspace;
-                } else {
-                    // Where the file prompting the workspace addition is from elsewhere, the best name is likely to be just one component but deleting is less work than typing.
-                    properties.name = friendlyDirectory;
                 }
             }
         }
