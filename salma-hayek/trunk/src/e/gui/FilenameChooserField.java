@@ -40,7 +40,9 @@ public class FilenameChooserField extends JPanel {
     }
     
     public String getPathname() {
-        return pathnameField.getText();
+        // Protect Windows users against accidental use of '/', which will probably mostly work, but is likely to lead to confusion.
+        // FIXME: what use is the second call to replace?
+        return pathnameField.getText().replace('/', File.separatorChar).replace('\\', File.separatorChar);
     }
     
     public void setPathname(String pathname) {
