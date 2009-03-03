@@ -25,7 +25,6 @@ public class ETextField extends JTextField implements DocumentListener {
     
     public ETextField(Document doc, String text, int columns) {
         super(doc, text, columns);
-        getCaret().setBlinkRate(0);
         addKeyListener(new KeyAdapter() {
             public void keyReleased(KeyEvent e) {
                 JDialog dialog = (JDialog) SwingUtilities.getAncestorOfClass(JDialog.class, ETextField.this);
@@ -37,7 +36,6 @@ public class ETextField extends JTextField implements DocumentListener {
             }
         });
         getDocument().addDocumentListener(this);
-        setCaretColor(Color.RED);
     }
     
     /** From the DocumentListener interface. Override if you like, but see textChanged. */
