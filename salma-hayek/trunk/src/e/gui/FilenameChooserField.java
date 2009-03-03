@@ -8,10 +8,8 @@ import java.io.*;
 import javax.swing.*;
 
 /**
- * Combines a pathname text field with a button that opens a file system browser. This is a common
- * feature in a number of systems, and can be implemented just once.
- *
- * FIXME: if the companion field gets updated, should we try to update the pathname field?
+ * Combines a pathname text field with a button that opens a file system browser.
+ * This is a common feature in a number of systems, and can be implemented just once.
  */
 public class FilenameChooserField extends JPanel {
     private final int fileChooserMode;
