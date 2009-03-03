@@ -473,13 +473,13 @@ public class Evergreen {
         return null;
     }
     
-    public void removeWorkspace(Workspace workspace) {
+    public void closeWorkspace(Workspace workspace) {
         if (workspace == null) {
-            showAlert("Couldn't remove workspace", "There's no workspace selected.");
+            showAlert("Couldn't close workspace", "There's no workspace selected.");
             return;
         }
         if (workspace.getDirtyTextWindows().length > 0) {
-            showAlert("Couldn't remove workspace", "The workspace has unsaved files.<p>Please deal with them and try again.");
+            showAlert("Couldn't close workspace", "The workspace has unsaved files.<p>Please deal with them and try again.");
             return;
         }
         

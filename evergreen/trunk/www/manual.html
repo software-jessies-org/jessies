@@ -40,7 +40,7 @@
 
 <p>If you need to change a workspace's root, name, or build target at any time, choose "Workspace" > "Edit Workspace..." from the menu. This option is also available by right-clicking on a workspace's tab.
 
-<p>If you no longer need a workspace, select that workspace and choose "Workspace" > "Remove Workspace" from the menu. This option is also available by right-clicking on a workspace's tab. Removing a workspace does not remove the files and directories in that workspace; it simply makes Evergreen forget about them. Everything is still there on disk unless you remove it yourself.
+<p>If you no longer need a workspace, select that workspace and choose "Workspace" > "Close Workspace" from the menu. This option is also available by right-clicking on a workspace's tab. Closing a workspace does not affect the files and directories in that workspace; it simply makes Evergreen forget about them. Everything is still there on disk unless you remove it yourself.
 
 <p>Workspace configuration is stored in Evergreen's dot-directory in your home directory, not under the workspace root itself, so you don't need to worry about telling your version control system to ignore anything.
 
@@ -232,9 +232,9 @@
 
 <p>Use <tt>evergreen --add-workspace <i>root</i> <i>name</i></tt> to add a workspace with the given root directory and name.
 
-<h3><a name="cli-remove-workspace">Removing a Workspace</a></h3>
+<h3><a name="cli-close-workspace">Closing a Workspace</a></h3>
 
-<p>Use <tt>evergreen --remove-workspace <i>name</i></tt> to remove the workspace with the given name.
+<p>Use <tt>evergreen --close-workspace <i>name</i></tt> to close the workspace with the given name.
 
 <h2><a name="documentation">Documentation</a></h2>
 

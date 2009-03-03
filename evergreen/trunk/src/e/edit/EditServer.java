@@ -34,12 +34,12 @@ public final class EditServer {
         });
     }
     
-    public void removeWorkspace(PrintWriter out, String line) throws Exception {
-        final String workspaceName = line.substring("removeWorkspace ".length());
+    public void closeWorkspace(PrintWriter out, String line) throws Exception {
+        final String workspaceName = line.substring("closeWorkspace ".length());
         
         EventQueue.invokeAndWait(new Runnable() {
             public void run() {
-                editor.removeWorkspace(editor.findWorkspaceByName(workspaceName));
+                editor.closeWorkspace(editor.findWorkspaceByName(workspaceName));
             }
         });
     }
