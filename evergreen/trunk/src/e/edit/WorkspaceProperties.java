@@ -16,14 +16,15 @@ public class WorkspaceProperties {
     
     public boolean showWorkspacePropertiesDialog(String dialogTitle, String buttonTitle) {
         JTextField nameField = new JTextField("", 40);
-        if (name != null) {
-            nameField.setText(name);
-        }
         
         FilenameChooserField filenameChooserField = new FilenameChooserField(JFileChooser.DIRECTORIES_ONLY);
         filenameChooserField.setCompanionNameField(nameField);
         if (rootDirectory != null) {
             filenameChooserField.setPathname(rootDirectory);
+        }
+        // filenameChooserField changes nameField when we call setPathname.
+        if (name != null) {
+            nameField.setText(name);
         }
         
         JTextField buildTargetField = new JTextField("", 40);
