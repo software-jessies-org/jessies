@@ -1,6 +1,7 @@
 package e.tools;
 
 import e.gui.*;
+import e.util.*;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
@@ -203,7 +204,7 @@ public class JavaWidgetFactory extends JPanel {
     }
     
     private javax.swing.border.Border makeEmptyBorder() {
-        return BorderFactory.createEmptyBorder(10, 10, 10, 10);
+        return GuiUtilities.createEmptyBorder(GuiUtilities.getComponentSpacing());
     }
     
     private JComponent makeTabbedPanes() {

@@ -1,5 +1,6 @@
 package e.forms;
 
+import e.util.*;
 import java.awt.*;
 import java.util.*;
 import javax.swing.*;
@@ -11,13 +12,10 @@ import javax.swing.text.JTextComponent;
 public class FormPanel extends JPanel {
     private int nextRow = 0;
 
-    private int componentSpacing;
-
     private ArrayList<JTextComponent> textComponents = new ArrayList<JTextComponent>();
     
     public FormPanel() {
         setLayout(new GridBagLayout());
-        componentSpacing = FormDialog.getComponentSpacing();
     }
     
     /**
@@ -40,7 +38,7 @@ public class FormPanel extends JPanel {
         GridBagConstraints labelConstraints = new GridBagConstraints();
         labelConstraints.gridx = 0;
         labelConstraints.gridy = nextRow;
-        labelConstraints.insets = new Insets(componentSpacing, componentSpacing, 0, 0);
+        labelConstraints.insets = new Insets(GuiUtilities.getComponentSpacing(), GuiUtilities.getComponentSpacing(), 0, 0);
         labelConstraints.anchor = (component instanceof JScrollPane) ? GridBagConstraints.NORTHEAST : GridBagConstraints.EAST;
         labelConstraints.fill = GridBagConstraints.NONE;
         add(label, labelConstraints);
@@ -50,7 +48,7 @@ public class FormPanel extends JPanel {
         componentConstraints.gridx = 1;
         componentConstraints.gridy = nextRow;
         componentConstraints.gridwidth = GridBagConstraints.REMAINDER;
-        componentConstraints.insets = new Insets(componentSpacing, componentSpacing, 0, componentSpacing);
+        componentConstraints.insets = new Insets(GuiUtilities.getComponentSpacing(), GuiUtilities.getComponentSpacing(), 0, GuiUtilities.getComponentSpacing());
         componentConstraints.weightx = 1.0;
         if (component instanceof JCheckBox) {
             // FIXME: we should have a better mechanism for component-specific spacing.

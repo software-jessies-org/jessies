@@ -90,7 +90,7 @@ public class FatBits extends MainFrame {
     
     private JPanel makeInfoPanel() {
         JPanel infoPanel = new JPanel(new BorderLayout(8, 0));
-        infoPanel.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        infoPanel.setBorder(GuiUtilities.createEmptyBorder(4));
         infoPanel.add(colorSwatchLabel, BorderLayout.WEST);
         if (GuiUtilities.isGtk()) {
             JButton infoButton = new JButton(preferences.makeShowPreferencesAction());

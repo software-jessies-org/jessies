@@ -5,6 +5,7 @@ import java.awt.event.*;
 import java.awt.image.*;
 import java.lang.reflect.*;
 import javax.swing.*;
+import javax.swing.border.*;
 import javax.swing.event.*;
 
 public class GuiUtilities {
@@ -33,6 +34,8 @@ public class GuiUtilities {
     
     // FIXME: Action.DISPLAYED_MNEMONIC_INDEX_KEY is only available in Java 6.
     private static final String DISPLAYED_MNEMONIC_INDEX_KEY = "SwingDisplayedMnemonicIndexKey";
+    
+    private static final int COMPONENT_SPACING = calculateComponentSpacing();
     
     /**
      * Guesses whether a font is fixed-width by comparing the widths of
@@ -80,6 +83,13 @@ public class GuiUtilities {
      */
     public static boolean isGtk() {
         return UIManager.getLookAndFeel().getClass().getName().contains("GTK");
+    }
+    
+    /**
+     * Returns an EmptyBorder of 'width' pixels on each side.
+     */
+    public static Border createEmptyBorder(int width) {
+        return BorderFactory.createEmptyBorder(width, width, width, width);
     }
     
     public static int getDefaultKeyStrokeModifier() {
@@ -202,6 +212,23 @@ public class GuiUtilities {
             ++min;
         }
         return min;
+    }
+    
+    /**
+     * Returns the amount of spacing between components appropriate for the system.
+     */
+    public static int getComponentSpacing() {
+        return COMPONENT_SPACING;
+    }
+    
+    private static int calculateComponentSpacing() {
+        if (GuiUtilities.isWindows()) {
+            return 4;
+        }
+        if (GuiUtilities.isMacOs()) {
+            return 10;
+        }
+        return 6;
     }
     
     /**
@@ -388,7 +415,7 @@ public class GuiUtilities {
         }
     }
     
-    private static javax.swing.border.Border makeEmptyBorderResource(int top, int left, int bottom, int right) {
+    private static Border makeEmptyBorderResource(int top, int left, int bottom, int right) {
         return new javax.swing.plaf.BorderUIResource.EmptyBorderUIResource(top, left, bottom, right);
     }
     
