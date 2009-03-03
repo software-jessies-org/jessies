@@ -38,7 +38,7 @@ public final class EditServer {
         final String workspaceName = line.substring("closeWorkspace ".length());
         final Workspace workspace = editor.findWorkspaceByName(workspaceName);
         if (workspace == null) {
-            out.println("There is no workspace called '" + workspaceName + "'.");
+            out.println("There is no workspace called \"" + workspaceName + "\".");
             return;
         }
         
@@ -105,6 +105,7 @@ public final class EditServer {
         Opener opener = new Opener(filename, out);
         final EWindow window = opener.open();
         if (shouldBlock) {
+            out.println("Waiting for \"" + filename + "\" to be closed...");
             final CountDownLatch done = new CountDownLatch(1);
             // FIXME: is this really the easiest way to watch for the component being removed from the hierarchy?
             window.addHierarchyListener(new HierarchyListener() {
@@ -119,7 +120,6 @@ public final class EditServer {
             } catch (Exception ex) {
                 out.println(ex.getMessage());
             }
-            out.println("Closed " + filename);
         }
     }
 }
