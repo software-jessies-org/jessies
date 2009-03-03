@@ -37,7 +37,7 @@ public class PTextAreaDemo {
     
     private static void makeTextViewer(String filename) {
         PTextArea textArea = new PTextArea();
-        textArea.setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        textArea.setBorder(GuiUtilities.createEmptyBorder(4));
         textArea.setFont(FIXED_FONT);
         
         final File file = new File(filename);

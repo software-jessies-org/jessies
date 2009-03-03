@@ -1,10 +1,11 @@
 package e.gui;
 
+import e.forms.*;
+import e.util.*;
+import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
-
-import e.util.*;
 
 /**
  * Combines a pathname text field with a button that opens a file system browser. This is a common
@@ -12,7 +13,7 @@ import e.util.*;
  *
  * FIXME: if the companion field gets updated, should we try to update the pathname field?
  */
-public class FilenameChooserField extends JPanel implements ActionListener {
+public class FilenameChooserField extends JPanel {
     private final int fileChooserMode;
     
     /**
@@ -53,29 +54,36 @@ public class FilenameChooserField extends JPanel implements ActionListener {
     }
     
     private void initUI() {
-        setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
-        pathnameField.setMaximumSize(pathnameField.getPreferredSize());
-        add(pathnameField);
-        add(Box.createHorizontalStrut(10));
-        add(makeButton());
+        // Ensure the text field will take up any spare space.
+        final Dimension maxSize = pathnameField.getPreferredSize();
+        maxSize.width = Integer.MAX_VALUE;
+        pathnameField.setMaximumSize(maxSize);
+        
+        setLayout(new BorderLayout(GuiUtilities.getComponentSpacing(), 0));
+        add(pathnameField, BorderLayout.CENTER);
+        add(makeButton(), BorderLayout.EAST);
     }
     
     private JButton makeButton() {
-        final String label = GuiUtilities.isMacOs() ? "Choose..." : "Browse...";
-        final JButton button = new JButton(label);
-        button.addActionListener(this);
+        final JButton button = new JButton(new BrowseAction());
         button.setFocusable(false); // Tabbing over this button in Evergreen's "Add Workspace" dialog is annoying.
         return button;
     }
     
-    public void actionPerformed(ActionEvent e) {
-        JFileChooser chooser = new JFileChooser();
-        chooser.setFileSelectionMode(fileChooserMode);
-        chooser.setCurrentDirectory(FileUtilities.fileFromString(pathnameField.getText()));
+    private class BrowseAction extends AbstractAction {
+        public BrowseAction() {
+            GuiUtilities.configureAction(this, GuiUtilities.isMacOs() ? "Choose..." : "_Browse...", null);
+        }
         
-        int result = chooser.showDialog(null, "Choose");
-        if (result == JFileChooser.APPROVE_OPTION) {
-            pathnameField.setText(FileUtilities.getUserFriendlyName(chooser.getSelectedFile()));
+        public void actionPerformed(ActionEvent e) {
+            JFileChooser chooser = new JFileChooser();
+            chooser.setFileSelectionMode(fileChooserMode);
+            chooser.setCurrentDirectory(FileUtilities.fileFromString(pathnameField.getText()));
+            
+            int result = chooser.showDialog(null, "Choose");
+            if (result == JFileChooser.APPROVE_OPTION) {
+                pathnameField.setText(FileUtilities.getUserFriendlyName(chooser.getSelectedFile()));
+            }
         }
     }
     

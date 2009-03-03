@@ -30,8 +30,6 @@ import javax.swing.text.*;
  * will be preserved.
  */
 public class FormDialog {
-    private static int componentSpacing = getComponentSpacing();
-    
     private ArrayList<JTextComponent> listenedToTextFields;
     
     private DocumentListener documentListener;
@@ -65,16 +63,6 @@ public class FormDialog {
     private boolean doNotSetLocationRelativeToOwner;
     
     private boolean doNotRememberBounds = false;
-    
-    public static int getComponentSpacing() {
-        if (GuiUtilities.isWindows()) {
-            return 4;
-        }
-        if (GuiUtilities.isMacOs()) {
-            return 10;
-        }
-        return 6;
-    }
     
     /**
      * Shows a non-modal dialog with a Close button.
@@ -181,7 +169,7 @@ public class FormDialog {
             centerpiece = makeTabbedPaneForFormPanels(formPanels);
         } else {
             centerpiece = formPanels.get(0);
-            centerpiece.setBorder(BorderFactory.createEmptyBorder(0, 0, componentSpacing, 0));
+            centerpiece.setBorder(BorderFactory.createEmptyBorder(0, 0, GuiUtilities.getComponentSpacing(), 0));
         }
         
         if (formPanels.size() == 1 && extraButton != null && builder.statusBar != null) {
@@ -191,7 +179,7 @@ public class FormDialog {
         }
         
         JPanel internalContentPane = new JPanel(new BorderLayout());
-        internalContentPane.setBorder(BorderFactory.createEmptyBorder(componentSpacing, componentSpacing, componentSpacing, componentSpacing));
+        internalContentPane.setBorder(GuiUtilities.createEmptyBorder(GuiUtilities.getComponentSpacing()));
         internalContentPane.add(centerpiece, BorderLayout.CENTER);
         internalContentPane.add(makeButtonPanel(dialog.getRootPane(), actionLabel, builder.statusBar), BorderLayout.SOUTH);
         
@@ -474,11 +462,11 @@ public class FormDialog {
             panel.add(Box.createGlue());
             panel.add(actionButton);
             if (cancelButton != null) {
-                panel.add(Box.createHorizontalStrut(componentSpacing));
+                panel.add(makeHorizontalSpacingStrut());
                 panel.add(cancelButton);
             }
             if (extraButton != null) {
-                panel.add(Box.createHorizontalStrut(componentSpacing));
+                panel.add(makeHorizontalSpacingStrut());
                 panel.add(extraButton);
             }
         } else {
@@ -492,12 +480,16 @@ public class FormDialog {
             panel.add(Box.createGlue());
             if (cancelButton != null) {
                 panel.add(cancelButton);
-                panel.add(Box.createHorizontalStrut(componentSpacing));
+                panel.add(makeHorizontalSpacingStrut());
             }
             panel.add(actionButton);
         }
         
         return panel;
+    }
+    
+    private Component makeHorizontalSpacingStrut() {
+        return Box.createHorizontalStrut(GuiUtilities.getComponentSpacing());
     }
     
     /**
