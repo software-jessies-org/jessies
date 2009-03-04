@@ -62,6 +62,13 @@ class InAppClient
   def trySendCommand(command)
     IO.read(@serverPortPathname) =~ /^(.+):(\d+)$/
     host = @host != nil ? @host : $1
+    require "socket"
+    # When connected via the BlueArc VPN, this laptop always thinks its name is
+    # lt-tseuchter.terastack.bluearc.com, which no DNS server will resolve.
+    # Fortunately, Java and Ruby agree on the name.
+    if host == Socket::gethostname()
+      host = "localhost"
+    end
     port = $2.to_i()
     secret = IO.read(@secretPathname)
     require "net/telnet"
