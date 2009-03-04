@@ -328,7 +328,7 @@ public class Workspace extends JPanel {
     
     public void moveFilesToBestWorkspaces() {
         for (ETextWindow textWindow : leftColumn.getTextWindows()) {
-            Workspace bestWorkspace = Evergreen.getInstance().getBestWorkspaceForFilename(textWindow.getFilename());
+            Workspace bestWorkspace = Evergreen.getInstance().getBestWorkspaceForFilename(textWindow.getFilename(), this);
             if (bestWorkspace != this) {
                 bestWorkspace.takeWindow(textWindow);
             }

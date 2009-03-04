@@ -318,15 +318,29 @@ public class Evergreen {
         }
         
         // Find which workspace this file is on/should be on, and make it visible.
-        Workspace workspace = getBestWorkspaceForFilename(filename);
-        if (isInitialized()) {
-            tabbedPane.setSelectedComponent(workspace);
+        Workspace workspace = getBestWorkspaceForFilename(filename, null);
+        Workspace[] candidateWorkspaces = new Workspace[] { workspace };
+        if (workspace == null) {
+            candidateWorkspaces = getWorkspaces();
         }
         
-        // If the user already has this file open, we shouldn't open it again.
-        EWindow alreadyOpenWindow = workspace.findIfAlreadyOpen(filename, address);
-        if (alreadyOpenWindow != null) {
-            return alreadyOpenWindow;
+        for (Workspace candidateWorkspace : candidateWorkspaces) {    
+            // If the user already has this file open, we mustn't open it again on  a different workspace.
+            EWindow alreadyOpenWindow = candidateWorkspace.findIfAlreadyOpen(filename, address);
+            if (alreadyOpenWindow != null) {                
+                if (isInitialized()) {
+                    tabbedPane.setSelectedComponent(candidateWorkspace);
+                }
+                return alreadyOpenWindow;
+            }
+        }
+        
+        if (workspace == null) {
+            workspace = (Workspace) tabbedPane.getSelectedComponent();
+        }
+        
+        if (isInitialized()) {
+            tabbedPane.setSelectedComponent(workspace);
         }
         
         // Add an appropriate viewer for the filename to the chosen workspace.
@@ -368,8 +382,7 @@ public class Evergreen {
     }
     
     /** Returns the workspace whose root directory shares the longest common prefix with the given filename. */
-    public Workspace getBestWorkspaceForFilename(String filename) {
-        Workspace bestWorkspace = (Workspace) tabbedPane.getSelectedComponent();
+    public Workspace getBestWorkspaceForFilename(String filename, Workspace bestWorkspace) {
         int bestLength = 0;
         for (Workspace workspace : getWorkspaces()) {
             String workspaceRoot = workspace.getRootDirectory();
