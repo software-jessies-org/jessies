@@ -483,6 +483,22 @@ public class Evergreen {
             return;
         }
         
+        // Removing the workspace from the index stops its windows from being moved to another workspace.
+        tabbedPane.remove(workspace);
+        workspaceConfigurationDidChange();
+        workspace.dispose();
+    }
+    
+    public void mergeWorkspace(Workspace workspace) {
+        if (workspace == null) {
+            showAlert("Couldn't merge workspace", "There's no workspace selected.");
+            return;
+        }
+        if (getWorkspaces().length == 1) {
+            showAlert("Couldn't merge workspace", "The last workspace cannot be merged.");
+            return;
+        }
+        
         tabbedPane.remove(workspace);
         // Now that the workspace has been removed from the tabbedPane which forms the workspace index,
         // the best workspace for any remaining files will be elsewhere.
