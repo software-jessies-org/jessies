@@ -11,7 +11,7 @@ public class SaveAllAction extends AbstractAction {
     
     @Override public boolean isEnabled() {
         for (Workspace workspace : Evergreen.getInstance().getWorkspaces()) {
-            if (workspace.getDirtyTextWindows().length > 0) {
+            if (!workspace.getDirtyTextWindows().isEmpty()) {
                 return true;
             }
         }

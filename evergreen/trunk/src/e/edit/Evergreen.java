@@ -491,7 +491,7 @@ public class Evergreen {
             showAlert("Couldn't close workspace", "There's no workspace selected.");
             return;
         }
-        if (workspace.getDirtyTextWindows().length > 0) {
+        if (!workspace.getDirtyTextWindows().isEmpty()) {
             showAlert("Couldn't close workspace", "The workspace has unsaved files.<p>Please deal with them and try again.");
             return;
         }
@@ -566,11 +566,11 @@ public class Evergreen {
         ArrayList<String> dirtyFileNames = new ArrayList<String>();
         ArrayList<Workspace> dirtyWorkspaces = new ArrayList<Workspace>();
         for (Workspace workspace : getWorkspaces()) {
-            ETextWindow[] dirtyWindows = workspace.getDirtyTextWindows();
+            Collection<ETextWindow> dirtyWindows = workspace.getDirtyTextWindows();
             for (ETextWindow dirtyWindow : dirtyWindows) {
                 dirtyFileNames.add(dirtyWindow.getFilename());
             }
-            if (dirtyWindows.length != 0) {
+            if (!dirtyWindows.isEmpty()) {
                 isSafeToQuit = false;
                 dirtyWorkspaces.add(workspace);
             }
@@ -587,7 +587,7 @@ public class Evergreen {
                 Workspace firstDirtyWorkspace = dirtyWorkspaces.get(0);
                 tabbedPane.setSelectedComponent(firstDirtyWorkspace);
                 // Ensure that at least the first dirty window is maximally visible.
-                ETextWindow firstDirtyWindow = firstDirtyWorkspace.getDirtyTextWindows()[0];
+                ETextWindow firstDirtyWindow = firstDirtyWorkspace.getDirtyTextWindows().iterator().next();
                 firstDirtyWindow.expand();
                 firstDirtyWindow.requestFocusInWindow();
             }

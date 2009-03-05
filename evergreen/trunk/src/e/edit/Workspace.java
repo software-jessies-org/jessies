@@ -151,14 +151,14 @@ public class Workspace extends JPanel {
     }
     
     /** Returns an array of this workspace's dirty text windows. */
-    public ETextWindow[] getDirtyTextWindows() {
+    public Collection<ETextWindow> getDirtyTextWindows() {
         ArrayList<ETextWindow> dirtyTextWindows = new ArrayList<ETextWindow>();
         for (ETextWindow textWindow : leftColumn.getTextWindows()) {
             if (textWindow.isDirty()) {
                 dirtyTextWindows.add(textWindow);
             }
         }
-        return dirtyTextWindows.toArray(new ETextWindow[dirtyTextWindows.size()]);
+        return dirtyTextWindows;
     }
     
     public EWindow findWindowByName(String name) {
@@ -230,8 +230,7 @@ public class Workspace extends JPanel {
      * Returns true if you should continue with your action, false if the user hit 'Cancel'.
      */
     public boolean prepareForAction(String activity, String unsavedDataPrompt) {
-        ETextWindow[] dirtyWindows = getDirtyTextWindows();
-        if (dirtyWindows.length > 0) {
+        if (!getDirtyTextWindows().isEmpty()) {
             String choice = Evergreen.getInstance().askQuestion(activity, unsavedDataPrompt, "Save All", "Don't Save");
             if (choice.equals("Cancel")) {
                 return false;
