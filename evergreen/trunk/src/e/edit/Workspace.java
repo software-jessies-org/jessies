@@ -90,7 +90,7 @@ public class Workspace extends JPanel {
         if (tabbedPane != null) {
             final File rootDirectory = FileUtilities.fileFromString(getRootDirectory());
             final boolean rootDirectoryValid = rootDirectory.exists() && rootDirectory.isDirectory();
-            final int openFileCount = leftColumn.getTextWindows().length + getInitialFileCount();
+            final int openFileCount = leftColumn.getTextWindows().size() + getInitialFileCount();
             
             String title = getTitle();
             if (openFileCount > 0) {
@@ -143,18 +143,17 @@ public class Workspace extends JPanel {
     
     /** Tests whether this workspace is empty. A workspace is still considered empty if all it contains is an errors window. */
     public boolean isEmpty() {
-        return leftColumn.getTextWindows().length == 0;
+        return leftColumn.getTextWindows().isEmpty();
     }
     
-    public ETextWindow[] getTextWindows() {
+    public Collection<ETextWindow> getTextWindows() {
         return leftColumn.getTextWindows();
     }
     
     /** Returns an array of this workspace's dirty text windows. */
     public ETextWindow[] getDirtyTextWindows() {
         ArrayList<ETextWindow> dirtyTextWindows = new ArrayList<ETextWindow>();
-        ETextWindow[] textWindows = leftColumn.getTextWindows();
-        for (ETextWindow textWindow : textWindows) {
+        for (ETextWindow textWindow : leftColumn.getTextWindows()) {
             if (textWindow.isDirty()) {
                 dirtyTextWindows.add(textWindow);
             }

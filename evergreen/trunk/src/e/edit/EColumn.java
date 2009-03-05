@@ -42,14 +42,14 @@ public class EColumn extends JPanel {
         window.requestFocus();
     }
     
-    public ETextWindow[] getTextWindows() {
+    public Collection<ETextWindow> getTextWindows() {
         ArrayList<ETextWindow> result = new ArrayList<ETextWindow>();
         for (Component c : getComponents()) {
             if (c instanceof ETextWindow) {
                 result.add((ETextWindow) c);
             }
         }
-        return result.toArray(new ETextWindow[result.size()]);
+        return result;
     }
     
     public EWindow findWindowByName(String name) {
