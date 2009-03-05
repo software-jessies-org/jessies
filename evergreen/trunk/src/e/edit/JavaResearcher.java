@@ -126,7 +126,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     
     private class ClassDoc {
         private String className;
-        private Class<?>[] classes;
+        private Collection<Class<?>> classes;
         
         private ClassDoc(String className) {
             this.className = className;
@@ -146,7 +146,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         }
         
         private String getSummary(boolean listClasses, boolean listConstructors, boolean listMembers) {
-            if (classes.length == 0) {
+            if (classes.isEmpty()) {
                 return "";
             }
             StringBuilder result = new StringBuilder();
