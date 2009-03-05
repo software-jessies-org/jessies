@@ -38,7 +38,7 @@ public class TagReader {
     
     private String chooseCtagsBinary() {
         // We don't cache this to give the user a chance to fix things while we're running.
-        for (String candidateCtags : new String[] { "ctags-exuberant", "exuberant-ctags", "ectags" }) {
+        for (String candidateCtags : Arrays.asList("ctags-exuberant", "exuberant-ctags", "ectags")) {
             if (FileUtilities.findOnPath(candidateCtags) != null) {
                 return candidateCtags;
             }
