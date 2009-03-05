@@ -4,6 +4,7 @@ import e.ptextarea.FileType;
 import e.util.*;
 import java.awt.event.*;
 import java.lang.reflect.*;
+import java.util.*;
 import java.util.regex.*;
 
 /**
@@ -66,13 +67,13 @@ public class InsertInterfaceAction extends ETextAction {
             return;
         }
         
-        Class<?>[] classes = JavaDoc.getClasses(className);
-        if (classes.length != 1) {
-            Evergreen.getInstance().showAlert("Couldn't insert interface", "The class name \"" + className + "\" must be unique, but matches " + classes.length + " classes.");
+        Collection<Class<?>> classes = JavaDoc.getClasses(className);
+        if (classes.size() != 1) {
+            Evergreen.getInstance().showAlert("Couldn't insert interface", "The class name \"" + className + "\" must be unique, but matches " + classes.size() + " classes.");
             return;
         }
         
-        String source = prefix + sourceCodeForClass(classes[0]);
+        String source = prefix + sourceCodeForClass(classes.iterator().next());
         getFocusedTextArea().pasteAndReIndent(source);
     }
     

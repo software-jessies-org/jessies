@@ -272,17 +272,9 @@ public class JavaDoc {
     }
     
     /**
-    * Returns a short text summary of the package and the names
-    * of all classes in it.
-    */
-    public static String[] getPackageInfo(String pkgName) {
-        return new String[] { getDocLink("package-summary", pkgName, true) };
-    }
-    
-    /**
     * Returns all classes whose name matches the supplied string.
     */
-    public static Class<?>[] getClasses(String className) {
+    public static Collection<Class<?>> getClasses(String className) {
         ArrayList<Class<?>> classes = new ArrayList<Class<?>>();
         for (String packageName : packageNames) {
             String soughtClass = packageName + ((packageName.length() > 0) ? "." : "") + className;
@@ -305,7 +297,7 @@ public class JavaDoc {
                 ex = ex;
             }
         }
-        return classes.toArray(new Class<?>[classes.size()]);
+        return classes;
     }
 
     /** Prevents instantiation. */
