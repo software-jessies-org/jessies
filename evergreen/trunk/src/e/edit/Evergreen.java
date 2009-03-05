@@ -319,10 +319,7 @@ public class Evergreen {
         
         // Find which workspace this file is on/should be on, and make it visible.
         Workspace workspace = getBestWorkspaceForFilename(filename, null);
-        Workspace[] candidateWorkspaces = new Workspace[] { workspace };
-        if (workspace == null) {
-            candidateWorkspaces = getWorkspaces();
-        }
+        Collection<Workspace> candidateWorkspaces = (workspace != null) ? Arrays.asList(workspace) : getWorkspaces();
         
         for (Workspace candidateWorkspace : candidateWorkspaces) {    
             // If the user already has this file open, we mustn't open it again on  a different workspace.
@@ -348,10 +345,10 @@ public class Evergreen {
     }
     
     /** Returns an array of all the workspaces. */
-    public Workspace[] getWorkspaces() {
-        Workspace[] result = new Workspace[tabbedPane != null ? tabbedPane.getTabCount() : 0];
-        for (int i = 0; i < result.length; ++i) {
-            result[i] = (Workspace) tabbedPane.getComponentAt(i);
+    public Collection<Workspace> getWorkspaces() {
+        ArrayList<Workspace> result = new ArrayList<Workspace>();
+        for (int i = 0; i < tabbedPane.getTabCount(); ++i) {
+            result.add((Workspace) tabbedPane.getComponentAt(i));
         }
         return result;
     }
@@ -507,7 +504,7 @@ public class Evergreen {
             showAlert("Couldn't merge workspace", "There's no workspace selected.");
             return;
         }
-        if (getWorkspaces().length == 1) {
+        if (getWorkspaces().size() == 1) {
             showAlert("Couldn't merge workspace", "The last workspace cannot be merged.");
             return;
         }
@@ -540,10 +537,11 @@ public class Evergreen {
         }
         
         // Re-sort the tabs.
-        final Workspace[] workspaces = getWorkspaces();
-        for (int i = 0; i < workspaces.length; ++i) {
-            final int newIndex = chooseIndexInTabbedPane(tabbedPane, workspaces[i].getTitle());
+        int i = 0;
+        for (Workspace workspace : getWorkspaces()) {
+            final int newIndex = chooseIndexInTabbedPane(tabbedPane, workspace.getTitle());
             tabbedPane.moveTab(i, newIndex);
+            ++i;
         }
     }
     
