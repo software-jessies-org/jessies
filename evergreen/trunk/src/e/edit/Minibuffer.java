@@ -1,10 +1,11 @@
 package e.edit;
 
+import e.gui.*;
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import e.util.*;
 
 public class Minibuffer extends JPanel implements FocusListener {
     private MinibufferUser minibufferUser;
@@ -63,17 +64,8 @@ public class Minibuffer extends JPanel implements FocusListener {
     }
     
     private void addListeners() {
-        textField.getDocument().addDocumentListener(new DocumentListener() {
-            public void changedUpdate(DocumentEvent e) {
-                /* Doesn't happen, because we're not a StyledDocument. */
-            }
-            public void insertUpdate(DocumentEvent e) {
-                textChanged();
-            }
-            public void removeUpdate(DocumentEvent e) {
-                textChanged();
-            }
-            public void textChanged() {
+        textField.getDocument().addDocumentListener(new DocumentAdapter() {
+            public void documentChanged() {
                 typingTimer.restart();
             }
         });
