@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import javax.swing.*;
+import javax.swing.text.*;
 
 /**
  * Combines a pathname text field with a button that opens a file system browser.
@@ -46,10 +47,7 @@ public class FilenameChooserField extends JPanel {
     }
     
     public String getPathname() {
-        // Protect Windows users against accidental use of '/', which will probably mostly work, but is likely to lead to confusion.
-        // FIXME: what use is the second call to replace?
-        // FIXME: do this rewriting as the user types?
-        return pathnameField.getText().replace('/', File.separatorChar).replace('\\', File.separatorChar);
+        return pathnameField.getText();
     }
     
     public void setPathname(String pathname) {
@@ -61,6 +59,8 @@ public class FilenameChooserField extends JPanel {
     }
     
     private void initUI() {
+        pathnameField.setDocument(new FilenameDocument());
+        
         // Ensure the text field will take up any spare space.
         final Dimension maxSize = pathnameField.getPreferredSize();
         maxSize.width = Integer.MAX_VALUE;
@@ -101,5 +101,16 @@ public class FilenameChooserField extends JPanel {
         
         final File file = FileUtilities.fileFromString(pathnameField.getText());
         companionNameField.setText(file.getName());
+    }
+    
+    // Protect Windows users against accidental use of '/', which may work, but is likely to lead to confusion.
+    // Likewise, protect Unix users who might accidentally use the Windows separator, unlikely though that is.
+    private static class FilenameDocument extends PlainDocument {
+        @Override public void insertString(int offset, String s, AttributeSet attributes) throws BadLocationException {
+            if (s != null) {
+                s = s.replace('/', File.separatorChar).replace('\\', File.separatorChar);
+            }
+            super.insertString(offset, s, attributes);
+        }
     }
 }
