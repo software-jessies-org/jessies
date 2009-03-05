@@ -526,12 +526,12 @@ public abstract class Preferences {
         }
         
         public void addRow(List<FormPanel> formPanels, final String key, final String description) {
-            final ETextField textField = new ETextField(preferences.get(key).toString()) {
-                @Override
-                public void textChanged() {
+            final JTextField textField = new JTextField(preferences.get(key).toString());
+            textField.getDocument().addDocumentListener(new DocumentAdapter() {
+                public void documentChanged() {
                     boolean okay = false;
                     try {
-                        int newValue = Integer.parseInt(getText());
+                        int newValue = Integer.parseInt(textField.getText());
                         // FIXME: really, an integer preference should have an explicit range.
                         if (newValue > 0) {
                             put(key, newValue);
@@ -539,9 +539,9 @@ public abstract class Preferences {
                         }
                     } catch (NumberFormatException ex) {
                     }
-                    setForeground(okay ? UIManager.getColor("TextField.foreground") : Color.RED);
+                    textField.setForeground(okay ? UIManager.getColor("TextField.foreground") : Color.RED);
                 }
-            };
+            });
             formPanels.get(0).addRow(description + ":", textField);
         }
     }
@@ -556,12 +556,12 @@ public abstract class Preferences {
         }
         
         public void addRow(List<FormPanel> formPanels, final String key, final String description) {
-            final ETextField textField = new ETextField(preferences.get(key).toString(), 20) {
-                @Override
-                public void textChanged() {
-                    put(key, getText());
+            final JTextField textField = new JTextField(preferences.get(key).toString(), 20);
+            textField.getDocument().addDocumentListener(new DocumentAdapter() {
+                public void documentChanged() {
+                    put(key, textField.getText());
                 }
-            };
+            });
             textField.setCaretPosition(0);
             formPanels.get(0).addRow(description + ":", textField);
         }
