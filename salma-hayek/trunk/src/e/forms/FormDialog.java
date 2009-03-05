@@ -265,20 +265,8 @@ public class FormDialog {
      * Restarts our timer whenever the user types.
      */
     private void initDocumentListener() {
-        this.documentListener = new DocumentListener() {
-            public void changedUpdate(DocumentEvent e) {
-                textChanged();
-            }
-            
-            public void insertUpdate(DocumentEvent e) {
-                textChanged();
-            }
-            
-            public void removeUpdate(DocumentEvent e) {
-                textChanged();
-            }
-            
-            private void textChanged() {
+        this.documentListener = new DocumentAdapter() {
+            public void documentChanged() {
                 textChangeTimer.restart();
                 isListenerUpToDate = false;
             }
