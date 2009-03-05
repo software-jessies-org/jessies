@@ -12,28 +12,26 @@ import terminator.view.*;
 public class InfoDialog {
     private static final InfoDialog INSTANCE = new InfoDialog();
     
-    private ETextField title;
-    private ETextField dimensions;
-    private ETextField processes;
-    private ETextField logFilename;
-    private ETextField ptyFilename;
+    private JTextField title;
+    private JTextField dimensions;
+    private JTextField processes;
+    private JTextField logFilename;
+    private JTextField ptyFilename;
     private JCheckBox suspendLogging;
     private JTerminalPane terminal;
     
     private InfoDialog() {
-        this.title = new TitleField();
+        this.title = new JTextField();
+        title.getDocument().addDocumentListener(new DocumentAdapter() {
+            public void documentChanged() {
+                terminal.setName(title.getText());
+            }
+        });
         this.dimensions = new UneditableTextField();
         this.processes = new UneditableTextField();
         this.logFilename = new UneditableTextField();
         this.ptyFilename = new UneditableTextField();
         this.suspendLogging = makeSuspendLoggingCheckBox();
-    }
-    
-    private class TitleField extends ETextField {
-        @Override
-        public void textChanged() {
-            terminal.setName(title.getText());
-        }
     }
     
     private JCheckBox makeSuspendLoggingCheckBox() {
