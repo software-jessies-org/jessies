@@ -8,6 +8,7 @@ public class ESwitchButton extends EButton implements ActionListener {
     
     public ESwitchButton(ETextWindow window) {
         this.window = window;
+        setToolTipText("Switch to \"" + window.getCounterpartFilename() + "\"");
     }
 
     public void paintComponent(Graphics g) {
