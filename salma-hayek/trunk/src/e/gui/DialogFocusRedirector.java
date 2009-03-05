@@ -23,7 +23,7 @@ public class DialogFocusRedirector {
     }
     
     public boolean isWorthGivingFocusTo(Component c) {
-        return (c instanceof ETextField || c instanceof JTextField);
+        return (c instanceof JTextField);
     }
     
     private boolean giveFocusToFirstTextComponent() {

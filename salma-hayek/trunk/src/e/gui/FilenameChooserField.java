@@ -23,11 +23,7 @@ public class FilenameChooserField extends JPanel {
      * We create a field to hold the user's chosen pathname.
      * Changes to this cause real-time updates to the companion field.
      */
-    private ETextField pathnameField = new ETextField("", 40) {
-        @Override public void textChanged() {
-            updateCompanionNameField();
-        }
-    };
+    private final JTextField pathnameField = new JTextField("", 40);
     
     // We're (optionally) given this one, if we're supposed to update another field with the chosen leafname.
     // FIXME: own this ourselves, and offer addActionListener or something to be informed of changes?
@@ -60,6 +56,11 @@ public class FilenameChooserField extends JPanel {
     
     private void initUI() {
         pathnameField.setDocument(new FilenameDocument());
+        pathnameField.getDocument().addDocumentListener(new DocumentAdapter() {
+            public void documentChanged() {
+                updateCompanionNameField();
+            }
+        });
         
         // Ensure the text field will take up any spare space.
         final Dimension maxSize = pathnameField.getPreferredSize();

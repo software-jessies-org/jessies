@@ -9,7 +9,7 @@ import javax.swing.border.*;
  * Win32 used these heavily to show information that couldn't be edited while making it easy to copy the information.
  * A good idea that sadly didn't really catch on with the other platforms.
  */
-public class UneditableTextField extends ETextField {
+public class UneditableTextField extends JTextField {
     public UneditableTextField() {
         this("");
     }
