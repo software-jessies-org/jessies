@@ -6,7 +6,7 @@ UI
 
 + Keyboard equivalent for "File Properties" (other than alt f p on Linux/Windows, which is probably good enough).
 
-+ Sort windows alphabetically?
++ Add a menu item to sort a column's windows alphabetically. Would need a keyboard equivalent to see any use, I think.
 
 + Make it possible to reorder windows, maybe with some kind of draggable widget at the left-hand edge.
 
