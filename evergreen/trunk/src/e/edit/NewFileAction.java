@@ -22,7 +22,9 @@ public class NewFileAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         ETextWindow window = ETextAction.getFocusedTextWindow();
         if (window != null) {
-            filenameField.setPathname(window.getContext());
+            final String filename = window.getFilename();
+            filenameField.setPathname(filename);
+            filenameField.getPathnameField().select(window.getContext().length(), filename.length());
         } else {
             filenameField.setPathname(Evergreen.getInstance().getCurrentWorkspace().getRootDirectory());
         }
