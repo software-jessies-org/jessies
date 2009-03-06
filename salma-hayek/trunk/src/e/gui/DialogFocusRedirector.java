@@ -35,7 +35,12 @@ public class DialogFocusRedirector {
         for (Component component : components) {
             if (isWorthGivingFocusTo(component)) {
                 component.requestFocus();
-                ((JTextField) component).selectAll();
+                // If there's no selection, select all so the user can conveniently replace everything.
+                // If there is a selection, assume that's because the dialog's creator has done something clever.
+                JTextField textField = (JTextField) component;
+                if (textField.getSelectionStart() == textField.getSelectionEnd()) {
+                    textField.selectAll();
+                }
                 return true;
             } else if (component instanceof Container) {
                 Component[] newComponents = ((Container) component).getComponents();

@@ -42,6 +42,10 @@ public class FilenameChooserField extends JPanel {
         initUI();
     }
     
+    public JTextField getPathnameField() {
+        return pathnameField;
+    }
+    
     public String getPathname() {
         return pathnameField.getText();
     }
