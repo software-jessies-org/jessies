@@ -97,6 +97,30 @@ public class GuiUtilities {
     }
     
     /**
+     * Translates a KeyStroke into the string that would be used in the UI to describe the keystroke.
+     * Menu items do this for you, but for tool tips you're on your own.
+     */
+    public static String keyStrokeToString(KeyStroke keyStroke) {
+        final StringBuilder result = new StringBuilder();
+        final int modifiers = keyStroke.getModifiers();
+        if (modifiers != 0) {
+            // This uses the appropriate glyphs on Mac OS 10.5 but says things like "meta" on earlier versions.
+            // We could work around that, but 10.6 will be along soon.
+            result.append(KeyEvent.getKeyModifiersText(modifiers));
+            if (!GuiUtilities.isMacOs()) {
+                result.append("+"); // FIXME: this is right for GTK+, but does Windows use "+" or " " here?
+            }
+        }
+        final int keyCode = keyStroke.getKeyCode();
+        if (keyCode != 0) {
+            result.append(KeyEvent.getKeyText(keyCode));
+        } else {
+            result.append(keyStroke.getKeyChar());
+        }
+        return result.toString();
+    }
+    
+    /**
      * Returns a KeyStroke suitable for passing to putValue(Action.ACCELERATOR_KEY) to set up a keyboard equivalent for an Action.
      * Assumes that you want the platform's default modifier for keyboard equivalents (but see also setDefaultKeyStrokeModifier).
      */
