@@ -108,7 +108,8 @@ public class GuiUtilities {
             // We could work around that, but 10.6 will be along soon.
             result.append(KeyEvent.getKeyModifiersText(modifiers));
             if (!GuiUtilities.isMacOs()) {
-                result.append("+"); // FIXME: this is right for GTK+, but does Windows use "+" or " " here?
+                // GTK and Windows both insert a '+' between the modifiers and the key itself.
+                result.append("+");
             }
         }
         final int keyCode = keyStroke.getKeyCode();
