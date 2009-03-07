@@ -5,6 +5,7 @@ import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.util.*;
 import javax.swing.*;
 import javax.swing.text.*;
 
@@ -66,6 +67,12 @@ public class FilenameChooserField extends JPanel {
             }
         });
         
+        // Enable auto-completion.
+        // FIXME: hijack tab, and bind control-tab to cycle focus forward?
+        final String actionName = "org.jessies.FilenameChooserField.autoComplete";
+        pathnameField.getActionMap().put(actionName, new AutoCompleteAction());
+        pathnameField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_MASK), actionName);
+        
         // Ensure the text field will take up any spare space.
         final Dimension maxSize = pathnameField.getPreferredSize();
         maxSize.width = Integer.MAX_VALUE;
@@ -80,6 +87,63 @@ public class FilenameChooserField extends JPanel {
         final JButton button = new JButton(new BrowseAction());
         button.setFocusable(false); // Tabbing over this button in Evergreen's "Add Workspace" dialog is annoying.
         return button;
+    }
+    
+    private class AutoCompleteAction extends AbstractAction {
+        public void actionPerformed(ActionEvent e) {
+            // Find what the user's entered, and break it into its known and to-be-completed parts.
+            final String currentText = getPathname();
+            final String directoryName = currentText.substring(0, currentText.lastIndexOf(File.separatorChar));
+            final String expectedCompletionPrefix = currentText.substring(currentText.lastIndexOf(File.separatorChar) + 1);
+            
+            //System.err.println("directoryName '" + directoryName + "'");
+            //System.err.println("expectedCompletionPrefix '" + expectedCompletionPrefix + "'");
+            
+            // If the directory doesn't exist, or isn't a directory, give up.
+            final File directory = FileUtilities.fileFromString(directoryName);
+            if (!directory.exists() || !directory.isDirectory()) {
+                return;
+            }
+            
+            // Collect the directory's children that start with the expected prefix, and aren't Unix hidden files.
+            final String[] children = directory.list();
+            final TreeSet<String> candidates = new TreeSet<String>();
+            for (String child : children) {
+                if (child.startsWith(expectedCompletionPrefix) && !child.startsWith(".")) {
+                    candidates.add(child);
+                }
+            }
+            
+            //for (String candidate : candidates) System.err.println(" -> '" + candidate + "'");
+            
+            if (candidates.isEmpty()) {
+                return;
+            }
+            
+            // If there's only one possibility, fill it in, adding a file separator if it was a directory.
+            if (candidates.size() == 1) {
+                String replacement = directoryName + File.separatorChar + candidates.first();
+                if (FileUtilities.fileFromString(replacement).isDirectory()) {
+                    replacement += File.separatorChar;
+                }
+                pathnameField.setText(replacement);
+            }
+            
+            // There are multiple possibilities, so fill in the common prefix if there is one.
+            final Iterator<String> it = candidates.iterator();
+            String commonPrefix = it.next();
+            while (it.hasNext() && commonPrefix.length() > 0) {
+                commonPrefix = commonPrefix.substring(0, StringUtilities.lengthOfCommonPrefix(commonPrefix, it.next()));
+            }
+            if (commonPrefix.length() > 0) {
+                pathnameField.setText(directoryName + File.separatorChar + commonPrefix);
+            }
+            
+            // FIXME: Apple's implementation also appends the rest of the first candidate, but selects it for easy overwriting.
+            // FIXME: successive auto-completion attempts then cycle through the other candidates.
+            
+            // FIXME: an alternative would be to pull the JWindow/JComboBox code out of Evergreen's (unrelated) AutoCompleteAction.
+        }
     }
     
     private class BrowseAction extends AbstractAction {
