@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -8,7 +9,9 @@ public class ESwitchButton extends EButton implements ActionListener {
     
     public ESwitchButton(ETextWindow window) {
         this.window = window;
-        setToolTipText("Switch to \"" + window.getCounterpartFilename() + "\"");
+        
+        final String keyboardEquivalent = GuiUtilities.keyStrokeToString(ShowCounterpartAction.KEYSTROKE);
+        setToolTipText("Switch to \"" + window.getCounterpartFilename() + "\" (" + keyboardEquivalent + ")");
     }
 
     public void paintComponent(Graphics g) {
