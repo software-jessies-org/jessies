@@ -20,7 +20,6 @@ public class EvergreenTabbedPane extends TabbedPane {
         actions.add(new RescanWorkspaceAction(workspace));
         actions.add(null);
         actions.add(new EditWorkspaceAction(workspace));
-        actions.add(new MergeWorkspaceAction(workspace));
         actions.add(new CloseWorkspaceAction(workspace));
     }
     
