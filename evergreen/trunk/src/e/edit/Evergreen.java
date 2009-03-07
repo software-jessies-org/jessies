@@ -495,23 +495,11 @@ public class Evergreen {
         
         // Removing the workspace from the index stops its windows from being moved to another workspace.
         tabbedPane.remove(workspace);
-        workspaceConfigurationDidChange();
-        workspace.dispose();
-    }
-    
-    public void mergeWorkspace(Workspace workspace) {
-        if (workspace == null) {
-            showAlert("Couldn't merge workspace", "There's no workspace selected.");
-            return;
-        }
-        if (getWorkspaces().size() == 1) {
-            showAlert("Couldn't merge workspace", "The last workspace cannot be merged.");
-            return;
-        }
-        
-        tabbedPane.remove(workspace);
-        // Now that the workspace has been removed from the tabbedPane which forms the workspace index,
-        // the best workspace for any remaining files will be elsewhere.
+        // Stealthily support merging of nested workspaces back into their parent.
+        // Now that the workspace has been removed from the tabbedPane,
+        // which forms the collection of workspaces, the best workspace for any files
+        // that were beneath its root directory will be the parent workspace, if there is one.
+        // Files belonging to no indexed workspace will remain where they are and so will be closed.
         workspace.moveFilesToBestWorkspaces();
         workspaceConfigurationDidChange();
         workspace.dispose();
