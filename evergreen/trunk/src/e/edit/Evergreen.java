@@ -501,6 +501,12 @@ public class Evergreen {
         // that were beneath its root directory will be the parent workspace, if there is one.
         // Files belonging to no indexed workspace will remain where they are and so will be closed.
         workspace.moveFilesToBestWorkspaces();
+        // After collapsing a nested workspace back into its parent,
+        // the parent is usually where you want to be.
+        Workspace parent = getBestWorkspaceForFilename(workspace.getRootDirectory(), null);
+        if (parent != null) {
+            tabbedPane.setSelectedComponent(parent);
+        }
         workspaceConfigurationDidChange();
         workspace.dispose();
     }
