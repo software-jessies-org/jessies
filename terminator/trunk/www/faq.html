@@ -133,6 +133,9 @@ defaulting to 'ansi'
 
 <p>For best results, on computers where you'll be logged in as root at times, we recommend you install the terminfo file for Terminator in <tt>/usr/share/terminfo</tt>. The easiest way to do this is to simply run Terminator once as root. From then on, you can run Terminator as your normal user, and use <tt>su(1)</tt> to become root.
 
+If you find nothing in <tt>/usr/share/terminfo</tt> already, then perhaps your system uses a different root directory.
+<tt>man infocmp</tt> should tell you.
+
 <h3>Terminfo problems when using SSH</h3>
 <p>You will also need to ensure that any machines you'll be remotely logging in to also have a copy of the terminfo file installed. If you use the same home directory on the local and remote machines, everything will just work. Likewise if someone has already run Terminator as root on the remote machine.
 
@@ -182,6 +185,9 @@ export TERMCAP=~/.termcap
 default.  It's apparently a snap to install the
 <a href="http://www.freebsd.org/cgi/url.cgi?ports/devel/ncurses/pkg-descr">devel/ncurses</a>
 package from the <a href="http://www.freebsd.org/ports/">FreeBSD Ports and Packages Collection</a>.
+
+<h3>Terminfo problems specific to AIX</h3>
+<p>We believe <tt>/usr/share/lib/terminfo</tt> to be the appropriate directory.
 
 <!-- ---------------------------------------------------- -->
 
