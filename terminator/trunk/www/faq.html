@@ -188,8 +188,7 @@ package from the <a href="http://www.freebsd.org/ports/">FreeBSD Ports and Packa
 
 <h3>Terminfo problems specific to AIX</h3>
 <p>We believe <tt>/usr/share/lib/terminfo</tt> to be the appropriate directory.
-telnetd might change <tt>$TERM</tt> to TERMINATOR.
-A workaround is to <tt>sudo ln -s /usr/share/lib/terminfo/t/terminator /usr/share/lib/terminfo/t/TERMINATOR</tt>.
+When the terminfo file is missing, telnetd sets <tt>$TERM</tt> to <tt>TERMINATOR</tt> (when it should be <tt>terminator</tt>).
 
 <!-- ---------------------------------------------------- -->
 
