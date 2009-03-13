@@ -14,6 +14,10 @@ public class JoinLinesAction extends ETextAction {
     
     public void actionPerformed(ActionEvent e) {
         PTextArea textArea = getFocusedTextArea();
+        if (textArea == null) {
+            return;
+        }
+        
         PTextBuffer buffer = textArea.getTextBuffer();
         // FIXME: would it be useful to join all the lines in the selection, if there is one?
         int startIndex = textArea.getSelectionStart();
