@@ -33,6 +33,7 @@ public class JHyperlinkButton extends JPanel implements ActionListener {
             }
         }
         button.addActionListener(this);
+        button.setFocusable(false);
         add(button);
     }
     
