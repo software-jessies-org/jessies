@@ -31,6 +31,9 @@ public class RescanWorkspaceAction extends AbstractAction {
     
     public static JButton makeRescanButton(Workspace workspace) {
         // Use a shorter name for buttons than menus...
-        return new JButton(new RescanWorkspaceAction("_Rescan", workspace));
+        final JButton button = new JButton(new RescanWorkspaceAction("_Rescan", workspace));
+        // This is going to be added to a form (with setExtraButton), and it's annoying if the button steals the focus.
+        button.setFocusable(false);
+        return button;
     }
 }
