@@ -9,7 +9,7 @@ DEB_DIRECTORY=/u/u154/software.jessies.org/
 # sudo ln -s $DEB_DIRECTORY /var/www/software.jessies.org
 
 mkdir -p $DEB_DIRECTORY
-cd $DEB_DIRECTORY
+cd $DEB_DIRECTORY || exit 1
 # Remove any .debs with obsolete names.
 rm *.deb
 
