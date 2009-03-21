@@ -36,7 +36,7 @@ public class EErrorsWindow extends JFrame {
      */
     private static final Pattern JAVA_STACK_TRACE_PATTERN = Pattern.compile("([\\.\\w]+)(?:(?:\\$\\w+)*?\\.)[\\w\\$<>]+\\(\\w+\\.java(:\\d+)");
     
-    private static final KillErrorsAction KILL_ERRORS_ACTION = new KillErrorsAction();
+    private static final ClearErrorsAction CLEAR_ERRORS_ACTION = new ClearErrorsAction();
     
     private final Workspace workspace;
     private JButton killButton;
@@ -79,10 +79,10 @@ public class EErrorsWindow extends JFrame {
     }
     
     private void initKeyboardEquivalents() {
-        final String KILL_ERRORS_ACTION_NAME = "e.edit.KillErrorsAction";
-        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), KILL_ERRORS_ACTION_NAME);
-        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put((KeyStroke) KILL_ERRORS_ACTION.getValue(Action.ACCELERATOR_KEY), KILL_ERRORS_ACTION_NAME);
-        getRootPane().getActionMap().put(KILL_ERRORS_ACTION_NAME, KILL_ERRORS_ACTION);
+        final String CLEAR_ERRORS_ACTION_NAME = "e.edit.ClearErrorsAction";
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false), CLEAR_ERRORS_ACTION_NAME);
+        getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put((KeyStroke) CLEAR_ERRORS_ACTION.getValue(Action.ACCELERATOR_KEY), CLEAR_ERRORS_ACTION_NAME);
+        getRootPane().getActionMap().put(CLEAR_ERRORS_ACTION_NAME, CLEAR_ERRORS_ACTION);
     }
     
     private void initKillButton() {
@@ -329,7 +329,7 @@ public class EErrorsWindow extends JFrame {
                 actions.add(null);
                 actions.add(new CheckInChangesAction());
                 actions.add(null);
-                actions.add(KILL_ERRORS_ACTION);
+                actions.add(CLEAR_ERRORS_ACTION);
                 EPopupMenu.addNumberInfoItems(actions, textArea.getSelectedText());
             }
         });

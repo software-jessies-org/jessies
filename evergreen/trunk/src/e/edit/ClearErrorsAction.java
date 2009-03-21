@@ -3,8 +3,8 @@ package e.edit;
 import java.awt.event.*;
 import javax.swing.*;
 
-public class KillErrorsAction extends AbstractAction {
-    public KillErrorsAction() {
+public class ClearErrorsAction extends AbstractAction {
+    public ClearErrorsAction() {
         super("Clear Errors");
         putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("K", false));
     }
