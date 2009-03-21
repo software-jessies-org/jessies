@@ -9,8 +9,8 @@ import javax.swing.*;
  * Opens the "Find in Files" dialog with a regular expression to match the current
  * selection entered in the dialog's pattern field.
  */
-public class FindFilesContainingSelectionAction extends AbstractAction {
-    public FindFilesContainingSelectionAction() {
+public class FindInFilesAction extends AbstractAction {
+    public FindInFilesAction() {
         GuiUtilities.configureAction(this, "Find in Files...", GuiUtilities.makeKeyStroke("G", true));
     }
     
