@@ -207,14 +207,14 @@ public class EvergreenMenuBar extends EMenuBar {
     
     private JMenu makeWorkspaceMenu() {
         JMenu menu = makeMenu("Workspace", 'W');
+        menu.add(new NewWorkspaceAction());
+        menu.add(new EditWorkspaceAction());
+        menu.add(new CloseWorkspaceAction());
+        menu.addSeparator();
         menu.add(new BuildAction(false));
         menu.add(new BuildAction(true));
         menu.addSeparator();
         menu.add(new RescanWorkspaceAction());
-        menu.addSeparator();
-        menu.add(new NewWorkspaceAction());
-        menu.add(new EditWorkspaceAction());
-        menu.add(new CloseWorkspaceAction());
         menu.addSeparator();
         menu.add(new CycleWorkspacesAction(1));
         menu.add(new CycleWorkspacesAction(-1));
