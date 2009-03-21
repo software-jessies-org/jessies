@@ -81,91 +81,95 @@
 #   available.)
 #
 
-# Looks for the first occurrence of program within path.
-# Returns nil if not found.
-# (From Ruby Facets' FileUtils, and hopefully part of Ruby at some point.)
-def which(program, path = ENV["PATH"])
-  path.split(File::PATH_SEPARATOR).each() {
-    |directory|
-    file = File.join(directory, program)
-    # Avoid /usr/lib/ruby, for example
-    if File.executable?(file) && File.directory?(file) == false
-      return file
-    end
-  }
-  # This differs from the behavior of `which `, but it makes it easier to find errors, and it's the behavior of the Ruby Facets' FileUtils extension.
-  nil
-end
-
-def find_jdk_root()
-  require "pathname.rb"
-  
-  # Load helper libraries, coping with symbolic links to this script.
-  bin = Pathname.new(__FILE__).realpath().dirname()
-  require "#{bin}/target-os.rb"
-  
-  # Kees Jongenburger says this is the way things are done on Gentoo.
-  # It sounds like a per-user equivalent of /etc/alternatives.
-  is_gentoo = (which("java-config") != nil)
-  if is_gentoo
-    return `java-config --jdk-home`
-  end
-  
-  # On Windows, it's likely that the only Java-related executables on the user's path are %WINDIR%\SYSTEM32\{java,javaw,javaws}.exe.
-  # This is unfortunately true even if the user has a properly installed JDK.
-  if target_os() == "Cygwin"
-    acceptableMajorVersions = [6, 5]
-    acceptableMajorVersions.each() {
-      |majorVersion|
-      # This returns a native path, but universal.make already copes with that.
-      registryKeyFile = "/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Development Kit/1.#{majorVersion}/JavaHome"
-      if File.exists?(registryKeyFile)
-        contents = IO.read(registryKeyFile);
-        # Cygwin's representation of REG_SZ keys contains the null terminator.
-        return contents.chomp("\0")
+if defined?(find_jdk_root)
+  # Allow this library to be multiply included without warning.
+else
+  # Looks for the first occurrence of program within path.
+  # Returns nil if not found.
+  # (From Ruby Facets' FileUtils, and hopefully part of Ruby at some point.)
+  def which(program, path = ENV["PATH"])
+    path.split(File::PATH_SEPARATOR).each() {
+      |directory|
+      file = File.join(directory, program)
+      # Avoid /usr/lib/ruby, for example
+      if File.executable?(file) && File.directory?(file) == false
+        return file
       end
     }
+    # This differs from the behavior of `which `, but it makes it easier to find errors, and it's the behavior of the Ruby Facets' FileUtils extension.
+    nil
   end
   
-  # Find javac(1) on the path.
-  # We used to look for java(1) instead, but that fails in the case where the user has both JRE and JDK installed, with the former coming first on their path.
-  javac_on_path = which("javac")
-  
-  # Our Windows "java-launcher.exe" uses the registry to find a JRE.
-  # Returning nil or an unsuitable Java here prevents you from building, but doesn't affect your ability to *run* our applications.
-  if javac_on_path == nil
-    return nil
-  end
-  
-  # Neophyte users are likely to be using whatever's in /usr/bin, and that's likely to be a link to where there's a JDK or JRE installation.
-  # Systems using /etc/alternatives are especially likely to be set up this way.
-  # We need to follow the links to the actual installation, because it's the support files we're really looking for.
-  javac_in_actual_location = Pathname.new(javac_on_path).realpath()
-  
-  # Assume we're in the JDK/JRE bin/ directory.
-  jdk_bin = javac_in_actual_location.dirname()
-  
-  # Assume the directory above the bin/ directory is the "home" directory; the directory that contains bin/ and include/ and so on.
-  jdk_root = jdk_bin.dirname()
-  
-  if target_os() == "Darwin"
-    # On Mac OS, Apple use their own layout but provide a Home/ subdirectory
-    # that contains a JDK-like directory structure of links to the files in
-    # the Apple tree.
-    # Unfortunately, they can point the /usr/bin/java link to the JRE (Versions/A/) rather than the JDK (Versions/CurrentJDK/).
-    # So now we need a heuristic.
-    if jdk_root.to_s().include?("/1.6")
-      # If the user's path has a 1.6 "java" highest, we use the latest Java 6.
-      # This will likely break when Java 6 becomes the default, if Apple continues to link to their JRE from /usr/bin/.
-      jdk_root = "/System/Library/Frameworks/JavaVM.framework/Versions/1.6/Home/"
-    else
-      # Otherwise we use the latest Java 5.
-      jdk_root = "/System/Library/Frameworks/JavaVM.framework/Versions/1.5/Home/"
+  def find_jdk_root()
+    require "pathname.rb"
+    
+    # Load helper libraries, coping with symbolic links to this script.
+    bin = Pathname.new(__FILE__).realpath().dirname()
+    require "#{bin}/target-os.rb"
+    
+    # Kees Jongenburger says this is the way things are done on Gentoo.
+    # It sounds like a per-user equivalent of /etc/alternatives.
+    is_gentoo = (which("java-config") != nil)
+    if is_gentoo
+      return `java-config --jdk-home`
     end
+    
+    # On Windows, it's likely that the only Java-related executables on the user's path are %WINDIR%\SYSTEM32\{java,javaw,javaws}.exe.
+    # This is unfortunately true even if the user has a properly installed JDK.
+    if target_os() == "Cygwin"
+      acceptableMajorVersions = [6, 5]
+      acceptableMajorVersions.each() {
+        |majorVersion|
+        # This returns a native path, but universal.make already copes with that.
+        registryKeyFile = "/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Development Kit/1.#{majorVersion}/JavaHome"
+        if File.exists?(registryKeyFile)
+          contents = IO.read(registryKeyFile);
+          # Cygwin's representation of REG_SZ keys contains the null terminator.
+          return contents.chomp("\0")
+        end
+      }
+    end
+    
+    # Find javac(1) on the path.
+    # We used to look for java(1) instead, but that fails in the case where the user has both JRE and JDK installed, with the former coming first on their path.
+    javac_on_path = which("javac")
+    
+    # Our Windows "java-launcher.exe" uses the registry to find a JRE.
+    # Returning nil or an unsuitable Java here prevents you from building, but doesn't affect your ability to *run* our applications.
+    if javac_on_path == nil
+      return nil
+    end
+    
+    # Neophyte users are likely to be using whatever's in /usr/bin, and that's likely to be a link to where there's a JDK or JRE installation.
+    # Systems using /etc/alternatives are especially likely to be set up this way.
+    # We need to follow the links to the actual installation, because it's the support files we're really looking for.
+    javac_in_actual_location = Pathname.new(javac_on_path).realpath()
+    
+    # Assume we're in the JDK/JRE bin/ directory.
+    jdk_bin = javac_in_actual_location.dirname()
+    
+    # Assume the directory above the bin/ directory is the "home" directory; the directory that contains bin/ and include/ and so on.
+    jdk_root = jdk_bin.dirname()
+    
+    if target_os() == "Darwin"
+      # On Mac OS, Apple use their own layout but provide a Home/ subdirectory
+      # that contains a JDK-like directory structure of links to the files in
+      # the Apple tree.
+      # Unfortunately, they can point the /usr/bin/java link to the JRE (Versions/A/) rather than the JDK (Versions/CurrentJDK/).
+      # So now we need a heuristic.
+      if jdk_root.to_s().include?("/1.6")
+        # If the user's path has a 1.6 "java" highest, we use the latest Java 6.
+        # This will likely break when Java 6 becomes the default, if Apple continues to link to their JRE from /usr/bin/.
+        jdk_root = "/System/Library/Frameworks/JavaVM.framework/Versions/1.6/Home/"
+      else
+        # Otherwise we use the latest Java 5.
+        jdk_root = "/System/Library/Frameworks/JavaVM.framework/Versions/1.5/Home/"
+      end
+    end
+    
+    # We must not return Pathname in some circumstances and String in others.
+    return jdk_root.to_s()
   end
-  
-  # We must not return Pathname in some circumstances and String in others.
-  return jdk_root.to_s()
 end
 
 if __FILE__ == $0
