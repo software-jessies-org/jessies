@@ -28,12 +28,12 @@ class Evergreen
             shouldBlock = true
         end
         
-        shouldAddWorkspace = false
-        if ARGV[0] == "--add-workspace"
+        shouldCreateNewWorkspace = false
+        if ARGV[0] == "--new-workspace"
             ARGV.shift()
             workspace_root = ARGV.shift()
             workspace_name = ARGV.shift()
-            shouldAddWorkspace = true
+            shouldCreateNewWorkspace = true
         end
         
         shouldCloseWorkspace = false
@@ -59,8 +59,8 @@ class Evergreen
         # InAppClient's constructor stops anyone else from reading the .secret file.
         client = InAppClient.new(serverPortPathname)
         
-        if shouldAddWorkspace
-            exit(client.trySendCommand("addWorkspace #{File.expand_path(workspace_root)}\t#{workspace_name}") ? 0 : 1)
+        if shouldCreateNewWorkspace
+            exit(client.trySendCommand("newWorkspace #{File.expand_path(workspace_root)}\t#{workspace_name}") ? 0 : 1)
         elsif shouldCloseWorkspace
             exit(client.trySendCommand("closeWorkspace #{workspace_name}") ? 0 : 1)
         end

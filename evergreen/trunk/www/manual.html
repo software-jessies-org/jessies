@@ -34,7 +34,7 @@
 
 <p>A workspace is also a way to work on multiple projects in the same editor. You can have as many workspaces as you like, and each will have its own tab in the main window.
 
-<p>To create a workspace, choose "Workspace" > "Add Workspace..." from the menu. A dialog will appear where you can choose a root directory, maybe customize the workspace's name, and maybe choose a custom build target (described later).
+<p>To create a workspace, choose "Workspace" > "New Workspace..." from the menu. A dialog will appear where you can choose a root directory, maybe customize the workspace's name, and maybe choose a custom build target (described later).
 
 <p>Each workspace gets a tab. You can switch between workspaces by clicking on the tab or, for the first ten workspaces, jump to the <i>n</i>th workspace with alt-<i>n</i> (where <i>n</i> goes from 1 to 9 and then to 0, so that keyboard order matches tab order). You can also move to the previous and next workspaces from the keyboard with control-shift-[ and control-shift-].
 
@@ -228,9 +228,9 @@
 
 <p>The <tt>--block</tt> option makes the <tt>evergreen</tt> command wait until the user closes the file that was opened. This is useful if you're trying to have a program call on Evergreen to edit a file, for example by setting the EDITOR environment variable. Another command, <tt>edit-and-block</tt> is provided for use with crontab(1), which is too stupid to cope with an editor that takes arguments.
 
-<h3><a name="cli-add-workspace">Adding a Workspace</a></h3>
+<h3><a name="cli-new-workspace">Creating a new Workspace</a></h3>
 
-<p>Use <tt>evergreen --add-workspace <i>root</i> <i>name</i></tt> to add a workspace with the given root directory and name.
+<p>Use <tt>evergreen --new-workspace <i>root</i> <i>name</i></tt> to create a workspace with the given root directory and name.
 
 <h3><a name="cli-close-workspace">Closing a Workspace</a></h3>
 
