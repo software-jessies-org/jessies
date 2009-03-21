@@ -131,7 +131,7 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(new OpenMakefileAction());
         
         menu.addSeparator();
-        menu.add(new KillErrorsAction());
+        menu.add(new ClearErrorsAction());
         
         menu.addSeparator();
         menu.add(new CheckForLintAction());
