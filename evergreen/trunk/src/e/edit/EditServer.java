@@ -14,8 +14,8 @@ public final class EditServer {
         this.editor = editor;
     }
     
-    public void addWorkspace(PrintWriter out, String line) throws Exception {
-        Matcher m = Pattern.compile("^addWorkspace (.+)\t(.+)$").matcher(line);
+    public void newWorkspace(PrintWriter out, String line) throws Exception {
+        Matcher m = Pattern.compile("^newWorkspace (.+)\t(.+)$").matcher(line);
         if (!m.matches()) {
             out.println("Syntax error.");
             return;
