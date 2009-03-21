@@ -325,7 +325,7 @@ public class EErrorsWindow extends JFrame {
         textArea.getPopupMenu().addMenuItemProvider(new MenuItemProvider() {
             public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
                 actions.add(new OpenQuicklyAction());
-                actions.add(new FindFilesContainingSelectionAction());
+                actions.add(new FindInFilesAction());
                 actions.add(null);
                 actions.add(new CheckInChangesAction());
                 actions.add(null);

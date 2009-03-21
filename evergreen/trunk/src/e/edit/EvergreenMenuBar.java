@@ -95,7 +95,7 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(new GoToTagAction());
         
         menu.addSeparator();
-        menu.add(new FindFilesContainingSelectionAction());
+        menu.add(new FindInFilesAction());
         
         menu.addSeparator();
         menu.add(PActionFactory.makeFindMatchingBracketAction());
