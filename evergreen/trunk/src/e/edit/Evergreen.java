@@ -34,8 +34,6 @@ public class Evergreen {
     
     private class InitialState {
         private ArrayList<InitialWorkspace> initialWorkspaces = new ArrayList<InitialWorkspace>();
-        private Point initialLocation = new Point(0, 0);
-        private Dimension initialSize = new Dimension(800, 730);
         private boolean showTagsPanel = true;
         private int tagsPanelSplitPaneDividerLocation = -1;
         
@@ -622,14 +620,15 @@ public class Evergreen {
     }
     
     private void readSavedState() {
+        Point initialLocation = null;
+        Dimension initialSize = null;
+        
         try {
             Document document = XmlUtilities.readXmlFromDisk(getPreferenceFilename("saved-state.xml"));
             
             Element root = document.getDocumentElement();
-            initialState.initialLocation.x = Integer.parseInt(root.getAttribute("x"));
-            initialState.initialLocation.y = Integer.parseInt(root.getAttribute("y"));
-            initialState.initialSize.width = Integer.parseInt(root.getAttribute("width"));
-            initialState.initialSize.height = Integer.parseInt(root.getAttribute("height"));
+            initialLocation = new Point(Integer.parseInt(root.getAttribute("x")), Integer.parseInt(root.getAttribute("y")));
+            initialSize = new Dimension(Integer.parseInt(root.getAttribute("width")), Integer.parseInt(root.getAttribute("height")));
             
             if (root.hasAttribute("showTagsPanel")) {
                 initialState.showTagsPanel = Boolean.parseBoolean(root.getAttribute("showTagsPanel"));
@@ -653,9 +652,17 @@ public class Evergreen {
         } catch (Exception ex) {
             Log.warn("Problem reading saved state", ex);
         }
-        frame.setLocation(initialState.initialLocation);
-        frame.setSize(initialState.initialSize);
-        JFrameUtilities.constrainToScreen(frame);
+        
+        if (initialLocation != null) {
+            frame.setSize(initialSize);
+            frame.setLocation(initialLocation);
+            JFrameUtilities.constrainToScreen(frame);
+        } else {
+            // FIXME: maybe use the next "natural" size down from the screen size?
+            frame.setSize(new Dimension(800, 730));
+            // The center of the display is a good default.
+            frame.setLocationRelativeTo(null);
+        }
     }
     
     private synchronized void writeSavedState() {
@@ -836,7 +843,7 @@ public class Evergreen {
             public void run() {
                 if (tabbedPane.getTabCount() == 0) {
                     // If we didn't create any workspaces, give the user some help...
-                    showAlert("Welcome to Evergreen!", "This looks like the first time you've used Evergreen. You'll need to create workspaces corresponding to the projects you wish to work on.<p>Choose \"New Workspace...\" from the the \"Workspace\" menu.<p>You can create as many workspaces as you like, but you'll need at least one to be able to do anything.");
+                    showAlert("Welcome to Evergreen!", "This looks like the first time you've used Evergreen. You'll need to create a workspace for each project you wish to work on.<p>Choose \"New Workspace...\" from the the \"Workspace\" menu.<p>You can create as many workspaces as you like, but you'll need at least one to be able to do anything.");
                 } else {
                     initRememberedFilesOpener();
                 }
