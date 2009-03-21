@@ -9,6 +9,10 @@ public class KillErrorsAction extends AbstractAction {
         putValue(ACCELERATOR_KEY, e.util.GuiUtilities.makeKeyStroke("K", false));
     }
     
+    @Override public boolean isEnabled() {
+        return !Evergreen.getInstance().getWorkspaces().isEmpty();
+    }
+    
     public void actionPerformed(ActionEvent e) {
         Workspace workspace = Evergreen.getInstance().getCurrentWorkspace();
         if (workspace == null) {

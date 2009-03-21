@@ -13,6 +13,10 @@ public class OpenAction extends AbstractAction {
         super("Open...");
     }
     
+    @Override public boolean isEnabled() {
+        return !Evergreen.getInstance().getWorkspaces().isEmpty();
+    }
+    
     public void actionPerformed(ActionEvent e) {
         Evergreen.getInstance().getCurrentWorkspace().showOpenDialog();
     }
