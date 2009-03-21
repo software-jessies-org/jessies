@@ -14,6 +14,10 @@ public class FindFilesContainingSelectionAction extends AbstractAction {
         GuiUtilities.configureAction(this, "Find in Files...", GuiUtilities.makeKeyStroke("G", true));
     }
     
+    @Override public boolean isEnabled() {
+        return !Evergreen.getInstance().getWorkspaces().isEmpty();
+    }
+    
     public void actionPerformed(ActionEvent e) {
         Workspace workspace = Evergreen.getInstance().getCurrentWorkspace();
         

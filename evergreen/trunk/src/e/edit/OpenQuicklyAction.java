@@ -14,6 +14,10 @@ public class OpenQuicklyAction extends AbstractAction {
         GnomeStockIcon.useStockIcon(this, "gtk-open");
     }
     
+    @Override public boolean isEnabled() {
+        return !Evergreen.getInstance().getWorkspaces().isEmpty();
+    }
+    
     public void actionPerformed(ActionEvent e) {
         String filename = ETextAction.getSelectedText();
         if (filename.startsWith("~") || filename.startsWith("/")) {

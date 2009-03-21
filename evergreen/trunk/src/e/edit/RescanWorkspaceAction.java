@@ -24,6 +24,10 @@ public class RescanWorkspaceAction extends AbstractAction {
         this.boundWorkspace = workspace;
     }
     
+    @Override public boolean isEnabled() {
+        return !Evergreen.getInstance().getWorkspaces().isEmpty();
+    }
+    
     public void actionPerformed(ActionEvent e) {
         Workspace workspace = (boundWorkspace != null) ? boundWorkspace : Evergreen.getInstance().getCurrentWorkspace();
         workspace.getFileList().updateFileList();

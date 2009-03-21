@@ -29,6 +29,10 @@ public class CycleWorkspacesAction extends AbstractAction {
         putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke(key, shifted));
     }
     
+    @Override public boolean isEnabled() {
+        return !Evergreen.getInstance().getWorkspaces().isEmpty();
+    }
+    
     public void actionPerformed(ActionEvent e) {
         Evergreen.getInstance().cycleWorkspaces(indexDelta);
     }

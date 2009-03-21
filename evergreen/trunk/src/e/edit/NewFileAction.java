@@ -19,6 +19,10 @@ public class NewFileAction extends AbstractAction {
         GnomeStockIcon.useStockIcon(this, "gtk-new");
     }
     
+    @Override public boolean isEnabled() {
+        return !Evergreen.getInstance().getWorkspaces().isEmpty();
+    }
+    
     public void actionPerformed(ActionEvent e) {
         ETextWindow window = ETextAction.getFocusedTextWindow();
         if (window != null) {
