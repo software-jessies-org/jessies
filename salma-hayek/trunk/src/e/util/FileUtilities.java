@@ -145,7 +145,7 @@ public class FileUtilities {
     }
     
     /**
-     * Tests whether filename is a symbolic link. This calls stat(2) via JNI
+     * Tests whether filename is a symbolic link. This calls lstat(2) via JNI
      * if the JNI library is available, falling back to a pure-Java
      * approximation otherwise.
      * 
