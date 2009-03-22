@@ -272,7 +272,7 @@ public class GuiUtilities {
         String DESKTOP_STARTUP_ID = System.getProperty("gnome.DESKTOP_STARTUP_ID");
         if (DESKTOP_STARTUP_ID != null) {
             System.clearProperty("gnome.DESKTOP_STARTUP_ID");
-            ProcessUtilities.spawn(null, new String[] { "gnome-startup", "stop", DESKTOP_STARTUP_ID });
+            ProcessUtilities.spawn(null, "gnome-startup", "stop", DESKTOP_STARTUP_ID);
         }
     }
     
@@ -280,10 +280,10 @@ public class GuiUtilities {
         // FIXME: add GNOME support, if possible. See https://launchpad.net/distros/ubuntu/+source/nautilus/+bug/57537
         // FIXME: make into an action that also supplies an appropriate name for the action on the current platform.
         if (GuiUtilities.isMacOs()) {
-            ProcessUtilities.spawn(null, new String[] { "/usr/bin/osascript", "-e", "tell application \"Finder\" to select \"" + fullPathname + "\" as POSIX file", "-e", "tell application \"Finder\" to activate" });
+            ProcessUtilities.spawn(null, "/usr/bin/osascript", "-e", "tell application \"Finder\" to select \"" + fullPathname + "\" as POSIX file", "-e", "tell application \"Finder\" to activate");
         } else if (GuiUtilities.isWindows()) {
             // See "Windows Explorer Command-Line Options", http://support.microsoft.com/default.aspx?scid=kb;EN-US;q152457
-            ProcessUtilities.spawn(null, new String[] { "Explorer", "/select," + fullPathname });
+            ProcessUtilities.spawn(null, "Explorer", "/select," + fullPathname);
         }
     }
     
