@@ -71,7 +71,7 @@ public class ProcessUtilities {
         }
     }
 
-    public static void spawn(final File directory, final String[] command) {
+    public static void spawn(final File directory, String... command) {
         spawn(directory, command, null);
     }
     
