@@ -20,8 +20,6 @@ class Evergreen
     def launch0()
         home = ENV["HOME"]
         
-        ENV["EDIT_HOME"] = convert_to_jvm_compatible_pathname(@project_root)
-        
         shouldBlock = false
         if ARGV[0] == "--block"
             ARGV.shift()

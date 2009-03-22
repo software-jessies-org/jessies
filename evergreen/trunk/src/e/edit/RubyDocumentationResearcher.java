@@ -11,7 +11,7 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
     public RubyDocumentationResearcher() {
         final long t0 = System.nanoTime();
         
-        final String listRubyWordsBinary = System.getenv("EDIT_HOME") + File.separator + "lib" + File.separator + "scripts" + File.separator + "list-ruby-words.rb";
+        final String listRubyWordsBinary = Evergreen.getScriptFilename("list-ruby-words.rb");
         
         final ArrayList<String> lines = new ArrayList<String>();
         final ArrayList<String> errors = new ArrayList<String>();

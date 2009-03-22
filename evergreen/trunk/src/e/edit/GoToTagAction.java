@@ -36,7 +36,7 @@ public class GoToTagAction extends ETextAction {
         final String workspaceRoot = Evergreen.getInstance().getCurrentWorkspace().getRootDirectory();
         
         // Call our helper script/binary to find the tags for us.
-        final String defaultFindTagsBinary = System.getenv("EDIT_HOME") + File.separator + "lib" + File.separator + "scripts" + File.separator + "find-tags.rb";
+        final String defaultFindTagsBinary = Evergreen.getScriptFilename("find-tags.rb");
         // FIXME: document this preference after it's been successfully used at least once.
         final String findTagsBinary = Parameters.getParameter("tags.findTagsTool", defaultFindTagsBinary);
         // FIXME: we could usefully check for a "tags" file, and maybe even offer to generate a usable one, but we'd need some kind of override in case a custom tool doesn't use a file.

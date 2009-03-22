@@ -538,7 +538,11 @@ public class Evergreen {
     }
     
     public static String getResourceFilename(String leafName) {
-        return System.getenv("EDIT_HOME") + File.separator + "lib" + File.separator + "data" + File.separator + leafName;
+        return System.getProperty("org.jessies.projectRoot") + File.separator + "lib" + File.separator + "data" + File.separator + leafName;
+    }
+    
+    public static String getScriptFilename(String leafName) {
+        return System.getProperty("org.jessies.projectRoot") + File.separator + "lib" + File.separator + "scripts" + File.separator + leafName;
     }
     
     private void initWindowIcon() {
