@@ -52,10 +52,9 @@ public class EColumn extends JPanel {
         return result;
     }
     
-    public EWindow findWindowByName(String name) {
-        name = name.toLowerCase();
+    public EWindow findWindowByFilename(String filename) {
         for (ETextWindow text : getTextWindows()) {
-            if (text.getTitle().toLowerCase().endsWith(name)) {
+            if (text.getTitle().endsWith(filename)) {
                 return text;
             }
         }
