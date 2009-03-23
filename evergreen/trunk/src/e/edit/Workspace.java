@@ -161,14 +161,10 @@ public class Workspace extends JPanel {
         return dirtyTextWindows;
     }
     
-    public EWindow findWindowByName(String name) {
-        return leftColumn.findWindowByName(name);
-    }
-    
     /** Returns the EWindow corresponding to the given file. If the file's open, shows the given address. */
     public EWindow findIfAlreadyOpen(String filename, String address) {
-        /* Check we don't already have this open as a file or directory. */
-        final EWindow window = findWindowByName(filename);
+        // Check we don't already have this open as a file or directory.
+        final EWindow window = leftColumn.findWindowByName(filename);
         if (window != null) {
             leftColumn.setSelectedWindow(window);
             window.ensureSufficientlyVisible();
