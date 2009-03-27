@@ -363,7 +363,7 @@ public class AboutBox {
     
     public String getProblemReportSubject() {
         String systemDetails = Log.getSystemDetailsForProblemReport();
-        String subject = Log.getApplicationName() + " problem (" + projectRevision + "/" + libraryRevision + "/" + systemDetails + ")";
+        String subject = "<<<YourSubjectHere>>> " + Log.getApplicationName() + " problem (" + projectRevision + "/" + libraryRevision + "/" + systemDetails + ")";
         return StringUtilities.urlEncode(subject).replaceAll("\\+", "%20");
     }
     
