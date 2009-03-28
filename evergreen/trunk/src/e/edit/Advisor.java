@@ -18,6 +18,8 @@ public class Advisor extends JPanel {
     /** The advice window. */
     private AdvisorHtmlPane advicePane = new AdvisorHtmlPane();
     
+    private JTextField searchField = new JTextField(20);
+    
     private JFrame frame;
     
     public static synchronized Advisor getInstance() {
@@ -29,18 +31,14 @@ public class Advisor extends JPanel {
     
     private Advisor() {
         super(new BorderLayout());
-        add(advicePane.makeToolBar(), BorderLayout.NORTH);
+        add(advicePane.makeToolBar(searchField), BorderLayout.NORTH);
         add(advicePane, BorderLayout.CENTER);
         
-        /*
-        final JTextField textField = new JTextField();
-        textField.addActionListener(new ActionListener() {
+        searchField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                linkClicked(textField.getText());
+                startResearch(searchField.getText());
             }
         });
-        add(textField, BorderLayout.NORTH);
-        */
     }
     
     /**
@@ -153,8 +151,15 @@ public class Advisor extends JPanel {
     }
     
     public synchronized void showDocumentation() {
+        final String searchTerm = ETextAction.getSearchTerm();
         setDocumentationVisible();
-        startResearch(ETextAction.getSearchTerm());
+        if (searchTerm.trim().length() == 0) {
+            // The user will have to be more explicit.
+            searchField.selectAll();
+            searchField.requestFocusInWindow();
+        } else {
+            startResearch(searchTerm);
+        }
     }
     
     private class ResearchRunner extends SwingWorker<String, Object> {
@@ -173,7 +178,7 @@ public class Advisor extends JPanel {
             StringBuilder newText = new StringBuilder();
             for (WorkspaceResearcher researcher : getResearchers()) {
                 if (fileType == null || researcher.isSuitable(fileType)) {
-                    String result = researcher.research(searchTerm, textWindow);
+                    String result = researcher.research(searchTerm);
                     if (result != null && result.length() > 0) {
                         // We need to strip HTML and BODY tags if we're to concatenate HTML documents.
                         // We can't strip HEAD tags because they may have useful content.

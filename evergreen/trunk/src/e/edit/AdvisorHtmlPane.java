@@ -129,7 +129,7 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
         ComponentUtilities.initKeyBinding(textPane, BACK_ACTION);
     }
     
-    public JComponent makeToolBar() {
+    public JComponent makeToolBar(JTextField searchField) {
         JButton backButton = new JButton(BACK_ACTION);
         backButton.setFocusable(false);
         backButton.setText(null);
@@ -142,6 +142,7 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
         toolBar.setFloatable(false);
         toolBar.add(backButton);
         toolBar.add(forwardButton);
+        toolBar.add(searchField);
         return toolBar;
     }
     

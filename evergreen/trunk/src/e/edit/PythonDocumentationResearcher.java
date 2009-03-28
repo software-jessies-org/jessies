@@ -18,7 +18,7 @@ import java.util.*;
  * ship a patched pydoc.py, this is currently academic.
  */
 public class PythonDocumentationResearcher implements WorkspaceResearcher {
-    public String research(String string, ETextWindow textWindow) {
+    public String research(String string) {
         String pydocBinary = Evergreen.getScriptFilename("epydoc.py");
         
         ArrayList<String> lines = new ArrayList<String>();
@@ -46,7 +46,7 @@ public class PythonDocumentationResearcher implements WorkspaceResearcher {
     /** Handles our non-standard "py:" scheme. */
     public boolean handleLink(String link) {
         if (link.startsWith("py:")) {
-            Advisor.getInstance().setDocumentationText(research(link.substring(3), null));
+            Advisor.getInstance().setDocumentationText(research(link.substring(3)));
             return true;
         }
         return false;

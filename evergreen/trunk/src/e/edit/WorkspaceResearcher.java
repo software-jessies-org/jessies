@@ -9,7 +9,7 @@ public interface WorkspaceResearcher {
      * Returns the empty string (not null) if it has nothing to say.
      * wordAtCaret is the selection, if there is one, or the word at the caret otherwise.
      */
-    public String research(String wordAtCaret, ETextWindow textWindow);
+    public String research(String wordAtCaret);
     
     /**
      * Invoked before research to give the Researcher an opportunity to decline.
