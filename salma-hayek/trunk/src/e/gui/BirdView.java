@@ -170,19 +170,17 @@ public class BirdView extends JComponent {
         }
 
         double scaleFactor = getLineScaleFactor(usableArea);
-        for (int i = 0; i < matchingLines.length(); i++) {
-            if (matchingLines.get(i)) {
-                Color color = Color.BLACK;
-                if (i == nearestLineToMouseInBirdView) {
-                    color = Color.CYAN;
-                } else if (birdsEye.isCurrentLineIndex(i)) {
-                    color = Color.RED;
-                }
-                g.setColor(color);
-                int visibleIndex = birdsEye.getVisibleLineIndex(i);
-                int y = usableArea.y + (int) ((double) visibleIndex * scaleFactor);
-                g.drawLine(usableArea.x, y, usableArea.width, y);
+        for (int i = matchingLines.nextSetBit(0); i != -1; i = matchingLines.nextSetBit(i + 1)) {
+            Color color = Color.BLACK;
+            if (i == nearestLineToMouseInBirdView) {
+                color = Color.CYAN;
+            } else if (birdsEye.isCurrentLineIndex(i)) {
+                color = Color.RED;
             }
+            g.setColor(color);
+            int visibleIndex = birdsEye.getVisibleLineIndex(i);
+            int y = usableArea.y + (int) ((double) visibleIndex * scaleFactor);
+            g.drawLine(usableArea.x, y, usableArea.width, y);
         }
     }
     
