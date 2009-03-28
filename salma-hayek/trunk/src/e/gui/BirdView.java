@@ -199,7 +199,11 @@ public class BirdView extends JComponent {
         matchingLines.set(lineNumber, false);
         maybeRepaint();
     }
-
+    
+    public synchronized boolean hasMatchingLines() {
+        return !matchingLines.isEmpty();
+    }
+    
     public synchronized void clearMatchingLines() {
         matchingLines = new BitSet();
         maybeRepaint();
