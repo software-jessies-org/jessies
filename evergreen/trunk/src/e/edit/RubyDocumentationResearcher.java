@@ -30,7 +30,7 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
         Log.warn("Learned " + uniqueWords.size() + " Ruby words in " + TimeUtilities.nsToString(t1 - t0) + ".");
     }
     
-    public String research(String string, ETextWindow textWindow) {
+    public String research(String string) {
         String ri = Advisor.findToolOnPath("ri");
         if (ri == null) {
             return "";
@@ -113,7 +113,7 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
     /** Handles our non-standard "ri:" scheme. */
     public boolean handleLink(String link) {
         if (link.startsWith("ri:")) {
-            Advisor.getInstance().setDocumentationText(research(link.substring(3), null));
+            Advisor.getInstance().setDocumentationText(research(link.substring(3)));
             return true;
         }
         return false;

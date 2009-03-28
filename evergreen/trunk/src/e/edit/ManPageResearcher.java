@@ -78,7 +78,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
         return manPaths;
     }
     
-    public String research(String string, ETextWindow textWindow) {
+    public String research(String string) {
         if (uniqueManPageNames.contains(string) == false) {
             return "";
         }

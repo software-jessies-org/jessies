@@ -47,7 +47,7 @@ public class StlDocumentationResearcher implements WorkspaceResearcher {
         Log.warn("Learned of " + docs.size() + " STL terms in " + TimeUtilities.nsToString(t1 - t0) + ".");
     }
     
-    public String research(String string, ETextWindow textWindow) {
+    public String research(String string) {
         return getDocumentation(string);
     }
     

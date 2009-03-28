@@ -12,11 +12,6 @@ public class JavaResearcher implements WorkspaceResearcher {
     private static final String NEWLINE = "<br>" + INDENT;
     private static final String COMMA = ",&nbsp;";
     
-    /** Matches 'new' expressions such as "new JSplitPane(". */
-    private static final Pattern NEW_PATTERN = Pattern.compile("(?x) .* \\b new \\s+ ([A-Za-z0-9_]+) \\s* \\($");
-    /** Matches field or static-method access expressions such as "JSplitPane.". */
-    private static final Pattern ACCESS_PATTERN = Pattern.compile("(?x) \\b ([A-Za-z0-9_]+) \\.$");
-    
     private static final Set<String> uniqueIdentifiers = new TreeSet<String>();
     private static final Set<String> uniqueWords = new TreeSet<String>();
     
@@ -80,45 +75,12 @@ public class JavaResearcher implements WorkspaceResearcher {
         return result;
     }
     
-    private String makeResult(String wordAtCaretOrSelection, ETextWindow textWindow) {
-        ETextArea textArea = textWindow.getTextArea();
-        if (textArea.hasSelection()) {
-            return makeDefaultResult(wordAtCaretOrSelection);
-        }
-        
-        CharSequence chars = textArea.getTextBuffer();
-        int end = textArea.getSelectionStart();
-        int start = end;
-        while (start > 0) {
-            char ch = chars.charAt(start - 1);
-            if (ch == '\n') {
-                break;
-            }
-            --start;
-        }
-        CharSequence lineToCaret = chars.subSequence(start, end);
-        
-        // Does it look like the user wants help with a constructor?
-        Matcher newMatcher = NEW_PATTERN.matcher(lineToCaret);
-        if (newMatcher.find()) {
-            String className = newMatcher.group(1);
-            return new ClassDoc(className).getConstructorSummary();
-        }
-        
-        Matcher accessMatcher = ACCESS_PATTERN.matcher(lineToCaret);
-        if (accessMatcher.find()) {
-            String className = accessMatcher.group(1);
-            return new ClassDoc(className).getStaticSummary();
-        }
-        
-        return makeDefaultResult(wordAtCaretOrSelection);
-    }
-    
-    private String makeDefaultResult(String wordAtCaretOrSelection) {
-        if (wordAtCaretOrSelection.matches("^[A-Z][A-Za-z0-9_]*$")) {
+    private String makeResult(String wordAtCaretOrSelection) {
+        if (wordAtCaretOrSelection.startsWith("import ")) {
+            return makePackageResult(wordAtCaretOrSelection);
+        } else if (wordAtCaretOrSelection.matches("^[A-Z][A-Za-z0-9_]*$")) {
             return new ClassDoc(wordAtCaretOrSelection).getClassSummary();
         } else if (wordAtCaretOrSelection.matches("^[a-z][A-Za-z0-9_]*$")) {
-            System.err.println(wordAtCaretOrSelection + " is probably a method; not yet implemented");
             return listMethodsOrFields(wordAtCaretOrSelection);
         }
         return "";
@@ -477,12 +439,8 @@ public class JavaResearcher implements WorkspaceResearcher {
         return fileType == FileType.JAVA;
     }
     
-    public String research(String string, ETextWindow textWindow) {
-        if (string.startsWith("import ")) {
-            return makePackageResult(string);
-        } else {
-            return makeResult(string, textWindow);
-        }
+    public String research(String string) {
+        return makeResult(string);
     }
     
     /** We don't implement any non-standard URI schemes. */
