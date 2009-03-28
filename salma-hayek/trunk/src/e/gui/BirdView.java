@@ -30,6 +30,9 @@ public class BirdView extends JComponent {
     
     private int nearestLineToMouseInBirdView = -1;
     
+    private int selectionStartLine = -1;
+    private int selectionEndLine = -1;
+    
     private boolean isAdjusting = false;
     
     public BirdView(BirdsEye birdsEye, JScrollBar scrollBar) {
@@ -161,20 +164,23 @@ public class BirdView extends JComponent {
 
         updateCursor();
 
-        Rectangle usableArea = getUsableArea();
-
-        if (false) {
-            /* When testing, it's nice to see where we think the rectangle is. */
-            g.setColor(Color.GRAY);
-            g.drawRect(usableArea.x, usableArea.y, usableArea.width, usableArea.height);
+        final Rectangle usableArea = getUsableArea();
+        final double scaleFactor = getLineScaleFactor(usableArea);
+        
+        // Make the extent of the current selection visible in the background.
+        if (selectionStartLine != -1) {
+            g.setColor(Color.LIGHT_GRAY);
+            final int y0 = usableArea.y + (int) ((double) selectionStartLine * scaleFactor);
+            final int y1 = usableArea.y + (int) ((double) selectionEndLine * scaleFactor);
+            g.fillRect(usableArea.x, y0, usableArea.x + usableArea.width + 1, y1 - y0 + 1);
         }
-
-        double scaleFactor = getLineScaleFactor(usableArea);
+        
+        // Mark the individual matches.
         for (int i = matchingLines.nextSetBit(0); i != -1; i = matchingLines.nextSetBit(i + 1)) {
             Color color = Color.BLACK;
             if (i == nearestLineToMouseInBirdView) {
                 color = Color.CYAN;
-            } else if (birdsEye.isCurrentLineIndex(i)) {
+            } else if (birdsEye.isCurrentLineIndex(i) || (i >= selectionStartLine && i <= selectionEndLine)) {
                 color = Color.RED;
             }
             g.setColor(color);
@@ -189,7 +195,15 @@ public class BirdView extends JComponent {
         // the bird view.  Otherwise the marker for the final line seems to be too high in short files.
         return ((double) usableArea.height) / (birdsEye.getVisibleLineCount() - 1);
     }
-
+    
+    public void setSelectedLines(int startLine, int endLine) {
+        if (selectionStartLine != startLine || selectionEndLine != endLine) {
+            selectionStartLine = startLine;
+            selectionEndLine = endLine;
+            repaint();
+        }
+    }
+    
     public synchronized void addMatchingLine(int lineNumber) {
         matchingLines.set(lineNumber);
         maybeRepaint();
@@ -198,10 +212,6 @@ public class BirdView extends JComponent {
     public synchronized void removeMatchingLine(int lineNumber) {
         matchingLines.set(lineNumber, false);
         maybeRepaint();
-    }
-    
-    public synchronized boolean hasMatchingLines() {
-        return !matchingLines.isEmpty();
     }
     
     public synchronized void clearMatchingLines() {
