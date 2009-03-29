@@ -58,9 +58,9 @@ class Evergreen
         client = InAppClient.new(serverPortPathname)
         
         if shouldCreateNewWorkspace
-            exit(client.trySendCommand("newWorkspace #{File.expand_path(workspace_root)}\t#{workspace_name}") ? 0 : 1)
+            exit(send_command(client, "newWorkspace #{File.expand_path(workspace_root)}\t#{workspace_name}"))
         elsif shouldCloseWorkspace
-            exit(client.trySendCommand("closeWorkspace #{workspace_name}") ? 0 : 1)
+            exit(send_command(client, "closeWorkspace #{workspace_name}"))
         end
         
         # Translate vi line number specifications.
@@ -69,14 +69,10 @@ class Evergreen
             ARGV[0] = "#{ARGV[0]}:#$1"
         end
         
+        # If we were given a filename, try to open it in an already-running instance.
         filename = ARGV[0]
-        if filename != nil && client.trySendCommand("#{shouldBlock ? 'openAndBlock' : 'open'} #{File.expand_path(filename)}")
-            exit(0)
-        end
-        
-        # FIXME: this isn't right if shouldBlock is true. We either need to pass the "shouldBlock" on to the Java side, or we need to wait until it's started up and "trySendCommand" again.
         if filename != nil
-            ARGV.push(filename)
+            exit(send_command(client, "#{shouldBlock ? 'openAndBlock' : 'open'} #{File.expand_path(filename)}"))
         end
         
         invoker = Java.new("Evergreen", "e/util/Launcher")
@@ -86,6 +82,10 @@ class Evergreen
         invoker.add_property("e.gui.HelpMenu.supportAddress", "evergreen-users@googlegroups.com")
         invoker.add_property("e.gui.HelpMenu.supportSite", "http://groups.google.com/group/evergreen-users")
         invoker.invoke([ "Evergreen", "e.edit.EvergreenLaunchable" ])
+    end
+    
+    def send_command(client, command)
+        return client.trySendCommand(command) ? 0 : 1
     end
 end
 
