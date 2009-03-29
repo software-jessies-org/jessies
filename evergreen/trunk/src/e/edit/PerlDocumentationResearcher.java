@@ -1,5 +1,6 @@
 package e.edit;
 
+import java.io.*;
 import java.util.*;
 import e.ptextarea.*;
 import e.util.*;
@@ -10,9 +11,11 @@ public class PerlDocumentationResearcher implements WorkspaceResearcher {
         if (perldoc == null) {
             return "";
         }
+        
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
-        int status = ProcessUtilities.backQuote(null, ProcessUtilities.makeShellCommandArray(perldoc + " -u -f " + string + " | pod2html"), lines, errors);
+        File tmp = new File(System.getProperty("java.io.tmpdir"));
+        int status = ProcessUtilities.backQuote(tmp, ProcessUtilities.makeShellCommandArray(perldoc + " -u -f " + string + " | pod2html"), lines, errors);
         String result = StringUtilities.join(lines, "\n");
         
         // Swing doesn't seem to cope with this, so remove it.
