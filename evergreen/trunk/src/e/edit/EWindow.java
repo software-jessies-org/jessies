@@ -6,10 +6,10 @@ import javax.swing.*;
 public class EWindow extends JComponent {
     private final ETitleBar titleBar;
     
-    public EWindow(String initialTitleText) {
+    public EWindow(String title) {
         setLayout(new BorderLayout());
         
-        this.titleBar = new ETitleBar(initialTitleText, this);
+        this.titleBar = new ETitleBar(title, this);
         add(titleBar, BorderLayout.NORTH);
         
         setOpaque(true);
