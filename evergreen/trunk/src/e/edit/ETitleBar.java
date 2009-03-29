@@ -78,6 +78,9 @@ public class ETitleBar extends JPanel {
         titleLabel.setFont(UIManager.getFont(GuiUtilities.isWindows() ? "InternalFrame.titleFont" : "TableHeader.font"));
         titleLabel.setOpaque(false);
         
+        if (GuiUtilities.isGtk()) {
+            add(Box.createHorizontalStrut(2), BorderLayout.WEST);
+        }
         add(titleLabel, BorderLayout.CENTER);
         
         this.buttonsPanel = new JPanel(new BorderLayout());
