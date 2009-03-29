@@ -29,12 +29,12 @@ public class EditWorkspaceAction extends AbstractAction {
         Workspace workspace = (boundWorkspace != null) ? boundWorkspace : Evergreen.getInstance().getCurrentWorkspace();
         
         WorkspaceProperties properties = new WorkspaceProperties();
-        properties.name = workspace.getTitle();
+        properties.name = workspace.getWorkspaceName();
         properties.rootDirectory = workspace.getRootDirectory();
         properties.buildTarget = workspace.getBuildTarget();
         
         if (properties.showWorkspacePropertiesDialog("Workspace Properties", "Apply") == true) {
-            workspace.setTitle(properties.name);
+            workspace.setWorkspaceName(properties.name);
             workspace.setRootDirectory(properties.rootDirectory);
             workspace.setBuildTarget(properties.buildTarget);
             Evergreen.getInstance().workspaceConfigurationDidChange();

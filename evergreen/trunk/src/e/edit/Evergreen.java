@@ -436,7 +436,7 @@ public class Evergreen {
     }
     
     private void addWorkspaceToTabbedPane(final Workspace workspace) {
-        final String name = workspace.getTitle();
+        final String name = workspace.getWorkspaceName();
         final int newIndex = chooseIndexInTabbedPane(tabbedPane, name);
         tabbedPane.insertTab(name, null, workspace, workspace.getRootDirectory(), newIndex);
         tabbedPane.setSelectedComponent(workspace);
@@ -473,7 +473,7 @@ public class Evergreen {
     
     public Workspace findWorkspaceByName(String name) {
         for (Workspace workspace : getWorkspaces()) {
-            if (workspace.getTitle().equals(name)) {
+            if (workspace.getWorkspaceName().equals(name)) {
                 return workspace;
             }
         }
@@ -530,7 +530,7 @@ public class Evergreen {
         // Re-sort the tabs.
         int i = 0;
         for (Workspace workspace : getWorkspaces()) {
-            final int newIndex = chooseIndexInTabbedPane(tabbedPane, workspace.getTitle());
+            final int newIndex = chooseIndexInTabbedPane(tabbedPane, workspace.getWorkspaceName());
             tabbedPane.moveTab(i, newIndex);
             ++i;
         }

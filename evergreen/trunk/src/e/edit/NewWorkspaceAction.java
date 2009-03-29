@@ -29,7 +29,7 @@ public class NewWorkspaceAction extends AbstractAction {
                     int prefixCharsToSkip = workspace.getRootDirectory().length();
                     String pathWithinWorkspace = friendlyDirectory.substring(prefixCharsToSkip);
                     // When adding a workspace which overlaps an existing one, choose a name that will sort close to but after the current workspace.
-                    properties.name = workspace.getTitle() + " " + pathWithinWorkspace;
+                    properties.name = workspace.getWorkspaceName() + " " + pathWithinWorkspace;
                 }
             }
         }
