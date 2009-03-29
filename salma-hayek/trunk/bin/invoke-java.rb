@@ -76,18 +76,15 @@ class InAppClient
     telnet.puts(secret)
     telnet.puts(command)
     serverOutput = telnet.readlines()
-    success = true
-    if serverOutput.length() > 0 && serverOutput[0].match(/^Authentication (OK|failed)$/)
-      if $1 == "OK"
-        serverOutput.shift()
-      else
-        success = false
-      end
+    authentication_response = serverOutput.shift().chomp()
+    if authentication_response != "Authentication OK"
+      raise authentication_response
     end
     print(serverOutput.join(""))
     telnet.close()
-    return success
+    return true
   rescue Exception => ex
+    $stderr.puts(ex)
     return false
   end
 end
