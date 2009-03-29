@@ -196,6 +196,7 @@ public class BirdView extends JComponent {
         return ((double) usableArea.height) / (birdsEye.getVisibleLineCount() - 1);
     }
     
+    // Lines are numbered from 0.
     public void setSelectedLines(int startLine, int endLine) {
         if (selectionStartLine != startLine || selectionEndLine != endLine) {
             selectionStartLine = startLine;
