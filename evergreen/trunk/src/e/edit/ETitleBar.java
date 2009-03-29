@@ -88,7 +88,7 @@ public class ETitleBar extends JPanel {
         buttonsPanel.add(closeButton, BorderLayout.EAST);
         
         setActive(false);
-        setTitle(name);
+        titleLabel.setText(name);
         initListener();
     }
     
@@ -128,14 +128,6 @@ public class ETitleBar extends JPanel {
         invalidate();
         validate();
         repaint();
-    }
-    
-    public void setTitle(String title) {
-        titleLabel.setText(title);
-    }
-    
-    public String getTitle() {
-        return titleLabel.getText();
     }
     
     public boolean isActive() {

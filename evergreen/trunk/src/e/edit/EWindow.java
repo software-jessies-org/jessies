@@ -19,14 +19,6 @@ public class EWindow extends JComponent {
         return titleBar;
     }
     
-    public String getTitle() {
-        return titleBar.getTitle();
-    }
-
-    public void setTitle(String title) {
-        titleBar.setTitle(title);
-    }
-    
     public boolean isDirty() {
         return false;
     }

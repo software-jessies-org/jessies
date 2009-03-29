@@ -54,7 +54,7 @@ public class EColumn extends JPanel {
     
     public EWindow findWindowByFilename(String filename) {
         for (ETextWindow text : getTextWindows()) {
-            if (text.getTitle().endsWith(filename)) {
+            if (text.getFilename().endsWith(filename)) {
                 return text;
             }
         }
