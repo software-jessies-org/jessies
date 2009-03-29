@@ -164,8 +164,9 @@ public class ETextWindow extends EWindow implements PTextListener {
         textArea.addCaretListener(new PCaretListener() {
             public void caretMoved(PTextArea textArea, int selectionStart, int selectionEnd) {
                 updateStatusLine();
-                final int startLine = 1 + textArea.getLineOfOffset(selectionStart);
-                final int endLine = 1 + textArea.getLineOfOffset(selectionEnd);
+                // BirdView numbers lines from 0.
+                final int startLine = textArea.getLineOfOffset(selectionStart);
+                final int endLine = textArea.getLineOfOffset(selectionEnd);
                 birdView.setSelectedLines(startLine, endLine);
             }
         });
