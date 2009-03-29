@@ -415,7 +415,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
     public synchronized void showMatches() {
         // Only bother if the user can see the results, and we're not currently rescanning the index.
         if (matchView.isShowing() && workspace.getFileList().getIndexedFileCount() != -1) {
-            new Thread(new FileFinder(), "Find in Files for " + workspace.getTitle()).start();
+            new Thread(new FileFinder(), "Find in Files for " + workspace.getWorkspaceName()).start();
         }
     }
     
@@ -532,7 +532,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
     }
     
     private void initForm() {
-        this.form = new FormBuilder(Evergreen.getInstance().getFrame(), "Find in Files in " + workspace.getTitle());
+        this.form = new FormBuilder(Evergreen.getInstance().getFrame(), "Find in Files in " + workspace.getWorkspaceName());
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Files Containing:", regexField);
         formPanel.addRow("Whose Names Match:", filenameRegexField);

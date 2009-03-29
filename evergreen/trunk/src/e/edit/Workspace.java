@@ -14,7 +14,7 @@ public class Workspace extends JPanel {
     
     private ArrayList<EErrorsWindow> errorsWindows = new ArrayList<EErrorsWindow>();
 
-    private String title;
+    private String workspaceName;
     private String rootDirectory;
     private String canonicalRootDirectory;
     private String buildTarget;
@@ -31,12 +31,12 @@ public class Workspace extends JPanel {
     
     private List<Evergreen.InitialFile> initialFiles = Collections.emptyList();
     
-    public Workspace(String title, final String rootDirectory) {
+    public Workspace(String workspaceName, final String rootDirectory) {
         super(new BorderLayout());
         
         initFileList();
         
-        setTitle(title);
+        setWorkspaceName(workspaceName);
         setRootDirectory(rootDirectory);
         setBuildTarget("");
         
@@ -71,12 +71,12 @@ public class Workspace extends JPanel {
         fileList.dispose();
     }
     
-    public String getTitle() {
-        return title;
+    public String getWorkspaceName() {
+        return workspaceName;
     }
     
-    public void setTitle(String newTitle) {
-        this.title = newTitle;
+    public void setWorkspaceName(String newWorkspaceName) {
+        this.workspaceName = newWorkspaceName;
         updateTabForWorkspace();
     }
     
@@ -92,14 +92,14 @@ public class Workspace extends JPanel {
             final boolean rootDirectoryValid = rootDirectory.exists() && rootDirectory.isDirectory();
             final int openFileCount = leftColumn.getTextWindows().size() + getInitialFileCount();
             
-            String title = getTitle();
+            String tabTitle = getWorkspaceName();
             if (openFileCount > 0) {
-                title += " (" + openFileCount + ")";
+                tabTitle += " (" + openFileCount + ")";
             }
             
             final int tabIndex = tabbedPane.indexOfComponent(this);
             tabbedPane.setForegroundAt(tabIndex, rootDirectoryValid ? Color.BLACK : Color.RED);
-            tabbedPane.setTitleAt(tabIndex, title);
+            tabbedPane.setTitleAt(tabIndex, tabTitle);
         }
     }
     
@@ -117,7 +117,7 @@ public class Workspace extends JPanel {
         try {
             this.canonicalRootDirectory = FileUtilities.fileFromString(rootDirectory).getCanonicalPath() + File.separator;
         } catch (IOException ex) {
-            Log.warn("Failed to cache canonical root directory for workspace \"" + title + "\" with new root \"" + rootDirectory + "\"", ex);
+            Log.warn("Failed to cache canonical root directory for workspace \"" + workspaceName + "\" with new root \"" + rootDirectory + "\"", ex);
         }
         fileList.rootDidChange();
         updateTabForWorkspace();
@@ -354,7 +354,7 @@ public class Workspace extends JPanel {
     public void serializeAsXml(org.w3c.dom.Document document, org.w3c.dom.Element workspaces) {
         org.w3c.dom.Element workspace = document.createElement("workspace");
         workspaces.appendChild(workspace);
-        workspace.setAttribute("name", getTitle());
+        workspace.setAttribute("name", getWorkspaceName());
         workspace.setAttribute("root", getRootDirectory());
         workspace.setAttribute("buildTarget", getBuildTarget());
         if (Evergreen.getInstance().getCurrentWorkspace() == this) {
@@ -417,9 +417,9 @@ public class Workspace extends JPanel {
         }
     }
     
-    public EErrorsWindow createErrorsWindow(String title) {
+    public EErrorsWindow createErrorsWindow(String windowTitle) {
         synchronized (errorsWindows) {
-            final EErrorsWindow errorsWindow = new EErrorsWindow(this, title);
+            final EErrorsWindow errorsWindow = new EErrorsWindow(this, windowTitle);
             errorsWindows.add(errorsWindow);
             return errorsWindow;
         }
