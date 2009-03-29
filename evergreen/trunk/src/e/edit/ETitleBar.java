@@ -69,12 +69,12 @@ public class ETitleBar extends JPanel {
     
     private boolean isActive;
     
-    public ETitleBar(String name, EWindow window) {
+    public ETitleBar(String title, EWindow window) {
         super(new BorderLayout());
         
         this.window = window;
         
-        this.titleLabel = new JLabel(" ");
+        this.titleLabel = new JLabel(title);
         titleLabel.setFont(UIManager.getFont(GuiUtilities.isWindows() ? "InternalFrame.titleFont" : "TableHeader.font"));
         titleLabel.setOpaque(false);
         
@@ -88,7 +88,6 @@ public class ETitleBar extends JPanel {
         buttonsPanel.add(closeButton, BorderLayout.EAST);
         
         setActive(false);
-        titleLabel.setText(name);
         initListener();
     }
     
