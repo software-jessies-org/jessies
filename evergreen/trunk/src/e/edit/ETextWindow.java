@@ -16,7 +16,7 @@ import javax.swing.Timer;
 /**
  * A text-editing component.
  */
-public class ETextWindow extends EWindow implements PTextListener {
+public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTextListener {
     private static final HashMap<FileType, HashSet<String>> SPELLING_EXCEPTIONS_MAP = new HashMap<FileType, HashSet<String>>();
     
     // Used to update the watermark without creating and destroying an excessive number of threads.
@@ -825,10 +825,10 @@ public class ETextWindow extends EWindow implements PTextListener {
     
     /**
      * Implements the Comparable interface so windows can be sorted
-     * into alphabetical order by title.
+     * into alphabetical order by filename.
      */
-    public int compareTo(Object other) {
-        return getTitle().compareTo(((EWindow) other).getTitle());
+    public int compareTo(ETextWindow other) {
+        return getFilename().compareTo(other.getFilename());
     }
     
     public void setCurrentRegularExpression(String regularExpression) {
