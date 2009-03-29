@@ -148,7 +148,6 @@ public class WorkspaceFileList {
          * Builds a list of files for Open Quickly.
          */
         private ArrayList<String> scanWorkspaceForFiles() {
-            Log.warn("Scanning " + workspaceRoot + " for interesting files.");
             final long t0 = System.nanoTime();
             
             // We should reload the file ignorer's configuration when we rescan.

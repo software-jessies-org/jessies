@@ -42,7 +42,6 @@ public class Evergreen {
          * Also makes the last-visible workspace visible again.
          */
         private void openRememberedWorkspaces() {
-            Log.warn("Opening remembered workspaces...");
             if (initialWorkspaces == null) {
                 return;
             }
@@ -697,7 +696,6 @@ public class Evergreen {
     }
     
     private Workspace openWorkspace(WorkspaceProperties properties, List<InitialFile> initialFiles) {
-        Log.warn("Opening workspace \"" + properties.name + "\" with root \"" + properties.rootDirectory + "\"");
         Workspace workspace = createWorkspace(properties);
         if (workspace == null) {
             return null;
