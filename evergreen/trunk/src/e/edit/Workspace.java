@@ -161,7 +161,10 @@ public class Workspace extends JPanel {
         return dirtyTextWindows;
     }
     
-    /** Returns the EWindow corresponding to the given file. If the file's open, shows the given address. */
+    /**
+     * Returns the EWindow corresponding to the given file. If the file's open, shows the given address.
+     * If the caller were to supply a different filename for the same file, then this wouldn't notice that the file was already open.
+     */
     public EWindow findIfAlreadyOpen(String filename, String address) {
         // Check we don't already have this open as a file or directory.
         final EWindow window = leftColumn.findWindowByFilename(filename);

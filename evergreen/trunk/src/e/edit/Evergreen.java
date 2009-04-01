@@ -291,7 +291,9 @@ public class Evergreen {
         try {
             /*
              * Open the file a symbolic link points to, and not the link itself.
-             * Clean paths like a/b/../c/d. Let the Java API do this.
+             * This ensures that, even on case-insensitive file systems, we always use the same case.
+             * That, in turn, ensures that we won't open a second viewer on the same file.
+             * This also cleans paths like a/b/../c/d.
              */
             filename = FileUtilities.fileFromString(filename).getCanonicalPath();
         } catch (IOException ex) {
