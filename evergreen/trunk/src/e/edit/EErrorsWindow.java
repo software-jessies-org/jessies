@@ -72,6 +72,10 @@ public class EErrorsWindow extends JFrame {
             public void componentMoved(ComponentEvent e) {
                 JFrameUtilities.storeBounds(getTitle(), EErrorsWindow.this);
             }
+            @Override
+            public void componentResized(ComponentEvent e) {
+                JFrameUtilities.storeBounds(getTitle(), EErrorsWindow.this);
+            }
         });
         initKeyboardEquivalents();
         

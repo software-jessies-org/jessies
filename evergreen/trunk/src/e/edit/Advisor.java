@@ -133,6 +133,10 @@ public class Advisor extends JPanel {
             JFrameUtilities.restoreBounds(frameTitle, frame);
             frame.addComponentListener(new ComponentAdapter() {
                 @Override
+                public void componentMoved(ComponentEvent e) {
+                    JFrameUtilities.storeBounds(frameTitle, frame);
+                }
+                @Override
                 public void componentResized(ComponentEvent e) {
                     JFrameUtilities.storeBounds(frameTitle, frame);
                 }
