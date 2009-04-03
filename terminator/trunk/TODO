@@ -265,11 +265,6 @@ RFEs
   a mailer or whatever, and preserve the formatting. Presumably we can put
   HTML data on the clipboard? [See elliotth's blog for details.]
 
-* We should remove the "no menu bar" option. I still think it's best to
-  pretend that it's Java 6's fault rather than ours (the only users who
-  can avoid the menu bar currently are Linux users running Java 5). It's
-  not worth a fight, but there is a bunch of cruft it will be nice to drop.
-
 * the absence of system wide C-`/C-~ functionality would make cycling through
   windows even more useful on Linux, so maybe we should support alt-` and
   alt-~ there? The obvious problem with this is that on Linux it's likely that

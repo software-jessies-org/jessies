@@ -385,16 +385,11 @@ public class TerminatorFrame extends JFrame implements TerminalPaneHost {
 		repaint();
 	}
 
-	public boolean isShowingMenu() {
-		return getJMenuBar() != null;
-	}
-
 	public boolean confirmClose(String processesUsingTty) {
 		return SimpleDialog.askQuestion(this, "Close Terminal?", "Closing this terminal may terminate the following processes: " + processesUsingTty, "Close");
 	}
 
-	public TerminalPaneActions createActions(JTerminalPane terminalPane) {
+	public MenuItemProvider createMenuItemProvider(JTerminalPane terminalPane) {
 		return new DefaultTerminatorPaneActions(terminalPane);
 	}
-	
 }

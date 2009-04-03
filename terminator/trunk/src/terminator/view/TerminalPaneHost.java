@@ -1,6 +1,7 @@
 package terminator.view;
 
-import java.awt.Dimension;
+import e.gui.*;
+import java.awt.*;
 
 /**
  * Contains JTerminatorPanes and provides their host environment.
@@ -19,9 +20,6 @@ public interface TerminalPaneHost {
 	void updateFrameTitle();
 	void terminalNameChanged(JTerminalPane terminalPane);
 	void setTerminalSize(Dimension size);
-
-	boolean isShowingMenu();
 	
-	TerminalPaneActions createActions(JTerminalPane terminalPane);
-
+	MenuItemProvider createMenuItemProvider(JTerminalPane terminalPane);
 }
