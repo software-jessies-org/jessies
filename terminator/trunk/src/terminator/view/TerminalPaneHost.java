@@ -9,17 +9,17 @@ import java.awt.*;
  * Not tied to the rest of Terminator to facilitate embedding.
  */
 public interface TerminalPaneHost {
-
-	void cycleTab(int delta);
-	void moveCurrentTab(int direction);
-	void setSelectedTabIndex(int index);
+	public void cycleTab(int delta);
+	public void moveCurrentTab(int direction);
+	public void setSelectedTabIndex(int index);
 	
-	boolean confirmClose(String processesUsingTty);
-	void closeTerminalPane(JTerminalPane terminalPane);
+	public boolean confirmClose(String processesUsingTty);
+	public void closeTerminalPane(JTerminalPane terminalPane);
 	
-	void updateFrameTitle();
-	void terminalNameChanged(JTerminalPane terminalPane);
-	void setTerminalSize(Dimension size);
+	public void updateFrameTitle();
+	public void terminalNameChanged(JTerminalPane terminalPane);
 	
-	MenuItemProvider createMenuItemProvider(JTerminalPane terminalPane);
+	public void setTerminalSize(Dimension size);
+	
+	public MenuItemProvider createMenuItemProvider(JTerminalPane terminalPane);
 }
