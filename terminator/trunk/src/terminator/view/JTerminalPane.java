@@ -21,6 +21,7 @@ public class JTerminalPane extends JPanel {
 	// Search the change log for "backspace" for more information.
 	private static final String ERASE_STRING = String.valueOf(GuiUtilities.isWindows() ? Ascii.BS : Ascii.DEL);
 	
+	private TerminalPaneHost host;
 	private TerminalControl control;
 	private TerminalView view;
 	private JScrollPane scrollPane;
@@ -29,26 +30,7 @@ public class JTerminalPane extends JPanel {
 	private boolean wasCreatedAsNewShell;
 	private Dimension currentSizeInChars;
 	private JAsynchronousProgressIndicator outputSpinner;
-	private Action[] menuAndKeyActions = new Action[] {
-		new TerminatorMenuBar.CopyAction(),
-		new TerminatorMenuBar.PasteAction(),
-		null,
-		new TerminatorMenuBar.NewShellAction(),
-		new TerminatorMenuBar.NewTabAction(),
-		new TerminatorMenuBar.CloseAction(),
-		null,
-		new TerminatorMenuBar.FindAction(),
-		new TerminatorMenuBar.FindNextAction(),
-		new TerminatorMenuBar.FindPreviousAction(),
-		null,
-		new TerminatorMenuBar.ClearScrollbackAction(),
-		null,
-		new TerminatorMenuBar.CycleTabAction(1),
-		new TerminatorMenuBar.CycleTabAction(-1),
-		null,
-		new TerminatorMenuBar.ShowInfoAction(),
-		new TerminatorMenuBar.ResetAction()
-	};
+	private TerminalPaneActions actions;
 	
 	/**
 	 * Creates a new terminal with the given name, running the given command.
@@ -127,7 +109,12 @@ public class JTerminalPane extends JPanel {
 		initOutputSpinner();
 		
 		EPopupMenu popupMenu = new EPopupMenu(view);
-		popupMenu.addMenuItemProvider(new TerminatorMenuItemProvider());
+		// Indirection because we've not yet created the actions.  
+		popupMenu.addMenuItemProvider(new MenuItemProvider() {
+			public void provideMenuItems(MouseEvent event, Collection<Action> actions) {
+				JTerminalPane.this.actions.provideMenuItems(event, actions);
+			}
+		});
 		
 		viewport = new VisualBellViewport();
 		viewport.setView(view);
@@ -231,7 +218,7 @@ public class JTerminalPane extends JPanel {
 		if (size.equals(currentSizeInChars) == false) {
 			try {
 				control.sizeChanged(size, view.getVisibleSize());
-				getTerminatorFrame().setTerminalSize(size);
+				host.setTerminalSize(size);
 			} catch (Exception ex) {
 				if (control != null) {
 					Log.warn("Failed to notify " + control.getPtyProcess() + " of size change", ex);
@@ -245,8 +232,14 @@ public class JTerminalPane extends JPanel {
 		return view;
 	}
 	
-	/** Starts the process listening once all the user interface stuff is set up. */
-	public void start() {
+	/** 
+	 * Starts the process listening once all the user interface stuff is set up.
+	 * 
+	 * @param host Reference to the environment hosting this JTerminalPane.
+	 */
+	public void start(TerminalPaneHost host) {
+		this.host = host;
+		this.actions = host.createActions(this);
 		control.start();
 	}
 	
@@ -274,7 +267,7 @@ public class JTerminalPane extends JPanel {
 	
 	public void setName(String name) {
 		this.name = name;
-		getTerminatorFrame().terminalNameChanged(this);
+		host.terminalNameChanged(this);
 	}
 	
 	public Dimension getOptimalViewSize() {
@@ -326,26 +319,6 @@ public class JTerminalPane extends JPanel {
 			// ruby -e 'while true; $stdout.write("X" * 90); $stdout.flush(); sleep(0.05); puts(); end'
 		}
 		
-		/**
-		 * On Mac OS, we have the screen menu bar to take care of
-		 * all the keyboard equivalents. Elsewhere, we have to detect
-		 * the events, and invoke actionPerformed on the relevant
-		 * Action ourselves.
-		 */
-		private void handleKeyboardEquivalent(KeyEvent event) {
-			for (Action action : menuAndKeyActions) {
-				if (action == null) {
-					continue;
-				}
-				KeyStroke accelerator = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
-				KeyStroke thisStroke = KeyStroke.getKeyStrokeForEvent(event);
-				if (thisStroke.equals(accelerator)) {
-					action.actionPerformed(null);
-					break;
-				}
-			}
-		}
-		
 		public void keyPressed(KeyEvent event) {
 			if (doKeyboardScroll(event) || doKeyboardTabAction(event)) {
 				event.consume();
@@ -354,9 +327,8 @@ public class JTerminalPane extends JPanel {
 			
 			// Support keyboard equivalents when the user's been stupid enough to turn the menu off.
 			if (TerminatorMenuBar.isKeyboardEquivalent(event)) {
-				JFrame frame = getTerminatorFrame();
-				if (frame != null && frame.getJMenuBar() == null) {
-					handleKeyboardEquivalent(event);
+				if (!host.isShowingMenu()) {
+					actions.handleKeyboardEquivalent(event);
 				}
 				return;
 			}
@@ -577,20 +549,20 @@ public class JTerminalPane extends JPanel {
 			final int keyCode = e.getKeyCode();
 			if (e.isControlDown() && keyCode == KeyEvent.VK_TAB) {
 				// Emulates Firefox's control-tab/control-shift-tab cycle-tab behavior.
-				getTerminatorFrame().cycleTab(e.isShiftDown() ? -1 : 1);
+				host.cycleTab(e.isShiftDown() ? -1 : 1);
 				return true;
 			} else if (e.isControlDown() && e.isShiftDown() == false && (keyCode == KeyEvent.VK_PAGE_UP || keyCode == KeyEvent.VK_PAGE_DOWN)) {
 				// Emulates gnome-terminal and Firefox's control-page up/down cycle-tab behavior.
 				// Strictly, we're supposed to send an escape sequence for these strokes, but I don't know of anything that uses them.
-				getTerminatorFrame().cycleTab(keyCode == KeyEvent.VK_PAGE_UP ? -1 : 1);
+				host.cycleTab(keyCode == KeyEvent.VK_PAGE_UP ? -1 : 1);
 				return true;
 			} else if (e.isControlDown() && e.isShiftDown() && (keyCode == KeyEvent.VK_PAGE_UP || keyCode == KeyEvent.VK_PAGE_DOWN)) {
 				// Emulates gnome-terminal's control-shift page up/page down move-tab behavior.
-				getTerminatorFrame().moveCurrentTab(keyCode == KeyEvent.VK_PAGE_UP ? -1 : +1);
+				host.moveCurrentTab(keyCode == KeyEvent.VK_PAGE_UP ? -1 : +1);
 				return true;
 			} else if (e.isControlDown() && e.isShiftDown() && (keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_RIGHT)) {
 				// Emulates konsole's control-shift left/right move-tab behavior.
-				getTerminatorFrame().moveCurrentTab(keyCode == KeyEvent.VK_LEFT ? -1 : +1);
+				host.moveCurrentTab(keyCode == KeyEvent.VK_LEFT ? -1 : +1);
 				return true;
 			} else if (TerminatorMenuBar.isKeyboardEquivalent(e)) {
 				// Emulates gnome-terminal's alt-<number> jump-to-tab behavior, or an analog of Terminal.app's command-<number> jump-to-window behavior.
@@ -598,7 +570,7 @@ public class JTerminalPane extends JPanel {
 				final char ch = (char) e.getKeyCode();
 				final int newIndex = TerminatorTabbedPane.keyCharToTabIndex(ch);
 				if (newIndex != -1) {
-					getTerminatorFrame().setSelectedTabIndex(newIndex);
+					host.setSelectedTabIndex(newIndex);
 					return true;
 				}
 			}
@@ -666,56 +638,6 @@ public class JTerminalPane extends JPanel {
 	public void requestFocus() {
 		view.requestFocus();
 	}
-	
-	private class TerminatorMenuItemProvider implements MenuItemProvider {
-		public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
-			actions.addAll(Arrays.asList(menuAndKeyActions));
-			addInfoItems(actions);
-		}
-		
-		private void addInfoItems(Collection<Action> actions) {
-			// Mac OS doesn't have an X11-like system-wide selection, so we just grab our own selected text directly.
-			// Windows can be treated like either here because we're deliberately making it pretend to be retarded, to be like PuTTY.
-			String selectedText = GuiUtilities.isMacOs() ? getSelectionHighlighter().getTabbedString() : getSystemSelection();
-			addSelectionInfoItems(actions, selectedText);
-			EPopupMenu.addNumberInfoItems(actions, selectedText);
-		}
-		
-		private void addSelectionInfoItems(Collection<Action> actions, String selectedText) {
-			if (selectedText.length() == 0) {
-				return;
-			}
-			
-			int selectedLineCount = 0;
-			for (int i = 0; i < selectedText.length(); ++i) {
-				if (selectedText.charAt(i) == '\n') {
-					++selectedLineCount;
-				}
-			}
-			actions.add(null);
-			actions.add(EPopupMenu.makeInfoItem("Selection"));
-			actions.add(EPopupMenu.makeInfoItem("  characters: " + selectedText.length()));
-			if (selectedLineCount != 0) {
-				actions.add(EPopupMenu.makeInfoItem("  lines: " + selectedLineCount));
-			}
-		}
-	}
-	
-	private String getSystemSelection() {
-		String result = "";
-		try {
-			Clipboard selection = getToolkit().getSystemSelection();
-			if (selection == null) {
-				selection = getToolkit().getSystemClipboard();
-			}
-			Transferable transferable = selection.getContents(null);
-			result = (String) transferable.getTransferData(DataFlavor.stringFlavor);
-		} catch (Exception ex) {
-			Log.warn("Couldn't get system selection", ex);
-		}
-		return result;
-	}
-	
 	public void doCopyAction() {
 		getSelectionHighlighter().copyToSystemClipboard();
 	}
@@ -751,8 +673,7 @@ public class JTerminalPane extends JPanel {
 			return true;
 		}
 
-		boolean reallyClose = SimpleDialog.askQuestion(getTerminatorFrame(), "Close Terminal?", "Closing this terminal may terminate the following processes: " + processesUsingTty, "Close");
-		return reallyClose;
+		return host.confirmClose(processesUsingTty);
 	}
 
 	/**
@@ -770,11 +691,7 @@ public class JTerminalPane extends JPanel {
 	public void doCloseAction() {
 		destroyProcess();
 		getLogWriter().close();
-		getTerminatorFrame().closeTerminalPane(this);
-	}
-	
-	public TerminatorFrame getTerminatorFrame() {
-		return (TerminatorFrame) SwingUtilities.getAncestorOfClass(TerminatorFrame.class, this);
+		host.closeTerminalPane(this);
 	}
 	
 	/**
@@ -783,4 +700,9 @@ public class JTerminalPane extends JPanel {
 	public void flash() {
 		viewport.flash();
 	}
+	
+	public TerminalPaneHost getHost() {
+		return host;
+	}
+	
 }

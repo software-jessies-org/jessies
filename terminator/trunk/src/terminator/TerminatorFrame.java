@@ -10,7 +10,7 @@ import javax.swing.*;
 import javax.swing.Timer;
 import terminator.view.*;
 
-public class TerminatorFrame extends JFrame {
+public class TerminatorFrame extends JFrame implements TerminalPaneHost {
 	private Dimension terminalSize;
 	private TerminatorTabbedPane tabbedPane;
 	
@@ -26,7 +26,7 @@ public class TerminatorFrame extends JFrame {
 		initFrame();
 		initFocus();
 		for (JTerminalPane terminal : terminals) {
-			terminal.start();
+			terminal.start(this);
 		}
 	}
 	
@@ -337,7 +337,7 @@ public class TerminatorFrame extends JFrame {
 	public void addTab(JTerminalPane newPane) {
 		terminals.add(newPane);
 		addPaneToUI(newPane);
-		newPane.start();
+		newPane.start(this);
 		tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
 		updateFrameTitle();
 	}
@@ -384,4 +384,17 @@ public class TerminatorFrame extends JFrame {
 		}
 		repaint();
 	}
+
+	public boolean isShowingMenu() {
+		return getJMenuBar() != null;
+	}
+
+	public boolean confirmClose(String processesUsingTty) {
+		return SimpleDialog.askQuestion(this, "Close Terminal?", "Closing this terminal may terminate the following processes: " + processesUsingTty, "Close");
+	}
+
+	public TerminalPaneActions createActions(JTerminalPane terminalPane) {
+		return new DefaultTerminatorPaneActions(terminalPane);
+	}
+	
 }
