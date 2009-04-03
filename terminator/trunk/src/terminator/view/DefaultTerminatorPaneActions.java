@@ -1,22 +1,14 @@
 package terminator.view;
 
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.util.Arrays;
-import java.util.Collection;
+import e.gui.*;
+import e.util.*;
+import java.awt.datatransfer.*;
+import java.awt.event.*;
+import java.util.*;
+import javax.swing.*;
+import terminator.*;
 
-import javax.swing.Action;
-import javax.swing.KeyStroke;
-
-import terminator.TerminatorMenuBar;
-import e.gui.EPopupMenu;
-import e.util.GuiUtilities;
-import e.util.Log;
-
-public class DefaultTerminatorPaneActions implements TerminalPaneActions {
+public class DefaultTerminatorPaneActions implements MenuItemProvider {
 	
 	private Action[] menuAndKeyActions = new Action[] {
 			new TerminatorMenuBar.CopyAction(),
@@ -91,19 +83,4 @@ public class DefaultTerminatorPaneActions implements TerminalPaneActions {
 		}
 		return result;
 	}
-	
-	public void handleKeyboardEquivalent(KeyEvent event) {
-		for (Action action : menuAndKeyActions) {
-			if (action == null) {
-				continue;
-			}
-			KeyStroke accelerator = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
-			KeyStroke thisStroke = KeyStroke.getKeyStrokeForEvent(event);
-			if (thisStroke.equals(accelerator)) {
-				action.actionPerformed(null);
-				break;
-			}
-		}
-	}
-	
 }

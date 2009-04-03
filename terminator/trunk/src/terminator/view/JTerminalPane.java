@@ -30,7 +30,7 @@ public class JTerminalPane extends JPanel {
 	private boolean wasCreatedAsNewShell;
 	private Dimension currentSizeInChars;
 	private JAsynchronousProgressIndicator outputSpinner;
-	private TerminalPaneActions actions;
+	private MenuItemProvider menuItemProvider;
 	
 	/**
 	 * Creates a new terminal with the given name, running the given command.
@@ -109,10 +109,10 @@ public class JTerminalPane extends JPanel {
 		initOutputSpinner();
 		
 		EPopupMenu popupMenu = new EPopupMenu(view);
-		// Indirection because we've not yet created the actions.  
+		// Indirection because we've not yet created the real MenuItemProvider.  
 		popupMenu.addMenuItemProvider(new MenuItemProvider() {
 			public void provideMenuItems(MouseEvent event, Collection<Action> actions) {
-				JTerminalPane.this.actions.provideMenuItems(event, actions);
+				menuItemProvider.provideMenuItems(event, actions);
 			}
 		});
 		
@@ -239,7 +239,7 @@ public class JTerminalPane extends JPanel {
 	 */
 	public void start(TerminalPaneHost host) {
 		this.host = host;
-		this.actions = host.createActions(this);
+		this.menuItemProvider = host.createMenuItemProvider(this);
 		control.start();
 	}
 	
@@ -324,15 +324,6 @@ public class JTerminalPane extends JPanel {
 				event.consume();
 				return;
 			}
-			
-			// Support keyboard equivalents when the user's been stupid enough to turn the menu off.
-			if (TerminatorMenuBar.isKeyboardEquivalent(event)) {
-				if (!host.isShowingMenu()) {
-					actions.handleKeyboardEquivalent(event);
-				}
-				return;
-			}
-			
 			String sequence = getEscapeSequenceForKeyCode(event);
 			if (sequence != null) {
 				if (sequence.length() == 1) {
