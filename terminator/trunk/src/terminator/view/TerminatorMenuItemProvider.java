@@ -8,32 +8,32 @@ import java.util.*;
 import javax.swing.*;
 import terminator.*;
 
-public class DefaultTerminatorPaneActions implements MenuItemProvider {
-	
-	private Action[] menuAndKeyActions = new Action[] {
-			new TerminatorMenuBar.CopyAction(),
-			new TerminatorMenuBar.PasteAction(),
-			null,
-			new TerminatorMenuBar.NewShellAction(),
-			new TerminatorMenuBar.NewTabAction(),
-			new TerminatorMenuBar.CloseAction(),
-			null,
-			new TerminatorMenuBar.FindAction(),
-			new TerminatorMenuBar.FindNextAction(),
-			new TerminatorMenuBar.FindPreviousAction(),
-			null,
-			new TerminatorMenuBar.ClearScrollbackAction(),
-			null,
-			new TerminatorMenuBar.CycleTabAction(1),
-			new TerminatorMenuBar.CycleTabAction(-1),
-			null,
-			new TerminatorMenuBar.ShowInfoAction(),
-			new TerminatorMenuBar.ResetAction()
-		};
-	
+public class TerminatorMenuItemProvider implements MenuItemProvider {
 	private final JTerminalPane terminalPane;
 	
-	public DefaultTerminatorPaneActions(JTerminalPane terminalPane) {
+	// FIXME: mad points out that we need to recreate these if the preferences change to get the right keyboard equivalents.
+	private Action[] menuAndKeyActions = new Action[] {
+		new TerminatorMenuBar.CopyAction(),
+		new TerminatorMenuBar.PasteAction(),
+		null,
+		new TerminatorMenuBar.NewShellAction(),
+		new TerminatorMenuBar.NewTabAction(),
+		new TerminatorMenuBar.CloseAction(),
+		null,
+		new TerminatorMenuBar.FindAction(),
+		new TerminatorMenuBar.FindNextAction(),
+		new TerminatorMenuBar.FindPreviousAction(),
+		null,
+		new TerminatorMenuBar.ClearScrollbackAction(),
+		null,
+		new TerminatorMenuBar.CycleTabAction(1),
+		new TerminatorMenuBar.CycleTabAction(-1),
+		null,
+		new TerminatorMenuBar.ShowInfoAction(),
+		new TerminatorMenuBar.ResetAction()
+	};
+	
+	public TerminatorMenuItemProvider(JTerminalPane terminalPane) {
 		this.terminalPane = terminalPane;
 	}
 	
