@@ -390,6 +390,6 @@ public class TerminatorFrame extends JFrame implements TerminalPaneHost {
 	}
 
 	public MenuItemProvider createMenuItemProvider(JTerminalPane terminalPane) {
-		return new DefaultTerminatorPaneActions(terminalPane);
+		return new TerminatorMenuItemProvider(terminalPane);
 	}
 }
