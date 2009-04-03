@@ -770,7 +770,7 @@ $(INSTALLER.dmg): $(MACHINE_PROJECT_NAME).app
 	@echo "Creating Mac OS .dmg disk image..."
 	mkdir -p $(@D) && \
 	$(RM) $@ && \
-	hdiutil create -fs HFSX -format UDBZ -volname $(HUMAN_PROJECT_NAME) -srcfolder $(PACKAGING_DIRECTORY) $@
+	hdiutil create -fs HFSX -format UDZO -volname $(HUMAN_PROJECT_NAME) -srcfolder $(PACKAGING_DIRECTORY) $@
 
 $(INSTALLER.pkg): $(MACHINE_PROJECT_NAME).app
 	@echo "Creating package stream..."
