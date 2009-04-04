@@ -184,7 +184,7 @@ public class JavaResearcher implements WorkspaceResearcher {
             return "file://" + htmlFile;
         } else {
             // The file doesn't exist locally with the name we have cached in "javadoc-summary.txt", so we'll have to get it from the local override, or direct from Sun.
-            final String javaDocLocation = Parameters.getString("java.advisor.doc", "http://java.sun.com/j2se/1.5.0/docs/api/");
+            final String javaDocLocation = Parameters.getString("java.advisor.doc", JavaDoc.SUN_JAVA_DOC_LOCATION);
             return javaDocLocation + htmlFile.replaceAll("^.*/api/", "/");
         }
     }

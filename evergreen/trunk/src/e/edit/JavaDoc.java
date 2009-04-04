@@ -16,6 +16,8 @@ FIXME: parts of this class are pretty much vestigial; most of the methods in her
 
 */
 public class JavaDoc {
+    public static final String SUN_JAVA_DOC_LOCATION = "http://java.sun.com/javase/6/docs/api/";
+    
     /** Holds the name of every package we know of. */
     private static ArrayList<String> packageNames = new ArrayList<String>();
     
@@ -82,7 +84,7 @@ public class JavaDoc {
         
         // In an emergency, fall back to Sun's copy on the web.
         if (javaDocLocations.isEmpty()) {
-            javaDocLocations.add("http://java.sun.com/javase/6/docs/api/");
+            javaDocLocations.add(SUN_JAVA_DOC_LOCATION);
         }
         
         int totalPkgs = packageNames.size();
