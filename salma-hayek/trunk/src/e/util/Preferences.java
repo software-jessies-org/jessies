@@ -249,6 +249,11 @@ public abstract class Preferences {
             }
         });
         
+        final JButton extraButton = getExtraButton();
+        if (extraButton != null) {
+            form.getFormDialog().setExtraButton(extraButton);
+        }
+        
         form.getFormDialog().setRememberBounds(false);
         form.show("Save");
     }
@@ -261,6 +266,11 @@ public abstract class Preferences {
     // Override this to add rows after the automatic ones.
     protected void didAddRows(List<FormPanel> formPanels) {
         // Don't add code here. This is for subclasses!
+    }
+    
+    // Override this to return any JButton you'd like added to the preferences dialog.
+    protected JButton getExtraButton() {
+        return null;
     }
     
     public void readFromDisk() {
