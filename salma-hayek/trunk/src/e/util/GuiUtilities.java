@@ -167,6 +167,18 @@ public class GuiUtilities {
     }
     
     /**
+     * Always call this instead of new JMenu.
+     * setMnemonic(0) afterward if need be.
+     * FIXME: This doesn't use the same underscore scheme as configureAction.
+     * configureAction's scheme can frustrate grep.
+     */
+    public static JMenu makeMenu(String name, char mnemonic) {
+        JMenu menu = new JMenu(name);
+        menu.setMnemonic(mnemonic);
+        return menu;
+    }
+    
+    /**
      * Returns the name of the system's best monospaced font.
      */
     public synchronized static String getMonospacedFontName() {
