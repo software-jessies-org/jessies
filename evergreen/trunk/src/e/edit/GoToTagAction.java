@@ -35,18 +35,16 @@ public class GoToTagAction extends ETextAction {
         
         final String workspaceRoot = Evergreen.getInstance().getCurrentWorkspace().getRootDirectory();
         
-        // Call our helper script/binary to find the tags for us.
-        final String defaultFindTagsScript = Evergreen.getScriptFilename("find-tags.rb");
-        // FIXME: document this preference after it's been successfully used at least once.
-        // FIXME: now we're assuming the tool is a Ruby script, which is a step backwards.
-        final String findTagsScript = Parameters.getString("tags.findTagsTool", defaultFindTagsScript);
+        // Call our helper to find the tags for us.
+        final String defaultFindTagsExecutable = Evergreen.getScriptFilename("find-tags.rb");
+        final String findTagsExecutable = Parameters.getString("tags.findTagsTool", defaultFindTagsExecutable);
         // FIXME: we could usefully check for a "tags" file, and maybe even offer to generate a usable one, but we'd need some kind of override in case a custom tool doesn't use a file.
         // FIXME: if Evergreen knew how to regenerate the tags, we could perhaps link it to "rescan".
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
-        int status = ProcessUtilities.backQuote(FileUtilities.fileFromString(workspaceRoot), new String[] { "ruby", findTagsScript, tagName }, lines, errors);
+        int status = ProcessUtilities.backQuote(FileUtilities.fileFromString(workspaceRoot), new String[] { findTagsExecutable, tagName }, lines, errors);
         if (status == 1 || errors.size() > 0) {
-            Evergreen.getInstance().showAlert("Unable to go to tag", findTagsScript + " failed. Error output:\n" + StringUtilities.join(errors, "\n"));
+            Evergreen.getInstance().showAlert("Unable to go to tag", findTagsExecutable + " failed. Error output:\n" + StringUtilities.join(errors, "\n"));
             return;
         }
         
