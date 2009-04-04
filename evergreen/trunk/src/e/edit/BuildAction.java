@@ -46,8 +46,8 @@ public class BuildAction extends ETextAction {
         
         // See if we've got special fall-back instructions.
         if (makefileName == null) {
-            String pathPattern = Parameters.getParameter("build.specialPathPattern");
-            String buildTool = Parameters.getParameter("build.specialBuildTool");
+            String pathPattern = Parameters.getString("build.specialPathPattern", null);
+            String buildTool = Parameters.getString("build.specialBuildTool", null);
             if (pathPattern != null && buildTool != null) {
                 String directory = getMakefileSearchStartDirectory();
                 if (directory.matches(pathPattern)) {

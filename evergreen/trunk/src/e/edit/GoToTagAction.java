@@ -38,7 +38,7 @@ public class GoToTagAction extends ETextAction {
         // Call our helper script/binary to find the tags for us.
         final String defaultFindTagsBinary = Evergreen.getScriptFilename("find-tags.rb");
         // FIXME: document this preference after it's been successfully used at least once.
-        final String findTagsBinary = Parameters.getParameter("tags.findTagsTool", defaultFindTagsBinary);
+        final String findTagsBinary = Parameters.getString("tags.findTagsTool", defaultFindTagsBinary);
         // FIXME: we could usefully check for a "tags" file, and maybe even offer to generate a usable one, but we'd need some kind of override in case a custom tool doesn't use a file.
         // FIXME: if Evergreen knew how to regenerate the tags, we could perhaps link it to "rescan".
         ArrayList<String> lines = new ArrayList<String>();

@@ -23,7 +23,7 @@ public abstract class ExternalToolsParser {
         for (int i = 0; i < 256; i++) {
             String prefix = "tools." + i + ".";
 
-            String name = Parameters.getParameter(prefix + "name");
+            String name = Parameters.getString(prefix + "name", null);
             if (name == null) {
                 // We allow missing entries.
                 continue;
@@ -34,7 +34,7 @@ public abstract class ExternalToolsParser {
                 continue;
             }
 
-            String command = Parameters.getParameter(prefix + "command");
+            String command = Parameters.getString(prefix + "command", null);
             if (command == null) {
                 Log.warn("Missing property " + prefix + "command for external tool \"" + name + "\"");
                 Log.warn("Perhaps you need to specify a command specific for " + System.getProperty("os.name") + "?");
@@ -72,9 +72,9 @@ public abstract class ExternalToolsParser {
             }
             
             ExternalToolAction action = new ExternalToolAction(name, inputDisposition, outputDisposition, command);
-            action.setChecksEverythingSaved(Parameters.getParameter(prefix + "checkEverythingSaved", false));
-            action.setNeedsFile(Parameters.getParameter(prefix + "needsFile", needsFile));
-            action.setRequestsConfirmation(Parameters.getParameter(prefix + "requestConfirmation", false));
+            action.setChecksEverythingSaved(Parameters.getBoolean(prefix + "checkEverythingSaved", false));
+            action.setNeedsFile(Parameters.getBoolean(prefix + "needsFile", needsFile));
+            action.setRequestsConfirmation(Parameters.getBoolean(prefix + "requestConfirmation", false));
             
             configureKeyboardEquivalent(action, prefix);
             configureIcon(action, prefix);
@@ -84,7 +84,7 @@ public abstract class ExternalToolsParser {
     }
     
     private void configureKeyboardEquivalent(Action action, String prefix) {
-        String keyboardEquivalent = Parameters.getParameter(prefix + "keyboardEquivalent", null);
+        String keyboardEquivalent = Parameters.getString(prefix + "keyboardEquivalent", null);
         if (keyboardEquivalent != null) {
             keyboardEquivalent = keyboardEquivalent.trim().toUpperCase();
             // For now, the heuristic is that special keys (mainly just the function keys) have names and don't want any extra modifiers.
@@ -111,11 +111,11 @@ public abstract class ExternalToolsParser {
     
     private void configureIcon(Action action, String prefix) {
         // Allow users to specify a GNOME stock icon, and/or the pathname to an icon.
-        String stockIcon = Parameters.getParameter(prefix + "stockIcon", null);
+        String stockIcon = Parameters.getString(prefix + "stockIcon", null);
         if (stockIcon != null) {
             GnomeStockIcon.useStockIcon(action, stockIcon);
         } else {
-            String icon = Parameters.getParameter(prefix + "icon", null);
+            String icon = Parameters.getString(prefix + "icon", null);
             if (icon != null) {
                 // We trust the user to specify an appropriately-sized icon.
                 action.putValue(Action.SMALL_ICON, new ImageIcon(icon));
