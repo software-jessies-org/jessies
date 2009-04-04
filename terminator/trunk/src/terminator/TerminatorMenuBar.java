@@ -35,7 +35,9 @@ public class TerminatorMenuBar extends EMenuBar {
 	}
 	
 	private JMenu makeFileMenu() {
-		JMenu menu = new JMenu("File");
+		JMenu menu = GuiUtilities.makeMenu("File", 'F');
+		// Alt-F for Find is more useful.
+		menu.setMnemonic(0);
 		menu.add(new NewShellAction());
 		menu.add(new NewCommandAction());
 		
@@ -54,7 +56,7 @@ public class TerminatorMenuBar extends EMenuBar {
 	}
 	
 	private JMenu makeEditMenu() {
-		JMenu menu = new JMenu("Edit");
+		JMenu menu = GuiUtilities.makeMenu("Edit", 'E');
 		menu.add(new CopyAction());
 		menu.add(new PasteAction());
 		menu.add(new SelectAllAction());
@@ -71,7 +73,7 @@ public class TerminatorMenuBar extends EMenuBar {
 	}
 	
 	private JMenu makeScrollbackMenu() {
-		JMenu menu = new JMenu("Scrollback");
+		JMenu menu = GuiUtilities.makeMenu("Scrollback", 'S');
 		
 		menu.add(new ScrollToTopAction());
 		menu.add(new ScrollToBottomAction());
@@ -91,7 +93,7 @@ public class TerminatorMenuBar extends EMenuBar {
 	}
 	
 	private JMenu makeTabsMenu() {
-		final JMenu menu = new JMenu("Tabs");
+		final JMenu menu = GuiUtilities.makeMenu("Tabs", 'T');
 		menu.add(new DetachTabAction());
 		for (Action action : customWindowMenuItems) {
 			menu.add(action);
