@@ -624,6 +624,10 @@ public class Evergreen {
         return getPreferenceFilename("dialog-geometries");
     }
     
+    public static String getUserPropertiesFilename() {
+        return getPreferenceFilename("edit.properties");
+    }
+    
     private void readSavedState() {
         Point initialLocation = null;
         Dimension initialSize = null;
@@ -810,7 +814,7 @@ public class Evergreen {
     private void init() {
         final long t0 = System.nanoTime();
         
-        Parameters.readPropertiesFile(getPreferenceFilename("edit.properties"));
+        Parameters.readPropertiesFile(getUserPropertiesFilename());
         Advisor.initResearchersOnBackgroundThread();
         
         initPreferences();
