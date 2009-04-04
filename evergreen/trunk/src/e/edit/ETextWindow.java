@@ -360,10 +360,19 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
             return;
         }
         newFileType.configureTextArea(textArea);
+        
+        // FIXME: when properties can be reloaded while we're running, this will want to be called on each reload.
+        final int defaultMargin = Parameters.getParameter("default.margin", 80);
+        final int margin = Parameters.getParameter(newFileType.getName() + ".margin", defaultMargin);
+        textArea.showRightHandMarginAt(margin);
+        
         BugDatabaseHighlighter.highlightBugs(textArea);
         initSpellingExceptionsForDocument();
+        
         // Ensure we re-do the tags now we've changed our mind about what kind of tags we're looking for.
         tagsUpdater.updateTags();
+        
+        repaint();
     }
     
     private void uncheckedRevertToSaved() {
