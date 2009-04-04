@@ -1,7 +1,7 @@
 package e.edit;
 
 import e.util.*;
-import java.util.Properties;
+import java.util.*;
 import java.io.*;
 
 /**
@@ -23,123 +23,101 @@ sets the property 'name' to 'value' only if the current OS is "Mac OS X".
 Other lines are considered to be assignments of the form name=value.
 
 */
-public class Parameters extends Properties {
+public class Parameters {
+    private static HashMap<String, String> map = new HashMap<String, String>();
     
     private Parameters() { /* Not instantiable. */ }
     
-    public static void readPropertiesFile(String fileName) {
+    public static synchronized void readPropertiesFile(String fileName) {
         File file = FileUtilities.fileFromString(fileName);
         if (file.exists() == false) {
             return;
         }
-        Properties props = new Properties(System.getProperties());
+        
         try {
-            loadProperties(props, new BufferedReader(new FileReader(file)));
+            map = loadProperties(new HashMap<String, String>(), file);
         } catch (Exception ex) {
             Log.warn("Unable to read properties file \"" + fileName + "\"", ex);
         }
-        System.setProperties(props);
     }
     
-    /** Reads properties into a Properties object from an input stream. */
-    public static synchronized void loadProperties(Properties props, BufferedReader inStream) throws IOException {
-        try {
-            String line;
-            while ((line = inStream.readLine()) != null) {
-                processPropertiesLine(props, line);
-            }
-        } finally {
-            try {
-                inStream.close();
-            } catch (IOException ex) {
-                /* Ignore. */
-                ex = ex;
-            }
+    /** Reads properties from the given file. */
+    private static HashMap<String, String> loadProperties(HashMap<String, String> props, File file) {
+        for (String line : StringUtilities.readLinesFromFile(file)) {
+            processPropertiesLine(props, line);
         }
+        return props;
     }
     
-    public static boolean isCommentLine(String line) {
-        String trimmedLine = line.trim();
-        return trimmedLine.length() == 0 || trimmedLine.charAt(0) == '#';
+    private static boolean isCommentLine(String line) {
+        return line.length() == 0 || line.charAt(0) == '#';
     }
     
-    public static void processIncludeLine(Properties props, String line) {
-        String filename = line.trim().substring(1).trim();
-        File file = FileUtilities.fileFromString(filename);
+    private static boolean isIncludeLine(String line) {
+        return line.charAt(0) == '<';
+    }
+    
+    private static void processIncludeLine(HashMap<String, String> props, String line) {
+        final String filename = line.substring(1);
         try {
-            loadProperties(props, new BufferedReader(new FileReader(file)));
+            loadProperties(props, FileUtilities.fileFromString(filename));
         } catch (Exception ex) {
             Log.warn("Unable to include properties file \"" + filename + "\"", ex);
         }
     }
     
-    public static void processPropertiesLine(Properties props, String line) {
-        // FIXME: what's the right behavior here? Either we disallow properties
-        // like the indent.string property (which will only ever be whitespace)
-        // or we insist that you be careful about trailing spaces. For now, I'll
-        // go with the latter because I need to get some C++ written... -enh
-        //        line = line.trim();
+    private static void processPropertiesLine(HashMap<String, String> props, String line) {
+        // We may need an escaping or quoting mechanism if we ever need to preserve trailing spaces.
+        line = line.trim();
+        
         if (isCommentLine(line)) {
             return;
         }
         
-        if (line.charAt(0) == '<') {
+        if (isIncludeLine(line)) {
             processIncludeLine(props, line);
             return;
         }
         
-        if (line.charAt(0) == '?') {
-            int end = line.indexOf(':');
-            String os = line.substring(1, end);
-            if (os.equals(System.getProperty("os.name")) == false) {
-                return;
-            }
-            line = line.substring(end + 1);
-        }
-        
-        /* Assignment. */
         int equalsPos = line.indexOf('=');
         if (equalsPos == -1) {
+            // TODO: isn't this an error worth reporting?
             Log.warn("line without '=' found in properties file");
             return;
         }
-        String name = line.substring(0, equalsPos);
-        String value = line.substring(equalsPos + 1);
-        //Log.warn("Setting property \"" + name + "\" to \"" + value + "\"");
+        final String name = line.substring(0, equalsPos);
+        final String value = line.substring(equalsPos + 1);
         props.put(name, value);
     }
     
-    public static String getParameter(String name) {
-        return System.getProperty(name);
+    public static synchronized String getParameter(String name) {
+        return map.get(name);
     }
     
-    public static String getParameter(String name, String defaultValue) {
-        return System.getProperty(name, defaultValue);
+    public static synchronized String getParameter(String name, String defaultValue) {
+        final String value = getParameter(name);
+        return (value != null) ? value : defaultValue;
     }
     
-    public static boolean getParameter(String name, boolean defaultValue) {
+    public static synchronized boolean getParameter(String name, boolean defaultValue) {
         // Yet again, the total lack of thought that went into java.lang.Boolean bites us.
-        String result = System.getProperty(name, defaultValue ? "true" : "false");
-        return result.equalsIgnoreCase("true");
+        final String value = getParameter(name, defaultValue ? "true" : "false");
+        return value.equalsIgnoreCase("true");
     }
     
-    public static int getParameter(String name, int defaultValue) {
-        try {
-            String value = getParameter(name);
-            return Integer.parseInt(value);
-        } catch (NumberFormatException ex) {
-            return defaultValue;
-        }
+    public static synchronized int getParameter(String name, int defaultValue) {
+        final String value = getParameter(name);
+        return (value != null) ? Integer.parseInt(value) : defaultValue;
     }
     
     /**
      * Returns an array with an item for each semicolon-separated element of the property.
      */
-    public static String[] getArrayOfSemicolonSeparatedElements(String propertyName) {
-        String configuration = Parameters.getParameter(propertyName, null);
-        if (configuration == null || configuration.trim().length() == 0) {
+    public static synchronized String[] getArrayOfSemicolonSeparatedElements(String name) {
+        final String value = getParameter(name, null);
+        if (value == null || value.trim().length() == 0) {
             return new String[0];
         }
-        return configuration.split(";");
+        return value.split(";");
     }
 }
