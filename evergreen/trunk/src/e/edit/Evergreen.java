@@ -167,9 +167,9 @@ public class Evergreen {
      */
     private String processPathRewrites(String filename) {
         String from;
-        for (int i = 0; (from = Parameters.getParameter("path.rewrite.from." + i)) != null; i++) {
+        for (int i = 0; (from = Parameters.getString("path.rewrite.from." + i, null)) != null; i++) {
             if (filename.startsWith(from)) {
-                String to = Parameters.getParameter("path.rewrite.to." + i);
+                String to = Parameters.getString("path.rewrite.to." + i, null);
                 String result = to + filename.substring(from.length());
                 return result;
             }

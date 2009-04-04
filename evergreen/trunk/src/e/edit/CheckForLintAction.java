@@ -98,7 +98,7 @@ public class CheckForLintAction extends ETextAction {
         // Override or supplement those with any user-configured checkers.
         for (String fileTypeName : FileType.getAllFileTypeNames()) {
             // FIXME: when we have per-FileType configuration, get the lint checker from there.
-            String checker = Parameters.getParameter(fileTypeName + ".lintChecker");
+            String checker = Parameters.getString(fileTypeName + ".lintChecker", null);
             if (checker != null) {
                 result.put(FileType.fromName(fileTypeName), checker.trim());
             }

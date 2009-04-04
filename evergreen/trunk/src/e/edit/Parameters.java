@@ -90,23 +90,19 @@ public class Parameters {
         props.put(name, value);
     }
     
-    public static synchronized String getParameter(String name) {
-        return map.get(name);
-    }
-    
-    public static synchronized String getParameter(String name, String defaultValue) {
-        final String value = getParameter(name);
+    public static synchronized String getString(String name, String defaultValue) {
+        final String value = map.get(name);
         return (value != null) ? value : defaultValue;
     }
     
-    public static synchronized boolean getParameter(String name, boolean defaultValue) {
+    public static synchronized boolean getBoolean(String name, boolean defaultValue) {
         // Yet again, the total lack of thought that went into java.lang.Boolean bites us.
-        final String value = getParameter(name, defaultValue ? "true" : "false");
+        final String value = getString(name, defaultValue ? "true" : "false");
         return value.equalsIgnoreCase("true");
     }
     
-    public static synchronized int getParameter(String name, int defaultValue) {
-        final String value = getParameter(name);
+    public static synchronized int getInteger(String name, int defaultValue) {
+        final String value = getString(name, null);
         return (value != null) ? Integer.parseInt(value) : defaultValue;
     }
     
@@ -114,7 +110,7 @@ public class Parameters {
      * Returns an array with an item for each semicolon-separated element of the property.
      */
     public static synchronized String[] getArrayOfSemicolonSeparatedElements(String name) {
-        final String value = getParameter(name, null);
+        final String value = getString(name, null);
         if (value == null || value.trim().length() == 0) {
             return new String[0];
         }

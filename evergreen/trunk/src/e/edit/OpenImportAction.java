@@ -92,7 +92,7 @@ public class OpenImportAction extends ETextAction {
         // Override or supplement those with any user-configured import paths.
         for (String fileTypeName : FileType.getAllFileTypeNames()) {
             // FIXME: when we have per-FileType configuration, get the import path from there.
-            String importPath = Parameters.getParameter(fileTypeName + ".importPath");
+            String importPath = Parameters.getString(fileTypeName + ".importPath", null);
             if (importPath != null) {
                 result.put(FileType.fromName(fileTypeName), importPath.trim());
             }

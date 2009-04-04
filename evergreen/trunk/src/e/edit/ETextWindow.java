@@ -95,7 +95,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         // often wrong, the guessing is just annoying.
         // FIXME: can we fix IndentationGuesser?
         // FIXME: is this common enough a situation to warrant a public preference?
-        if (Parameters.getParameter("indentation.allowGuessing", true)) {
+        if (Parameters.getBoolean("indentation.allowGuessing", true)) {
             indentation = IndentationGuesser.guessIndentationFromFile(content, defaultIndentation);
         }
         textArea.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, indentation);
@@ -362,8 +362,8 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         newFileType.configureTextArea(textArea);
         
         // FIXME: when properties can be reloaded while we're running, this will want to be called on each reload.
-        final int defaultMargin = Parameters.getParameter("default.margin", 80);
-        final int margin = Parameters.getParameter(newFileType.getName() + ".margin", defaultMargin);
+        final int defaultMargin = Parameters.getInteger("default.margin", 80);
+        final int margin = Parameters.getInteger(newFileType.getName() + ".margin", defaultMargin);
         textArea.showRightHandMarginAt(margin);
         
         BugDatabaseHighlighter.highlightBugs(textArea);
