@@ -14,8 +14,7 @@ import javax.swing.Timer;
  */
 public class DebugMenu {
     public static JMenu makeJMenu() {
-        JMenu menu = new JMenu("Debugging Tools");
-        menu.setMnemonic('D');
+        JMenu menu = GuiUtilities.makeMenu("Debugging Tools", 'D');
         menu.add(new ShowDebuggingMessagesAction());
         menu.addSeparator();
         menu.add(new ShowEnvironmentAction());
@@ -37,8 +36,7 @@ public class DebugMenu {
     }
     
     private static JMenu makeChangeLafMenu() {
-        JMenu menu = new JMenu("Look And Feel");
-        menu.setMnemonic('L');
+        JMenu menu = GuiUtilities.makeMenu("Look And Feel", 'L');
         UIManager.LookAndFeelInfo[] lafs = UIManager.getInstalledLookAndFeels();
         for (UIManager.LookAndFeelInfo laf : lafs) {
             menu.add(new ChangeLookAndFeelAction(laf.getName(), laf.getClassName()));
