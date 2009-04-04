@@ -37,7 +37,9 @@ public class TerminatorMenuBar extends EMenuBar {
 	private JMenu makeFileMenu() {
 		JMenu menu = GuiUtilities.makeMenu("File", 'F');
 		// Alt-F for Find is more useful.
-		menu.setMnemonic(0);
+		if (Terminator.getPreferences().getBoolean(TerminatorPreferences.USE_ALT_AS_META) == false) {
+			menu.setMnemonic(0);
+		}
 		menu.add(new NewShellAction());
 		menu.add(new NewCommandAction());
 		
