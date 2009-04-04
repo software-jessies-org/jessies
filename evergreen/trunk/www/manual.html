@@ -52,7 +52,11 @@
 
 <p>Any dialog whose functionality relies on the index will also offer a "Rescan" button, accessible from the keyboard with alt-r.
 
-<p>There's more on <a href="#configuration-indexing">configuring indexing behavior</a> later.
+<p>Evergreen will only index a workspace that looks like a project: it must have a Makefile (or equivalent) or be under revision control. There's no reason you can't create an empty Makefile as a hint to Evergreen if you want a workspace's root to be a directory that contains a collection of related projects, or it can sometimes be useful to create a simple Makefile to build all the contained projects. Evergreen doesn't look at Makefile content, so it doesn't care.
+
+<p>When indexing, symbolic links are ignored. A symbolic link to a file won't be added to the index. A symbolic link to a directory won't be followed. For links within your workspace, this means (barring hard links) that each file has a unique name, reducing clutter when displaying search results and the like. For links outside your workspace, this means you'll need to find an alternative way of expressing what you mean. You might find the idea in the previous paragraph about creating a parent directory to collect various sub-projects together useful if you were using symbolic links for this purpose.
+
+<p>There's more about <a href="#configuration-indexing">configuring indexing</a> later.
 
 <h2><a name="opening">Opening Files</a></h2>
 
