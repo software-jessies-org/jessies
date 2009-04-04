@@ -44,7 +44,7 @@ public class PtyProcess {
     }
     
     private int fd = -1;
-    private int weaklyTypedPid;
+    private int pid;
     private String slavePtyName;
     
     private boolean didDumpCore = false;
@@ -108,7 +108,7 @@ public class PtyProcess {
     public PtyProcess(String executable, String[] argv, String workingDirectory) throws Exception {
         ensureLibraryLoaded();
         startProcess(executable, argv, workingDirectory);
-        if (weaklyTypedPid == -1) {
+        if (pid == -1) {
             throw new IOException("Could not start process \"" + executable + "\".");
         }
         inStream = new PtyInputStream();
@@ -124,7 +124,7 @@ public class PtyProcess {
     }
     
     public int getPid() {
-        return weaklyTypedPid;
+        return pid;
     }
     
     private void startProcess(final String executable, final String[] argv, final String workingDirectory) throws Exception {
@@ -178,7 +178,7 @@ public class PtyProcess {
     
     @Override
     public String toString() {
-        String result = "PtyProcess[pid=" + weaklyTypedPid + ",fd=" + fd + ",pty=\"" + slavePtyName + "\"";
+        String result = "PtyProcess[pid=" + pid + ",fd=" + fd + ",pty=\"" + slavePtyName + "\"";
         if (didExitNormally) {
             result += ",didExitNormally,exitValue=" + exitValue;
         }
