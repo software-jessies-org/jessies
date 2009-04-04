@@ -31,7 +31,7 @@ public class EvergreenMenuBar extends EMenuBar {
     }
     
     private JMenu makeFileMenu() {
-        JMenu menu = makeMenu("File", 'F');
+        JMenu menu = GuiUtilities.makeMenu("File", 'F');
         menu.add(new NewFileAction());
         menu.add(new OpenQuicklyAction());
         menu.add(new OpenImportAction());
@@ -56,7 +56,7 @@ public class EvergreenMenuBar extends EMenuBar {
     }
 
     private JMenu makeEditMenu() {
-        JMenu menu = makeMenu("Edit", 'E');
+        JMenu menu = GuiUtilities.makeMenu("Edit", 'E');
         menu.add(PActionFactory.makeUndoAction());
         menu.add(PActionFactory.makeRedoAction());
 
@@ -82,7 +82,7 @@ public class EvergreenMenuBar extends EMenuBar {
     }
 
     private JMenu makeFindMenu() {
-        JMenu menu = makeMenu("Find", 'n');
+        JMenu menu = GuiUtilities.makeMenu("Find", 'n');
         menu.add(FindAction.INSTANCE);
         menu.add(PActionFactory.makeFindNextAction());
         menu.add(PActionFactory.makeFindPreviousAction());
@@ -105,7 +105,7 @@ public class EvergreenMenuBar extends EMenuBar {
     }
     
     private JMenu makeViewMenu() {
-        JMenu menu = makeMenu("View", 'V');
+        JMenu menu = GuiUtilities.makeMenu("View", 'V');
         menu.add(new ProportionalFontAction());
         menu.add(new FixedFontAction());
         menu.add(new AppropriateFontAction());
@@ -127,7 +127,7 @@ public class EvergreenMenuBar extends EMenuBar {
     }
     
     private JMenu makeToolsMenu() {
-        final JMenu menu = makeMenu("Tools", 'T');
+        final JMenu menu = GuiUtilities.makeMenu("Tools", 'T');
         menu.add(new OpenMakefileAction());
         
         menu.addSeparator();
@@ -160,7 +160,7 @@ public class EvergreenMenuBar extends EMenuBar {
     }
     
     private JMenu makeDocumentationMenu() {
-        JMenu menu = makeMenu("Documentation", 'D');
+        JMenu menu = GuiUtilities.makeMenu("Documentation", 'D');
         menu.add(new ShowDocumentationAction());
         
         // UI guidelines.
@@ -198,14 +198,14 @@ public class EvergreenMenuBar extends EMenuBar {
     }
     
     private JMenu makeScmMenu() {
-        JMenu menu = makeMenu("SCM", 'S');
+        JMenu menu = GuiUtilities.makeMenu("SCM", 'S');
         menu.add(new CheckInChangesAction());
         menu.add(new ShowHistoryAction());
         return menu;
     }
     
     private JMenu makeWorkspaceMenu() {
-        JMenu menu = makeMenu("Workspace", 'W');
+        JMenu menu = GuiUtilities.makeMenu("Workspace", 'W');
         menu.add(new NewWorkspaceAction());
         menu.add(new EditWorkspaceAction());
         menu.add(new CloseWorkspaceAction());
@@ -217,12 +217,6 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.addSeparator();
         menu.add(new CycleWorkspacesAction(1));
         menu.add(new CycleWorkspacesAction(-1));
-        return menu;
-    }
-    
-    private JMenu makeMenu(String name, char mnemonic) {
-        JMenu menu = new JMenu(name);
-        menu.setMnemonic(mnemonic);
         return menu;
     }
     
