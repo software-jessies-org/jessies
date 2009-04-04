@@ -2,6 +2,7 @@ package e.edit;
 
 import e.util.*;
 import java.awt.*;
+import javax.swing.*;
 
 public class EvergreenPreferences extends Preferences {
     public static final String ALWAYS_USE_FIXED_FONT = "alwaysUseFixedFont";
@@ -33,5 +34,9 @@ public class EvergreenPreferences extends Preferences {
         //addSeparator();
         //addPreference(BACKGROUND_COLOR, UIManager.getColor("EditorPane.background"), "Background");
         //addPreference(FOREGROUND_COLOR, UIManager.getColor("EditorPane.foreground"), "Foreground");
+    }
+    
+    protected JButton getExtraButton() {
+        return new JButton(new OpenPropertiesFileAction());
     }
 }
