@@ -653,7 +653,7 @@ public class JTerminalPane extends JPanel {
 			return true;
 		}
 
-		final int directChildProcessId = ptyProcess.getProcessId();
+		final int directChildPid = ptyProcess.getPid();
 		final String processesUsingTty = ptyProcess.listProcessesUsingTty();
 
 		if (processesUsingTty.length() == 0) {
@@ -665,7 +665,7 @@ public class JTerminalPane extends JPanel {
 		// In either of those cases, there's no reason to hang around.
 		// FIXME: ideally, PtyProcess would give us a List<ProcessInfo>, but that opens a whole can of JNI worms. Hence the following hack.
 		final String[] processList = processesUsingTty.split(", ");
-		if (processList.length == 1 && (processList[0].matches("^.*\\(" + directChildProcessId + "\\)$") || processList[0].equals("(pty closed)"))) {
+		if (processList.length == 1 && (processList[0].matches("^.*\\(" + directChildPid + "\\)$") || processList[0].equals("(pty closed)"))) {
 			return true;
 		}
 
