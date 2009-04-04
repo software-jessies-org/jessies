@@ -82,7 +82,7 @@ void terminator_terminal_PtyProcess::nativeStartProcess(jstring javaExecutable, 
         workingDirectory = JniString(m_env, javaWorkingDirectory);
     }
     
-    processId = ptyGenerator.forkAndExec("terminator", executable, &argv[0], workingDirectory);
+    weaklyTypedPid = ptyGenerator.forkAndExec("terminator", executable, &argv[0], workingDirectory);
     
     // On Linux, the TIOCSWINSZ ioctl sets the size of the pty (without blocking) even if it hasn't been opened by the child yet.
     // On Mac OS, it silently does nothing, meaning that when the child does open the pty, TIOCGWINSZ reports the wrong size.
@@ -184,7 +184,7 @@ void terminator_terminal_PtyProcess::sendResizeNotification(jobject sizeInChars,
 }
 
 void terminator_terminal_PtyProcess::destroy() {
-    pid_t pid = processId.get();
+    pid_t pid = weaklyTypedPid.get();
     int status = killpg(pid, SIGHUP);
     if (status < 0) {
         throw unix_exception("killpg(" + toString(pid) + ", SIGHUP) failed");
@@ -200,7 +200,7 @@ void terminator_terminal_PtyProcess::nativeWaitFor() {
     close(fd.get());
     fd = -1;
     
-    pid_t pid = processId.get();
+    pid_t pid = weaklyTypedPid.get();
     
     // Loop until waitpid(2) returns a status or a real error.
     int status = 0;
