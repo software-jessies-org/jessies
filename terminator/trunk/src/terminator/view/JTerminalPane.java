@@ -95,6 +95,11 @@ public class JTerminalPane extends JPanel {
 	}
 	
 	public void optionsDidChange() {
+		// We're called before start().
+		if (host != null) {
+			// "Use alt key as meta key" affects the keyboard shortcuts displayed on the pop-up menu.
+			this.menuItemProvider = host.createMenuItemProvider(this);
+		}
 		view.optionsDidChange();
 		viewport.setBackground(view.getBackground());
 		updateTerminalSize();
