@@ -327,23 +327,20 @@ public class FatBits extends MainFrame {
         }
         
         private JMenu makeFileMenu() {
-            JMenu menu = new JMenu("File");
-            menu.setMnemonic('F');
+            JMenu menu = GuiUtilities.makeMenu("File", 'F');
             menu.add(new QuitAction());
             return menu;
         }
         
         private JMenu makeEditMenu() {
-            JMenu menu = new JMenu("Edit");
-            menu.setMnemonic('E');
+            JMenu menu = GuiUtilities.makeMenu("Edit", 'E');
             menu.add(new CopyImageAction());
             preferences.initPreferencesMenuItem(menu);
             return menu;
         }
         
         private JMenu makeImageMenu() {
-            JMenu menu = new JMenu("Image");
-            menu.setMnemonic('I');
+            JMenu menu = GuiUtilities.makeMenu("Image", 'I');
             menu.add(new MouseMotionAction("Left", -1, 0));
             menu.add(new MouseMotionAction("Right", +1, 0));
             menu.add(new MouseMotionAction("Up", 0, -1));
