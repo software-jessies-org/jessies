@@ -11,11 +11,11 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
     public RubyDocumentationResearcher() {
         final long t0 = System.nanoTime();
         
-        final String listRubyWordsBinary = Evergreen.getScriptFilename("list-ruby-words.rb");
+        final String listRubyWordsScript = Evergreen.getScriptFilename("list-ruby-words.rb");
         
         final ArrayList<String> lines = new ArrayList<String>();
         final ArrayList<String> errors = new ArrayList<String>();
-        final int status = ProcessUtilities.backQuote(null, new String[] { "ruby", listRubyWordsBinary }, lines, errors);
+        final int status = ProcessUtilities.backQuote(null, new String[] { "ruby", listRubyWordsScript }, lines, errors);
         if (status != 0) {
             return;
         }
