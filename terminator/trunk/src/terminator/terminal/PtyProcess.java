@@ -44,7 +44,7 @@ public class PtyProcess {
     }
     
     private int fd = -1;
-    private int pid;
+    private long pid;
     private String slavePtyName;
     
     private boolean didDumpCore = false;
@@ -123,7 +123,7 @@ public class PtyProcess {
         return outStream;
     }
     
-    public int getPid() {
+    public long getPid() {
         return pid;
     }
     
