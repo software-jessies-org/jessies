@@ -143,8 +143,6 @@ public class FileType {
             throw new RuntimeException("configureTextArea failed", ex);
         }
         
-        int margin = Integer.getInteger(name + ".margin", Integer.getInteger("default.margin", 80));
-        textArea.showRightHandMarginAt(margin);
         textArea.repaint();
     }
     
