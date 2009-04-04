@@ -134,6 +134,13 @@
 
 <p>If <a href="http://ctags.sourceforge.net/">Exuberant Ctags</a> is installed, and the language you're editing is supported by it, Evergreen will show a tree on the right-hand side of the main window. You can click on an item in the tree to jump straight to the corresponding line in the source.
 
+<p>The shape of the icons next to the names tell you what kind of symbol they represent: classes (circles), methods/functions (squares), and fields/variables (triangles).
+Icons for abstract classes or methods are hollow.
+
+<p>The color of the icons denote their symbol's accessibility: public (green), protected (orange), private (red), and default or unknown accessibilities (gray).
+
+<p>Public static symbols have their names in bold.
+
 <p>If you have a "tags" file in the workspace root, you can also jump to a tag in a different file. Choose "Find" > "Go to Tag" from the menu, accessible with control-t from the keyboard. If there's a selection, it's used as the search term. Otherwise, the word around the caret is used. If there's a single match, you're taken straight to it. If there are multiple matches, you're shown a dialog from which you can choose.
 
 <p>Evergreen currently has no support for creating or updating the "tags" file itself, though you could create an <a href="#configuration-tools">external tool</a> as a work-around.
