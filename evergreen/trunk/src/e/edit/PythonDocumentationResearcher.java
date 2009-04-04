@@ -19,11 +19,11 @@ import java.util.*;
  */
 public class PythonDocumentationResearcher implements WorkspaceResearcher {
     public String research(String string) {
-        String pydocBinary = Evergreen.getScriptFilename("epydoc.py");
+        String pydocScript = Evergreen.getScriptFilename("epydoc.py");
         
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
-        int status = ProcessUtilities.backQuote(null, new String[] { pydocBinary, string }, lines, errors);
+        int status = ProcessUtilities.backQuote(null, new String[] { "python", pydocScript, string }, lines, errors);
         if (status == 1) {
             return "";
         }
