@@ -22,7 +22,7 @@ There are also two new guiding principles: accept regular expressions, output di
 <ul>
 <li><p><strong>Ubiquitous Regular Expressions</strong> - Programmers know regular expressions, and yet their graphical tools don't use make much use of them.
 Evergreen does.
-Anywhere it's asking you to type something, it's probably expecting a regular expression: full Perl/Java regular expressions in find, in find/replace, in find in files (as you'd expect), but also in the open dialog. Evergreen uses "smart case" regular expressions, too, where an all-lowercase regular expression is assumed to be case-insensitive. You can use <tt>(?-i)</tt> and <tt>(?i)</tt> to explicitly turn case-sensitivity on and off.
+Anywhere it's asking you to type something, it's probably expecting a regular expression: full Perl/Java regular expressions in find, in find/replace, in find in files (as you'd expect), but also in the open dialog [<a href="manual.html#regexps">full details</a>].
 
 <li><p><strong>Open Files Quicker</strong> - Evergreen indexes your project, so you don't have to remember where files are.
 Or what case your co-worker used ("Hyperlink" or "HyperLink"?).
@@ -54,7 +54,7 @@ In this example, the identifiers have been checked too:
 
 <p align="center"><img src="spelling.png" width="433" height="159" alt="Spelling checking of code">
 
-<li><p><strong>Exuberant Ctags Support</strong> - Evergreen uses <a href="http://ctags.sourceforge.net/">Exuberant Ctags</a> (if installed) to understand the structure of your file.
+<li><p><strong>Exuberant Ctags Support</strong> - Evergreen uses Exuberant Ctags (if installed) to understand the structure of your file [<a href="manual.html#navigation-tags">full details</a>].
 The symbols in the current file are shown as a tree preserving their hierarchy.
 You can click on an item in the tree to go to the corresponding part of the file.
 Conversely, as you edit, the item in the tree corresponding to the current caret position is always highlighted.
