@@ -16,13 +16,31 @@ import java.io.*;
  * Other lines are considered to be assignments of the form name=value.
  */
 public class Parameters {
+    private static File file;
+    private static FileAlterationMonitor fileAlterationMonitor;
+    
     private static HashMap<String, String> map = new HashMap<String, String>();
     private static ArrayList<Preferences.Listener> listeners = new ArrayList<Preferences.Listener>();
     
     private Parameters() { /* Not instantiable. */ }
     
-    public static synchronized void readPropertiesFile(String fileName) {
-        File file = FileUtilities.fileFromString(fileName);
+    public static synchronized void initParameters(String filename) {
+        file = FileUtilities.fileFromString(filename);
+        
+        // Arrange to reload the configuration whenever it changes.
+        fileAlterationMonitor = new FileAlterationMonitor(filename);
+        fileAlterationMonitor.addListener(new FileAlterationMonitor.Listener() {
+            public void fileTouched(String pathname) {
+                reloadParametersFile();
+            }
+        });
+        fileAlterationMonitor.addPathname(filename);
+        
+        // Load the initial configuration.
+        reloadParametersFile();
+    }
+    
+    private static synchronized void reloadParametersFile() {
         if (file.exists() == false) {
             return;
         }
@@ -31,7 +49,7 @@ public class Parameters {
             map = loadProperties(new HashMap<String, String>(), file);
             firePreferencesChanged();
         } catch (Exception ex) {
-            Log.warn("Unable to read properties file \"" + fileName + "\"", ex);
+            Log.warn("Unable to read properties file \"" + file + "\"", ex);
         }
     }
     
