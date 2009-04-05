@@ -730,7 +730,11 @@ public class Evergreen {
         tagsPanel = new TagsPanel();
     }
     
-    private void initPreferences() {
+    private void initConfiguration() {
+        // Properties (configuration done by editing text files).
+        Parameters.readPropertiesFile(getUserPropertiesFilename());
+        
+        // Preferences (configuration done with a GUI).
         this.preferences = new EvergreenPreferences();
         preferences.readFromDisk();
         preferences.addPreferencesListener(new Preferences.Listener() {
@@ -814,10 +818,10 @@ public class Evergreen {
     private void init() {
         final long t0 = System.nanoTime();
         
-        Parameters.readPropertiesFile(getUserPropertiesFilename());
+        initConfiguration();
+        
         Advisor.initResearchersOnBackgroundThread();
         
-        initPreferences();
         initMacOs();
         initAboutBox();
         JFrameUtilities.readGeometriesFrom(getDialogGeometriesPreferenceFilename());
