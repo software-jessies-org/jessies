@@ -5,26 +5,19 @@ import java.util.*;
 import java.io.*;
 
 /**
-The format of a properties file is as follows:
-
-Lines whose first non-space character is # are comments and are ignored.
-
-Lines whose first non-space character is < are include directives. The rest
-of the line is the name of a file whose contents will be read as if they occured
-at this point.
-
-Lines whose first non-space character is ? are conditional on the current OS.
-The line
-
-    ?Mac OS X:name=value
-
-sets the property 'name' to 'value' only if the current OS is "Mac OS X".
-
-Other lines are considered to be assignments of the form name=value.
-
-*/
+ * The format of a properties file is as follows:
+ * 
+ * Lines whose first non-space character is # are comments and are ignored.
+ * 
+ * Lines whose first non-space character is < are include directives. The rest
+ * of the line is the name of a file whose contents will be read as if they occurred
+ * at this point.
+ * 
+ * Other lines are considered to be assignments of the form name=value.
+ */
 public class Parameters {
     private static HashMap<String, String> map = new HashMap<String, String>();
+    private static ArrayList<Preferences.Listener> listeners = new ArrayList<Preferences.Listener>();
     
     private Parameters() { /* Not instantiable. */ }
     
@@ -36,6 +29,7 @@ public class Parameters {
         
         try {
             map = loadProperties(new HashMap<String, String>(), file);
+            firePreferencesChanged();
         } catch (Exception ex) {
             Log.warn("Unable to read properties file \"" + fileName + "\"", ex);
         }
@@ -115,5 +109,19 @@ public class Parameters {
             return new String[0];
         }
         return value.split(";");
+    }
+    
+    public static void addPreferencesListener(Preferences.Listener l) {
+        listeners.add(l);
+    }
+    
+    public static void removePreferencesListener(Preferences.Listener l) {
+        listeners.remove(l);
+    }
+    
+    private static void firePreferencesChanged() {
+        for (Preferences.Listener l : listeners) {
+            l.preferencesChanged();
+        }
     }
 }
