@@ -731,20 +731,23 @@ public class Evergreen {
     }
     
     private void initConfiguration() {
-        // Properties (configuration done by editing text files).
-        Parameters.readPropertiesFile(getUserPropertiesFilename());
-        
-        // Preferences (configuration done with a GUI).
-        this.preferences = new EvergreenPreferences();
-        preferences.readFromDisk();
-        preferences.addPreferencesListener(new Preferences.Listener() {
+        Preferences.Listener preferencesListener = new Preferences.Listener() {
             public void preferencesChanged() {
                 for (Workspace workspace : getWorkspaces()) {
                     workspace.preferencesChanged();
                 }
                 tagsPanel.repaint();
             }
-        });
+        };
+        
+        // Properties (configuration done by editing text files).
+        Parameters.readPropertiesFile(getUserPropertiesFilename());
+        Parameters.addPreferencesListener(preferencesListener);
+        
+        // Preferences (configuration done with a GUI).
+        this.preferences = new EvergreenPreferences();
+        preferences.readFromDisk();
+        preferences.addPreferencesListener(preferencesListener);
     }
     
     private void initStatusArea() {
