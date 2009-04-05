@@ -14,11 +14,12 @@ public class FileAlterationMonitor {
     private Timer timer;
     
     /**
-     * Constructs a file alteration monitor with the given name, typically the file system or root directory being monitored.
+     * Constructs a new file alteration monitor.
+     * The string 'purpose' is used in the thread's name to distinguish the various file alteration monitors that may be running.
      * Monitoring begins immediately.
      */
-    public FileAlterationMonitor(String name) {
-        this.timer = new Timer("FileAlterationMonitor " + name, true);
+    public FileAlterationMonitor(String purpose) {
+        this.timer = new Timer("FileAlterationMonitor for " + purpose, true);
         timer.schedule(new TimerTask() {
             public void run() {
                 checkFileTimes();
