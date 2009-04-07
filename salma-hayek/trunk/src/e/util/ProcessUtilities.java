@@ -207,7 +207,7 @@ public class ProcessUtilities {
         }
         ArrayList<String> result = new ArrayList<String>();
         // Try to put the command in its own process group, so it's easier to kill it and its children.
-        File setsidBinary = FileUtilities.findOnPath("setsid");
+        File setsidBinary = FileUtilities.findSupportBinary("setsid");
         if (setsidBinary != null) {
             result.add(setsidBinary.toString());
         } else if (GuiUtilities.isWindows() && FileUtilities.findOnPath(shell) == null) {

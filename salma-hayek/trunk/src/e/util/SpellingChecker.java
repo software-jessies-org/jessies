@@ -42,9 +42,12 @@ public class SpellingChecker {
     /** Establishes the connection to ispell, if possible. */
     private SpellingChecker() {
         // On Mac OS, we want to use the system's spelling checker, so try our NSSpell utility (which gives Apple's code an ispell-like interface) first.
-        // Our start-up scripts ensure it's on our path if we're running on a Mac.
+        File nsSpellBinary = FileUtilities.findSupportBinary("NSSpell");
+        if (nsSpellBinary != null && connectTo(new String[] { nsSpellBinary.toString(), "-a" })) {
+            return;
+        }
         // Otherwise try aspell(1) -- also used by gedit(1) -- first, and fall back to good old ispell(1).
-        String[] backEnds = { "NSSpell", "aspell", "ispell" };
+        String[] backEnds = { "aspell", "ispell" };
         for (String backEnd : backEnds) {
             if (FileUtilities.findOnPath(backEnd) != null) {
                 if (connectTo(new String[] { backEnd, "-a" })) {

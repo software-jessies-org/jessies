@@ -136,6 +136,8 @@ class Java
     # We don't know the JVM's architecture at this point.
     # We've seen a number of systems which run an i386 JVM on an amd64 kernel.
     add_pathnames_property("org.jessies.libraryDirectories", Dir.glob("{#{@project_root},#{@salma_hayek}}/.generated/*_#{target_os()}/lib"))
+    # But an i386 JVM on an amd64 kernel will run amd64 binaries.
+    add_pathname_property("org.jessies.binaryDirectory", "#{@salma_hayek}/.generated/#{target_directory()}/bin")
     
     set_icons(name)
     
