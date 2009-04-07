@@ -466,6 +466,31 @@ public class FileUtilities {
         throw new UnsatisfiedLinkError("Failed to load " + fileName + " for " + arch + " from " + directories);
     }
     
+    /**
+     * Convert a filename to one that Java will be able to open.
+     */
+    public static String rewriteCygwinFilename(String filename) {
+        if (GuiUtilities.isWindows() == false) {
+            return filename;
+        }
+        ArrayList<String> jvmForm = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<String>();
+        // On Windows, our "friendly" filenames look like "~\dir\file".
+        // This esoteric use of tilde with backslashes isn't understood by anything apart from Evergreen.
+        // When a Cygwin process is started, Cygwin does shell-style processing on its arguments, including globbing where backslashes are treated as escaping the following character.
+        // The backslash escaping is disabled if the argument starts with a DOS-style drive specifier but not if it starts with a tilde.
+        // (Search the Cygwin source for "globify".)
+        // We shouldn't let our "friendly" filenames escape from Evergreen.
+        filename = FileUtilities.parseUserFriendlyName(filename);
+        // Should there ever be useful a Cygwin JVM, we may be back here.
+        // Should we need the opposite translation, there's --unix.
+        int status = ProcessUtilities.backQuote(null, new String[] { "cygpath", "--windows", filename }, jvmForm, errors);
+        if (status != 0 || jvmForm.size() != 1) {
+            return filename;
+        }
+        return jvmForm.get(0);
+    }
+    
     public static void main(String[] arguments) {
         for (String filename : arguments) {
             System.err.println(parseUserFriendlyName(filename));
