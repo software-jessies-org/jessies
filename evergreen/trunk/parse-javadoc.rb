@@ -50,6 +50,7 @@ class JavaDocParser
         @constructors = []
         @annotationTypes = []
         @enumConstants = []
+        @line_number = 0
     end
 
     def parse_file(filename)
@@ -76,6 +77,7 @@ class JavaDocParser
         
         file.each_line() {
             |line|
+            @line_number += 1
             #puts(">>>>> #{line}")
             
             if line =~ /^<META NAME="keywords" CONTENT="(.+) .+">$/
@@ -85,14 +87,13 @@ class JavaDocParser
             elsif line =~ /^<!-- =+ .+ SUMMARY =+ -->$/
                 item = nil
             elsif line =~ /^<A NAME=\"(.*)\">.*<\/A><H3>$/
-                if item != nil
-                    raise "haven't finished #{item}, so can't start #$1!"
-                end
                 item = Item.new($1)
                 item.append_doc_line(line)
             elsif item != nil && item != @class && (line =~ /^<HR>$/ || line =~ /^<!-- =+ .* =+ -->/)
-                items << item
-                item.extract_summary()
+                if items != nil # This check was added in lieu of support for annotations.
+                    items << item
+                    item.extract_summary()
+                end
                 item = nil
             elsif item != nil
                 item.append_doc_line(line)
@@ -121,6 +122,10 @@ class JavaDocParser
         #puts("#{name}:")
         #puts("  #{items.join("\n  ")}")
     end
+    
+    def line_number()
+        return @line_number
+    end
 end
 
 #####################
@@ -142,7 +147,7 @@ if ARGV.length() == 0
     exit(1)
 end
 
-# Find all the .html files under the JavaDoc directory.
+# Find all the .html files under each JavaDoc directory.
 files = []
 ARGV.each() {
     |java_doc_directory|
@@ -158,19 +163,18 @@ ARGV.each() {
 # their class 'index' or 'packages', but that would be a
 # violation of the naming conventions that insist on an
 # initial capital for a class name, so "hard luck".
-files.delete_if { |file| /-/ === file }
-files.delete_if { |file| /\/(index|packages)\.html/ === file }
-
-#puts("Files to process: #{files.length()}\n#{files.join("\n")}")
+# On Debian-based systems, the JDK documentation lives in /usr/share/doc/sun-java6-jdk/ so we can't just exclude '-'.
+files.delete_if { |file| /(\/(class-use|doc-files)\/|\/(\w+-\w+)\.html|index\.html|packages\.html)/ === file }
+#puts("Files to process: #{files.length()}")
 
 # Parse each .html file in turn.
 files.each() {
     |filename|
+    parser = JavaDocParser.new()
     begin
-        parser = JavaDocParser.new
         parser.parse_file(filename)
     rescue Exception => ex
-        puts("Failure parsing #{filename}: " + ex)
+        puts("#{filename}:#{parser.line_number()}: " + ex)
         puts(ex.backtrace().join("\n"))
         exit(1)
     end
