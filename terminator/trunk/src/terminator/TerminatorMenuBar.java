@@ -95,12 +95,7 @@ public class TerminatorMenuBar extends EMenuBar {
 	}
 	
 	private JMenu makeTabsMenu() {
-		final JMenu menu = GuiUtilities.makeMenu("Tabs", 'T');
-		// Alt-T for New Tab is more useful.
-		if (Terminator.getPreferences().getBoolean(TerminatorPreferences.USE_ALT_AS_META) == false) {
-			menu.setMnemonic(0);
-		}
-		
+		final JMenu menu = GuiUtilities.makeMenu("Tabs", 'b');
 		menu.add(new DetachTabAction());
 		for (Action action : customWindowMenuItems) {
 			menu.add(action);
