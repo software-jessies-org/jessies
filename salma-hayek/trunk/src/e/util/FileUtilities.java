@@ -372,7 +372,7 @@ public class FileUtilities {
         }
         if (GuiUtilities.isMacOs()) {
             ArrayList<String> bundleLocations = new ArrayList<String>();
-            String[] command = ProcessUtilities.makeShellCommandArray(FileUtilities.findOnPath("LSFindApplicationForInfo") + " " + bundleId);
+            String[] command = ProcessUtilities.makeShellCommandArray(FileUtilities.findSupportBinary("LSFindApplicationForInfo") + " " + bundleId);
             int status = ProcessUtilities.backQuote(null, command, bundleLocations, new ArrayList<String>());
             if (status == 0 && bundleLocations.size() == 1) {
                 // The app name isn't necessarily the lower-cased last element of the bundle id, but it happens to be at the moment.
@@ -464,6 +464,25 @@ public class FileUtilities {
         }
         final String arch = System.getProperty("os.arch");
         throw new UnsatisfiedLinkError("Failed to load " + fileName + " for " + arch + " from " + directories);
+    }
+    
+    // By analogy with System.mapLibraryName.
+    public static String mapBinaryName(String binaryName) {
+        if (GuiUtilities.isWindows()) {
+            return binaryName + ".exe";
+        }
+        return binaryName;
+    }
+    
+    public static File findSupportBinary(String binaryName) {
+        String fileName = mapBinaryName(binaryName);
+        String directory = System.getProperty("org.jessies.binaryDirectory");
+        File path = new File(directory, fileName);
+        if (path.exists()) {
+            // FIXME: in Java 6, check for executable permission too.
+            return path;
+        }
+        return null;
     }
     
     /**
