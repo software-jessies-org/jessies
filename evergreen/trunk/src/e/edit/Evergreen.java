@@ -177,30 +177,6 @@ public class Evergreen {
         return filename;
     }
     
-    private static String processCygwinRewrites(String filename) {
-        // Perhaps we should replace processPathRewrites with a generalization of this method.
-        // I'm imagining a script that we'd invoke on all platforms.
-        // Our default script would invoke cygpath on Cygwin.
-        if (GuiUtilities.isWindows() == false) {
-            return filename;
-        }
-        ArrayList<String> jvmForm = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
-        // On Windows, our "friendly" filenames look like "~\dir\file".
-        // This esoteric use of tilde with backslashes isn't understood by anything apart from Evergreen.
-        // When a Cygwin process is started, Cygwin does shell-style processing on its arguments, including globbing where backslashes are treated as escaping the following character.
-        // The backslash escaping is disabled if the argument starts with a DOS-style drive specifier but not if it starts with a tilde.
-        // (Search the Cygwin source for "globify".)
-        // We shouldn't let our "friendly" filenames escape from Evergreen.
-        filename = FileUtilities.parseUserFriendlyName(filename);
-        // Should there ever be useful a Cygwin JVM, we may be back here.
-        int status = ProcessUtilities.backQuote(null, new String[] { "cygpath", "--windows", filename }, jvmForm, errors);
-        if (status != 0 || jvmForm.size() != 1) {
-            return filename;
-        }
-        return jvmForm.get(0);
-    }
-    
     public EWindow openFile(InitialFile file) {
         try {
             return openFileNonInteractively(file);
@@ -249,7 +225,7 @@ public class Evergreen {
         }
         
         filename = processPathRewrites(filename);
-        filename = processCygwinRewrites(filename);
+        filename = FileUtilities.rewriteCygwinFilename(filename);
         
         // Remove local-directory fluff.
         if (filename.startsWith("./") || filename.startsWith(".\\")) {
