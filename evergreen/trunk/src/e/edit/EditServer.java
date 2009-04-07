@@ -90,7 +90,7 @@ public final class EditServer {
             try {
                 this.window = editor.openFileNonInteractively(filename);
                 if (GuiUtilities.isMacOs()) {
-                    ProcessUtilities.spawn(null, FileUtilities.findOnPath("BringProcessToFront").toString());
+                    ProcessUtilities.spawn(null, FileUtilities.findSupportBinary("BringProcessToFront").toString());
                 } else {
                     editor.getFrame().toFront();
                 }
