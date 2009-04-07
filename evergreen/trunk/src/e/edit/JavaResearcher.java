@@ -1,9 +1,12 @@
 package e.edit;
 
+import java.io.*;
 import java.lang.reflect.*;
+import java.nio.*;
 import java.util.*;
 import java.util.List;
 import java.util.regex.*;
+import java.util.zip.*;
 import e.ptextarea.*;
 import e.util.*;
 
@@ -15,7 +18,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     private static final Set<String> uniqueIdentifiers = new TreeSet<String>();
     private static final Set<String> uniqueWords = new TreeSet<String>();
     
-    private static String[] javaDocSummary;
+    private static String[] javaDocSummary = new String[0];
     
     private static final JavaResearcher INSTANCE = new JavaResearcher();
     
@@ -30,11 +33,11 @@ public class JavaResearcher implements WorkspaceResearcher {
     private static void init() {
         final long t0 = System.nanoTime();
         
-        final String filename = Evergreen.getResourceFilename("javadoc-summary.txt");
-        if (FileUtilities.exists(filename)) {
-            javaDocSummary = StringUtilities.readLinesFromFile(filename);
-        } else {
-            javaDocSummary = new String[0];
+        final String filename = Evergreen.getResourceFilename("javadoc-summary.txt.gz");
+        try {
+            javaDocSummary = gunzipTextFile(filename).split("\n");
+        } catch (IOException ex) {
+            Log.warn("Failed to read JavaDoc summary from \"" + filename + "\"", ex);
         }
         Log.warn("Read JavaDoc summary from \"" + filename + "\" in " + TimeUtilities.nsToString(System.nanoTime() - t0));
         
@@ -63,6 +66,27 @@ public class JavaResearcher implements WorkspaceResearcher {
         
         final long t1 = System.nanoTime();
         Log.warn("Read summarized JavaDoc for " + classCount + " classes (" + javaDocSummary.length + " lines, " + uniqueIdentifiers.size() + " unique identifiers) in " + TimeUtilities.nsToString(t1 - t0) + ".");
+    }
+    
+    private static String gunzipTextFile(String filename) throws IOException {
+        final File file = FileUtilities.fileFromString(filename);
+        if (!file.exists()) {
+            return "";
+        }
+        final InputStream in = new GZIPInputStream(new FileInputStream(file));
+        try {
+            final byte[] buf = new byte[8192];
+            final ByteArrayOutputStream uncompressedBytes = new ByteArrayOutputStream();
+            int byteCount = 0;
+            while ((byteCount = in.read(buf)) > 0) {
+                uncompressedBytes.write(buf, 0, byteCount);
+            }
+            final ByteBuffer byteBuffer = ByteBuffer.wrap(uncompressedBytes.toByteArray());
+            final ByteBufferDecoder decoder = new ByteBufferDecoder(byteBuffer, byteBuffer.capacity());
+            return new String(decoder.getCharArray());
+        } finally {
+            FileUtilities.close(in);
+        }
     }
     
     public synchronized List<String> listIdentifiersStartingWith(String prefix) {
