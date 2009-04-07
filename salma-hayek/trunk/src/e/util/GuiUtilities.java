@@ -295,7 +295,9 @@ public class GuiUtilities {
             ProcessUtilities.spawn(null, "/usr/bin/osascript", "-e", "tell application \"Finder\" to select \"" + fullPathname + "\" as POSIX file", "-e", "tell application \"Finder\" to activate");
         } else if (GuiUtilities.isWindows()) {
             // See "Windows Explorer Command-Line Options", http://support.microsoft.com/default.aspx?scid=kb;EN-US;q152457
-            ProcessUtilities.spawn(null, "Explorer", "/select," + fullPathname);
+            // doesn't work: $ explorer '/select,C:\Program Files'
+            // does work: $ explorer '/select,C:\Program' 'Files'
+            ProcessUtilities.spawn(null, ("Explorer /select," + fullPathname).split(" "));
         }
     }
     
