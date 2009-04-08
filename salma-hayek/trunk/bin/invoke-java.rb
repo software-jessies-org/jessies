@@ -317,7 +317,8 @@ class Java
   
   def getExtraPathComponents()
     subProjectRoots = [ @project_root, @salma_hayek ]
-    executableSubDirectories = [ "bin", ".generated/#{target_directory()}/bin" ]
+    executableSubDirectories = [ "bin" ]
+    executableSubDirectories << ".generated/#{target_directory()}/bin"
     extraPathComponents = []
     subProjectRoots.each() {
       |subProjectRoot|
@@ -353,6 +354,10 @@ class Java
     report_exceptions(@dock_name) { launch() }
   end
   
+  def findSupportBinary(binaryName)
+    return "#{@salma_hayek}/.generated/#{target_directory()}/bin/#{binaryName}"
+  end
+  
   def launch()
     # If we're using our own launcher, it'll worry about finding an appropriate JVM version and reporting errors.
     # If we're using Sun's java(1), we need to do some pre-flight checks.
@@ -370,7 +375,7 @@ class Java
     
     # Since we're often started from the command line or from other programs, set up startup notification ourselves if it looks like we should.
     if @initiate_startup_notification && ENV["DISPLAY"] != nil && ENV["DESKTOP_STARTUP_ID"] == nil && target_os() == "Linux"
-      id=`gnome-startup start #{@frame_icon} Starting #{@dock_name}`.chomp()
+      id=`#{findSupportBinary("gnome-startup")} start #{@frame_icon} Starting #{@dock_name}`.chomp()
       ENV["DESKTOP_STARTUP_ID"] = id
     end
     
