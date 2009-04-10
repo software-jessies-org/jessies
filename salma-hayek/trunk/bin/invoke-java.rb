@@ -318,7 +318,6 @@ class Java
   def getExtraPathComponents()
     subProjectRoots = [ @project_root, @salma_hayek ]
     executableSubDirectories = [ "bin" ]
-    executableSubDirectories << ".generated/#{target_directory()}/bin"
     extraPathComponents = []
     subProjectRoots.each() {
       |subProjectRoot|
