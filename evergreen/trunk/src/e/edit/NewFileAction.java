@@ -79,13 +79,9 @@ public class NewFileAction extends AbstractAction {
         // FIXME: we could use FileType.guessFileTypeByFilename to allow the user to specify scripts that override a single type. YAGNI.
         String defaultBoilerplateGenerator = FileUtilities.findOnPath("evergreen-boilerplate-generator").toString();
         String boilerplateGenerator = Parameters.getString("boilerplateGenerator", defaultBoilerplateGenerator);
-        if (boilerplateGenerator == null) {
-            return;
-        }
         
-        String command = "'" + boilerplateGenerator + "' '" + file.toString() + "'";
         ArrayList<String> lines = new ArrayList<String>();
-        int status = ProcessUtilities.backQuote(null, ProcessUtilities.makeShellCommandArray(command), lines, lines);
+        int status = ProcessUtilities.backQuote(null, new String[] { boilerplateGenerator, file.toString() }, lines, lines);
         
         String result = StringUtilities.writeFile(file, lines);
         if (result != null) {
