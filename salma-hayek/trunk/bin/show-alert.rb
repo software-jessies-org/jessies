@@ -10,8 +10,7 @@ else
         require "#{salma_hayek}/bin/target-os.rb"
         if target_os() == "Darwin"
             # FIXME: Mac OS 10.5 should give us RubyCocoa. Until then, we need a separate helper executable.
-            ENV["PATH"] = "#{salma_hayek}/bin:#{salma_hayek}/.generated/#{target_directory()}/bin"
-            command = [ "NSRunAlertPanel", title, message ]
+            command = [ "#{salma_hayek}/.generated/#{target_directory()}/bin/NSRunAlertPanel", title, message ]
             system(*command)
         elsif target_os() == "Linux"
             text = "#{title}\n\n#{message}"
