@@ -3,8 +3,57 @@ package e.util;
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.regex.*;
 
 public class ProcessUtilities {
+    private static List<String> prependCygwinShell(final List<String> command) {
+        if (GuiUtilities.isWindows() == false) {
+            return command;
+        }
+        if (command.isEmpty()) {
+            return command;
+        }
+        String filename = command.get(0);
+        // There is no standard for #! lines.
+        // This is the longest length given in http://www.in-ulm.de/~mascheck/various/shebang/ (for FreeBSD).
+        int bufferLength = 8192;
+        char[] buffer = new char[bufferLength];
+        int charactersRead;
+        try {
+            FileReader in = new FileReader(filename);
+            try {
+                charactersRead = in.read(buffer, 0, bufferLength);
+            } finally {
+                in.close();
+            }
+        } catch (Exception ex) {
+            ex = ex;
+            return command;
+        }
+        String line = new String(buffer, 0, charactersRead);
+        // Cygwin and Linux pass second and subsequent words as a single argument.
+        Matcher matcher = Pattern.compile("^#![ \\t]*(\\S+)[ \\t]*([^\\r\\n]+)?[\\r\\n]").matcher(line);
+        if (matcher.find() == false) {
+            return command;
+        }
+        String cygwinShell = matcher.group(1);
+        // We won't recurse indefinitely because we won't be able to open "cygpath", even if run in Cygwin's bin directory, because the file is "cygpath.exe".
+        String windowsShell = FileUtilities.rewriteCygwinFilename(cygwinShell);
+        String flag = matcher.group(2);
+        List<String> arguments = new ArrayList<String>();
+        arguments.add(windowsShell);
+        if (flag != null) {
+            arguments.add(flag);
+        }
+        arguments.addAll(command);
+        return arguments;
+    }
+    
+    private static Process exec(final List<String> command, final File directory) throws Exception {
+        String[] commandArray = prependCygwinShell(command).toArray(new String[command.size()]);
+        return Runtime.getRuntime().exec(commandArray, null, directory);
+    }
+    
     /**
      * Runs 'command'. Returns the command's exit status.
      * Lines written to standard output are appended to 'lines'.
@@ -30,15 +79,16 @@ public class ProcessUtilities {
      * You can use the same ArrayList for 'lines' and 'errors'. All the error
      * lines will appear after all the output lines.
      */
-    public static int backQuote(final File directory, final String[] command, final LineListener outputLineListener, final LineListener errorLineListener) {
+    public static int backQuote(final File directory, final String[] commandArray, final LineListener outputLineListener, final LineListener errorLineListener) {
+        List<String> command = Arrays.asList(commandArray);
         try {
-            final Process p = Runtime.getRuntime().exec(command, null, directory);
+            final Process p = exec(command, directory);
             p.getOutputStream().close();
             Thread errorReaderThread = new Thread(new Runnable() {
                 public void run() {
                     readLinesFromStream(errorLineListener, p.getErrorStream());
                 }
-            }, "Process Back-Quote: " + shellQuotedFormOf(Arrays.asList(command)));
+            }, "Process Back-Quote: " + shellQuotedFormOf(command));
             errorReaderThread.start();
             readLinesFromStream(outputLineListener, p.getInputStream());
             errorReaderThread.join();
@@ -86,10 +136,11 @@ public class ProcessUtilities {
      * 
      * listener may be null.
      */
-    public static void spawn(final File directory, final String[] command, final ProcessListener listener) {
-        final String quotedCommand = shellQuotedFormOf(Arrays.asList(command));
+    public static void spawn(final File directory, final String[] commandArray, final ProcessListener listener) {
+        final List<String> command = Arrays.asList(commandArray);
+        final String quotedCommand = shellQuotedFormOf(command);
         try {
-            final Process p = Runtime.getRuntime().exec(command, null, directory);
+            final Process p = exec(command, directory);
             new Thread("Process Spawn: " + quotedCommand) {
                 public void run() {
                     try {
