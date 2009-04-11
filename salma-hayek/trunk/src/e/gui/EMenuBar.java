@@ -34,6 +34,7 @@ public class EMenuBar extends JMenuBar {
      * Overrides add to listen for "menu" being selected so we can update its
      * enabled/disabled state.
      */
+    @Override
     public JMenu add(JMenu menu) {
         menu.addMenuListener(MenuItemStateUpdater.INSTANCE);
         return super.add(menu);
@@ -146,6 +147,7 @@ public class EMenuBar extends JMenuBar {
     /**
      * Searches for a menu item whose accelerator property is the given KeyStroke.
      * The menu item's Action will be performed with a null ActionEvent, on the EDT.
+     * This isn't a JMenuBar facility - it's used by Evergreen's Minibuffer to forward a keystroke.
      */
     public void performActionForKeyStroke(KeyStroke keyStroke) {
         performActionForKeyStroke(keyStroke, this);
