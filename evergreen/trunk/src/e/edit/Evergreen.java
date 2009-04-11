@@ -21,7 +21,7 @@ public class Evergreen {
     private TabbedPane tabbedPane;
     private JSplitPane splitPane;
     private TagsPanel tagsPanel;
-    private EStatusBar statusLine;
+    private EStatusBar statusLine = new EStatusBar();
     private Minibuffer minibuffer;
     private JPanel statusArea;
     
@@ -727,7 +727,6 @@ public class Evergreen {
     }
     
     private void initStatusArea() {
-        statusLine = new EStatusBar();
         minibuffer = new Minibuffer();
         
         statusArea = new JPanel(new BorderLayout());
