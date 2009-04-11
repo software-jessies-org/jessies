@@ -47,6 +47,7 @@ public class Parameters {
         
         try {
             map = loadProperties(new HashMap<String, String>(), file);
+            Evergreen.getInstance().showStatus("Configuration reloaded");
             firePreferencesChanged();
         } catch (Exception ex) {
             Log.warn("Unable to read properties file \"" + file + "\"", ex);
