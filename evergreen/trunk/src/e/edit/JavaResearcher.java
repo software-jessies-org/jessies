@@ -65,7 +65,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         Advisor.extractUniqueWords(uniqueIdentifiers, uniqueWords);
         
         final long t1 = System.nanoTime();
-        Log.warn("Read summarized JavaDoc for " + classCount + " classes (" + javaDocSummary.length + " lines, " + uniqueIdentifiers.size() + " unique identifiers) in " + TimeUtilities.nsToString(t1 - t0) + ".");
+        Log.warn("Read summarized JavaDoc for " + classCount + " classes (" + javaDocSummary.length + " lines, " + uniqueIdentifiers.size() + " unique identifiers, " + uniqueWords.size() + " unique words) in " + TimeUtilities.nsToString(t1 - t0) + ".");
     }
     
     private static String gunzipTextFile(String filename) throws IOException {
