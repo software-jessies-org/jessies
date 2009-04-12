@@ -15,7 +15,7 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
         
         final ArrayList<String> lines = new ArrayList<String>();
         final ArrayList<String> errors = new ArrayList<String>();
-        final int status = ProcessUtilities.backQuote(null, new String[] { "ruby", listRubyWordsScript }, lines, errors);
+        final int status = ProcessUtilities.backQuote(null, new String[] { listRubyWordsScript }, lines, errors);
         if (status != 0) {
             return;
         }
@@ -37,7 +37,7 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
         }
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
-        int status = ProcessUtilities.backQuote(null, new String[] { "ruby", ri, "-T", "-f", "html", string }, lines, errors);
+        int status = ProcessUtilities.backQuote(null, new String[] { ri, "-T", "-f", "html", string }, lines, errors);
         
         String className = string;
         String lastLine = "";
