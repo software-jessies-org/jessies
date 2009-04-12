@@ -23,7 +23,7 @@ public class PythonDocumentationResearcher implements WorkspaceResearcher {
         
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
-        int status = ProcessUtilities.backQuote(null, new String[] { "python", pydocScript, string }, lines, errors);
+        int status = ProcessUtilities.backQuote(null, new String[] { pydocScript, string }, lines, errors);
         if (status == 1) {
             return "";
         }
