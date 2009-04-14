@@ -569,6 +569,11 @@ public class JTerminalPane extends JPanel {
 					host.setSelectedTabIndex(newIndex);
 					return true;
 				}
+				if (keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_RIGHT) {
+					// gnome-terminal behaves a little differently - it disables the left action on the first tab and the right action on the last tab.
+					host.cycleTab(keyCode == KeyEvent.VK_LEFT ? -1 : 1);
+					return true;
+				}
 			}
 			return false;
 		}
