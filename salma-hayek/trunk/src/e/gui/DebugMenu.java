@@ -290,22 +290,30 @@ public class DebugMenu {
             GuiUtilities.configureAction(this, "Show _Heap Usage", null);
         }
         
+        private class GcAction extends AbstractAction {
+            public GcAction() {
+                GuiUtilities.configureAction(this, "_Collect", null);
+            }
+            
+            public void actionPerformed(ActionEvent e) {
+                System.gc();
+            }
+        }
+        
+        private class HistogramAction extends AbstractAction {
+            public HistogramAction() {
+                GuiUtilities.configureAction(this, "_Histogram", null);
+                setEnabled(System.getProperty("java.specification.version").equals("1.5") == false);
+            }
+            
+            public void actionPerformed(ActionEvent e) {
+                JFrameUtilities.showTextWindow(null, Log.getApplicationName() + " Heap Histogram", getHeapHistogram());
+            }
+        }
+        
         public void actionPerformed(ActionEvent e) {
-            JButton gcButton = new JButton("Collect");
-            gcButton.setMnemonic('C');
-            gcButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    System.gc();
-                }
-            });
-            JButton histogramButton = new JButton("Histogram");
-            histogramButton.setMnemonic('H');
-            histogramButton.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    JFrameUtilities.showTextWindow(null, Log.getApplicationName() + " Heap Histogram", getHeapHistogram());
-                }
-            });
-            histogramButton.setEnabled(System.getProperty("java.specification.version").equals("1.5") == false);
+            JButton gcButton = new JButton(new GcAction());
+            JButton histogramButton = new JButton(new HistogramAction());
             JLabel currentHeapUsageLabel = new JLabel(" ");
             JPanel buttonPanel = makeButtonPanel(gcButton, histogramButton, Box.createHorizontalStrut(10), currentHeapUsageLabel);
             
