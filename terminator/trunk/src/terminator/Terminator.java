@@ -199,11 +199,13 @@ public class Terminator {
 		// At the moment, we assume that Linux users who want characters not on their keyboard will switch keyboard mapping dynamically (which works fine).
 		// We can avoid the question on Mac OS for now because disabling input methods doesn't currently work properly, and we don't get the key events anyway.
 		if (GuiUtilities.isMacOs() == false) {
+			final boolean useAltAsMeta = preferences.getBoolean(TerminatorPreferences.USE_ALT_AS_META);
 			int modifiers = KeyEvent.ALT_MASK;
-			if (preferences.getBoolean(TerminatorPreferences.USE_ALT_AS_META)) {
+			if (useAltAsMeta) {
 				modifiers = KeyEvent.SHIFT_MASK | KeyEvent.CTRL_MASK;
 			}
 			TerminatorMenuBar.setDefaultKeyStrokeModifiers(modifiers);
+			GuiUtilities.setMnemonicsEnabled(useAltAsMeta);
 		}
 		
 		for (int i = 0; i < frames.size(); ++i) {
