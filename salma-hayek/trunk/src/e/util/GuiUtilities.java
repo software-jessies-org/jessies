@@ -37,6 +37,8 @@ public class GuiUtilities {
     
     private static final int COMPONENT_SPACING = calculateComponentSpacing();
     
+    private static boolean mnemonicsEnabled = true;
+    
     /**
      * Guesses whether a font is fixed-width by comparing the widths of
      * various characters known for having wildly different sizes in
@@ -168,14 +170,27 @@ public class GuiUtilities {
     
     /**
      * Always call this instead of new JMenu.
-     * setMnemonic(0) afterward if need be.
      * FIXME: This doesn't use the same underscore scheme as configureAction.
      * configureAction's scheme can frustrate grep.
      */
     public static JMenu makeMenu(String name, char mnemonic) {
         JMenu menu = new JMenu(name);
-        menu.setMnemonic(mnemonic);
+        if (mnemonicsEnabled) {
+            menu.setMnemonic(mnemonic);
+        }
         return menu;
+    }
+    
+    /**
+     * Terminator uses alt as the modifier for its accelerators by default, so it needs a way to disable mnemonics.
+     * Normal applications should have no reason to call this.
+     */
+    public static void setMnemonicsEnabled(boolean newState) {
+        mnemonicsEnabled = newState;
+    }
+    
+    public static boolean getMnemonicsEnabled() {
+        return mnemonicsEnabled;
     }
     
     /**
