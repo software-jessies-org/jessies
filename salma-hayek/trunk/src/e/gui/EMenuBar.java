@@ -46,16 +46,20 @@ public class EMenuBar extends JMenuBar {
      */
     @Override
     protected boolean processKeyBinding(KeyStroke ks, KeyEvent e, int condition, boolean pressed) {
-        traverseMenu(this);
+        updateMenuItemEnabledStates(this);
         return super.processKeyBinding(ks, e, condition, pressed);
     }
     
-    private static void traverseMenu(MenuElement menu) {
+    /**
+     * Traverses a menu recursively, setting each menu item's enabled state from the item's action's state.
+     * This way, the application need only update the actions' states, and the menu bar just does the right thing.
+     */
+    private static void updateMenuItemEnabledStates(MenuElement menu) {
         for (MenuElement element : menu.getSubElements()) {
             if (element instanceof JMenu) {
-                traverseMenu((JMenu) element);
+                updateMenuItemEnabledStates((JMenu) element);
             } else if (element instanceof JPopupMenu) {
-                traverseMenu((JPopupMenu) element);
+                updateMenuItemEnabledStates((JPopupMenu) element);
             } else {
                 JMenuItem menuItem = (JMenuItem) element;
                 Action action = menuItem.getAction();
@@ -75,7 +79,7 @@ public class EMenuBar extends JMenuBar {
         }
         
         public void menuSelected(MenuEvent e) {
-            traverseMenu((JMenu) e.getSource());
+            updateMenuItemEnabledStates((JMenu) e.getSource());
         }
         
         public void menuDeselected(MenuEvent e) {
