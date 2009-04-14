@@ -77,7 +77,7 @@ public class NewFileAction extends AbstractAction {
     
     private void fillWithInitialContents(File file) {
         // FIXME: we could use FileType.guessFileTypeByFilename to allow the user to specify scripts that override a single type. YAGNI.
-        String defaultBoilerplateGenerator = FileUtilities.findOnPath("evergreen-boilerplate-generator").toString();
+        String defaultBoilerplateGenerator = Evergreen.getScriptFilename("evergreen-boilerplate-generator").toString();
         String boilerplateGenerator = Parameters.getString("boilerplateGenerator", defaultBoilerplateGenerator);
         
         ArrayList<String> lines = new ArrayList<String>();
