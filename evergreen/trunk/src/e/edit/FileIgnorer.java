@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.regex.*;
 import e.util.*;
 
-public class FileIgnorer {
+public class FileIgnorer implements FileFinder.Filter {
     /** The tree we're responsible for. */
     private final File rootDirectory;
     
@@ -21,7 +21,17 @@ public class FileIgnorer {
         this.ignoredExtensions = Collections.unmodifiableList(makeIgnoredExtensions());
     }
     
-    public boolean isIgnored(File file, boolean isDirectory) {
+    // FileFinder.Filter API.
+    public boolean acceptFile(File file) {
+        return !isIgnored(file, false) && !FileUtilities.isSymbolicLink(file);
+    }
+    
+    // FileFinder.Filter API.
+    public boolean enterDirectory(File directory) {
+        return !isIgnored(directory, true) && !FileUtilities.isSymbolicLink(directory);
+    }
+    
+    private boolean isIgnored(File file, boolean isDirectory) {
         String filename = file.getName();
         // FIXME: if it were cheap, we'd use File.isHidden. But it's unnecessarily expensive on Unix and not obviously useful on Windows.
         // (Subversion for Windows doesn't use the hidden bit for its .svn directories, for example.)
@@ -29,7 +39,8 @@ public class FileIgnorer {
             return true;
         }
         if (isDirectory) {
-            return isIgnoredDirectory(filename);
+            // Making this a no-op for a large tree with no files to ignore makes no measurable improvement to the overall indexing time.
+            return uninterestingDirectoryNames.matcher(filename).matches();
         }
         // People using ctags(1) don't want their tags files indexed.
         if (filename.equals("tags")) {
@@ -75,11 +86,6 @@ public class FileIgnorer {
         ArrayList<String> errors = new ArrayList<String>();
         // Try to run any site-local script.
         ProcessUtilities.backQuote(rootDirectory, command, lines, errors);
-    }
-    
-    public boolean isIgnoredDirectory(String filename) {
-        // Making this a no-op for a large tree with no files to ignore makes no measurable improvement to the overall indexing time.
-        return uninterestingDirectoryNames.matcher(filename).matches();
     }
     
     /**
