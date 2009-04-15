@@ -108,7 +108,7 @@ public class Minibuffer extends JPanel implements FocusListener {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             EvergreenMenuBar menuBar = (EvergreenMenuBar) Evergreen.getInstance().getFrame().getJMenuBar();
-                            menuBar.performActionForKeyStroke(thisKeyStroke);
+                            menuBar.performActionForKeyStroke(thisKeyStroke, e);
                         }
                     });
                 }
