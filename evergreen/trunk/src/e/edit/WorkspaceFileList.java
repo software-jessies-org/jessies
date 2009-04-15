@@ -152,34 +152,18 @@ public class WorkspaceFileList {
             
             // We should reload the file ignorer's configuration when we rescan.
             updateFileIgnorer();
-            ArrayList<String> result = new ArrayList<String>();
-            scanDirectory(FileUtilities.fileFromString(workspaceRoot), fileIgnorer, result);
+            
+            List<File> files = new FileFinder().filesUnder(FileUtilities.fileFromString(workspaceRoot), fileIgnorer);
+            ArrayList<String> result = new ArrayList<String>(files.size());
+            for (File file : files) {
+                result.add(file.toString().substring(prefixCharsToSkip));
+            }
+            
             Evergreen.getInstance().showStatus("Scan of \"" + workspaceRoot + "\" complete (" + result.size() + " files)");
             
             final long t1 = System.nanoTime();
             Log.warn("Scan of " + workspaceRoot + " took " + TimeUtilities.nsToString(t1 - t0) + "; found " + result.size() + " files.");
             return result;
-        }
-        
-        private void scanDirectory(File directory, FileIgnorer fileIgnorer, ArrayList<String> result) {
-            File[] files = directory.listFiles();
-            if (files == null) {
-                return;
-            }
-            for (File file : files) {
-                boolean isDirectory = file.isDirectory();
-                if (fileIgnorer.isIgnored(file, isDirectory)) {
-                    continue;
-                }
-                if (FileUtilities.isSymbolicLink(file)) {
-                    continue;
-                }
-                if (isDirectory) {
-                    scanDirectory(file, fileIgnorer, result);
-                } else {
-                    result.add(file.toString().substring(prefixCharsToSkip));
-                }
-            }
         }
         
         @Override
