@@ -87,33 +87,10 @@ public class EMenuBar extends JMenuBar {
     }
     
     /**
-     * Searches for a menu item whose accelerator property is the given KeyStroke.
-     * The menu item's Action will be performed with a null ActionEvent, on the EDT.
-     * This isn't a JMenuBar facility - it's used by Evergreen's Minibuffer to forward a keystroke.
+     * This isn't a JMenuBar facility - it's used by Evergreen's Minibuffer to forward key strokes.
      */
-    public void performActionForKeyStroke(KeyStroke keyStroke) {
-        performActionForKeyStroke(keyStroke, this);
-    }
-    
-    private void performActionForKeyStroke(KeyStroke keyStroke, MenuElement menu) {
-        for (MenuElement element : menu.getSubElements()) {
-            if (element instanceof JMenu || element instanceof JPopupMenu) {
-                performActionForKeyStroke(keyStroke, element);
-            } else if (element instanceof JMenuItem) {
-                final JMenuItem menuItem = (JMenuItem) element;
-                final Action action = menuItem.getAction();
-                final KeyStroke menuItemKeyStroke = menuItem.getAccelerator();
-                if (action != null && menuItemKeyStroke != null && action.isEnabled()) {
-                    // We can't use KeyStroke.equals because that requires the pressed/released/typed state to match too, which won't (necessarily) on all platforms.
-                    if (keyStroke.getKeyChar() == menuItemKeyStroke.getKeyChar() && keyStroke.getKeyCode() == menuItemKeyStroke.getKeyCode() && keyStroke.getModifiers() == menuItemKeyStroke.getModifiers()) {
-                        SwingUtilities.invokeLater(new Runnable() {
-                            public void run() {
-                                action.actionPerformed(null);
-                            }
-                        });
-                    }
-                }
-            }
-        }
+    public void performActionForKeyStroke(KeyStroke keyStroke, KeyEvent e) {
+        updateMenuItemEnabledStates(this);
+        processKeyBinding(keyStroke, e, JComponent.WHEN_IN_FOCUSED_WINDOW, e.getID() == KeyEvent.KEY_PRESSED);
     }
 }
