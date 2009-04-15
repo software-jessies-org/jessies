@@ -121,26 +121,22 @@ public class ProcessUtilities {
         }
     }
 
-    public static void spawn(final File directory, String... command) {
-        spawn(directory, command, null);
+    public static Process spawn(final File directory, String... command) {
+        return spawn(directory, command, null);
     }
     
     /**
-     * Runs a command and ignores the output. The child is waited for on a
-     * separate thread, so there's no indication of whether the spawning was
-     * successful or not. A better design might be to exec in the current
-     * thread, and hand the Process over to another Thread; you'd still not
-     * get the return code (but losing that is part of the deal), but you
-     * would at least know that Java had no trouble in exec. Is that worth
-     * anything?
-     * 
-     * listener may be null.
+     * Runs a command and ignores the output.
+     * The Process corresponding to the command is returned.
+     * 'listener' may be null, but if supplied will be notified when the process exits.
      */
-    public static void spawn(final File directory, final String[] commandArray, final ProcessListener listener) {
+    public static Process spawn(final File directory, final String[] commandArray, final ProcessListener listener) {
         final List<String> command = Arrays.asList(commandArray);
         final String quotedCommand = shellQuotedFormOf(command);
+        Process result = null;
         try {
             final Process p = exec(command, directory);
+            result = p;
             new Thread("Process Spawn: " + quotedCommand) {
                 public void run() {
                     try {
@@ -159,6 +155,7 @@ public class ProcessUtilities {
         } catch (Exception ex) {
             Log.warn("Failed to spawn command: " + quotedCommand, ex);
         }
+        return result;
     }
 
     public interface ProcessListener {
