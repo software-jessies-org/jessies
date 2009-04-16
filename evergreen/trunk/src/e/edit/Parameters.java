@@ -28,16 +28,25 @@ public class Parameters {
         file = FileUtilities.fileFromString(filename);
         
         // Arrange to reload the configuration whenever it changes.
-        fileAlterationMonitor = new FileAlterationMonitor(filename);
+        FileAlterationMonitor newFileAlterationMonitor = new FileAlterationMonitor(filename);
+        newFileAlterationMonitor.addPathname(filename);
+        setFileAlterationMonitor(newFileAlterationMonitor);
+        
+        // Load the initial configuration.
+        reloadParametersFile();
+    }
+    
+    private static void setFileAlterationMonitor(FileAlterationMonitor newFileAlterationMonitor) {
+        if (fileAlterationMonitor != null) {
+            fileAlterationMonitor.dispose();
+        }
+        fileAlterationMonitor = newFileAlterationMonitor;
         fileAlterationMonitor.addListener(new FileAlterationMonitor.Listener() {
             public void fileTouched(String pathname) {
                 reloadParametersFile();
             }
         });
-        fileAlterationMonitor.addPathname(filename);
         
-        // Load the initial configuration.
-        reloadParametersFile();
     }
     
     private static synchronized void reloadParametersFile() {
@@ -46,7 +55,10 @@ public class Parameters {
         }
         
         try {
-            map = loadProperties(new HashMap<String, String>(), file);
+            Loader loader = new Loader();
+            loader.load(file);
+            map = loader.map;
+            setFileAlterationMonitor(loader.fileAlterationMonitor);
             Evergreen.getInstance().showStatus("Configuration reloaded");
             firePreferencesChanged();
         } catch (Exception ex) {
@@ -54,53 +66,63 @@ public class Parameters {
         }
     }
     
-    /** Reads properties from the given file. */
-    private static HashMap<String, String> loadProperties(HashMap<String, String> props, File file) {
-        for (String line : StringUtilities.readLinesFromFile(file)) {
-            processPropertiesLine(props, line);
-        }
-        return props;
-    }
-    
-    private static boolean isCommentLine(String line) {
-        return line.length() == 0 || line.charAt(0) == '#';
-    }
-    
-    private static boolean isIncludeLine(String line) {
-        return line.charAt(0) == '<';
-    }
-    
-    private static void processIncludeLine(HashMap<String, String> props, String line) {
-        final String filename = line.substring(1);
-        try {
-            loadProperties(props, FileUtilities.fileFromString(filename));
-        } catch (Exception ex) {
-            Log.warn("Unable to include properties file \"" + filename + "\"", ex);
-        }
-    }
-    
-    private static void processPropertiesLine(HashMap<String, String> props, String line) {
-        // We may need an escaping or quoting mechanism if we ever need to preserve trailing spaces.
-        line = line.trim();
+    private static class Loader {
+        private FileAlterationMonitor fileAlterationMonitor;
+        private HashMap<String, String> map;
         
-        if (isCommentLine(line)) {
-            return;
+        private void load(File file) {
+            this.fileAlterationMonitor = new FileAlterationMonitor(file.toString());
+            this.map = new HashMap<String, String>();
+            loadProperties(file);
         }
         
-        if (isIncludeLine(line)) {
-            processIncludeLine(props, line);
-            return;
+        private void loadProperties(File file) {
+            fileAlterationMonitor.addPathname(file.toString());
+            for (String line : StringUtilities.readLinesFromFile(file)) {
+                processPropertiesLine(line);
+            }
         }
         
-        int equalsPos = line.indexOf('=');
-        if (equalsPos == -1) {
-            // TODO: isn't this an error worth reporting?
-            Log.warn("line without '=' found in properties file");
-            return;
+        private void processPropertiesLine(String line) {
+            // We may need an escaping or quoting mechanism if we ever need to preserve trailing spaces.
+            line = line.trim();
+            
+            if (isCommentLine(line)) {
+                return;
+            }
+            
+            if (isIncludeLine(line)) {
+                processIncludeLine(line);
+                return;
+            }
+            
+            int equalsPos = line.indexOf('=');
+            if (equalsPos == -1) {
+                // TODO: isn't this an error worth reporting?
+                Log.warn("line without '=' found in properties file");
+                return;
+            }
+            final String name = line.substring(0, equalsPos);
+            final String value = line.substring(equalsPos + 1);
+            map.put(name, value);
         }
-        final String name = line.substring(0, equalsPos);
-        final String value = line.substring(equalsPos + 1);
-        props.put(name, value);
+        
+        private static boolean isCommentLine(String line) {
+            return line.length() == 0 || line.charAt(0) == '#';
+        }
+        
+        private static boolean isIncludeLine(String line) {
+            return line.charAt(0) == '<';
+        }
+        
+        private void processIncludeLine(String line) {
+            final String filename = line.substring(1);
+            try {
+                loadProperties(FileUtilities.fileFromString(filename));
+            } catch (Exception ex) {
+                Log.warn("Unable to include properties file \"" + filename + "\"", ex);
+            }
+        }
     }
     
     public static synchronized String getString(String name, String defaultValue) {
