@@ -1,5 +1,7 @@
 #!/bin/bash
 
+ssh software@jessies.org /home/software/checked-out/salma-hayek/lib/build/make-www-and-source-dist.rb
+
 # BlueArc's local copy of the archive:
 DEB_DIRECTORY=/u/u154/software.jessies.org/
 # deb http://deb/software.jessies.org/ ./
