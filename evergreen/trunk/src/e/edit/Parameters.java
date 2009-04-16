@@ -141,15 +141,14 @@ public class Parameters {
     }
     
     /**
-     * Returns an array with an item for each semicolon-separated element of the property.
-     * FIXME: return List<String> instead.
+     * Returns a list with an item for each semicolon-separated element of the property.
      */
-    public static synchronized String[] getArrayOfSemicolonSeparatedElements(String name) {
+    public static synchronized List<String> getListOfSemicolonSeparatedElements(String name) {
         final String value = getString(name, null);
         if (value == null || value.trim().length() == 0) {
-            return new String[0];
+            return Collections.emptyList();
         }
-        return value.split(";");
+        return Arrays.asList(value.split(";"));
     }
     
     public static void addPreferencesListener(Preferences.Listener l) {

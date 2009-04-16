@@ -59,7 +59,7 @@ public class OpenImportAction extends ETextAction {
         }
         
         // FIXME: we should probably allow "." and interpret it as "the directory containing the current file". maybe just implicitly always check there first?
-        List<String> importPath = Arrays.asList(Parameters.getArrayOfSemicolonSeparatedElements(fileType.getName() + ".importPath"));
+        List<String> importPath = Parameters.getListOfSemicolonSeparatedElements(fileType.getName() + ".importPath");
         for (String importDir : importPath) {
             File file;
             if (importDir.startsWith("/") || importDir.startsWith("~")) {
