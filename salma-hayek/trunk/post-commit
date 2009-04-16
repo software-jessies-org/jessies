@@ -18,10 +18,10 @@ ENV["PATH"] = "/usr/local/bin:/usr/bin:/bin"
 
 # You *will* need to change these.
 
-mail_domain="jessies.org" # Assumes all authors (and the to_address) share a domain.
+mail_domain = "jessies.org" # Assumes all authors (and the to_address) share a domain.
 
-to_address="software@#{mail_domain}"
-reply_to_address=to_address # Use "nil" to reply to the author.
+to_address = "software@#{mail_domain}"
+reply_to_address = to_address # Use "nil" to reply to the author.
 
 # ------------------------------------------------------------------------
 
@@ -33,8 +33,8 @@ salma_hayek = Pathname.new(__FILE__).realpath().dirname()
 
 # We can work out the repository name because we're <path>/<name>/hooks/post-commit
 # We could also work this out from the spurious repository_path argument.
-repository_path=Pathname.new(__FILE__).parent().parent()
-repository_name=repository_path.basename()
+repository_path = Pathname.new(__FILE__).parent().parent()
+repository_name = repository_path.basename()
 
 require "#{salma_hayek}/lib/build/escaping.rb"
 require "#{salma_hayek}/lib/build/patch-to-html-email.rb"
@@ -50,19 +50,19 @@ rev = ARGV.shift()
 # svn(1) stores everything as UTF-8 but translates it on output according to LC_CTYPE.
 # This appears not to be set by default on jessies.org in the environment in which this job runs.
 ENV["LC_CTYPE"] = "en_US.UTF-8"
-info=`svnlook info #{repository_path} -r #{rev}`
-info_lines=info.split("\n")
-author=info_lines.shift()
-date=info_lines.shift()
+info = `svnlook info #{repository_path} -r #{rev}`
+info_lines = info.split("\n")
+author = info_lines.shift()
+date = info_lines.shift()
 info_lines.shift()
-comment=info_lines
+comment = info_lines
 
 # Remove the localized date that follows the ISO date.
 date = date.gsub(/ \(.*\)$/, "")
 
-from_address="#{author}@#{mail_domain}"
+from_address = "#{author}@#{mail_domain}"
 
-subject="#{repository_name} revision #{rev}"
+subject = "#{repository_name} revision #{rev}"
 
 body = ""
 
@@ -79,7 +79,7 @@ body << "</p></div>\n"
 # Get and output the patch.
 # We'd like to | #{salma_hayek}/bin/annotate-patch.rb
 # But that requires that the correct version of the file is available as trunk/filename
-changes=`svnlook diff #{repository_path} -r #{rev}`
+changes = `svnlook diff #{repository_path} -r #{rev}`
 changes.gsub!(/\r/, "") # In case we're running on MS Windows.
 
 sendHtmlEmail(from_address, to_address, reply_to_address, subject, body, changes.split("\n"))
@@ -90,11 +90,11 @@ sendHtmlEmail(from_address, to_address, reply_to_address, subject, body, changes
 # will require manual intervention to fix, because we'll be stuck at the broken
 # revision forever.
 
-updateResult=`{ umask 0002 && cd #{salma_hayek}/../#{repository_name} && svn update && make www-dist; } 2>&1`
+updateResult = `{ umask 0002 && cd #{salma_hayek}/../#{repository_name} && svn update && make www-dist; } 2>&1`
 if $? != 0
     begin
         # Consider using http://www.opengroup.org/onlinepubs/007908799/xcu/mailx.html if sendmail causes a problem.
-        sendmail="/usr/sbin/sendmail"
+        sendmail = "/usr/sbin/sendmail"
         
         open("|#{sendmail} #{to_address}", "w") {
             |fd|
