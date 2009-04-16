@@ -100,7 +100,8 @@ public class NumberDecoder {
     }
     
     private static String toString(int radix, long number) {
-        String digits = Long.toString(number, radix);
+        String signPrefix = number < 0 ? "-" : "";
+        String digits = Long.toString(Math.abs(number), radix);
         // Make it easier to read large numbers.
         if (radix == 2) {
             // FIXME: it would be convenient if binary numbers were always a multiple of 4 digits long (i.e. no partial bytes).
@@ -113,7 +114,7 @@ public class NumberDecoder {
             // FIXME: it would be convenient if hex numbers were always a multiple of 2 digits long (i.e. no partial bytes).
             digits = insertCharEveryNDigits(digits, ' ', 4);
         }
-        return radixToName(radix) + " " + radixToPrefix(radix) + digits;
+        return radixToName(radix) + " " + signPrefix + radixToPrefix(radix) + digits;
     }
     
     private static String insertCharEveryNDigits(String s, char ch, int n) {
