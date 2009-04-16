@@ -90,7 +90,7 @@ sendHtmlEmail(from_address, to_address, reply_to_address, subject, body, changes
 # will require manual intervention to fix, because we'll be stuck at the broken
 # revision forever.
 
-updateResult=`{ cd #{salma_hayek}/../#{repository_name} && svn update && make www-dist source-dist; } 2>&1`
+updateResult=`{ cd #{salma_hayek}/../#{repository_name} && svn update && make www-dist; } 2>&1`
 if $? != 0
     begin
         # Consider using http://www.opengroup.org/onlinepubs/007908799/xcu/mailx.html if sendmail causes a problem.
