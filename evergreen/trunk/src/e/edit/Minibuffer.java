@@ -108,6 +108,7 @@ public class Minibuffer extends JPanel implements FocusListener {
                     SwingUtilities.invokeLater(new Runnable() {
                         public void run() {
                             EvergreenMenuBar menuBar = (EvergreenMenuBar) Evergreen.getInstance().getFrame().getJMenuBar();
+                            // FIXME: PTextAction.isEnabled often returns false, disabling Find Next and Find Previous, because the focus transition initiated by deactivate, above, hasn't completed yet.
                             menuBar.performActionForKeyStroke(thisKeyStroke, e);
                         }
                     });
