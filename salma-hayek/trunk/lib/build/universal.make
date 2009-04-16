@@ -725,10 +725,15 @@ source-dist: ../$(SOURCE_DIST_FILE)
 
 # This is only designed to be run on jessies.org itself.
 .PHONY: www-dist
-www-dist: ChangeLog.html www
+www-dist: www
 	mkdir -p $(DIST_DIRECTORY) && \
-	mv ChangeLog.html $(DIST_DIRECTORY)/ && \
 	rsync -v -r www/* $(DIST_DIRECTORY)/
+
+# This is only designed to be run on jessies.org itself.
+.PHONY: publish-changelog
+publish-changelog: ChangeLog.html
+	mkdir -p $(DIST_DIRECTORY) && \
+	mv ChangeLog.html $(DIST_DIRECTORY)/
 
 .PHONY: .generated/build-revision.txt
 .generated/build-revision.txt:
