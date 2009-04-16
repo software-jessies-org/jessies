@@ -336,9 +336,9 @@ class Java
     # File::PATH_SEPARATOR is the right choice here for Cygwin (":") and native Windows Ruby (";").
     originalPathComponents = ENV["PATH"].split(File::PATH_SEPARATOR)
     newPathComponents = []
-    # Ensure that our setsid(1) is on the PATH, for the potential benefit of Evergreen.
     # Experience suggests that various startup files are likely to reset the PATH in terminator shells.
-    newPathComponents.concat(getExtraPathComponents())
+    # FIXME: If we can live with this commented out for a week from 2009-04-15, then getExtraPathComponents can be deleted.
+    #newPathComponents.concat(getExtraPathComponents())
     newPathComponents.concat(originalPathComponents)
     # Find cygwin1.dll.
     newPathComponents << "/bin"
