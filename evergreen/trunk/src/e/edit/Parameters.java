@@ -16,7 +16,8 @@ import java.io.*;
  * Other lines are considered to be assignments of the form name=value.
  */
 public class Parameters {
-    private static File file;
+    private static final String MONITOR_NAME = "configuration";
+    private static ArrayList<File> files = new ArrayList<File>();
     private static FileAlterationMonitor fileAlterationMonitor;
     
     private static HashMap<String, String> map = new HashMap<String, String>();
@@ -24,13 +25,10 @@ public class Parameters {
     
     private Parameters() { /* Not instantiable. */ }
     
-    public static synchronized void initParameters(String filename) {
-        file = FileUtilities.fileFromString(filename);
-        
-        // Arrange to reload the configuration whenever it changes.
-        FileAlterationMonitor newFileAlterationMonitor = new FileAlterationMonitor(filename);
-        newFileAlterationMonitor.addPathname(filename);
-        setFileAlterationMonitor(newFileAlterationMonitor);
+    public static synchronized void initParameters(String... filenames) {
+        for (String filename : filenames) {
+            files.add(FileUtilities.fileFromString(filename));
+        }
         
         // Load the initial configuration.
         reloadParametersFile();
@@ -50,34 +48,35 @@ public class Parameters {
     }
     
     private static synchronized void reloadParametersFile() {
-        if (file.exists() == false) {
-            return;
-        }
-        
         try {
             Loader loader = new Loader();
-            loader.load(file);
+            loader.load(files);
             map = loader.map;
             setFileAlterationMonitor(loader.fileAlterationMonitor);
             Evergreen.getInstance().showStatus("Configuration reloaded");
             firePreferencesChanged();
         } catch (Exception ex) {
-            Log.warn("Unable to read properties file \"" + file + "\"", ex);
+            Log.warn("Unable to reload properties files", ex);
         }
     }
     
     private static class Loader {
-        private FileAlterationMonitor fileAlterationMonitor;
-        private HashMap<String, String> map;
+        private FileAlterationMonitor fileAlterationMonitor = new FileAlterationMonitor(MONITOR_NAME);;
+        private HashMap<String, String> map = new HashMap<String, String>();
         
-        private void load(File file) {
-            this.fileAlterationMonitor = new FileAlterationMonitor(file.toString());
-            this.map = new HashMap<String, String>();
-            loadProperties(file);
+        private void load(Iterable<File> files) {
+            for (File file : files) {
+                loadProperties(file);
+            }
         }
         
         private void loadProperties(File file) {
             fileAlterationMonitor.addPathname(file.toString());
+            
+            if (!file.exists()) {
+                return;
+            }
+            
             for (String line : StringUtilities.readLinesFromFile(file)) {
                 processPropertiesLine(line);
             }
@@ -143,6 +142,7 @@ public class Parameters {
     
     /**
      * Returns an array with an item for each semicolon-separated element of the property.
+     * FIXME: return List<String> instead.
      */
     public static synchronized String[] getArrayOfSemicolonSeparatedElements(String name) {
         final String value = getString(name, null);
@@ -162,7 +162,11 @@ public class Parameters {
     
     private static void firePreferencesChanged() {
         for (Preferences.Listener l : listeners) {
-            l.preferencesChanged();
+            try {
+                l.preferencesChanged();
+            } catch (Exception ex) {
+                Log.warn("Exception thrown by preferences listener " + l, ex);
+            }
         }
     }
 }

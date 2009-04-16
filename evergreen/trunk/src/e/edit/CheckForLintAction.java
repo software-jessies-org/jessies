@@ -19,8 +19,6 @@ import java.util.*;
  * Checking as-you-type sounds eminently possible, even without the ability to use any of these in-process.
  */
 public class CheckForLintAction extends ETextAction {
-    private static final HashMap<FileType, String> checkers = initCheckers();
-    
     public CheckForLintAction() {
         super("Check For _Lint", GuiUtilities.makeKeyStroke("L", true));
     }
@@ -31,7 +29,11 @@ public class CheckForLintAction extends ETextAction {
     
     @Override public boolean isEnabled() {
         final ETextWindow textWindow = getFocusedTextWindow();
-        return textWindow != null && checkers.containsKey(textWindow.getFileType());
+        return textWindow != null && getCheckerCommand(textWindow.getFileType()) != null;
+    }
+    
+    private String getCheckerCommand(FileType fileType) {
+        return Parameters.getString(fileType.getName() + ".lintChecker", null);
     }
     
     private void checkForLint() {
@@ -45,7 +47,7 @@ public class CheckForLintAction extends ETextAction {
         
         // Get the appropriate command for the selected file's type.
         FileType fileType = textWindow.getFileType();
-        String command = checkers.get(fileType);
+        String command = getCheckerCommand(fileType);
         if (command == null) {
             Evergreen.getInstance().showAlert("Unable to check for lint", "Don't know how to check " + fileType.getName() + " files.");
             return;
@@ -83,27 +85,5 @@ public class CheckForLintAction extends ETextAction {
         final EErrorsWindow errorsWindow = workspace.createErrorsWindow("Lint Output");
         errorsWindow.appendLines(true, lines);
         errorsWindow.taskDidExit(status);
-    }
-    
-    private static HashMap<FileType, String> initCheckers() {
-        HashMap<FileType, String> result = new HashMap<FileType, String>();
-        
-        // Set up the defaults.
-        // It's probably useful to try to run these even if they're not installed; the user can figure out what's missing from the error message.
-        result.put(FileType.PERL, "perl -c");
-        result.put(FileType.PYTHON, "pychecker -Q");
-        result.put(FileType.RUBY, "ruby -wc");
-        result.put(FileType.XML, "tidy -qe");
-        
-        // Override or supplement those with any user-configured checkers.
-        for (String fileTypeName : FileType.getAllFileTypeNames()) {
-            // FIXME: when we have per-FileType configuration, get the lint checker from there.
-            String checker = Parameters.getString(fileTypeName + ".lintChecker", null);
-            if (checker != null) {
-                result.put(FileType.fromName(fileTypeName), checker.trim());
-            }
-        }
-        
-        return result;
     }
 }

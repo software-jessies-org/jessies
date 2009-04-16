@@ -13,8 +13,6 @@ import java.util.*;
  * For Java, this would be the source file corresponding to the selected import.
  */
 public class OpenImportAction extends ETextAction {
-    private static final HashMap<FileType, String> importPaths = initImportPaths();
-    
     public OpenImportAction() {
         super("Open _Import...", GuiUtilities.makeKeyStroke("O", true));
     }
@@ -61,7 +59,7 @@ public class OpenImportAction extends ETextAction {
         }
         
         // FIXME: we should probably allow "." and interpret it as "the directory containing the current file". maybe just implicitly always check there first?
-        List<String> importPath = importPathForFileType(fileType);
+        List<String> importPath = Arrays.asList(Parameters.getArrayOfSemicolonSeparatedElements(fileType.getName() + ".importPath"));
         for (String importDir : importPath) {
             File file;
             if (importDir.startsWith("/") || importDir.startsWith("~")) {
@@ -79,33 +77,5 @@ public class OpenImportAction extends ETextAction {
             }
         }
         editor.showAlert("Couldn't open imported file", "There was no file \"" + path + "\" under any of the directories on the import path:\n" + StringUtilities.join(importPath, ":"));
-    }
-    
-    private static HashMap<FileType, String> initImportPaths() {
-        HashMap<FileType, String> result = new HashMap<FileType, String>();
-        
-        // Set up the defaults.
-        result.put(FileType.C_PLUS_PLUS, "/usr/include/:/usr/include/c++/4.2/:native/Headers/");
-        // FIXME: backquote ruby -e 'puts($:.join(":"))'
-        result.put(FileType.RUBY, "/usr/lib/ruby/1.8/");
-        
-        // Override or supplement those with any user-configured import paths.
-        for (String fileTypeName : FileType.getAllFileTypeNames()) {
-            // FIXME: when we have per-FileType configuration, get the import path from there.
-            String importPath = Parameters.getString(fileTypeName + ".importPath", null);
-            if (importPath != null) {
-                result.put(FileType.fromName(fileTypeName), importPath.trim());
-            }
-        }
-        
-        return result;
-    }
-    
-    private static List<String> importPathForFileType(FileType fileType) {
-        if (importPaths.containsKey(fileType)) {
-            return Arrays.asList(importPaths.get(fileType).split(":"));
-        } else {
-            return Arrays.asList(new String[0]);
-        }
     }
 }
