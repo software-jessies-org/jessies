@@ -723,7 +723,7 @@ source-dist: ../$(SOURCE_DIST_FILE)
 
 # This is only designed to be run on jessies.org itself.
 .PHONY: www-dist
-www-dist: ChangeLog.html
+www-dist: ChangeLog.html www
 	mkdir -p $(DIST_DIRECTORY) && \
 	mv ChangeLog.html $(DIST_DIRECTORY)/ && \
 	rsync -v -r www/* $(DIST_DIRECTORY)/
