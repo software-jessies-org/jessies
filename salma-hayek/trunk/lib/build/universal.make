@@ -564,7 +564,9 @@ DIST_SSH_USER_AND_HOST = software@jessies.org
 DIST_SUBDIRECTORY_FOR_PREREQUISITE = $(DIST_SUBDIRECTORY$(suffix $<))
 DIST_DIRECTORY = /home/software/downloads/$(if $(DIST_SUBDIRECTORY_FOR_PREREQUISITE),$(DIST_SUBDIRECTORY_FOR_PREREQUISITE),$(error sub-directory not specified for extension "$(suffix $<)"))
 # The html files are copied, with rsync, from www/ into this directory.
-DIST_SUBDIRECTORY.html = $(MACHINE_PROJECT_NAME)
+DIST_SUBDIRECTORY = $(MACHINE_PROJECT_NAME)
+# ChangeLog.html is copied to the same place.
+DIST_SUBDIRECTORY.html = $(DIST_SUBDIRECTORY)
 # $(suffix)'s definition means we need .gz here not .tar.gz.
 # We have to distinguish between the SOURCE_DIST and OS-specific .tar.gz distributions here.
 DIST_SUBDIRECTORY.gz = $(DIST_SUBDIRECTORY_FOR_$(notdir $<))
