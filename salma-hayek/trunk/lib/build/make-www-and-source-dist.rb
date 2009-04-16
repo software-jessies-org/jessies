@@ -7,7 +7,7 @@ Dir.glob("#{salma_hayek}/../*/.svn").each() {
     repository = Pathname.new(svnDirectory).realpath().dirname()
     Dir.chdir(repository) {
         # "At revision 2962" is uninteresting.
-        updateResult = `{ umask 0002 && svn update && make www-dist source-dist; } 2>&1`
+        updateResult = `{ umask 0002 && svn update && make www-dist publish-changelog source-dist; } 2>&1`
         if $? != 0
             $stderr.puts("Failed in #{repository}:")
             $stderr.puts(updateResult)
