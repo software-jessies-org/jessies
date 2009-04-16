@@ -7,6 +7,7 @@
 #   make remove
 #   make native-clean
 #   make native-dist
+#   make publish-changelog
 #   make source-dist
 #   make test
 #   make www-dist
