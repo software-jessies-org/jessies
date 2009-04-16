@@ -377,15 +377,15 @@ JAVA_CLASSES_PREREQUISITES += $(if $(WILDCARD.classes),,.generated)
 $(takeProfileSample)
 
 define GENERATE_CHANGE_LOG.svn
-  svn log > ChangeLog
+  svn log
 endef
 
 define GENERATE_CHANGE_LOG.hg
-  hg log > ChangeLog
+  hg log
 endef
 
 define GENERATE_CHANGE_LOG.cvs
-  $(if $(shell which cvs2cl),cvs2cl,cvs2cl.pl) --hide-filenames
+  $(if $(shell which cvs2cl),cvs2cl,cvs2cl.pl) --hide-filenames --stdout
 endef
 
 GENERATED_FILES += ChangeLog
@@ -701,12 +701,14 @@ native-clean:
 
 ChangeLog.html: ChangeLog
 	$(RM) $@ && \
-	ruby $(BUILD_SCRIPT_PATH)/svn-log-to-html.rb < $< > $@
+	ruby $(BUILD_SCRIPT_PATH)/svn-log-to-html.rb < $< > $@.tmp && \
+	mv $@.tmp $@
 
 .PHONY: ChangeLog
 ChangeLog:
 	$(RM) $@ && \
-	$(GENERATE_CHANGE_LOG.$(REVISION_CONTROL_SYSTEM))
+	$(GENERATE_CHANGE_LOG.$(REVISION_CONTROL_SYSTEM)) > $@.tmp && \
+	mv $@.tmp $@
 
 # This is only designed to be run on jessies.org itself.
 # It's run by a custom post-commit hook to generate a new source download for each revision.
@@ -731,7 +733,8 @@ www-dist: ChangeLog.html www
 .PHONY: .generated/build-revision.txt
 .generated/build-revision.txt:
 	mkdir -p $(@D) && \
-	$(MAKE_VERSION_FILE_COMMAND) > $@
+	$(MAKE_VERSION_FILE_COMMAND) > $@.tmp && \
+	mv $@.tmp $@
 
 # Old versions of SunOS tic don't support the -o argument but do support redirecting
 # the output to $TERMINFO.
@@ -807,12 +810,14 @@ $(INSTALLER.gz): $(MACHINE_PROJECT_NAME).app
 # Later we add more dependencies when we know $(ALL_PER_DIRECTORY_TARGETS).
 %/component-definitions.wxi: $(MAKEFILE_LIST) $(FILE_LIST_TO_WXI) $(MACHINE_PROJECT_NAME).app
 	mkdir -p $(@D) && \
-	( cd $(PACKAGING_DIRECTORY) && find . -type f -print ) | cut -c3- | $(FILE_LIST_TO_WXI) > $@
+	( cd $(PACKAGING_DIRECTORY) && find . -type f -print ) | cut -c3- | $(FILE_LIST_TO_WXI) > $@.tmp && \
+	mv $@.tmp $@
 
 # This silliness is probably sufficient (as well as sadly necessary).
 %/component-references.wxi: %/component-definitions.wxi $(MAKEFILE_LIST)
 	mkdir -p $(@D) && \
-	ruby -w -ne '$$_.match(/Include/) && puts($$_); $$_.match(/<Component (Id='\''component\d+'\'')/) && puts("<ComponentRef #{$$1} />")' < $< > $@
+	ruby -w -ne '$$_.match(/Include/) && puts($$_); $$_.match(/<Component (Id='\''component\d+'\'')/) && puts("<ComponentRef #{$$1} />")' < $< > $@.tmp && \
+	mv $@.tmp $@
 
 %.wixobj: %.wxs $(patsubst %,$(WIX_COMPILATION_DIRECTORY)/component-%.wxi,references definitions)
 	@echo Compiling $(notdir $<)...
@@ -850,7 +855,8 @@ echo.%:
 # The $$1 here is a Ruby variable, not a make one.
 .generated/local-variables.make: $(SALMA_HAYEK)/lib/build/per-directory.make $(SALMA_HAYEK)/lib/build/universal.make
 	mkdir -p $(@D) && \
-	ruby -w -ne '($$_.match(/^ *(\S+)\s*[:+]?=/) || $$_.match(/^\s*define\s*(\S+)/)) && puts("LOCAL_VARIABLES += #{$$1}")' $< | sort -u > $@
+	ruby -w -ne '($$_.match(/^ *(\S+)\s*[:+]?=/) || $$_.match(/^\s*define\s*(\S+)/)) && puts("LOCAL_VARIABLES += #{$$1}")' $< | sort -u > $@.tmp && \
+	mv $@.tmp $@
 
 # Several of the rules include $(MAKEFILE_LIST) in their prerequisites.
 # All of the .o files, for example, depend on the makefiles.
