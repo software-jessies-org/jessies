@@ -554,11 +554,11 @@ public class JTerminalPane extends JPanel {
 				return true;
 			} else if (e.isControlDown() && e.isShiftDown() && (keyCode == KeyEvent.VK_PAGE_UP || keyCode == KeyEvent.VK_PAGE_DOWN)) {
 				// Emulates gnome-terminal's control-shift page up/page down move-tab behavior.
-				host.moveCurrentTab(keyCode == KeyEvent.VK_PAGE_UP ? -1 : +1);
+				host.moveCurrentTab(keyCode == KeyEvent.VK_PAGE_UP ? -1 : 1);
 				return true;
 			} else if (e.isControlDown() && e.isShiftDown() && (keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_RIGHT)) {
 				// Emulates konsole's control-shift left/right move-tab behavior.
-				host.moveCurrentTab(keyCode == KeyEvent.VK_LEFT ? -1 : +1);
+				host.moveCurrentTab(keyCode == KeyEvent.VK_LEFT ? -1 : 1);
 				return true;
 			} else if (TerminatorMenuBar.isKeyboardEquivalent(e)) {
 				// Emulates gnome-terminal's alt-<number> jump-to-tab behavior, or an analog of Terminal.app's command-<number> jump-to-window behavior.
@@ -570,8 +570,12 @@ public class JTerminalPane extends JPanel {
 					return true;
 				}
 				if (keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_RIGHT) {
-					// gnome-terminal behaves a little differently - it disables the left action on the first tab and the right action on the last tab.
-					host.cycleTab(keyCode == KeyEvent.VK_LEFT ? -1 : 1);
+					if (e.isShiftDown()) {
+						host.moveCurrentTab(keyCode == KeyEvent.VK_LEFT ? -1 : 1);
+					} else {
+						// gnome-terminal behaves a little differently - it disables the left action on the first tab and the right action on the last tab.
+						host.cycleTab(keyCode == KeyEvent.VK_LEFT ? -1 : 1);
+					}
 					return true;
 				}
 			}
