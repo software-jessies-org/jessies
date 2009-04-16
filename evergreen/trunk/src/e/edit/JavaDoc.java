@@ -49,9 +49,8 @@ public class JavaDoc {
         /**
         * Find all the packages specified by the "java.advisor.classpath" property.
         */
-        String[] advisorClasspath = Parameters.getArrayOfSemicolonSeparatedElements("java.advisor.classpath");
         ArrayList<URL> urls = new ArrayList<URL>();
-        for (String classPathItem : advisorClasspath) {
+        for (String classPathItem : Parameters.getListOfSemicolonSeparatedElements("java.advisor.classpath")) {
             if (classPathItem.length() > 0) {
                 File classpath = FileUtilities.fileFromString(classPathItem);
                 try {
@@ -65,7 +64,7 @@ public class JavaDoc {
         classLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), ClassLoader.getSystemClassLoader());
         
         // Note the user-configured JavaDoc locations.
-        javaDocLocations.addAll(Arrays.asList(Parameters.getArrayOfSemicolonSeparatedElements("java.advisor.doc")));
+        javaDocLocations.addAll(Parameters.getListOfSemicolonSeparatedElements("java.advisor.doc"));
         
         // On some systems we may have the documentation installed in a well-known place.
         String[] wellKnownJavaDocDirectories = {
