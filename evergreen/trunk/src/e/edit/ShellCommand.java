@@ -11,11 +11,13 @@ import java.util.List;
 
 public class ShellCommand {
     private String command;
-    private ToolInputDisposition inputDisposition;
-    private ToolOutputDisposition outputDisposition;
+    private final ToolInputDisposition inputDisposition;
+    private final ToolOutputDisposition outputDisposition;
     
-    private Workspace workspace;
-    private EErrorsWindow errorsWindow;
+    private final Workspace workspace;
+    private final EErrorsWindow errorsWindow;
+    
+    private final StringBuilder capturedOutput = new StringBuilder();
     
     private ETextWindow textWindow;
     private String context;
@@ -27,8 +29,6 @@ public class ShellCommand {
     
     private Runnable launchRunnable = new NoOpRunnable();
     private Runnable completionRunnable = new NoOpRunnable();
-    
-    private StringBuilder capturedOutput;
     
     /**
      * Creates a ShellCommand that, when runCommand is invoked, will start a
@@ -65,6 +65,8 @@ public class ShellCommand {
     }
 
     public void runCommand() throws IOException {
+        final CharSequence data = chooseStandardInputData();
+        
         process = makeProcessBuilder().start();
 
         EventQueue.invokeLater(launchRunnable);
@@ -74,35 +76,32 @@ public class ShellCommand {
         // I don't know of any way to test whether we're already on top.
         // FIXME: this isn't relevant at the moment, because each build gets a new EErrorsWindow.
         //errorsWindow.setVisible(false);
-        errorsWindow.setVisible(true);
+        if (outputDisposition == ToolOutputDisposition.ERRORS_WINDOW) {
+            errorsWindow.setVisible(true);
+        }
         
         errorsWindow.showStatus("Started task \"" + command + "\"");
         errorsWindow.taskDidStart(process);
         
         Thread standardInputPump = new Thread(new Runnable() {
             public void run() {
-                pumpStandardInput();
+                pumpStandardInput(data);
             }
         });
         standardInputPump.start();
-        
-        capturedOutput = new StringBuilder();
-        
+                
         startMonitoringStream(process.getInputStream(), false);
         startMonitoringStream(process.getErrorStream(), true);
     }
     
-    private void pumpStandardInput() {
+    private void pumpStandardInput(CharSequence data) {
         OutputStream os = process.getOutputStream();
         try {
-            CharSequence data = chooseStandardInputData();
-            if (data != null) {
-                // As of Java 6, using PrintWriter so we can "append" a CharSequence is no more efficient than converting it to a String ourselves and passing it directly to BufferedWriter, but one can only hope that this will improve in future...
-                PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(os, "UTF-8")));
-                out.append(data);
-                out.flush();
-                out.close();
-            }
+            // As of Java 6, using PrintWriter so we can "append" a CharSequence is no more efficient than converting it to a String ourselves and passing it directly to BufferedWriter, but one can only hope that this will improve in future...
+            PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(os, "UTF-8")));
+            out.append(data);
+            out.flush();
+            out.close();
         } catch (Exception ex) {
             Log.warn("Problem pumping standard input for task \"" + command + "\"", ex);
             errorsWindow.appendLines(true, Collections.singletonList("Problem pumping standard input for task \"" + command + "\": " + ex.getMessage() + "."));
@@ -115,18 +114,18 @@ public class ShellCommand {
         }
     }
     
-    private CharSequence chooseStandardInputData() {
-        CharSequence result = null;
+    private String chooseStandardInputData() {
+        String result = "";
         if (textWindow != null) {
             PTextArea textArea = textWindow.getTextArea();
             switch (inputDisposition) {
             case NO_INPUT:
                 break;
             case SELECTION_OR_DOCUMENT:
-                result = textArea.hasSelection() ? textArea.getSelectedText() : textArea.getTextBuffer();
+                result = textArea.hasSelection() ? textArea.getSelectedText() : textArea.getTextBuffer().toString();
                 break;
             case DOCUMENT:
-                result = textArea.getTextBuffer();
+                result = textArea.getTextBuffer().toString();
                 break;
             }
         }
@@ -216,9 +215,8 @@ public class ShellCommand {
     }
     
     /**
-     * Invoked by StreamMonitor when one of this task's streams is closed. If
-     * there are no streams left open, this task has finished and the
-     * completion runnable is run on the event dispatch thread.
+     * Invoked by StreamMonitor on the EDT when one of this task's streams is closed.
+     * If there are no streams left open, this task has finished and the completion runnable is run on the EDT.
      */
     public synchronized void streamClosed() {
         openStreamCount--;
@@ -230,12 +228,8 @@ public class ShellCommand {
                 /* Ignore what we don't understand. */
                 ex = ex;
             }
-            final int finalExitStatus = exitStatus;
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    processFinished(finalExitStatus);
-                }
-            });
+            
+            processFinished(exitStatus);
             EventQueue.invokeLater(completionRunnable);
         }
     }
