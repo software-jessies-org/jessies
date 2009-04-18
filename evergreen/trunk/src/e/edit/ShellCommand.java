@@ -8,6 +8,7 @@ import java.awt.datatransfer.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
+import org.jdesktop.swingworker.SwingWorker;
 
 public class ShellCommand {
     private String command;
@@ -65,7 +66,7 @@ public class ShellCommand {
     }
 
     public void runCommand() throws IOException {
-        final CharSequence data = chooseStandardInputData();
+        final String data = chooseStandardInputData();
         
         process = makeProcessBuilder().start();
 
@@ -83,33 +84,34 @@ public class ShellCommand {
         errorsWindow.showStatus("Started task \"" + command + "\"");
         errorsWindow.taskDidStart(process);
         
-        Thread standardInputPump = new Thread(new Runnable() {
-            public void run() {
-                pumpStandardInput(data);
-            }
-        });
-        standardInputPump.start();
-                
+        ThreadUtilities.newSingleThreadExecutor("stdin pump for " + command).execute(new StandardInputPump(data));
         startMonitoringStream(process.getInputStream(), false);
         startMonitoringStream(process.getErrorStream(), true);
     }
     
-    private void pumpStandardInput(CharSequence data) {
-        OutputStream os = process.getOutputStream();
-        try {
-            // As of Java 6, using PrintWriter so we can "append" a CharSequence is no more efficient than converting it to a String ourselves and passing it directly to BufferedWriter, but one can only hope that this will improve in future...
-            PrintWriter out = new PrintWriter(new BufferedWriter(new OutputStreamWriter(os, "UTF-8")));
-            out.append(data);
-            out.flush();
-            out.close();
-        } catch (Exception ex) {
-            Log.warn("Problem pumping standard input for task \"" + command + "\"", ex);
-            errorsWindow.appendLines(true, Collections.singletonList("Problem pumping standard input for task \"" + command + "\": " + ex.getMessage() + "."));
-        } finally {
+    private class StandardInputPump implements Runnable {
+        private final String utf8;
+        
+        private StandardInputPump(String utf8) {
+            this.utf8 = utf8;
+        }
+        
+        public void run() {
+            OutputStream os = process.getOutputStream();
             try {
-                os.close();
-            } catch (IOException ex) {
-                errorsWindow.appendLines(true, Collections.singletonList("Couldn't close standard input for task \"" + command + "\": " + ex.getMessage() + "."));
+                BufferedWriter out = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                out.append(utf8);
+                out.flush();
+                out.close();
+            } catch (Exception ex) {
+                Log.warn("Problem pumping standard input for task \"" + command + "\"", ex);
+                errorsWindow.appendLines(true, Collections.singletonList("Problem pumping standard input for task \"" + command + "\": " + ex.getMessage() + "."));
+            } finally {
+                try {
+                    os.close();
+                } catch (IOException ex) {
+                    errorsWindow.appendLines(true, Collections.singletonList("Couldn't close standard input for task \"" + command + "\": " + ex.getMessage() + "."));
+                }
             }
         }
     }
@@ -132,19 +134,53 @@ public class ShellCommand {
         return result;
     }
     
-    public void startMonitoringStream(InputStream stream, boolean isStdErr) throws IOException {
+    private void startMonitoringStream(InputStream stream, boolean isStdErr) throws IOException {
         InputStreamReader inputStreamReader = new InputStreamReader(stream, "UTF-8");
         BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-        StreamMonitor streamMonitor = new StreamMonitor(bufferedReader, this, isStdErr);
+        StreamMonitor streamMonitor = new StreamMonitor(bufferedReader, isStdErr);
         // Circumvent SwingWorker's MAX_WORKER_THREADS limit, as a ShellCommand may run for arbitrarily long.
         final String threadName = (isStdErr ? "stderr" : "stdout") + " pump for " + command;
         ThreadUtilities.newSingleThreadExecutor(threadName).execute(streamMonitor);
     }
     
+    // We use SwingWorker to batch up groups of lines rather than process each one individually.
+    private class StreamMonitor extends SwingWorker<Void, String> {
+        private final BufferedReader stream;
+        private final boolean isStdErr;
+        
+        private StreamMonitor(BufferedReader stream, boolean isStdErr) {
+            this.stream = stream;
+            this.isStdErr = isStdErr;
+        }
+        
+        @Override protected Void doInBackground() throws IOException {
+            streamOpened();
+            String line;
+            while ((line = stream.readLine()) != null) {
+                publish(line);
+            }
+            return null;
+        }
+        
+        @Override protected void done() {
+            try {
+                // Wait for the stream to empty and all lines to have been processed.
+                get();
+            } catch (Exception ex) {
+                Log.warn("Unexpected failure", ex);
+            }
+            streamClosed();
+        }
+        
+        @Override protected void process(List<String> lines) {
+            processLines(isStdErr, lines);
+        }
+    }
+    
     /**
-     * Invoked by StreamMonitor.process, on the EDT.
+     * Invoked on the EDT by StreamMonitor.process.
      */
-    public void processLines(boolean isStdErr, List<String> lines) {
+    private void processLines(boolean isStdErr, List<String> lines) {
         switch (outputDisposition) {
         case CREATE_NEW_DOCUMENT:
             Log.warn("CREATE_NEW_DOCUMENT not yet implemented.");
@@ -167,10 +203,19 @@ public class ShellCommand {
     }
     
     /**
-     * Invoked when the StreamMonitors finish, on the EDT.
+     * Invoked on the EDT when the StreamMonitors finish.
      */
-    private void processFinished(int exitStatus) {
-        errorsWindow.showStatus("Task \"" + command + "\" finished");
+    private void processFinished() {
+        // Get the process' exit status.
+        // FIXME: strictly, we don't know the process exited, only that it closed its streams.
+        int exitStatus = 0;
+        try {
+            exitStatus = process.waitFor();
+        } catch (InterruptedException ex) {
+            Log.warn("Process.waitFor interrupted", ex);
+        }
+        
+        // Deal with the output we may have collected.
         switch (outputDisposition) {
         case CLIPBOARD:
             StringSelection selection = new StringSelection(capturedOutput.toString());
@@ -200,37 +245,33 @@ public class ShellCommand {
             break;
         }
         
-        // A non-zero exit status is always potentially interesting.
+        // Keep the errors window informed.
+        errorsWindow.showStatus("Task \"" + command + "\" finished");
         if (exitStatus != 0) {
+            // A non-zero exit status is always potentially interesting.
             errorsWindow.appendLines(true, Collections.singletonList("Task \"" + command + "\" failed with exit status " + exitStatus));
         }
         errorsWindow.taskDidExit(exitStatus);
+        
+        // Run any user-specified completion code.
+        EventQueue.invokeLater(completionRunnable);
     }
     
     /**
      * Invoked by StreamMonitor when one of this task's streams is opened.
      */
-    public synchronized void streamOpened() {
+    private synchronized void streamOpened() {
         ++openStreamCount;
     }
     
     /**
-     * Invoked by StreamMonitor on the EDT when one of this task's streams is closed.
-     * If there are no streams left open, this task has finished and the completion runnable is run on the EDT.
+     * Invoked on the EDT by StreamMonitor when one of this task's streams is closed.
+     * If there are no streams left open, we assume the process has exited.
      */
-    public synchronized void streamClosed() {
+    private synchronized void streamClosed() {
         openStreamCount--;
         if (openStreamCount == 0) {
-            int exitStatus = 0;
-            try {
-                exitStatus = process.waitFor();
-            } catch (InterruptedException ex) {
-                /* Ignore what we don't understand. */
-                ex = ex;
-            }
-            
-            processFinished(exitStatus);
-            EventQueue.invokeLater(completionRunnable);
+            processFinished();
         }
     }
     
