@@ -9,7 +9,7 @@ import org.jdesktop.swingworker.SwingWorker;
  * Forwards lines of output from the given BufferedReader to the ShellCommand's
  * "process" method. Also informs the ShellCommand when the stream closes.
  */
-public class StreamMonitor extends SwingWorker<Object, String> {
+public class StreamMonitor extends SwingWorker<Void, String> {
     private BufferedReader stream;
     private ShellCommand task;
     private boolean isStdErr;
@@ -20,19 +20,23 @@ public class StreamMonitor extends SwingWorker<Object, String> {
         this.isStdErr = isStdErr;
     }
     
-    @Override protected Object doInBackground() {
+    @Override protected Void doInBackground() throws IOException {
         task.streamOpened();
-        try {
-            String line;
-            while ((line = stream.readLine()) != null) {
-                publish(line);
-            }
-        } catch (IOException ex) {
-            Log.warn("Unexpected stream closure", ex);
-        } finally {
-            task.streamClosed();
+        String line;
+        while ((line = stream.readLine()) != null) {
+            publish(line);
         }
         return null;
+    }
+    
+    @Override protected void done() {
+        try {
+            // Wait for the stream to empty and all lines to have been processed.
+            get();
+        } catch (Exception ex) {
+            Log.warn("Unexpected failure", ex);
+        }
+        task.streamClosed();
     }
     
     @Override protected void process(List<String> lines) {
