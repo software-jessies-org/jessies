@@ -53,7 +53,7 @@ class Evergreen
             FileUtils.mkdir_p(dot_directory)
         end
         
-        serverPortPathname = Pathname.new(dot_directory) + "edit-server-port"
+        serverPortPathname = Pathname.new(dot_directory) + "evergreen-server-port"
         # InAppClient's constructor stops anyone else from reading the .secret file.
         client = InAppClient.new(serverPortPathname)
         
