@@ -601,7 +601,7 @@ public class Evergreen {
     }
     
     public static String getUserPropertiesFilename() {
-        return getPreferenceFilename("edit.properties");
+        return getPreferenceFilename("evergreen.properties");
     }
     
     private void readSavedState() {
