@@ -34,7 +34,11 @@ public abstract class ExternalToolsParser {
         
         addSeparator();
         for (File toolFile : toolFiles) {
-            parseFile(toolFile);
+            try {
+                parseFile(toolFile);
+            } catch (Exception ex) {
+                Log.warn("Problem reading \"" + toolFile + "\"", ex);
+            }
         }
     }
     
