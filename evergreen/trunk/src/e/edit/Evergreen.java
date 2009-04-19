@@ -811,7 +811,7 @@ public class Evergreen {
         readSavedState();
         
         InetAddress wildcardAddress = null;
-        new InAppServer("EditServer", getPreferenceFilename("edit-server-port"), wildcardAddress, EditServer.class, new EditServer(this));
+        new InAppServer("EditServer", getPreferenceFilename("evergreen-server-port"), wildcardAddress, EditServer.class, new EditServer(this));
         
         frame.getContentPane().add(splitPane, BorderLayout.CENTER);
         frame.getContentPane().add(statusArea, BorderLayout.SOUTH);
