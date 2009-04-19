@@ -51,16 +51,16 @@ public class ShellCommand {
         ProcessBuilder processBuilder = new ProcessBuilder(ProcessUtilities.makeShellCommandArray(command));
         processBuilder.directory(FileUtilities.fileFromString(context));
         Map<String, String> environment = processBuilder.environment();
-        environment.put("EDIT_CURRENT_DIRECTORY", FileUtilities.parseUserFriendlyName(context));
-        environment.put("EDIT_WORKSPACE_ROOT", FileUtilities.parseUserFriendlyName(workspace.getRootDirectory()));
+        environment.put("EVERGREEN_CURRENT_DIRECTORY", FileUtilities.parseUserFriendlyName(context));
+        environment.put("EVERGREEN_WORKSPACE_ROOT", FileUtilities.parseUserFriendlyName(workspace.getRootDirectory()));
         if (textWindow != null) {
-            environment.put("EDIT_CURRENT_FILENAME", FileUtilities.parseUserFriendlyName(textWindow.getFilename()));
+            environment.put("EVERGREEN_CURRENT_FILENAME", FileUtilities.parseUserFriendlyName(textWindow.getFilename()));
             
             // Humans number lines from 1, text components from 0.
             // FIXME: we should pass full selection information.
             PTextArea textArea = textWindow.getTextArea();
             final int currentLineNumber = 1 + textArea.getLineOfOffset(textArea.getSelectionStart());
-            environment.put("EDIT_CURRENT_LINE_NUMBER", Integer.toString(currentLineNumber));
+            environment.put("EVERGREEN_CURRENT_LINE_NUMBER", Integer.toString(currentLineNumber));
         }
         return processBuilder;
     }

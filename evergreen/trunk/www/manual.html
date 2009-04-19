@@ -263,10 +263,10 @@ Icons for abstract classes or methods are hollow.
 
 <p>Some of the later sections describe customizing Evergreen using external scripts. These can be written in any language you like or can be native binaries for all Evergreen cares. Most communication is via environment variables. Unless otherwise stated, you can expect to have access to:
 
-<p><b>EDIT_CURRENT_DIRECTORY</b> The equivalent of "dirname $EDIT_CURRENT_FILENAME".
-<p><b>EDIT_CURRENT_FILENAME</b> The full pathname of the file containing the caret, if there is a current file.
-<p><b>EDIT_CURRENT_LINE_NUMBER</b> The line number containing the caret, counted from 1, if there is a current file.
-<p><b>EDIT_WORKSPACE_ROOT</b> The root directory of the workspace the command was run from.
+<p><b>EVERGREEN_CURRENT_DIRECTORY</b> The equivalent of "dirname $EVERGREEN_CURRENT_FILENAME".
+<p><b>EVERGREEN_CURRENT_FILENAME</b> The full pathname of the file containing the caret, if there is a current file.
+<p><b>EVERGREEN_CURRENT_LINE_NUMBER</b> The line number containing the caret, counted from 1, if there is a current file.
+<p><b>EVERGREEN_WORKSPACE_ROOT</b> The root directory of the workspace the command was run from.
 
 <h3><a name="configuration-properties">Properties</a></h3>
 
@@ -327,7 +327,7 @@ Note that we use the file type mode's name ("XML") rather than, say, the specifi
 
 <p>You can add your own tools to the "Tools" menu, and optionally to the pop-up menu.
 
-<p>On launch, Evergreen looks for properties whose names start <tt>tools.0.</tt> through <tt>tools.255.</tt>. All possibilities will be tested, with gaps being meaningless. If you want to add a separator to the menu, use <tt>tools.9.name=&lt;separator&gt;</tt> (changing 9 to correspond to where you want your separator).
+<p>On launch, Evergreen scans the <tt>~/.e.edit.Edit/tools/</tt> directory. Each file is parsed as a newline-separated sequence of key=value pairs.
 
 <p>The minimum information needed for an actual tool is a name and a command. You can add a keyboard equivalent if you like, either a function key or a single character; in the latter case, the keystroke will be control-shift-<i>letter</i>. To add a mnemonic, insert an underscore before the relevant character in the name property.
 
@@ -341,29 +341,29 @@ Note that we use the file type mode's name ("XML") rather than, say, the specifi
 <p>'&gt;' executes the command with stdin containing the selection (or the whole document if there's no selection), and stdout/stderr sent to a "Build Output" window.
 </blockquote>
 
-<p>Here's how you'd make f5 run wc on the current file:
+<p>Here's what you could store in a file (<tt>wc.tool</tt>, say) to make f5 run wc on the current file:
 <pre>
-tools.0.name=wc current file
-tools.0.command=!wc $EDIT_CURRENT_FILENAME
-tools.0.keyboardEquivalent=f5
+name=wc current file
+command=!wc $EVERGREEN_CURRENT_FILENAME
+keyboardEquivalent=f5
 </pre>
 
 <p>If you work on scripts that take no arguments, and would like to be able to run them from the editor (with clickable links in any stack traces that are output, taking you back to the source), you can use something like this:
 <pre>
-tools.1.name=Execute Current File
-tools.1.command=!$EDIT_CURRENT_FILENAME
-tools.1.keyboardEquivalent=f3
+name=Execute Current File
+command=!$EVERGREEN_CURRENT_FILENAME
+keyboardEquivalent=f3
 </pre>
 
 <p>Here's how you'd make control-shift-e insert the current date (with mnemonic 'D'):
 <pre>
-tools.2.name=Insert _Date
-tools.2.command=&lt;date --iso
-tools.2.keyboardEquivalent=e
+name=Insert _Date
+command=&lt;date --iso
+keyboardEquivalent=e
 </pre>
 
-<p>There are also three boolean settings. You can cause the "some files are unsaved" dialog to appear by setting <tt>tools.0.checkEverythingSaved=true</tt>. You can disable a tool if there's no current file with <tt>tools.0.needsFile=true</tt>. You can cause an "are you sure" dialog to appear by setting <tt>tools.0.requestsConfirmation=true</tt>.
+<p>There are also three boolean settings. You can cause the "some files are unsaved" dialog to appear by setting <tt>checkEverythingSaved=true</tt>. You can disable a tool if there's no current file with <tt>needsFile=true</tt>. You can cause an "are you sure" dialog to appear by setting <tt>requestsConfirmation=true</tt>.
 
-<p>If you have a suitable icon in, say, <tt>/usr/share/icons/Tango/24x24/apps/user-info.png</tt>, you can set it with <tt>tools.0.icon=/usr/share/icons/Tango/24x24/apps/user-info.png</tt>. Additionally, on Linux you can request one of the <a href="http://library.gnome.org/devel/gtk/stable/gtk-Stock-Items.html">GTK+ stock icons</a> thus: <tt>tools.0.stockIcon=gtk-clear</tt>.
+<p>If you have a suitable icon in, say, <tt>/usr/share/icons/Tango/24x24/apps/user-info.png</tt>, you can set it with <tt>icon=/usr/share/icons/Tango/24x24/apps/user-info.png</tt>. Additionally, on Linux you can request one of the <a href="http://library.gnome.org/devel/gtk/stable/gtk-Stock-Items.html">GTK+ stock icons</a> thus: <tt>stockIcon=gtk-clear</tt>.
 
 <!--#include virtual="/salma-hayek/footer.html" -->
