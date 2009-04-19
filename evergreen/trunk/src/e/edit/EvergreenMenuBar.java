@@ -141,7 +141,7 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(makeExternalToolAction("Sort", "sort"));
         menu.add(makeExternalToolAction("Sort and Remove Duplicates", "sort -u"));
         
-        List<ExternalToolAction> actions = ExternalToolsParser.getTools();
+        List<ExternalToolAction> actions = ExternalTools.getTools();
         if (!actions.isEmpty()) {
             menu.addSeparator();
             for (ExternalToolAction action : actions) {

@@ -485,7 +485,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     }
 
     private void addExternalToolMenuItems(final Collection<Action> items) {
-        List<ExternalToolAction> actions = ExternalToolsParser.getTools();
+        List<ExternalToolAction> actions = ExternalTools.getTools();
         if (actions.isEmpty()) {
             return;
         }
