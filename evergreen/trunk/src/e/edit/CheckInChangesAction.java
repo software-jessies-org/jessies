@@ -7,8 +7,8 @@ import e.util.*;
  */
 public class CheckInChangesAction extends ExternalToolAction {
     public CheckInChangesAction() {
-        super("Check in _Changes...", ToolInputDisposition.NO_INPUT, ToolOutputDisposition.ERRORS_WINDOW, "cd $EDIT_CURRENT_DIRECTORY ; SCM_EDITOR=" + FileUtilities.findScriptFromBundle("evergreen", "org.jessies.Evergreen") + " " + FileUtilities.findScriptFromBundle("checkintool", "org.jessies.SCM"));
-        setChecksEverythingSaved(true);
+        super("Check in _Changes...", ToolInputDisposition.NO_INPUT, ToolOutputDisposition.ERRORS_WINDOW, "cd $EVERGREEN_CURRENT_DIRECTORY ; SCM_EDITOR=" + FileUtilities.findScriptFromBundle("evergreen", "org.jessies.Evergreen") + " " + FileUtilities.findScriptFromBundle("checkintool", "org.jessies.SCM"));
+        setCheckEverythingSaved(true);
     }
     
     @Override public boolean isEnabled() {

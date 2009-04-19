@@ -32,7 +32,7 @@ public class ExternalToolAction extends ETextAction {
     /**
      * Sets whether or not the user will be asked to confirm the running of this command. Defaults to false.
      */
-    public void setRequestsConfirmation(boolean newState) {
+    public void setRequestConfirmation(boolean newState) {
         this.requestConfirmation = newState;
     }
     
@@ -46,7 +46,7 @@ public class ExternalToolAction extends ETextAction {
     /**
      * Sets whether or not this command will warn the user if there are unsaved files in the workspace before running. Defaults to false.
      */
-    public void setChecksEverythingSaved(boolean newState) {
+    public void setCheckEverythingSaved(boolean newState) {
         this.checkEverythingSaved = newState;
     }
     
@@ -85,7 +85,7 @@ public class ExternalToolAction extends ETextAction {
     }
     
     public boolean isContextSensitive() {
-        return needsFile || command.contains("EDIT_");
+        return needsFile || command.contains("EVERGREEN_");
     }
 
     private void runCommand(ShellCommand shellCommand) {
