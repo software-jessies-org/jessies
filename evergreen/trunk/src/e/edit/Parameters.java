@@ -44,7 +44,6 @@ public class Parameters {
                 reloadParametersFile();
             }
         });
-        
     }
     
     private static synchronized void reloadParametersFile() {
