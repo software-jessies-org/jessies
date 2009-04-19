@@ -793,6 +793,23 @@ public class Evergreen {
         initialFileOpener.stateChanged(null);
     }
     
+    private void initMenuBar() {
+        updateMenuBar();
+        // We need to recreate the menu bar (or at least the "Tools" menu) whenever the tools change.
+        ExternalToolsParser.addToolsListener(new ExternalToolsParser.Listener() {
+            public void toolsChanged() {
+                updateMenuBar();
+            }
+        });
+    }
+    
+    private void updateMenuBar() {
+        EvergreenMenuBar menuBar = new EvergreenMenuBar();
+        frame.setJMenuBar(menuBar);
+        // Work around Sun bug 4949810 (setJMenuBar doesn't call revalidate/repaint).
+        menuBar.revalidate();
+    }
+    
     private void init() {
         final long t0 = System.nanoTime();
         
@@ -803,6 +820,7 @@ public class Evergreen {
         initMacOs();
         initAboutBox();
         JFrameUtilities.readGeometriesFrom(getDialogGeometriesPreferenceFilename());
+        ExternalToolsParser.initTools();
         initWindow();
         initTagsPanel();
         tabbedPane = new EvergreenTabbedPane();
@@ -815,7 +833,7 @@ public class Evergreen {
         
         frame.getContentPane().add(splitPane, BorderLayout.CENTER);
         frame.getContentPane().add(statusArea, BorderLayout.SOUTH);
-        frame.setJMenuBar(new EvergreenMenuBar());
+        initMenuBar();
         
         initialState.openRememberedWorkspaces();
         

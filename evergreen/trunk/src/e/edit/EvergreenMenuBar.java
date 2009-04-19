@@ -4,6 +4,7 @@ import e.gui.*;
 import e.ptextarea.*;
 import e.util.*;
 import java.awt.event.*;
+import java.util.*;
 import javax.swing.*;
 
 public class EvergreenMenuBar extends EMenuBar {
@@ -140,16 +141,14 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(makeExternalToolAction("Sort", "sort"));
         menu.add(makeExternalToolAction("Sort and Remove Duplicates", "sort -u"));
         
-        ExternalToolsParser toolsParser = new ExternalToolsParser() {
-            public void addItem(ExternalToolAction action) {
+        List<ExternalToolAction> actions = ExternalToolsParser.getTools();
+        if (!actions.isEmpty()) {
+            menu.addSeparator();
+            for (ExternalToolAction action : actions) {
                 menu.add(action);
             }
-
-            public void addSeparator() {
-                menu.addSeparator();
-            }
-        };
-        toolsParser.parse();
+        }
+        
         return menu;
     }
     
