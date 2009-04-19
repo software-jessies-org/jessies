@@ -796,7 +796,7 @@ public class Evergreen {
     private void initMenuBar() {
         updateMenuBar();
         // We need to recreate the menu bar (or at least the "Tools" menu) whenever the tools change.
-        ExternalToolsParser.addToolsListener(new ExternalToolsParser.Listener() {
+        ExternalTools.addToolsListener(new ExternalTools.Listener() {
             public void toolsChanged() {
                 updateMenuBar();
             }
@@ -820,7 +820,7 @@ public class Evergreen {
         initMacOs();
         initAboutBox();
         JFrameUtilities.readGeometriesFrom(getDialogGeometriesPreferenceFilename());
-        ExternalToolsParser.initTools();
+        ExternalTools.initTools();
         initWindow();
         initTagsPanel();
         tabbedPane = new EvergreenTabbedPane();

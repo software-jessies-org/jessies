@@ -12,7 +12,7 @@ import javax.swing.*;
  * See the manual for the format of the files.
  * The files and their directories are automatically monitored for changes, so you must not cache the result of getTools.
  */
-public class ExternalToolsParser {
+public class ExternalTools {
     private static final File TOOLS_DIRECTORY = FileUtilities.fileFromString(Evergreen.getPreferenceFilename("tools"));
     private static final String MONITOR_NAME = "external tools";
     private static FileAlterationMonitor fileAlterationMonitor;
@@ -23,7 +23,7 @@ public class ExternalToolsParser {
         public void toolsChanged();
     }
     
-    private ExternalToolsParser() { /* Not instantiable. */ }
+    private ExternalTools() { /* Not instantiable. */ }
     
     public static synchronized void initTools() {
         rescanToolsDirectory();
