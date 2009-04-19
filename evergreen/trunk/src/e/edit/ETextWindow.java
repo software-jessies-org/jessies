@@ -9,6 +9,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.Timer;
@@ -484,24 +485,17 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     }
 
     public void addExternalToolMenuItems(final Collection<Action> items) {
-        ExternalToolsParser toolsParser = new ExternalToolsParser() {
-            public void addItem(ExternalToolAction action) {
-                addAction(action);
-            }
-
-            private void addAction(ExternalToolAction action) {
-                /* Ignore ExternalToolActions that aren't context-sensitive. */
-                if (action.isContextSensitive() == false) {
-                        return;
-                }
+        List<ExternalToolAction> actions = ExternalToolsParser.getTools();
+        if (actions.isEmpty()) {
+            return;
+        }
+        items.add(null); // Add a menu separator.
+        for (ExternalToolAction action : actions) {
+            // We only want ExternalToolActions that are context-sensitive.
+            if (action.isContextSensitive()) {
                 items.add(action);
             }
-
-            public void addSeparator() {
-                items.add(null);
-            }
-        };
-        toolsParser.parse();
+        }
     }
 
     /**

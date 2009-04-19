@@ -8,41 +8,96 @@ import java.util.*;
 import javax.swing.*;
 
 /**
-
-Parses the external tool descriptions in the system properties, invoking
-the appropriate abstract method when a tool is parsed. You need to subclass
-and implement these methods. Examples are in EvergreenMenuBar (which puts
-everything on the Tools menu) and ETextWindow, which puts just the
-context-sensitive actions on its popup menu.
-
+ * Parses the external tool descriptions, found in files under ~/.e.edit.Edit/tools/.
+ * See the manual for the format of the files.
+ * The files and their directories are automatically monitored for changes, so you must not cache the result of getTools.
  */
-public abstract class ExternalToolsParser {
-    public abstract void addItem(ExternalToolAction action);
-    public abstract void addSeparator();
-
-    public void parse() {
-        final File toolsDirectory = FileUtilities.fileFromString(Evergreen.getPreferenceFilename("tools"));
-        if (!toolsDirectory.exists()) {
-            return;
-        }
-        
-        List<File> toolFiles = new FileFinder().filesUnder(toolsDirectory);
-        Collections.sort(toolFiles);
-        if (toolFiles.isEmpty()) {
-            return;
-        }
-        
-        addSeparator();
-        for (File toolFile : toolFiles) {
-            try {
-                parseFile(toolFile);
-            } catch (Exception ex) {
-                Log.warn("Problem reading \"" + toolFile + "\"", ex);
-            }
+public class ExternalToolsParser {
+    private static final File TOOLS_DIRECTORY = FileUtilities.fileFromString(Evergreen.getPreferenceFilename("tools"));
+    private static final String MONITOR_NAME = "external tools";
+    private static FileAlterationMonitor fileAlterationMonitor;
+    private static List<ExternalToolAction> tools;
+    private static List<Listener> listeners = new ArrayList<Listener>();
+    
+    public interface Listener {
+        public void toolsChanged();
+    }
+    
+    private ExternalToolsParser() { /* Not instantiable. */ }
+    
+    public static synchronized void initTools() {
+        rescanToolsDirectory();
+    }
+    
+    public static void addToolsListener(Listener l) {
+        listeners.add(l);
+    }
+    
+    private static void fireToolsChanged() {
+        for (Listener l : listeners) {
+            l.toolsChanged();
         }
     }
     
-    private void parseFile(File file) {
+    private static void setFileAlterationMonitor(FileAlterationMonitor newFileAlterationMonitor) {
+        if (fileAlterationMonitor != null) {
+            fileAlterationMonitor.dispose();
+        }
+        fileAlterationMonitor = newFileAlterationMonitor;
+        fileAlterationMonitor.addListener(new FileAlterationMonitor.Listener() {
+            public void fileTouched(String pathname) {
+                rescanToolsDirectory();
+            }
+        });
+    }
+    
+    public static List<ExternalToolAction> getTools() {
+        return Collections.unmodifiableList(tools);
+    }
+    
+    private static void rescanToolsDirectory() {
+        if (!TOOLS_DIRECTORY.exists()) {
+            return;
+        }
+        
+        final FileAlterationMonitor newFileAlterationMonitor = new FileAlterationMonitor(MONITOR_NAME);
+        newFileAlterationMonitor.addPathname(TOOLS_DIRECTORY.toString());
+        
+        List<File> toolFiles = new FileFinder().filesUnder(TOOLS_DIRECTORY, new FileFinder.Filter() {
+            public boolean acceptFile(File file) {
+                newFileAlterationMonitor.addPathname(file.toString());
+                return true;
+            }
+            
+            public boolean enterDirectory(File directory) {
+                newFileAlterationMonitor.addPathname(directory.toString());
+                return true;
+            }
+        });
+        
+        if (!toolFiles.isEmpty()) {
+            List<ExternalToolAction> newTools = new ArrayList<ExternalToolAction>();
+            Collections.sort(toolFiles);
+            for (File toolFile : toolFiles) {
+                try {
+                    ExternalToolAction tool = parseFile(toolFile);
+                    if (tool != null) {
+                        newTools.add(tool);
+                    }
+                } catch (Exception ex) {
+                    Log.warn("Problem reading \"" + toolFile + "\"", ex);
+                }
+            }
+            tools = newTools;
+        }
+        
+        // Even if we found no files, a new directory may have been created.
+        setFileAlterationMonitor(newFileAlterationMonitor);
+        Evergreen.getInstance().showStatus("Tools reloaded");
+        fireToolsChanged();
+    }
+    
+    private static ExternalToolAction parseFile(File file) {
         String name = null;
         String command = null;
         
@@ -60,7 +115,7 @@ public abstract class ExternalToolsParser {
             if (equalsPos == -1) {
                 // TODO: isn't this an error worth reporting?
                 Log.warn("line without '=' found in properties file");
-                return;
+                return null;
             }
             final String key = line.substring(0, equalsPos);
             final String value = line.substring(equalsPos + 1);
@@ -82,13 +137,16 @@ public abstract class ExternalToolsParser {
                 requestConfirmation = Boolean.valueOf(value);
             } else {
                 Log.warn("Strange line in tool file \"" + file + "\": " + line);
+                return null;
             }
         }
         
         if (name == null) {
             Log.warn("No 'name' line in tool file \"" + file + "\"!");
+            return null;
         } else if (command == null) {
             Log.warn("No 'command' line in tool file \"" + file + "\"!");
+            return null;
         }
         
         // We accept a shorthand notation for specifying input/output dispositions based on Perl's "open" syntax.
@@ -124,10 +182,10 @@ public abstract class ExternalToolsParser {
         configureKeyboardEquivalent(action, keyboardEquivalent);
         configureIcon(action, stockIcon, icon);
         
-        addItem(action);
+        return action;
     }
     
-    private void configureKeyboardEquivalent(Action action, String keyboardEquivalent) {
+    private static void configureKeyboardEquivalent(Action action, String keyboardEquivalent) {
         if (keyboardEquivalent == null) {
             return;
         }
@@ -154,7 +212,7 @@ public abstract class ExternalToolsParser {
         }
     }
     
-    private void configureIcon(Action action, String stockIcon, String icon) {
+    private static void configureIcon(Action action, String stockIcon, String icon) {
         // Allow users to specify a GNOME stock icon, and/or the pathname to an icon.
         if (stockIcon != null) {
             GnomeStockIcon.useStockIcon(action, stockIcon);
