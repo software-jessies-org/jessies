@@ -54,8 +54,8 @@ public class FileAlterationMonitor {
      */
     public synchronized void dispose() {
         timer.cancel();
-        files = null;
-        listeners = null;
+        files = new ArrayList<FileDetails>();
+        listeners = new ArrayList<Listener>();
         timer = null;
     }
     
@@ -70,8 +70,8 @@ public class FileAlterationMonitor {
     }
     
     private synchronized void fireFileTouched(FileDetails fileDetails) {
-        for (Listener l : listeners) {
-            l.fileTouched(fileDetails.pathname);
+        for (Listener listener : listeners) {
+            listener.fileTouched(fileDetails.pathname);
         }
     }
     
