@@ -522,6 +522,10 @@ public class Evergreen {
         return System.getProperty("org.jessies.projectRoot") + File.separator + "lib" + File.separator + "scripts" + File.separator + leafName;
     }
     
+    public static String getApplicationFilename() {
+        return System.getProperty("org.jessies.projectRoot") + File.separator + "bin" + File.separator + "evergreen";
+    }
+    
     private void initWindowIcon() {
         JFrameUtilities.setFrameIcon(frame);
     }
