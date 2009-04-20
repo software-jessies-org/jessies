@@ -57,6 +57,7 @@ public class ExternalTools {
     
     private static void rescanToolsDirectory() {
         if (!TOOLS_DIRECTORY.exists()) {
+            tools = Collections.emptyList();
             return;
         }
         
