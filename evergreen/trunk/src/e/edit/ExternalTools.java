@@ -56,11 +56,11 @@ public class ExternalTools {
     }
     
     private static List<ExternalToolAction> rescanToolsDirectory(final FileAlterationMonitor newFileAlterationMonitor) {
+        newFileAlterationMonitor.addPathname(TOOLS_DIRECTORY.toString());
+        
         if (!TOOLS_DIRECTORY.exists()) {
             return Collections.emptyList();
         }
-        
-        newFileAlterationMonitor.addPathname(TOOLS_DIRECTORY.toString());
         
         List<File> toolFiles = new FileFinder().filesUnder(TOOLS_DIRECTORY, new FileFinder.Filter() {
             public boolean acceptFile(File file) {
@@ -91,8 +91,6 @@ public class ExternalTools {
     
     private static void rescanToolConfiguration() {
         final FileAlterationMonitor newFileAlterationMonitor = new FileAlterationMonitor(MONITOR_NAME);
-        // If the tools directory appears or is renamed, then we should rescan.
-        newFileAlterationMonitor.addPathname(TOOLS_DIRECTORY.getParentFile().toString());
         tools = rescanToolsDirectory(newFileAlterationMonitor);
         // Even if we found no files, a new directory may have been created.
         // The tools might even have disappeared.
