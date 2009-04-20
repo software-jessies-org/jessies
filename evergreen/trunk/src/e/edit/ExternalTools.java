@@ -26,7 +26,7 @@ public class ExternalTools {
     private ExternalTools() { /* Not instantiable. */ }
     
     public static synchronized void initTools() {
-        rescanToolsDirectory();
+        rescanToolConfiguration();
     }
     
     public static void addToolsListener(Listener l) {
@@ -46,7 +46,7 @@ public class ExternalTools {
         fileAlterationMonitor = newFileAlterationMonitor;
         fileAlterationMonitor.addListener(new FileAlterationMonitor.Listener() {
             public void fileTouched(String pathname) {
-                rescanToolsDirectory();
+                rescanToolConfiguration();
             }
         });
     }
@@ -55,13 +55,11 @@ public class ExternalTools {
         return Collections.unmodifiableList(tools);
     }
     
-    private static void rescanToolsDirectory() {
+    private static List<ExternalToolAction> rescanToolsDirectory(final FileAlterationMonitor newFileAlterationMonitor) {
         if (!TOOLS_DIRECTORY.exists()) {
-            tools = Collections.emptyList();
-            return;
+            return Collections.emptyList();
         }
         
-        final FileAlterationMonitor newFileAlterationMonitor = new FileAlterationMonitor(MONITOR_NAME);
         newFileAlterationMonitor.addPathname(TOOLS_DIRECTORY.toString());
         
         List<File> toolFiles = new FileFinder().filesUnder(TOOLS_DIRECTORY, new FileFinder.Filter() {
@@ -76,23 +74,28 @@ public class ExternalTools {
             }
         });
         
-        if (!toolFiles.isEmpty()) {
-            List<ExternalToolAction> newTools = new ArrayList<ExternalToolAction>();
-            Collections.sort(toolFiles);
-            for (File toolFile : toolFiles) {
-                try {
-                    ExternalToolAction tool = parseFile(toolFile);
-                    if (tool != null) {
-                        newTools.add(tool);
-                    }
-                } catch (Exception ex) {
-                    Log.warn("Problem reading \"" + toolFile + "\"", ex);
+        List<ExternalToolAction> newTools = new ArrayList<ExternalToolAction>();
+        Collections.sort(toolFiles);
+        for (File toolFile : toolFiles) {
+            try {
+                ExternalToolAction tool = parseFile(toolFile);
+                if (tool != null) {
+                    newTools.add(tool);
                 }
+            } catch (Exception ex) {
+                Log.warn("Problem reading \"" + toolFile + "\"", ex);
             }
-            tools = newTools;
         }
-        
+        return newTools;
+    }
+    
+    private static void rescanToolConfiguration() {
+        final FileAlterationMonitor newFileAlterationMonitor = new FileAlterationMonitor(MONITOR_NAME);
+        // If the tools directory appears or is renamed, then we should rescan.
+        newFileAlterationMonitor.addPathname(TOOLS_DIRECTORY.getParentFile().toString());
+        tools = rescanToolsDirectory(newFileAlterationMonitor);
         // Even if we found no files, a new directory may have been created.
+        // The tools might even have disappeared.
         setFileAlterationMonitor(newFileAlterationMonitor);
         Evergreen.getInstance().showStatus("Tools reloaded");
         fireToolsChanged();
