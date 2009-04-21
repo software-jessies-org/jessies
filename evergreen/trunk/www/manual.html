@@ -329,7 +329,11 @@ Note that we use the file type mode's name ("XML") rather than, say, the specifi
 
 <p>You can add your own tools to the "Tools" menu, and optionally to the pop-up menu.
 
-<p>On launch, Evergreen scans the <tt>~/.e.edit.Edit/tools/</tt> directory. Each file is parsed as a newline-separated sequence of key=value pairs.
+<p>On launch, Evergreen scans the <tt>~/.e.edit.Edit/tools/</tt> directory. The scan is recursive and does follow symbolic links (you might want to keep your tools under version control). The files are sorted by filename before being presented to the user, so use the Unix rc.d trick of prepending a number if you want meaningful names but non-alphabetic ordering.
+
+<p>Each file is parsed as a newline-separated sequence of key=value pairs.
+
+<p>A file containing just the line <tt>name=&lt;separator&gt;</tt> will appear as a separator on the "Tools" menu.
 
 <p>The minimum information needed for an actual tool is a name and a command. You can add a keyboard equivalent if you like, either a function key or a single character; in the latter case, the keystroke will be control-shift-<i>letter</i>. To add a mnemonic, insert an underscore before the relevant character in the name property.
 
