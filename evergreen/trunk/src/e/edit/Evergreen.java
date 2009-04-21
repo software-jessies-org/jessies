@@ -514,16 +514,8 @@ public class Evergreen {
         }
     }
     
-    public static String getResourceFilename(String leafName) {
-        return System.getProperty("org.jessies.projectRoot") + File.separator + "lib" + File.separator + "data" + File.separator + leafName;
-    }
-    
-    public static String getScriptFilename(String leafName) {
-        return System.getProperty("org.jessies.projectRoot") + File.separator + "lib" + File.separator + "scripts" + File.separator + leafName;
-    }
-    
-    public static String getApplicationFilename() {
-        return System.getProperty("org.jessies.projectRoot") + File.separator + "bin" + File.separator + "evergreen";
+    public static String getResourceFilename(String... components) {
+        return System.getProperty("org.jessies.projectRoot") + File.separator + StringUtilities.join(components, File.separator);
     }
     
     private void initWindowIcon() {
@@ -721,7 +713,7 @@ public class Evergreen {
         };
         
         // Properties (configuration done by editing text files).
-        Parameters.initParameters(getResourceFilename("default.properties"), getUserPropertiesFilename());
+        Parameters.initParameters(getResourceFilename("lib", "data", "default.properties"), getUserPropertiesFilename());
         Parameters.addPreferencesListener(preferencesListener);
         
         // Preferences (configuration done with a GUI).

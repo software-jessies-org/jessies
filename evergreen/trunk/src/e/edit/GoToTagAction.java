@@ -36,7 +36,7 @@ public class GoToTagAction extends ETextAction {
         final String workspaceRoot = Evergreen.getInstance().getCurrentWorkspace().getRootDirectory();
         
         // Call our helper to find the tags for us.
-        final String defaultFindTagsExecutable = Evergreen.getScriptFilename("find-tags.rb");
+        final String defaultFindTagsExecutable = Evergreen.getResourceFilename("lib", "scripts", "find-tags.rb");
         final String findTagsExecutable = Parameters.getString("tags.findTagsTool", defaultFindTagsExecutable);
         // FIXME: we could usefully check for a "tags" file, and maybe even offer to generate a usable one, but we'd need some kind of override in case a custom tool doesn't use a file.
         // FIXME: if Evergreen knew how to regenerate the tags, we could perhaps link it to "rescan".

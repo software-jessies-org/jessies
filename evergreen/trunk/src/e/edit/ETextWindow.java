@@ -286,7 +286,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         Advisor.addWordsTo(language, result);
         
         // And there may be a file of extra spelling exceptions for this language.
-        final String exceptionsFileName = Evergreen.getResourceFilename("spelling-exceptions-" + language.getName());
+        final String exceptionsFileName = Evergreen.getResourceFilename("lib", "data", "spelling-exceptions-" + language.getName());
         if (FileUtilities.exists(exceptionsFileName)) {
             for (String exception : StringUtilities.readLinesFromFile(exceptionsFileName)) {
                 if (exception.startsWith("#")) {
