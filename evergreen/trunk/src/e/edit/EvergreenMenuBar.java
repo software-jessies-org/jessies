@@ -145,7 +145,11 @@ public class EvergreenMenuBar extends EMenuBar {
         if (!actions.isEmpty()) {
             menu.addSeparator();
             for (ExternalToolAction action : actions) {
-                menu.add(action);
+                if (action != null) {
+                    menu.add(action);
+                } else {
+                    menu.addSeparator();
+                }
             }
         }
         

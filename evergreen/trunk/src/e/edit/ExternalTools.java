@@ -51,6 +51,10 @@ public class ExternalTools {
         });
     }
     
+    /**
+     * Returns an up-to-date list of the tools.
+     * Note that elements may be null, indicating that UI listing tools should show a separator at that point.
+     */
     public static List<ExternalToolAction> getTools() {
         return Collections.unmodifiableList(tools);
     }
@@ -78,10 +82,7 @@ public class ExternalTools {
         Collections.sort(toolFiles);
         for (File toolFile : toolFiles) {
             try {
-                ExternalToolAction tool = parseFile(toolFile);
-                if (tool != null) {
-                    newTools.add(tool);
-                }
+                parseFile(toolFile, newTools);
             } catch (Exception ex) {
                 Log.warn("Problem reading \"" + toolFile + "\"", ex);
             }
@@ -99,7 +100,7 @@ public class ExternalTools {
         fireToolsChanged();
     }
     
-    private static ExternalToolAction parseFile(File file) {
+    private static void parseFile(File file, List<ExternalToolAction> newTools) {
         String name = null;
         String command = null;
         
@@ -117,7 +118,7 @@ public class ExternalTools {
             if (equalsPos == -1) {
                 // TODO: isn't this an error worth reporting?
                 Log.warn("line without '=' found in properties file");
-                return null;
+                return;
             }
             final String key = line.substring(0, equalsPos);
             final String value = line.substring(equalsPos + 1);
@@ -139,16 +140,21 @@ public class ExternalTools {
                 requestConfirmation = Boolean.valueOf(value);
             } else {
                 Log.warn("Strange line in tool file \"" + file + "\": " + line);
-                return null;
+                return;
             }
         }
         
         if (name == null) {
             Log.warn("No 'name' line in tool file \"" + file + "\"!");
-            return null;
-        } else if (command == null) {
+            return;
+        }
+        if (name.equals("<separator>")) {
+            newTools.add(null);
+            return;
+        }
+        if (command == null) {
             Log.warn("No 'command' line in tool file \"" + file + "\"!");
-            return null;
+            return;
         }
         
         // We accept a shorthand notation for specifying input/output dispositions based on Perl's "open" syntax.
@@ -184,7 +190,7 @@ public class ExternalTools {
         configureKeyboardEquivalent(action, keyboardEquivalent);
         configureIcon(action, stockIcon, icon);
         
-        return action;
+        newTools.add(action);
     }
     
     private static void configureKeyboardEquivalent(Action action, String keyboardEquivalent) {
