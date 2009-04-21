@@ -55,7 +55,7 @@ public class WorkspaceFileList {
     }
     
     private synchronized void updateFileIgnorer() {
-        fileIgnorer = new FileIgnorer(workspace.getRootDirectory());
+        fileIgnorer = new FileIgnorer(FileUtilities.fileFromString(workspace.getRootDirectory()));
     }
     
     public void ensureInFileList(String pathWithinWorkspace) {

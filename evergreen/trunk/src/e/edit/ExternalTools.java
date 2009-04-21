@@ -65,17 +65,7 @@ public class ExternalTools {
             return;
         }
         
-        List<File> toolFiles = new FileFinder().filesUnder(directory, new FileFinder.Filter() {
-            public boolean acceptFile(File file) {
-                newFileAlterationMonitor.addPathname(file.toString());
-                return true;
-            }
-            
-            public boolean enterDirectory(File directory) {
-                newFileAlterationMonitor.addPathname(directory.toString());
-                return true;
-            }
-        });
+        List<File> toolFiles = new FileFinder().filesUnder(directory, new FileIgnorer().followSymbolicLinks(true));
         
         Collections.sort(toolFiles);
         for (File toolFile : toolFiles) {
