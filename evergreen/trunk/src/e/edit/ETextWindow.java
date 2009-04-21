@@ -492,7 +492,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         items.add(null); // Add a menu separator.
         for (ExternalToolAction action : actions) {
             // We only want ExternalToolActions that are context-sensitive.
-            if (action.isContextSensitive()) {
+            if (action != null && action.isContextSensitive()) {
                 items.add(action);
             }
         }
