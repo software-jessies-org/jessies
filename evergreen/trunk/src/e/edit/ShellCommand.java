@@ -52,6 +52,7 @@ public class ShellCommand {
         processBuilder.directory(FileUtilities.fileFromString(context));
         Map<String, String> environment = processBuilder.environment();
         environment.put("EVERGREEN_CURRENT_DIRECTORY", FileUtilities.parseUserFriendlyName(context));
+        environment.put("EVERGREEN_LAUNCHER", Evergreen.getApplicationFilename());
         environment.put("EVERGREEN_WORKSPACE_ROOT", FileUtilities.parseUserFriendlyName(workspace.getRootDirectory()));
         if (textWindow != null) {
             environment.put("EVERGREEN_CURRENT_FILENAME", FileUtilities.parseUserFriendlyName(textWindow.getFilename()));
