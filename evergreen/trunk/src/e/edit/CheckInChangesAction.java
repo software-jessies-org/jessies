@@ -7,7 +7,7 @@ import e.util.*;
  */
 public class CheckInChangesAction extends ExternalToolAction {
     public CheckInChangesAction() {
-        super("Check in _Changes...", ToolInputDisposition.NO_INPUT, ToolOutputDisposition.ERRORS_WINDOW, "cd $EVERGREEN_CURRENT_DIRECTORY ; SCM_EDITOR=" + Evergreen.getApplicationFilename() + " " + FileUtilities.findScriptFromBundle("checkintool", "org.jessies.SCM"));
+        super("Check in _Changes...", ToolInputDisposition.NO_INPUT, ToolOutputDisposition.ERRORS_WINDOW, "cd $EVERGREEN_CURRENT_DIRECTORY ; SCM_EDITOR=$EVERGREEN_LAUNCHER " + FileUtilities.findScriptFromBundle("checkintool", "org.jessies.SCM"));
         setCheckEverythingSaved(true);
     }
     
