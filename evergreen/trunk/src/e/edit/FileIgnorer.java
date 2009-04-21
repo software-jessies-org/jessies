@@ -17,7 +17,7 @@ public class FileIgnorer implements FileFinder.Filter {
     
     public FileIgnorer(String rootDirectoryPath) {
         this.rootDirectory = FileUtilities.fileFromString(rootDirectoryPath);
-        this.uninterestingDirectoryNames = getUninterestingDirectoryPattern();
+        this.uninterestingDirectoryNames = makeUninterestingDirectoryPattern();
         this.ignoredExtensions = Collections.unmodifiableList(makeIgnoredExtensions());
     }
     
@@ -60,7 +60,7 @@ public class FileIgnorer implements FileFinder.Filter {
         return nameEndsWithOneOf(filename, ignoredExtensions);
     }
     
-    private Pattern getUninterestingDirectoryPattern() {
+    private Pattern makeUninterestingDirectoryPattern() {
         ArrayList<String> patterns = new ArrayList<String>();
         
         // Start with the default ignored directory patterns.
