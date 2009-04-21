@@ -33,7 +33,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     private static void init() {
         final long t0 = System.nanoTime();
         
-        final String filename = Evergreen.getResourceFilename("javadoc-summary.txt.gz");
+        final String filename = Evergreen.getResourceFilename("lib", "data", "javadoc-summary.txt.gz");
         try {
             javaDocSummary = gunzipTextFile(filename).split("\n");
         } catch (IOException ex) {

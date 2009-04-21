@@ -138,28 +138,16 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(new CheckForLintAction());
         
         menu.addSeparator();
-        menu.add(makeExternalToolAction("Sort", "sort"));
-        menu.add(makeExternalToolAction("Sort and Remove Duplicates", "sort -u"));
-        
         List<ExternalToolAction> actions = ExternalTools.getTools();
-        if (!actions.isEmpty()) {
-            menu.addSeparator();
-            for (ExternalToolAction action : actions) {
-                if (action != null) {
-                    menu.add(action);
-                } else {
-                    menu.addSeparator();
-                }
+        for (ExternalToolAction action : actions) {
+            if (action != null) {
+                menu.add(action);
+            } else {
+                menu.addSeparator();
             }
         }
         
         return menu;
-    }
-    
-    private ExternalToolAction makeExternalToolAction(String name, String command) {
-        ExternalToolAction result = new ExternalToolAction(name, ToolInputDisposition.SELECTION_OR_DOCUMENT, ToolOutputDisposition.REPLACE, command);
-        result.setNeedsFile(true);
-        return result;
     }
     
     private JMenu makeDocumentationMenu() {

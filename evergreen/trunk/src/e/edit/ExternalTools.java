@@ -13,7 +13,6 @@ import javax.swing.*;
  * The files and their directories are automatically monitored for changes, so you must not cache the result of getTools.
  */
 public class ExternalTools {
-    private static final File TOOLS_DIRECTORY = FileUtilities.fileFromString(Evergreen.getPreferenceFilename("tools"));
     private static final String MONITOR_NAME = "external tools";
     private static FileAlterationMonitor fileAlterationMonitor;
     private static List<ExternalToolAction> tools;
@@ -59,14 +58,14 @@ public class ExternalTools {
         return Collections.unmodifiableList(tools);
     }
     
-    private static List<ExternalToolAction> rescanToolsDirectory(final FileAlterationMonitor newFileAlterationMonitor) {
-        newFileAlterationMonitor.addPathname(TOOLS_DIRECTORY.toString());
+    private static void scanToolsDirectory(File directory, final FileAlterationMonitor newFileAlterationMonitor, List<ExternalToolAction> newTools) {
+        newFileAlterationMonitor.addPathname(directory.toString());
         
-        if (!TOOLS_DIRECTORY.exists()) {
-            return Collections.emptyList();
+        if (!directory.exists()) {
+            return;
         }
         
-        List<File> toolFiles = new FileFinder().filesUnder(TOOLS_DIRECTORY, new FileFinder.Filter() {
+        List<File> toolFiles = new FileFinder().filesUnder(directory, new FileFinder.Filter() {
             public boolean acceptFile(File file) {
                 newFileAlterationMonitor.addPathname(file.toString());
                 return true;
@@ -78,7 +77,6 @@ public class ExternalTools {
             }
         });
         
-        List<ExternalToolAction> newTools = new ArrayList<ExternalToolAction>();
         Collections.sort(toolFiles);
         for (File toolFile : toolFiles) {
             try {
@@ -87,12 +85,17 @@ public class ExternalTools {
                 Log.warn("Problem reading \"" + toolFile + "\"", ex);
             }
         }
-        return newTools;
     }
     
     private static void rescanToolConfiguration() {
+        final File builtInToolsDirectory = FileUtilities.fileFromString(Evergreen.getResourceFilename("lib", "data", "tools"));
+        final File userToolsDirectory = FileUtilities.fileFromString(Evergreen.getPreferenceFilename("tools"));
+        
         final FileAlterationMonitor newFileAlterationMonitor = new FileAlterationMonitor(MONITOR_NAME);
-        tools = rescanToolsDirectory(newFileAlterationMonitor);
+        final List<ExternalToolAction> newTools = new ArrayList<ExternalToolAction>();
+        scanToolsDirectory(builtInToolsDirectory, newFileAlterationMonitor, newTools);
+        scanToolsDirectory(userToolsDirectory, newFileAlterationMonitor, newTools);
+        tools = newTools;
         // Even if we found no files, a new directory may have been created.
         // The tools might even have disappeared.
         setFileAlterationMonitor(newFileAlterationMonitor);

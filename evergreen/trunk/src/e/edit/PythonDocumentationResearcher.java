@@ -19,7 +19,7 @@ import java.util.*;
  */
 public class PythonDocumentationResearcher implements WorkspaceResearcher {
     public String research(String string) {
-        String pydocScript = Evergreen.getScriptFilename("epydoc.py");
+        String pydocScript = Evergreen.getResourceFilename("lib", "scripts", "epydoc.py");
         
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
