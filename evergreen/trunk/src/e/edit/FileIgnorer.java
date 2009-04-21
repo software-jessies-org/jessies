@@ -6,7 +6,7 @@ import java.util.regex.*;
 import e.util.*;
 
 public class FileIgnorer implements FileFinder.Filter {
-    /** The tree we're responsible for. */
+    /** The tree we're responsible for, or null. */
     private final File rootDirectory;
     
     /** Extensions of files that shouldn't be indexed. */
@@ -15,20 +15,32 @@ public class FileIgnorer implements FileFinder.Filter {
     /** Names of directories that shouldn't be entered when indexing. */
     private final Pattern uninterestingDirectoryNames;
     
-    public FileIgnorer(String rootDirectoryPath) {
-        this.rootDirectory = FileUtilities.fileFromString(rootDirectoryPath);
+    // Whether or not to follow symbolic links.
+    private boolean followSymbolicLinks = false;
+    
+    public FileIgnorer() {
+        this(null);
+    }
+    
+    public FileIgnorer(File rootDirectory) {
+        this.rootDirectory = rootDirectory;
         this.uninterestingDirectoryNames = makeUninterestingDirectoryPattern();
         this.ignoredExtensions = Collections.unmodifiableList(makeIgnoredExtensions());
     }
     
+    public FileIgnorer followSymbolicLinks(boolean followSymbolicLinks) {
+        this.followSymbolicLinks = followSymbolicLinks;
+        return this;
+    }
+    
     // FileFinder.Filter API.
     public boolean acceptFile(File file) {
-        return !isIgnored(file, false) && !FileUtilities.isSymbolicLink(file);
+        return !isIgnored(file, false) && (followSymbolicLinks || !FileUtilities.isSymbolicLink(file));
     }
     
     // FileFinder.Filter API.
     public boolean enterDirectory(File directory) {
-        return !isIgnored(directory, true) && !FileUtilities.isSymbolicLink(directory);
+        return !isIgnored(directory, true) && (followSymbolicLinks || !FileUtilities.isSymbolicLink(directory));
     }
     
     private boolean isIgnored(File file, boolean isDirectory) {
@@ -81,7 +93,13 @@ public class FileIgnorer implements FileFinder.Filter {
         return Pattern.compile(StringUtilities.join(patterns, "|"));
     }
     
+    // FIXME: find a way to get rid of this without anything more than once-off inconvenience to its users.
+    // FIXME: (then rename this class and move it to salma-hayek.)
     private void appendLinesFromScriptOutput(ArrayList<String> lines, String scriptName) {
+        if (rootDirectory == null) {
+            return;
+        }
+        
         String[] command = ProcessUtilities.makeShellCommandArray(scriptName);
         ArrayList<String> errors = new ArrayList<String>();
         // Try to run any site-local script.
