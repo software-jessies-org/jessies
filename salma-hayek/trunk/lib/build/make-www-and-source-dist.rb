@@ -2,9 +2,9 @@
 require "pathname"
 salma_hayek = Pathname.new(__FILE__).realpath().dirname().dirname().dirname()
 failed = false
-Dir.glob("#{salma_hayek}/../*/.svn").each() {
+Dir.glob("#{salma_hayek}/../*/www/.svn").each() {
     |svnDirectory|
-    repository = Pathname.new(svnDirectory).realpath().dirname()
+    repository = Pathname.new(svnDirectory).realpath().dirname().dirname()
     Dir.chdir(repository) {
         # "At revision 2962" is uninteresting.
         updateResult = `{ umask 0002 && svn update && make www-dist publish-changelog source-dist; } 2>&1`
