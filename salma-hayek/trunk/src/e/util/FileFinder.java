@@ -10,6 +10,8 @@ import java.util.*;
  * FIXME: allow for parallelism in the caller. return a blocking iterator? accept a Processor functor?
  */
 public class FileFinder {
+    private boolean includeDirectories = false;
+    
     /**
      * Used to filter results.
      * We could use java.io.FileFilter, but having our own interface lets us add more functionality in future.
@@ -42,6 +44,17 @@ public class FileFinder {
     }
     
     /**
+     * Whether or not the result of filesUnder should include directories.
+     * Defaults to false.
+     * Directories rejected by any Filter's enterDirectory are never included.
+     * Directories are never passed to acceptFile.
+     */
+    public FileFinder includeDirectories(boolean includeDirectories) {
+        this.includeDirectories = includeDirectories;
+        return this;
+    }
+    
+    /**
      * Returns all files under 'root', entering all directories and accepting all files.
      */
     public List<File> filesUnder(File root) {
@@ -68,6 +81,9 @@ public class FileFinder {
         for (File file : files) {
             if (file.isDirectory()) {
                 if (filter.enterDirectory(file)) {
+                    if (includeDirectories) {
+                        result.add(file);
+                    }
                     findFilesInDirectory(result, file, filter);
                 }
             } else {
