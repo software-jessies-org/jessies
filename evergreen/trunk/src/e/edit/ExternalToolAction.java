@@ -84,10 +84,6 @@ public class ExternalToolAction extends ETextAction {
         return (needsFile == false || getFocusedTextWindow() != null);
     }
     
-    public boolean isContextSensitive() {
-        return needsFile || command.contains("EVERGREEN_");
-    }
-
     private void runCommand(ShellCommand shellCommand) {
         if (requestConfirmation) {
             confirmRunCommand(shellCommand);

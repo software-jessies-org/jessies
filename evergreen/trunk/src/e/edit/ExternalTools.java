@@ -10,13 +10,16 @@ import javax.swing.*;
 /**
  * Parses the external tool descriptions, found in files under ~/.e.edit.Edit/tools/.
  * See the manual for the format of the files.
- * The files and their directories are automatically monitored for changes, so you must not cache the result of getTools.
+ * The files and their directories are automatically monitored for changes, so you must not cache the result of getAllTools or getPopUpTools.
+ * Note that elements in the lists returned by getAllTools and getPopUpTools may be null, indicating that UI listing tools should show a separator at that point.
  */
 public class ExternalTools {
     private static final String MONITOR_NAME = "external tools";
+    private static final List<Listener> listeners = new ArrayList<Listener>();
+    
     private static FileAlterationMonitor fileAlterationMonitor;
-    private static List<ExternalToolAction> tools;
-    private static List<Listener> listeners = new ArrayList<Listener>();
+    private static List<ExternalToolAction> allTools;
+    private static List<ExternalToolAction> popUpTools;
     
     public interface Listener {
         public void toolsChanged();
@@ -51,14 +54,20 @@ public class ExternalTools {
     }
     
     /**
-     * Returns an up-to-date list of the tools.
-     * Note that elements may be null, indicating that UI listing tools should show a separator at that point.
+     * Returns an up-to-date list of all the tools.
      */
-    public static List<ExternalToolAction> getTools() {
-        return Collections.unmodifiableList(tools);
+    public static List<ExternalToolAction> getAllTools() {
+        return Collections.unmodifiableList(allTools);
     }
     
-    private static void scanToolsDirectory(File directory, final FileAlterationMonitor newFileAlterationMonitor, List<ExternalToolAction> newTools) {
+    /**
+     * Returns an up-to-date list of those tools that are meant to be shown on the pop-up menu.
+     */
+    public static List<ExternalToolAction> getPopUpTools() {
+        return Collections.unmodifiableList(popUpTools);
+    }
+    
+    private static void scanToolsDirectory(File directory, final FileAlterationMonitor newFileAlterationMonitor, List<ExternalToolAction> newAllTools, List<ExternalToolAction> newPopUpTools) {
         newFileAlterationMonitor.addPathname(directory.toString());
         
         if (!directory.exists()) {
@@ -70,7 +79,7 @@ public class ExternalTools {
         Collections.sort(toolFiles);
         for (File toolFile : toolFiles) {
             try {
-                parseFile(toolFile, newTools);
+                parseFile(toolFile, newAllTools, newPopUpTools);
             } catch (Exception ex) {
                 Log.warn("Problem reading \"" + toolFile + "\"", ex);
             }
@@ -82,10 +91,16 @@ public class ExternalTools {
         final File userToolsDirectory = FileUtilities.fileFromString(Evergreen.getPreferenceFilename("tools"));
         
         final FileAlterationMonitor newFileAlterationMonitor = new FileAlterationMonitor(MONITOR_NAME);
-        final List<ExternalToolAction> newTools = new ArrayList<ExternalToolAction>();
-        scanToolsDirectory(builtInToolsDirectory, newFileAlterationMonitor, newTools);
-        scanToolsDirectory(userToolsDirectory, newFileAlterationMonitor, newTools);
-        tools = newTools;
+        final List<ExternalToolAction> newAllTools = new ArrayList<ExternalToolAction>();
+        final List<ExternalToolAction> newPopUpTools = new ArrayList<ExternalToolAction>();
+        
+        // FIXME: every change of directory (including within builtInToolsDirectory and userToolsDirectory) should probably add a separator automatically.
+        scanToolsDirectory(builtInToolsDirectory, newFileAlterationMonitor, newAllTools, newPopUpTools);
+        scanToolsDirectory(userToolsDirectory, newFileAlterationMonitor, newAllTools, newPopUpTools);
+        // FIXME: strip duplicate and leading/trailing separators after all the directories have been scanned.
+        
+        allTools = newAllTools;
+        popUpTools = newPopUpTools;
         // Even if we found no files, a new directory may have been created.
         // The tools might even have disappeared.
         setFileAlterationMonitor(newFileAlterationMonitor);
@@ -93,7 +108,7 @@ public class ExternalTools {
         fireToolsChanged();
     }
     
-    private static void parseFile(File file, List<ExternalToolAction> newTools) {
+    private static void parseFile(File file, List<ExternalToolAction> newAllTools, List<ExternalToolAction> newPopUpTools) {
         String name = null;
         String command = null;
         
@@ -105,6 +120,7 @@ public class ExternalTools {
         boolean checkEverythingSaved = false;
         boolean needsFile = false;
         boolean requestConfirmation = false;
+        boolean showOnPopUpMenu = false;
         
         for (String line : StringUtilities.readLinesFromFile(file)) {
             int equalsPos = line.indexOf('=');
@@ -131,6 +147,8 @@ public class ExternalTools {
                 needsFile = Boolean.valueOf(value);
             } else if (key.equals("requestConfirmation")) {
                 requestConfirmation = Boolean.valueOf(value);
+            } else if (key.equals("showOnPopUpMenu")) {
+                showOnPopUpMenu = Boolean.valueOf(value);
             } else {
                 Log.warn("Strange line in tool file \"" + file + "\": " + line);
                 return;
@@ -142,7 +160,10 @@ public class ExternalTools {
             return;
         }
         if (name.equals("<separator>")) {
-            newTools.add(null);
+            newAllTools.add(null);
+            if (showOnPopUpMenu) {
+                newPopUpTools.add(null);
+            }
             return;
         }
         if (command == null) {
@@ -183,7 +204,10 @@ public class ExternalTools {
         configureKeyboardEquivalent(action, keyboardEquivalent);
         configureIcon(action, stockIcon, icon);
         
-        newTools.add(action);
+        newAllTools.add(action);
+        if (showOnPopUpMenu) {
+            newPopUpTools.add(action);
+        }
     }
     
     private static void configureKeyboardEquivalent(Action action, String keyboardEquivalent) {

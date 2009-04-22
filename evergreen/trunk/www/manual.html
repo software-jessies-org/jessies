@@ -333,9 +333,11 @@ Note that we use the file type mode's name ("XML") rather than, say, the specifi
 
 <p>Each file is parsed as a newline-separated sequence of key=value pairs.
 
-<p>A file containing just the line <tt>name=&lt;separator&gt;</tt> will appear as a separator on the "Tools" menu.
+<p>A file containing just the line <tt>name=&lt;separator&gt;</tt> will appear as a separator.
 
 <p>The minimum information needed for an actual tool is a name and a command. You can add a keyboard equivalent if you like, either a function key or a single character; in the latter case, the keystroke will be control-shift-<i>letter</i>. To add a mnemonic, insert an underscore before the relevant character in the name property.
+
+<p>All tools and separators appear on the "Tools" menu. There's plenty of room there, but space on the pop-up menu is at a premium. The boolean <tt>showOnPopUpMenu</tt> determines whether a given tool or separator also appears on the pop-up menu.
 
 <!--FIXME: this would probably be clearer as a table. -->
 
@@ -368,7 +370,7 @@ command=&lt;date --iso
 keyboardEquivalent=e
 </pre>
 
-<p>There are also three boolean settings. You can cause the "some files are unsaved" dialog to appear by setting <tt>checkEverythingSaved=true</tt>. You can disable a tool if there's no current file with <tt>needsFile=true</tt>. You can cause an "are you sure" dialog to appear by setting <tt>requestsConfirmation=true</tt>.
+<p>There are also other boolean settings. You can cause the "some files are unsaved" dialog to appear by setting <tt>checkEverythingSaved=true</tt>. You can disable a tool if there's no current file with <tt>needsFile=true</tt>. You can cause an "are you sure" dialog to appear by setting <tt>requestsConfirmation=true</tt>.
 
 <p>If you have a suitable icon in, say, <tt>/usr/share/icons/Tango/24x24/apps/user-info.png</tt>, you can set it with <tt>icon=/usr/share/icons/Tango/24x24/apps/user-info.png</tt>. Additionally, on Linux you can request one of the <a href="http://library.gnome.org/devel/gtk/stable/gtk-Stock-Items.html">GTK+ stock icons</a> thus: <tt>stockIcon=gtk-clear</tt>.
 

@@ -138,7 +138,7 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(new CheckForLintAction());
         
         menu.addSeparator();
-        List<ExternalToolAction> actions = ExternalTools.getTools();
+        List<ExternalToolAction> actions = ExternalTools.getAllTools();
         for (ExternalToolAction action : actions) {
             if (action != null) {
                 menu.add(action);

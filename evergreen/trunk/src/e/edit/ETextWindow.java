@@ -470,6 +470,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     private void initTextAreaPopupMenu() {
         textArea.getPopupMenu().addMenuItemProvider(new MenuItemProvider() {
             public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
+                final List<ExternalToolAction> tools = ExternalTools.getPopUpTools();
                 actions.add(new OpenQuicklyAction());
                 actions.add(new OpenImportAction());
                 actions.add(new FindInFilesAction());
@@ -477,25 +478,13 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
                 actions.add(null);
                 actions.add(new CheckInChangesAction());
                 actions.add(new ShowHistoryAction());
-                // FIXME: this could be an additional provider. Would there be any advantage?
-                addExternalToolMenuItems(actions);
+                if (!tools.isEmpty()) {
+                    actions.add(null);
+                    actions.addAll(tools);
+                }
                 EPopupMenu.addNumberInfoItems(actions, textArea.getSelectedText());
             }
         });
-    }
-
-    private void addExternalToolMenuItems(final Collection<Action> items) {
-        List<ExternalToolAction> actions = ExternalTools.getTools();
-        if (actions.isEmpty()) {
-            return;
-        }
-        items.add(null); // Add a menu separator.
-        for (ExternalToolAction action : actions) {
-            // We only want ExternalToolActions that are context-sensitive.
-            if (action != null && action.isContextSensitive()) {
-                items.add(action);
-            }
-        }
     }
 
     /**
