@@ -74,14 +74,17 @@ public class ExternalTools {
             return;
         }
         
-        List<File> toolFiles = new FileFinder().filesUnder(directory, new FileIgnorer().followSymbolicLinks(true));
-        
-        Collections.sort(toolFiles);
-        for (File toolFile : toolFiles) {
+        List<File> files = new FileFinder().includeDirectories(true).filesUnder(directory, new FileIgnorer().followSymbolicLinks(true));
+        Collections.sort(files);
+        for (File file : files) {
+            newFileAlterationMonitor.addPathname(file.toString());
+            if (file.isDirectory()) {
+                continue;
+            }
             try {
-                parseFile(toolFile, newAllTools, newPopUpTools);
+                parseFile(file, newAllTools, newPopUpTools);
             } catch (Exception ex) {
-                Log.warn("Problem reading \"" + toolFile + "\"", ex);
+                Log.warn("Problem reading \"" + file + "\"", ex);
             }
         }
     }
