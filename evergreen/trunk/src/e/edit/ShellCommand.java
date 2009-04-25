@@ -47,15 +47,19 @@ public class ShellCommand {
         setContext(System.getProperty("java.io.tmpdir"));
     }
     
+    private String canonicalizePath(String path) {
+        return FileUtilities.fileFromString(path).toString();
+    }
+    
     private ProcessBuilder makeProcessBuilder() {
         ProcessBuilder processBuilder = new ProcessBuilder(ProcessUtilities.makeShellCommandArray(command));
         processBuilder.directory(FileUtilities.fileFromString(context));
         Map<String, String> environment = processBuilder.environment();
-        environment.put("EVERGREEN_CURRENT_DIRECTORY", FileUtilities.parseUserFriendlyName(context));
+        environment.put("EVERGREEN_CURRENT_DIRECTORY", canonicalizePath(context));
         environment.put("EVERGREEN_LAUNCHER", Evergreen.getResourceFilename("bin", "evergreen"));
-        environment.put("EVERGREEN_WORKSPACE_ROOT", FileUtilities.parseUserFriendlyName(workspace.getRootDirectory()));
+        environment.put("EVERGREEN_WORKSPACE_ROOT", canonicalizePath(workspace.getRootDirectory()));
         if (textWindow != null) {
-            environment.put("EVERGREEN_CURRENT_FILENAME", FileUtilities.parseUserFriendlyName(textWindow.getFilename()));
+            environment.put("EVERGREEN_CURRENT_FILENAME", canonicalizePath(textWindow.getFilename()));
             
             // Humans number lines from 1, text components from 0.
             // FIXME: we should pass full selection information.
