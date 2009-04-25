@@ -90,16 +90,20 @@ public class ExternalTools {
     }
     
     private static void rescanToolConfiguration() {
-        final File builtInToolsDirectory = FileUtilities.fileFromString(Evergreen.getResourceFilename("lib", "data", "tools"));
-        final File userToolsDirectory = FileUtilities.fileFromString(Evergreen.getPreferenceFilename("tools"));
+        final List<File> toolsDirectories = new ArrayList<File>();
+        toolsDirectories.add(FileUtilities.fileFromString(Evergreen.getResourceFilename("lib", "data", "tools")));
+        toolsDirectories.add(FileUtilities.fileFromString("/usr/lib/software.jessies.org/evergreen/tools/"));
+        toolsDirectories.add(FileUtilities.fileFromString("/usr/local/software.jessies.org/evergreen/tools/"));
+        toolsDirectories.add(FileUtilities.fileFromString(Evergreen.getPreferenceFilename("tools")));
         
         final FileAlterationMonitor newFileAlterationMonitor = new FileAlterationMonitor(MONITOR_NAME);
         final List<ExternalToolAction> newAllTools = new ArrayList<ExternalToolAction>();
         final List<ExternalToolAction> newPopUpTools = new ArrayList<ExternalToolAction>();
         
-        // FIXME: every change of directory (including within builtInToolsDirectory and userToolsDirectory) should probably add a separator automatically.
-        scanToolsDirectory(builtInToolsDirectory, newFileAlterationMonitor, newAllTools, newPopUpTools);
-        scanToolsDirectory(userToolsDirectory, newFileAlterationMonitor, newAllTools, newPopUpTools);
+        // FIXME: every change of directory should probably add a separator automatically. (including within a toolsDirectory?)
+        for (File toolsDirectory : toolsDirectories) {
+            scanToolsDirectory(toolsDirectory, newFileAlterationMonitor, newAllTools, newPopUpTools);
+        }
         // FIXME: strip duplicate and leading/trailing separators after all the directories have been scanned.
         
         allTools = newAllTools;
