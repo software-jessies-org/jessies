@@ -121,12 +121,12 @@ public class WorkspaceFileList {
     }
     
     private class FileListUpdater extends SwingWorker<ArrayList<String>, Object> {
-        private final String workspaceRoot;
+        private final File workspaceRoot;
         private final int prefixCharsToSkip;
         
         public FileListUpdater() {
-            this.workspaceRoot = workspace.getRootDirectory();
-            this.prefixCharsToSkip = FileUtilities.parseUserFriendlyName(workspaceRoot).length();
+            this.workspaceRoot = FileUtilities.fileFromString(workspace.getRootDirectory());
+            this.prefixCharsToSkip = workspaceRoot.toString().length();
             fireListeners(false);
             fileList = null;
         }
@@ -153,16 +153,16 @@ public class WorkspaceFileList {
             // We should reload the file ignorer's configuration when we rescan.
             updateFileIgnorer();
             
-            List<File> files = new FileFinder().filesUnder(FileUtilities.fileFromString(workspaceRoot), fileIgnorer);
+            List<File> files = new FileFinder().filesUnder(workspaceRoot, fileIgnorer);
             ArrayList<String> result = new ArrayList<String>(files.size());
             for (File file : files) {
                 result.add(file.toString().substring(prefixCharsToSkip));
             }
             
-            Evergreen.getInstance().showStatus("Scan of \"" + workspaceRoot + "\" complete (" + result.size() + " files)");
+            Evergreen.getInstance().showStatus("Scan of workspace \"" + workspace.getWorkspaceName() + "\" complete (" + result.size() + " files)");
             
             final long t1 = System.nanoTime();
-            Log.warn("Scan of " + workspaceRoot + " took " + TimeUtilities.nsToString(t1 - t0) + "; found " + result.size() + " files.");
+            Log.warn("Scan of workspace \"" + workspace.getWorkspaceName() + "\" took " + TimeUtilities.nsToString(t1 - t0) + "; found " + result.size() + " files.");
             return result;
         }
         

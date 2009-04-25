@@ -63,7 +63,8 @@ public class CheckForLintAction extends ETextAction {
         
         // Append the filename.
         final String filename = textWindow.getFilename();
-        command += " \"" + FileUtilities.parseUserFriendlyName(filename) + "\"";
+        // FIXME: shouldn't this actually be using our shell-escaping code?
+        command += " \"" + FileUtilities.fileFromString(filename).toString() + "\"";
         
         // Collect stdout and stderr into the same list, so we don't have to worry about which commands output where.
         ArrayList<String> lines = new ArrayList<String>();

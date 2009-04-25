@@ -80,7 +80,7 @@ public class BuildAction extends ETextAction {
         if (focusedTextWindow != null) {
             return focusedTextWindow.getContext();
         } else {
-            return FileUtilities.parseUserFriendlyName(Evergreen.getInstance().getCurrentWorkspace().getRootDirectory());
+            return Evergreen.getInstance().getCurrentWorkspace().getCanonicalRootDirectory();
         }
     }
     
