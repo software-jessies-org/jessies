@@ -123,27 +123,23 @@ public class FilenameChooserField extends JPanel {
             //for (String candidate : candidates) System.err.println(" -> '" + candidate + "'");
             
             if (candidates.isEmpty()) {
+                // FIXME: it would be nice to show some visual feedback in this case.
                 return;
             }
             
-            // If there's only one possibility, fill it in, adding a file separator if it was a directory.
-            if (candidates.size() == 1) {
-                String replacement = directoryName + File.separatorChar + candidates.first();
-                if (FileUtilities.fileFromString(replacement).isDirectory()) {
-                    replacement += File.separatorChar;
-                }
-                pathnameField.setText(replacement);
-                return;
-            }
-            
-            // There are multiple possibilities, so fill in the common prefix if there is one.
+            // Find the longest common prefix.
             final Iterator<String> it = candidates.iterator();
             String commonPrefix = it.next();
             while (it.hasNext() && commonPrefix.length() > 0) {
                 commonPrefix = commonPrefix.substring(0, StringUtilities.lengthOfCommonPrefix(commonPrefix, it.next()));
             }
             if (commonPrefix.length() > 0) {
-                pathnameField.setText(directoryName + File.separatorChar + commonPrefix);
+                String replacement = directoryName + File.separatorChar + commonPrefix;
+                // If there was only one match, and that was a directory, add the file separator.
+                if (candidates.size() == 1 && FileUtilities.fileFromString(replacement).isDirectory()) {
+                    replacement += File.separatorChar;
+                }
+                pathnameField.setText(replacement);
             }
             
             // FIXME: Apple's implementation also appends the rest of the first candidate, but selects it for easy overwriting.
