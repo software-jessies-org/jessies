@@ -714,7 +714,7 @@ public class Evergreen {
         };
         
         // Properties (configuration done by editing text files).
-        Parameters.initParameters(getResourceFilename("lib", "data", "default.properties"), getUserPropertiesFilename());
+        Parameters.initParameters();
         Parameters.addPreferencesListener(preferencesListener);
         
         // Preferences (configuration done with a GUI).

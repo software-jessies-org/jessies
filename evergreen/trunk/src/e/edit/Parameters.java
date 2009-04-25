@@ -25,10 +25,11 @@ public class Parameters {
     
     private Parameters() { /* Not instantiable. */ }
     
-    public static synchronized void initParameters(String... filenames) {
-        for (String filename : filenames) {
-            files.add(FileUtilities.fileFromString(filename));
-        }
+    public static synchronized void initParameters() {
+        files.add(FileUtilities.fileFromString(Evergreen.getResourceFilename("lib", "data", "default.properties")));
+        files.add(FileUtilities.fileFromString("/usr/lib/software.jessies.org/evergreen/evergreen.properties"));
+        files.add(FileUtilities.fileFromString("/usr/local/software.jessies.org/evergreen/evergreen.properties"));
+        files.add(FileUtilities.fileFromString(Evergreen.getUserPropertiesFilename()));
         
         // Load the initial configuration.
         reloadParametersFile();

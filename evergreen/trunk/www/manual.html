@@ -274,6 +274,8 @@ Icons for abstract classes or methods are hollow.
 
 <p>Many of the configuration options not presented in the UI are available by setting 'properties'. These are read from the <tt>~/.e.edit.Edit/evergreen.properties</tt> file. If you want to keep your local modifications separate, or share them more conveniently, you can include other files. Say you have a <tt>/home/enh/config/evergreen.properties</tt> file, just add a line <tt>&lt;/home/enh/config/evergreen.properties</tt> to the main file.
 
+<p>Additionally, Evergreen will try to read <tt>/usr/lib/software.jessies.org/evergreen/evergreen.properties</tt> and then <tt>/usr/local/software.jessies.org/evergreen/evergreen.properties</tt> to pick up system-wide configuration. Your user-specific configuration is read last, so your settings override anything else.
+
 <h3><a name="configuration-indexing">Advanced Indexing</a></h3>
 
 <p>If Evergreen finds an executable called <tt>echo-local-directories-evergreen-should-not-index</tt> on your path, it will be run at start-up.
@@ -329,7 +331,9 @@ Note that we use the file type mode's name ("XML") rather than, say, the specifi
 
 <p>You can add your own tools to the "Tools" menu, and optionally to the pop-up menu.
 
-<p>On launch, Evergreen scans the <tt>~/.e.edit.Edit/tools/</tt> directory. The scan is recursive and does follow symbolic links (you might want to keep your tools under version control). The files are sorted by filename before being presented to the user, so use the Unix rc.d trick of prepending a number if you want meaningful names but non-alphabetic ordering.
+<p>On launch, Evergreen scans the <tt>~/.e.edit.Edit/tools/</tt> directory. The scan is recursive and will follow symbolic links (so you can keep your tools elsewhere, under version control). The files are sorted by filename before being presented to the user, so use the Unix rc.d trick of prepending a number if you want meaningful names but non-alphabetic ordering.
+
+<p>Additionally, Evergreen will try to scan <tt>/usr/lib/software.jessies.org/evergreen/tools/</tt> and then <tt>/usr/local/software.jessies.org/evergreen/tools/</tt> to pick up system-wide configuration.
 
 <p>Each file is parsed as a newline-separated sequence of key=value pairs.
 
