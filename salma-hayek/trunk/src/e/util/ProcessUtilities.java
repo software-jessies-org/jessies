@@ -38,7 +38,7 @@ public class ProcessUtilities {
         }
         String cygwinShell = matcher.group(1);
         // We won't recurse indefinitely because we won't be able to open "cygpath", even if run in Cygwin's bin directory, because the file is "cygpath.exe".
-        String windowsShell = FileUtilities.rewriteCygwinFilename(cygwinShell);
+        String windowsShell = FileUtilities.fileFromString(cygwinShell).toString();
         String flag = matcher.group(2);
         List<String> arguments = new ArrayList<String>();
         arguments.add(windowsShell);
