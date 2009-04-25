@@ -133,6 +133,7 @@ public class FilenameChooserField extends JPanel {
                     replacement += File.separatorChar;
                 }
                 pathnameField.setText(replacement);
+                return;
             }
             
             // There are multiple possibilities, so fill in the common prefix if there is one.
