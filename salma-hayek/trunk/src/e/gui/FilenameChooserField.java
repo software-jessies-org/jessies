@@ -67,11 +67,17 @@ public class FilenameChooserField extends JPanel {
             }
         });
         
-        // Enable auto-completion.
-        // FIXME: hijack tab, and bind control-tab to cycle focus forward?
+        // Disable the tab key's usual cycle-focus-forward behavior.
+        // Control-tab is already bound as a back-up anyway, so we don't need to do that ourselves.
+        final Set<AWTKeyStroke> forwardTraversalKeys = new HashSet<AWTKeyStroke>(pathnameField.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+        forwardTraversalKeys.remove(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
+        pathnameField.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, forwardTraversalKeys);
+        
+        // Bind both tab (like Unix) and control-space (like IDEs) to perform auto-completion.
         final String actionName = "org.jessies.FilenameChooserField.autoComplete";
         pathnameField.getActionMap().put(actionName, new AutoCompleteAction());
         pathnameField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_MASK), actionName);
+        pathnameField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), actionName);
         
         // Ensure the text field will take up any spare space.
         final Dimension maxSize = pathnameField.getPreferredSize();
