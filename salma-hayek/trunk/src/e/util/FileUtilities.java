@@ -32,7 +32,7 @@ public class FileUtilities {
      * whatever the user's home directory is). Also copes with the
      * special case of ~ on its own, and with ~someone-else/tmp.
      */
-    public static String parseUserFriendlyName(String filename) {
+    private static String parseUserFriendlyName(String filename) {
         String result = filename;
         if (filename.startsWith("~" + File.separator) || filename.equals("~")) {
             result = getUserHomeDirectory();
@@ -52,7 +52,7 @@ public class FileUtilities {
                 }
             }
         }
-        return result;
+        return cygpathIfNecessary(result);
     }
     
     /**
@@ -487,20 +487,19 @@ public class FileUtilities {
     
     /**
      * Convert a filename to one that Java will be able to open.
+     * You probably want to use fileFromString and get this for free.
      */
-    public static String rewriteCygwinFilename(String filename) {
+    public static String cygpathIfNecessary(String filename) {
         if (GuiUtilities.isWindows() == false) {
             return filename;
         }
         ArrayList<String> jvmForm = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
-        // On Windows, our "friendly" filenames look like "~\dir\file".
-        // This esoteric use of tilde with backslashes isn't understood by anything apart from Evergreen.
+        // On Windows, we allow "~\dir\file".
+        // This esoteric use of tilde with backslashes isn't understood by anything apart from our code.
         // When a Cygwin process is started, Cygwin does shell-style processing on its arguments, including globbing where backslashes are treated as escaping the following character.
         // The backslash escaping is disabled if the argument starts with a DOS-style drive specifier but not if it starts with a tilde.
         // (Search the Cygwin source for "globify".)
-        // We shouldn't let our "friendly" filenames escape from Evergreen.
-        filename = FileUtilities.parseUserFriendlyName(filename);
         // Should there ever be useful a Cygwin JVM, we may be back here.
         // Should we need the opposite translation, there's --unix.
         int status = ProcessUtilities.backQuote(null, new String[] { "cygpath", "--windows", filename }, jvmForm, errors);
@@ -508,13 +507,6 @@ public class FileUtilities {
             return filename;
         }
         return jvmForm.get(0);
-    }
-    
-    public static void main(String[] arguments) {
-        for (String filename : arguments) {
-            System.err.println(parseUserFriendlyName(filename));
-            System.err.println(md5(fileFromString(filename)) + "\t" + filename);
-        }
     }
     
     private FileUtilities() { /* Not instantiable. */ }
