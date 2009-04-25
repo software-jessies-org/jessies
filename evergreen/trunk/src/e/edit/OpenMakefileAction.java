@@ -4,7 +4,7 @@ import java.awt.event.*;
 
 public class OpenMakefileAction extends ETextAction {
     public OpenMakefileAction() {
-        super("Open Makefile", null);
+        super("Open _Makefile", null);
     }
     
     public void actionPerformed(ActionEvent e) {
