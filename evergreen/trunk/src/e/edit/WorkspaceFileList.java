@@ -126,7 +126,8 @@ public class WorkspaceFileList {
         
         public FileListUpdater() {
             this.workspaceRoot = FileUtilities.fileFromString(workspace.getRootDirectory());
-            this.prefixCharsToSkip = workspaceRoot.toString().length();
+            // All children of the root will start with a '/', which we don't want to be part of the name.
+            this.prefixCharsToSkip = workspaceRoot.toString().length() + 1;
             fireListeners(false);
             fileList = null;
         }
