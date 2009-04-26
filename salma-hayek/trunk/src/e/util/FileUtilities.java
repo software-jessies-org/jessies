@@ -488,6 +488,12 @@ public class FileUtilities {
     /**
      * Convert a filename to one that Java will be able to open.
      * You probably want to use fileFromString and get this for free.
+     * cygpath doesn't require the file to exist.
+     * It doesn't usually make absolute paths where the argument is specified relative to the current directory.
+     * It does make absolute paths where the argument refers to the parent directory.
+     * It does clean up unnecessary path components.
+     * It follows Cygwin symbolic links to return the target path.
+     * I suspect that it will cause problems for us if given non-Ascii input, and possibly even in Windows configurations where the first 128 code points aren't Ascii.
      */
     private static String cygpathIfNecessary(String filename) {
         if (GuiUtilities.isWindows() == false) {
