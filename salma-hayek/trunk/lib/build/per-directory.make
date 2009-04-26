@@ -197,9 +197,9 @@ missing-prerequisites.$(BASE_NAME):
 
 # This way, we can use compilation rules which assume everything's
 # in the same directory.
-# FIXME: Copies of files which no longer exist must be removed.
+# FIXME: Do dangling links need to be removed?
 $(SOURCE_LINKS) $(HEADER_LINKS): $(COMPILATION_DIRECTORY)/%: $(SOURCE_DIRECTORY)/%
-	$(COPY_RULE)
+	$(SYMLINK_RULE)
 
 # ----------------------------------------------------------------------------
 # Dependencies.

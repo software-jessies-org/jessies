@@ -96,17 +96,18 @@ convertToNativeFilenames = $(convertToNativeFilenames.$(TARGET_OS))
 searchPath = $(shell which $(1) 2> /dev/null)
 makeNativePath = $(subst $(SPACE),$(NATIVE_PATH_SEPARATOR),$(call convertToNativeFilenames,$(strip $(1))))
 
-symlink.$(TARGET_OS) = ln -s $(1) $(2)
+define SYMLINK_RULE
+	mkdir -p $(@D) && \
+	$(RM) $@ && \
+	ln -s $< $@
+endef
+
 # Use cp for the benefit of Windows native compilers which don't
 # understand "symlinks".
-symlink.Cygwin = cp $(1) $(2).tmp && chmod a-w $(2).tmp && mv $(2).tmp $(2)
-
-symlink = $(symlink.$(TARGET_OS))
-
 define COPY_RULE
 	mkdir -p $(@D) && \
 	$(RM) $@ && \
-	$(call symlink,$<,$@)
+	cp $< $@.tmp && chmod a-w $@.tmp && mv $@.tmp $@
 endef
 
 # ----------------------------------------------------------------------------
