@@ -493,6 +493,11 @@ public class FileUtilities {
         if (GuiUtilities.isWindows() == false) {
             return filename;
         }
+        // This reduces the time taken to search a jessies.org work area
+        // from ~1 minute to ~0.25 s.
+        if (filename.matches("^[A-Za-z]:\\\\.*")) {
+            return filename;
+        }
         ArrayList<String> jvmForm = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
         // Should there ever be useful a Cygwin JVM, we may be back here.
