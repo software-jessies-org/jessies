@@ -225,8 +225,6 @@ public class Evergreen {
         }
         
         filename = processPathRewrites(filename);
-        // FIXME: can we rewrite this method so that we get this for free from FileUtilities.fileFromString?
-        filename = FileUtilities.cygpathIfNecessary(filename);
         
         // Remove local-directory fluff.
         if (filename.startsWith("./") || filename.startsWith(".\\")) {
