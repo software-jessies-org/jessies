@@ -11,6 +11,16 @@ import java.util.regex.*;
  */
 
 public class FileUtilities {
+    private static boolean libraryLoaded = false;
+    static {
+        try {
+            FileUtilities.loadNativeLibrary("salma-hayek");
+            libraryLoaded = true;
+        } catch (UnsatisfiedLinkError ex) {
+            ex.printStackTrace();
+        }
+    }
+    
     /**
      * Returns a new File for the given filename, coping with "~/".
      * Try not to ever use "new File(String)": use this instead.
@@ -153,7 +163,7 @@ public class FileUtilities {
      * and we can use the new JSR-203 functionality.
      */
     public static boolean isSymbolicLink(String filename) {
-        if (ensureLibraryLoaded()) {
+        if (libraryLoaded) {
             try {
                 return nativeIsSymbolicLink(filename);
             } catch (IOException ex) {
@@ -167,24 +177,6 @@ public class FileUtilities {
     
     public static boolean isSymbolicLink(File file) {
         return isSymbolicLink(file.toString());
-    }
-    
-    private static boolean libraryLoaded = false;
-    private static boolean triedToLoadLibrary = false;
-    
-    private static synchronized boolean ensureLibraryLoaded() {
-        if (libraryLoaded == false) {
-            if (triedToLoadLibrary == false) {
-                triedToLoadLibrary = true;
-                try {
-                    FileUtilities.loadNativeLibrary("salma-hayek");
-                    libraryLoaded = true;
-                } catch (UnsatisfiedLinkError ex) {
-                    ex.printStackTrace();
-                }
-            }
-        }
-        return libraryLoaded;
     }
     
     private static native boolean nativeIsSymbolicLink(String pathname) throws IOException;
