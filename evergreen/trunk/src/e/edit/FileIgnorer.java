@@ -1,9 +1,10 @@
 package e.edit;
 
+import e.util.*;
 import java.io.*;
 import java.util.*;
 import java.util.regex.*;
-import e.util.*;
+import org.jessies.os.*;
 
 public class FileIgnorer implements FileFinder.Filter {
     /** The tree we're responsible for, or null. */
@@ -34,13 +35,13 @@ public class FileIgnorer implements FileFinder.Filter {
     }
     
     // FileFinder.Filter API.
-    public boolean acceptFile(File file) {
-        return !isIgnored(file, false) && (followSymbolicLinks || !FileUtilities.isSymbolicLink(file));
+    public boolean acceptFile(File file, Stat stat) {
+        return !isIgnored(file, false) && (followSymbolicLinks || !stat.isSymbolicLink());
     }
     
     // FileFinder.Filter API.
-    public boolean enterDirectory(File directory) {
-        return !isIgnored(directory, true) && (followSymbolicLinks || !FileUtilities.isSymbolicLink(directory));
+    public boolean enterDirectory(File directory, Stat stat) {
+        return !isIgnored(directory, true) && (followSymbolicLinks || !stat.isSymbolicLink());
     }
     
     private boolean isIgnored(File file, boolean isDirectory) {
