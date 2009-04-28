@@ -2,6 +2,7 @@ package e.util;
 
 import java.io.*;
 import java.util.*;
+import org.jessies.os.*;
 
 /**
  * Finds files in a directory tree.
@@ -14,9 +15,8 @@ public class FileFinder {
     
     /**
      * Used to filter results.
-     * We could use java.io.FileFilter, but having our own interface lets us add more functionality in future.
-     * If we write our own JNI, we can pass in the equivalent of a 'struct stat'.
-     * (Given a 'struct stat', it would be tempting to just have one method, but having two makes it clear that the caller needs to think about directories.)
+     * We could use java.io.FileFilter, but having our own interface lets us pass in the Stat.
+     * It's tempting to just have one method, but having two makes it clear that the caller needs to think about directories.
      * We could also add explicit interface for asking about symbolic links (instead of calling acceptFile).
      */
     public interface Filter {
@@ -24,18 +24,18 @@ public class FileFinder {
          * Return true if 'file' should be included in the resulting list of files, false to ignore the file.
          * This method will be called for all non-directory names in the file system (not just regular files).
          */
-        public boolean acceptFile(File file);
+        public boolean acceptFile(File file, Stat stat);
         
         /** Return true if 'directory' should be recursed into, false otherwise. */
-        public boolean enterDirectory(File directory);
+        public boolean enterDirectory(File directory, Stat stat);
     }
     
     private static class DefaultFilter implements Filter {
-        public boolean acceptFile(File file) {
+        public boolean acceptFile(File file, Stat stat) {
             return true;
         }
         
-        public boolean enterDirectory(File directory) {
+        public boolean enterDirectory(File directory, Stat stat) {
             return true;
         }
     }
@@ -79,15 +79,20 @@ public class FileFinder {
             return;
         }
         for (File file : files) {
-            if (file.isDirectory()) {
-                if (filter.enterDirectory(file)) {
+            final Stat stat = new Stat();
+            if (Posix.lstat(file.toString(), stat) != 0) {
+                // Ignore files that disappear while we're traversing the directory structure.
+                continue;
+            }
+            if (stat.isDirectory()) {
+                if (filter.enterDirectory(file, stat)) {
                     if (includeDirectories) {
                         result.add(file);
                     }
                     findFilesInDirectory(result, file, filter);
                 }
             } else {
-                if (filter.acceptFile(file)) {
+                if (filter.acceptFile(file, stat)) {
                     result.add(file);
                 }
             }
