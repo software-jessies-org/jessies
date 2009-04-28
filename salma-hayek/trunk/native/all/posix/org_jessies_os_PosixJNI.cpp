@@ -43,17 +43,10 @@ jint org_jessies_os_PosixJNI::chmod(jstring javaPath, jint mode) {
     return translateResult(::chmod(JniString(m_env, javaPath).c_str(), mode));
 }
 
-static jint translateStat(JNIEnv* env, jobject javaStat, const struct stat& sb) {
+static void translateStat(JNIEnv* env, jobject javaStat, const struct stat& sb) {
     jclass statClass = env->FindClass("org/jessies/os/Stat");
-    if (statClass == NULL) {
-        return NULL; // Exception already thrown.
-    }
     jmethodID setter = env->GetMethodID(statClass, "set", "(JJIJIIJJJJJJJ)V");
-    if (setter == NULL) {
-        return NULL; // Exception already thrown.
-    }
     env->CallVoidMethod(javaStat, setter, sb.st_dev, sb.st_ino, sb.st_mode, sb.st_nlink, sb.st_uid, sb.st_gid, sb.st_rdev, sb.st_size, sb.st_atime, sb.st_mtime, sb.st_ctime, sb.st_blksize, sb.st_blocks);
-    return 0;
 }
 
 jint org_jessies_os_PosixJNI::lstat(jstring javaPath, jobject javaStat) {
@@ -61,7 +54,8 @@ jint org_jessies_os_PosixJNI::lstat(jstring javaPath, jobject javaStat) {
     if (::lstat(JniString(m_env, javaPath).c_str(), &sb) != 0) {
         return -errno;
     }
-    return translateStat(m_env, javaStat, sb);
+    translateStat(m_env, javaStat, sb);
+    return 0;
 }
 
 jint org_jessies_os_PosixJNI::stat(jstring javaPath, jobject javaStat) {
@@ -69,5 +63,6 @@ jint org_jessies_os_PosixJNI::stat(jstring javaPath, jobject javaStat) {
     if (::stat(JniString(m_env, javaPath).c_str(), &sb) != 0) {
         return -errno;
     }
-    return translateStat(m_env, javaStat, sb);
+    translateStat(m_env, javaStat, sb);
+    return 0;
 }
