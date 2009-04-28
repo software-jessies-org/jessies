@@ -5,22 +5,12 @@ import java.nio.channels.*;
 import java.security.*;
 import java.util.*;
 import java.util.regex.*;
+import org.jessies.os.*;
 
 /**
  * Provides utilities for dealing with files and paths.
  */
-
 public class FileUtilities {
-    private static boolean libraryLoaded = false;
-    static {
-        try {
-            FileUtilities.loadNativeLibrary("salma-hayek");
-            libraryLoaded = true;
-        } catch (UnsatisfiedLinkError ex) {
-            ex.printStackTrace();
-        }
-    }
-    
     /**
      * Returns a new File for the given filename, coping with "~/".
      * Try not to ever use "new File(String)": use this instead.
@@ -163,92 +153,19 @@ public class FileUtilities {
     }
     
     /**
-     * Tests whether filename is a symbolic link. This calls lstat(2) via JNI
-     * if the JNI library is available, falling back to a pure-Java
-     * approximation otherwise.
+     * Tests whether filename is a symbolic link.
      * 
      * FIXME: all of this should be replaced when Java 7 is in widespread use,
      * and we can use the new JSR-203 functionality.
      */
     public static boolean isSymbolicLink(String filename) {
-        if (libraryLoaded) {
-            try {
-                return nativeIsSymbolicLink(filename);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-                return false;
-            }
-        } else {
-            return emulatedIsSymbolicLink(filename);
-        }
+        final Stat stat = new Stat();
+        final int result = Posix.lstat(filename, stat);
+        return result == 0 && stat.isSymbolicLink();
     }
     
     public static boolean isSymbolicLink(File file) {
         return isSymbolicLink(file.toString());
-    }
-    
-    private static native boolean nativeIsSymbolicLink(String pathname) throws IOException;
-    
-    /**
-     * Tests heuristically whether filename is a symbolic link. That is, test
-     * whether the leaf is a symbolic link, not whether we need to traverse a
-     * symbolic link to get to the leaf.
-     *
-     * First, consider the case where the file in question is a symbolic link.
-     * Say that the symbolic link:
-     *   "/u/u58/martind/kipper/include/PtrTraits.h"
-     * has as its link target:
-     *   "/u/u58/martind/kipper/libs/RCPtr/PtrTraits.h"
-     * In isSymbolicLink("/u/u58/martind/kipper/include/PtrTraits.h"):
-     *   up           := "/u/u58/martind/kipper/include"
-     *   upThenFollow := "/u/u58/martind/kipper/include"
-     *   upFollowDown := "/u/u58/martind/kipper/include/PtrTraits.h"
-     *   follow       := "/u/u58/martind/kipper/libs/RCPtr/PtrTraits.h"
-     *        => true
-     *
-     * Now consider the case where the file in question isn't a symbolic link
-     * but something on its path is - and let's pick the case that's most
-     * likely to cause us problems - the one where our immediate parent is a
-     * symbolic link.  The link in question is:
-     *   "/home/martind/kipper"
-     * which has as its link target:
-     *   "/u/u58/martind/kipper"
-     * In isSymbolicLink("/home/martind/kipper/include"):
-     *   up           := "/home/martind/kipper"
-     *   upThenFollow := "/u/u58/martind/kipper"
-     *   upFollowDown := "/u/u58/martind/kipper/include"
-     *   follow       := "/u/u58/martind/kipper/include"
-     *        => false
-     * 
-     * Finally, consider the case where the file is a symbolic link
-     * within the directory.  The link in question is:
-     *   "/home/martind/playpen/symlink"
-     * which has as its link target:
-     *   "/home/martind/playpen/target"
-     * In isSymbolicLink("/home/martind/playpen/symlink"):
-     *   up           := "/home/martind/playpen"
-     *   upThenFollow := "/home/martind/playpen"
-     *   upFollowDown := "/home/martind/playpen/symlink"
-     *   follow       := "/home/martind/playpen/target"
-     *        => true
-     */
-    private static boolean emulatedIsSymbolicLink(String filename) {
-        File file = FileUtilities.fileFromString(filename);
-        if (file.exists() == false) {
-            // There are more causes of non-existent files than dangling
-            // and cyclic symbolic links but, like Java, we're happy to treat
-            // them the same.
-            return true;
-        }
-        try {
-            File up = file.getAbsoluteFile().getParentFile();
-            File upThenFollow = up.getCanonicalFile();
-            File upFollowDown = new File(upThenFollow, file.getName());
-            File follow = file.getCanonicalFile();
-            return !follow.equals(upFollowDown);
-        } catch (IOException ex) {
-            return false;
-        }
     }
     
     /**
