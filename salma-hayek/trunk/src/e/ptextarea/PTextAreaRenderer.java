@@ -142,16 +142,18 @@ final class PTextAreaRenderer {
             // A disabled component shouldn't render highlights (especially not the selection).
             return;
         }
-        //StopWatch stopWatch = new StopWatch()
+        // Find the highlights that overlap the area we're redrawing.
         int beginOffset = textArea.getSplitLine(minLine).getTextIndex(textArea);
         SplitLine max = textArea.getSplitLine(maxLine);
         int endOffset = max.getTextIndex(textArea) + max.getLength();
-        textArea.getSelection().paint(g);
         Collection<PHighlight> highlightList = textArea.getHighlightManager().getHighlightsOverlapping(beginOffset, endOffset);
+        // Paint the highlights first...
         for (PHighlight highlight : highlightList) {
             highlight.paint(g);
         }
-        //stopWatch.print("Highlight painting");
+        // ...and then draw the selection on top.
+        // This ensures that even fully opaque highlights don't obscure the selection.
+        textArea.getSelection().paint(g);
     }
     
     private void paintCaret(int x, int y) {
