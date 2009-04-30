@@ -23,7 +23,6 @@ public class Workspace extends JPanel {
     private FindInFilesDialog findInFilesDialog;
     
     private EFileDialog openDialog;
-    private EFileDialog saveAsDialog;
     
     private WorkspaceFileList fileList;
     
@@ -309,15 +308,6 @@ public class Workspace extends JPanel {
         }
     }
 
-    /** Returns the chosen save-as name, or null. */
-    public String showSaveAsDialog() {
-        if (saveAsDialog == null) {
-            saveAsDialog = EFileDialog.makeSaveDialog(Evergreen.getInstance().getFrame(), getRootDirectory());
-        }
-        saveAsDialog.show();
-        return saveAsDialog.getFile();
-    }
-    
     public void takeWindow(EWindow window) {
         window.removeFromColumn();
         leftColumn.addComponent(window, -1);
