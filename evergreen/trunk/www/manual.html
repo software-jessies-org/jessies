@@ -163,7 +163,9 @@ Icons for abstract classes or methods are hollow.
 
 <p>Typing characters inserts them at the caret position. If there's a selection, typing replaces the selection.
 
-<p>The backspace key removes the character to the left of the caret (or removes the selection). To remove everything to the beginning of the current line, use alt-backspace. To remove everything to the previous non-whitespace character, use control-backspace.
+<p>The backspace key removes the character to the left of the caret (or removes the selection). To remove everything to the beginning of the current line, use alt-backspace.
+
+<p>To remove the preceding run of whitespace or non-whitespace, use control-backspace. (This is deliberately less eager than Unix shells' control-w so that you can use it both to delete words and to tidy up whitespace.)
 
 <p>The delete key removes the character to the right of the caret (or removes the selection).
 
