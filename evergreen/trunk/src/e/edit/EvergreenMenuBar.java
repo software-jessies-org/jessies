@@ -43,7 +43,6 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.addSeparator();
         menu.add(new CloseWindowAction());
         menu.add(new SaveAction());
-        menu.add(new SaveAsAction());
         menu.add(new SaveAllAction());
         menu.add(new RevertToSavedAction());
         

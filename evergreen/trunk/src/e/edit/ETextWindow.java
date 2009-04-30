@@ -712,26 +712,6 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         return false;
     }
     
-    /** Saves the text to a file with the given name. Returns true if the file was saved okay. */
-    public boolean saveAs(String newFilename) {
-        try {
-            File newFile = FileUtilities.fileFromString(newFilename);
-            if (newFile.exists()) {
-                boolean replace = Evergreen.getInstance().askQuestion("Overwrite existing file?", "An item named \"" + newFilename + "\" already exists in this location. Do you want to replace it with the one you are saving?", "Replace");
-                if (replace == false) {
-                    return false;
-                }
-            }
-            writeToFile(newFile);
-            Evergreen.getInstance().openFile(newFile.getAbsolutePath());
-            return true;
-        } catch (Exception ex) {
-            Evergreen.getInstance().showAlert("Couldn't save file \"" + newFilename + "\"", ex.getMessage());
-            Log.warn("Problem saving as \"" + newFilename + "\"", ex);
-        }
-        return false;
-    }
-    
     private void writeToFile(File file) {
         // Only Java has newline hygiene as part of its language specification, but it probably applies to most computer languages.
         // For now, though, we let authors of plain text do what they like.
