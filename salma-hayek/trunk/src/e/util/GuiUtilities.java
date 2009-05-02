@@ -7,6 +7,7 @@ import java.lang.reflect.*;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
+import org.jessies.os.*;
 
 public class GuiUtilities {
     static {
@@ -70,14 +71,14 @@ public class GuiUtilities {
      * on the Mac.
      */
     public static boolean isMacOs() {
-        return System.getProperty("os.name").contains("Mac");
+        return OS.isMacOs();
     }
     
     /**
      * Tests whether we're running on Windows.
      */
     public static boolean isWindows() {
-        return System.getProperty("os.name").contains("Windows");
+        return OS.isWindows();
     }
     
     /**
