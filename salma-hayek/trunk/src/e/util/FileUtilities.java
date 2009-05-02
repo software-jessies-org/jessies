@@ -251,7 +251,7 @@ public class FileUtilities {
     
     public static File findOnPath(String executableName) {
         File result = findOnPath0(executableName);
-        if (result == null && GuiUtilities.isWindows()) {
+        if (result == null && OS.isWindows()) {
             result = findOnPath0(executableName + ".exe");
         }
         return result;
@@ -287,7 +287,7 @@ public class FileUtilities {
         if (FileUtilities.findOnPath(scriptName) != null) {
             return scriptName;
         }
-        if (GuiUtilities.isMacOs()) {
+        if (OS.isMacOs()) {
             ArrayList<String> bundleLocations = new ArrayList<String>();
             String[] command = ProcessUtilities.makeShellCommandArray(FileUtilities.findSupportBinary("LSFindApplicationForInfo") + " " + bundleId);
             int status = ProcessUtilities.backQuote(null, command, bundleLocations, new ArrayList<String>());
@@ -385,7 +385,7 @@ public class FileUtilities {
     
     // By analogy with System.mapLibraryName.
     public static String mapBinaryName(String binaryName) {
-        if (GuiUtilities.isWindows()) {
+        if (OS.isWindows()) {
             return binaryName + ".exe";
         }
         return binaryName;
@@ -413,7 +413,7 @@ public class FileUtilities {
      * I suspect that it will cause problems for us if given non-Ascii input, and possibly even in Windows configurations where the first 128 code points aren't Ascii.
      */
     private static String cygpathIfNecessary(String filename) {
-        if (GuiUtilities.isWindows() == false) {
+        if (OS.isWindows() == false) {
             return filename;
         }
         // This reduces the time taken to search a jessies.org work area

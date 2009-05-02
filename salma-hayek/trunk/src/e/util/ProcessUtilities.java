@@ -4,10 +4,11 @@ import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.regex.*;
+import org.jessies.os.*;
 
 public class ProcessUtilities {
     private static List<String> prependCygwinShell(final List<String> command) {
-        if (GuiUtilities.isWindows() == false) {
+        if (OS.isWindows() == false) {
             return command;
         }
         if (command.isEmpty()) {
@@ -210,7 +211,7 @@ public class ProcessUtilities {
      */
     public static int getVmProcessId() {
         try {
-            if (GuiUtilities.isMacOs()) {
+            if (OS.isMacOs()) {
                 // This only works if we were started with -Xdock, but that's true for our applications, and I don't have a better solution.
                 Map<String, String> env = System.getenv();
                 for (String key : env.keySet()) {
@@ -258,7 +259,7 @@ public class ProcessUtilities {
         File setsidBinary = FileUtilities.findSupportBinary("setsid");
         if (setsidBinary != null) {
             result.add(setsidBinary.toString());
-        } else if (GuiUtilities.isWindows() && FileUtilities.findOnPath(shell) == null) {
+        } else if (OS.isWindows() && FileUtilities.findOnPath(shell) == null) {
             // If we found setsid, then setsid will be able to find /bin/bash.
             // The JVM won't, as it's not a Cygwin program and so is not aware of Cygwin's /bin mount.
             // /bin/bash is what SHELL will be if Evergreen's started from Terminator.
