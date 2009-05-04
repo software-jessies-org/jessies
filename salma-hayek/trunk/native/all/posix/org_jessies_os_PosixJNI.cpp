@@ -46,7 +46,7 @@ jint org_jessies_os_PosixJNI::chmod(jstring javaPath, jint mode) {
 static void translateStat(JNIEnv* env, jobject javaStat, const struct stat& sb) {
     jclass statClass = env->FindClass("org/jessies/os/Stat");
     jmethodID setter = env->GetMethodID(statClass, "set", "(JJIJIIJJJJJJJ)V");
-    env->CallVoidMethod(javaStat, setter, sb.st_dev, sb.st_ino, sb.st_mode, sb.st_nlink, sb.st_uid, sb.st_gid, sb.st_rdev, sb.st_size, sb.st_atime, sb.st_mtime, sb.st_ctime, sb.st_blksize, sb.st_blocks);
+    env->CallVoidMethod(javaStat, setter, jlong(sb.st_dev), jlong(sb.st_ino), jint(sb.st_mode), jlong(sb.st_nlink), jint(sb.st_uid), jint(sb.st_gid), jlong(sb.st_rdev), jlong(sb.st_size), jlong(sb.st_atime), jlong(sb.st_mtime), jlong(sb.st_ctime), jlong(sb.st_blksize), jlong(sb.st_blocks));
 }
 
 jint org_jessies_os_PosixJNI::lstat(jstring javaPath, jobject javaStat) {
