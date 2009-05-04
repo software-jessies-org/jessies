@@ -19,35 +19,45 @@ std::string quote(const std::string& argument) {
     return std::string("\"") + argument + ("\"");
 }
 
-std::string readRegistryString(HKEY hive, const char* keyName, const char* valueName) {
-    HKEY keyHandle;
-    // RegGetValue would let us replace most of this function with a single line but "Requires Windows Vista or Windows XP Professional x64 Edition".
-    LONG errorCode = RegOpenKey(hive, keyName, &keyHandle);
-    if (errorCode != ERROR_SUCCESS) {
-        throw WindowsError("RegOpenKey(" + toString(hive) + ", " + keyName + ", &keyHandle)", errorCode);
+struct RegistryEntry {
+private:
+    const char* keyName;
+    const char* valueName;
+    
+public:
+    RegistryEntry(const char* keyName0, const char* valueName0)
+    : keyName(keyName0), valueName(valueName0) {
     }
-    // MAX_PATH seems likely to be enough.
-    std::vector<BYTE> buffer(MAX_PATH);
-    DWORD type;
-    DWORD size = buffer.size();
-    // FIXME: We could make some effort towards Unicode support.
-    errorCode = RegQueryValueEx(keyHandle, valueName, 0, &type, &buffer[0], &size);
-    if (errorCode != ERROR_SUCCESS) {
-        throw WindowsError("RegQueryValueEx(" + toString(keyHandle) + ", " + valueName + ", 0, &type, &buffer[0], &size)", errorCode);
+    
+    std::string read(HKEY hive) const {
+        HKEY keyHandle;
+        // RegGetValue would let us replace most of this function with a single line but "Requires Windows Vista or Windows XP Professional x64 Edition".
+        LONG errorCode = RegOpenKey(hive, keyName, &keyHandle);
+        if (errorCode != ERROR_SUCCESS) {
+            throw WindowsError("RegOpenKey(" + toString(hive) + ", " + keyName + ", &keyHandle)", errorCode);
+        }
+        // MAX_PATH seems likely to be enough.
+        std::vector<BYTE> buffer(MAX_PATH);
+        DWORD type;
+        DWORD size = buffer.size();
+        // FIXME: We could make some effort towards Unicode support.
+        errorCode = RegQueryValueEx(keyHandle, valueName, 0, &type, &buffer[0], &size);
+        if (errorCode != ERROR_SUCCESS) {
+            throw WindowsError("RegQueryValueEx(" + toString(keyHandle) + ", " + valueName + ", 0, &type, &buffer[0], &size)", errorCode);
+        }
+        if (type != REG_SZ) {
+            throw std::runtime_error("The type of registry entry hive " + toString(hive) + ", key " + keyName + ", value " + valueName + " was not REG_SZ (" + toString(REG_SZ) + ") as expected but " + toString(type));
+        }
+        // MSDN's article on RegQueryValueEx explains that the value may or may not include the null terminator.
+        if (size != 0 && buffer[size - 1] == 0) {
+            -- size;
+        }
+        return std::string(reinterpret_cast<const char*>(&buffer[0]), size);
     }
-    if (type != REG_SZ) {
-        throw std::runtime_error("The type of registry entry hive " + toString(hive) + ", key " + keyName + ", value " + valueName + " was not REG_SZ (" + toString(REG_SZ) + ") as expected but " + toString(type));
-    }
-    // MSDN's article on RegQueryValueEx explains that the value may or may not include the null terminator.
-    if (size != 0 && buffer[size - 1] == 0) {
-        -- size;
-    }
-    return std::string(reinterpret_cast<const char*>(&buffer[0]), size);
-}
+};
 
-std::string findCygwinBin() {
+std::string findCygwinBin(const RegistryEntry& registryEntry) {
     std::ostringstream os;
-    os << "We failed to find Cygwin, the errors were:\n";
     typedef std::deque<HKEY> Hives;
     Hives hives;
     hives.push_back(HKEY_CURRENT_USER);
@@ -55,9 +65,28 @@ std::string findCygwinBin() {
     for (Hives::const_iterator it = hives.begin(), en = hives.end(); it != en; ++ it) {
         HKEY hive = *it;
         try {
-            std::string cygwinRoot = readRegistryString(hive, "Software\\Cygnus Solutions\\Cygwin\\mounts v2\\/", "native");
+            std::string cygwinRoot = registryEntry.read(hive);
             std::string cygwinBin = cygwinRoot + "\\bin";
             return cygwinBin;
+        } catch (const std::exception& ex) {
+            os << ex.what();
+            os << std::endl;
+        }
+    }
+    throw std::runtime_error(os.str());
+}
+
+std::string findCygwinBin() {
+    std::ostringstream os;
+    os << "We failed to find Cygwin, the errors were:\n";
+    typedef std::deque<RegistryEntry> RegistryEntries;
+    RegistryEntries registryEntries;
+    registryEntries.push_back(RegistryEntry("Software\\Cygwin\\Setup", "rootdir"));
+    registryEntries.push_back(RegistryEntry("Software\\Cygnus Solutions\\Cygwin\\mounts v2\\/", "native"));
+    for (RegistryEntries::const_iterator it = registryEntries.begin(), en = registryEntries.end(); it != en; ++ it) {
+        RegistryEntry registryEntry = *it;
+        try {
+            return findCygwinBin(registryEntry);
         } catch (const std::exception& ex) {
             os << ex.what();
             os << std::endl;
