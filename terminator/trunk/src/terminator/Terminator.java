@@ -205,7 +205,10 @@ public class Terminator {
 				modifiers = KeyEvent.SHIFT_MASK | KeyEvent.CTRL_MASK;
 			}
 			TerminatorMenuBar.setDefaultKeyStrokeModifiers(modifiers);
-			GuiUtilities.setMnemonicsEnabled(useAltAsMeta);
+			// When useAltAsMeta is true, we want Alt-F to go to Emacs.
+			// When useAltAsMeta is false, we want Alt-F to invoke the Find action.
+			// In neither case do we want Alt-F to open the File menu.
+			GuiUtilities.setMnemonicsEnabled(false);
 		}
 		
 		for (int i = 0; i < frames.size(); ++i) {
