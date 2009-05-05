@@ -114,7 +114,7 @@ void launchCygwin(char** argValues) {
     // We need cygwin1.dll to be on the PATH.
     std::string putenvArgument = std::string("PATH=") + oldPath + ";" + cygwinBin;
     if (putenv(putenvArgument.c_str()) == -1) {
-        throw unix_exception(std::string("putenv(\"") + putenvArgument + "\")");
+        throw unix_exception(std::string("putenv(\"") + putenvArgument + "\") failed");
     }
     checkReadableFile("Cygwin DLL", cygwinBin + "\\cygwin1.dll");
     
@@ -143,7 +143,7 @@ void launchCygwin(char** argValues) {
     childArgValues.push_back(0);
     WindowsDllErrorModeChange windowsDllErrorModeChange;
     execv(program.c_str(), &childArgValues[0]);
-    throw unix_exception(std::string("execv(\"") + program + "\", [" + join(", ", arguments) + "])");
+    throw unix_exception(std::string("execv(\"") + program + "\", [" + join(", ", arguments) + "]) failed");
 }
 
 int main(int, char** argValues) {

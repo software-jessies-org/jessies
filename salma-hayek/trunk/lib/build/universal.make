@@ -90,7 +90,9 @@ NATIVE_PATH_SEPARATOR = $(NATIVE_PATH_SEPARATOR.$(TARGET_OS))
 
 convertToNativeFilenames.$(TARGET_OS) = $(1)
 # javac is happy with forward slashes (as is the underlying Win32 API).
-convertToNativeFilenames.Cygwin = $(if $(1),$(shell cygpath --mixed $(1)))
+# --absolute is only needed because cygpath 1.52 on Cygwin 1.7.0(0.210/5/3) produces empty output for relative paths with --mixed or --windows.
+# This bug is already "fixed in CVS", per http://www.cygwin.com/ml/cygwin/2009-04/msg00359.html.
+convertToNativeFilenames.Cygwin = $(if $(1),$(shell cygpath --mixed --absolute $(1)))
 convertToNativeFilenames = $(convertToNativeFilenames.$(TARGET_OS))
 
 searchPath = $(shell which $(1) 2> /dev/null)
