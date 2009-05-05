@@ -410,7 +410,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         String toContent = fromDiskToMemory ? memoryContent : diskContent;
         
         // We reverse the from/to order because we want reverse patches.
-        JComponent patchView = SimplePatchDialog.makeScrollablePatchView(textArea.getFont(), toLabel, toContent, fromLabel, fromContent);
+        JComponent patchView = SimplePatchDialog.makeScrollablePatchView(ChangeFontAction.getConfiguredFixedFont(), toLabel, toContent, fromLabel, fromContent);
         
         String title = verb;
         String buttonLabel = verb;
