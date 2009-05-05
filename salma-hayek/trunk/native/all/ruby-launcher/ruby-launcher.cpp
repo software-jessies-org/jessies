@@ -25,11 +25,11 @@ void ensureDescriptorIsOpen(int targetFd) {
         return;
     }
     if (errno != EBADF) {
-        throw unix_exception("fcntl(" + toString(targetFd) + ", F_GETFL)");
+        throw unix_exception("fcntl(" + toString(targetFd) + ", F_GETFL) failed");
     }
     int openedFd = open("/dev/null", O_WRONLY);
     if (openedFd == -1) {
-        throw unix_exception("open(\"/dev/null\", O_WRONLY)");
+        throw unix_exception("open(\"/dev/null\", O_WRONLY) failed");
     }
     // If we've already opened the right descriptor, we mustn't close it!
     if (openedFd == targetFd) {
@@ -37,22 +37,22 @@ void ensureDescriptorIsOpen(int targetFd) {
     }
     rc = dup2(openedFd, targetFd);
     if (rc == -1) {
-        throw unix_exception("dup2(" + toString(openedFd) + ", " + toString(targetFd) + ")");
+        throw unix_exception("dup2(" + toString(openedFd) + ", " + toString(targetFd) + ") failed");
     }
     rc = close(openedFd);
     if (rc == -1) {
-        throw unix_exception("close(" + toString(openedFd) + ")");
+        throw unix_exception("close(" + toString(openedFd) + ") failed");
     }
 }
 
 void launchRuby(char** argValues) {
     int rc = unsetenv("RUBYOPT");
     if (rc != 0) {
-        throw unix_exception("unsetenv(\"RUBYOPT\")");
+        throw unix_exception("unsetenv(\"RUBYOPT\") failed");
     }
     rc = setenv("RUBY_LAUNCHER_INVOKING", "1", 1);
     if (rc != 0) {
-        throw unix_exception("setenv(\"RUBY_LAUNCHER_INVOKING\", \"1\", 1)");
+        throw unix_exception("setenv(\"RUBY_LAUNCHER_INVOKING\", \"1\", 1) failed");
     }
     ensureDescriptorIsOpen(1);
     ensureDescriptorIsOpen(2);
@@ -67,7 +67,7 @@ void launchRuby(char** argValues) {
     checkReadableFile("Ruby script", rubyScript);
     WindowsDllErrorModeChange windowsDllErrorModeChange;
     execv(interpreter, argValues);
-    throw unix_exception(std::string("execv(\"") + interpreter + "\", ...)");
+    throw unix_exception(std::string("execv(\"") + interpreter + "\", ...) failed");
 }
 
 int main(int, char** argValues) {

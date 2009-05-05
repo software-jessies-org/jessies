@@ -42,7 +42,7 @@ private:
     }
     m_eof = true;
     if (errno != 0) {
-      throw unix_exception(std::string("readdir(\"") + m_directoryName + "\" " + toString(m_handle) + ")");
+      throw unix_exception(std::string("readdir(\"") + m_directoryName + "\" " + toString(m_handle) + ") failed");
     }
   }
   
@@ -53,7 +53,7 @@ public:
   , m_eof(false)
   {
     if (m_handle == 0) {
-      throw unix_exception(std::string("opendir(\"") + m_directoryName + "\")");
+      throw unix_exception(std::string("opendir(\"") + m_directoryName + "\") failed");
     }
     readOneEntry();
   }
