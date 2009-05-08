@@ -60,6 +60,7 @@ public class Posix {
     /**
      * Returns the process id of the calling process.
      * This function is always successful and no return value is reserved to indicate an error.
+     * http://www.opengroup.org/onlinepubs/000095399/functions/getpid.html
      */
     public static int getpid() {
         return PosixJNI.getpid();
@@ -68,6 +69,7 @@ public class Posix {
     /**
      * Returns the process id of the calling process' parent.
      * This function is always successful and no return value is reserved to indicate an error.
+     * http://www.opengroup.org/onlinepubs/000095399/functions/getppid.html
      */
     public static int getppid() {
         return PosixJNI.getppid();
