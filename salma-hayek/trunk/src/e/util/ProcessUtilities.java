@@ -307,36 +307,6 @@ public class ProcessUtilities {
     }
     
     /**
-     * Returns the integer file descriptor corresponding to one of
-     * FileDescriptor.in, FileDescriptor.out or FileDescriptor.err
-     * for the given process. Returns -1 on error.
-     */
-    public static int getFd(Process process, FileDescriptor which) {
-        if (which == FileDescriptor.in) {
-            return getFd(process, "stdin_fd");
-        } else if (which == FileDescriptor.out) {
-            return getFd(process, "stdout_fd");
-        } else if (which == FileDescriptor.err) {
-            return getFd(process, "stderr_fd");
-        } else {
-            return -1;
-        }
-    }
-    
-    private static int getFd(Process process, String which) {
-        try {
-            Field fileDescriptorField = process.getClass().getDeclaredField(which);
-            fileDescriptorField.setAccessible(true);
-            FileDescriptor fileDescriptor = (FileDescriptor) fileDescriptorField.get(process);
-            Field fdField = FileDescriptor.class.getDeclaredField("fd");
-            fdField.setAccessible(true);
-            return fdField.getInt(fileDescriptor);
-        } catch (Exception ex) {
-            return -1;
-        }
-    }
-    
-    /**
      * Returns a single string representing the given command, quoted for
      * passing to a shell or, more usually, for unambiguous human-readable
      * output.
