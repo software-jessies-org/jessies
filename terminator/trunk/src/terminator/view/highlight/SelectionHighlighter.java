@@ -327,13 +327,11 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 	}
 	
 	/** Request to add highlights to all lines of the view from the index given onwards. */
-	public int addHighlights(TerminalView view, int firstLineIndex) {
+	public void addHighlights(TerminalView view, int firstLineIndex) {
 		if (highlight != null && isValidLocation(view, highlight.getStart()) && isValidLocation(view, highlight.getEnd())) {
 			view.addHighlight(highlight);
-			return 1;
 		} else {
 			highlight = null;
-			return 0;
 		}
 	}
 	

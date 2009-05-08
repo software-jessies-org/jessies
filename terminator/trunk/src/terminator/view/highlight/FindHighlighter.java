@@ -48,7 +48,7 @@ public class FindHighlighter implements Highlighter {
 			
 			@Override
 			protected Object doInBackground() {
-				matchCount = addHighlights(view, 0);
+				matchCount = addHighlightsInternal(view, 0);
 				return null;
 			}
 			
@@ -70,8 +70,15 @@ public class FindHighlighter implements Highlighter {
 	}
 	
 	/** Request to add highlights to all lines of the view from the index given onwards. */
-	public int addHighlights(TerminalView view, int firstLineIndex) {
-		if (pattern == null) {
+	public void addHighlights(TerminalView view, int firstLineIndex) {
+		addHighlightsInternal(view, firstLineIndex);
+	}
+
+	/**
+	 * Returns the number of highlights added.
+	 */
+    private int addHighlightsInternal(TerminalView view, int firstLineIndex) {
+        if (pattern == null) {
 			return 0;
 		}
 		view.getBirdView().setValueIsAdjusting(true);
