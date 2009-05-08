@@ -6,6 +6,13 @@ package org.jessies.os;
  * This is deliberately a very thin wrapper. Where possible, all policy should reside in Java code.
  */
 public class Posix {
+    /** Posix.lseek constant to set file offset to current offset plus 'offset'. */
+    public static final int SEEK_CUR = PosixJNI.get_SEEK_CUR();
+    /** Posix.lseek constant to set file offset to end of file plus 'offset'. */
+    public static final int SEEK_END = PosixJNI.get_SEEK_END();
+    /** Posix.lseek constant to set file offset to 'offset'. */
+    public static final int SEEK_SET = PosixJNI.get_SEEK_SET();
+    
     /** Posix.access mode bit to test for read permission. */
     public static final int R_OK = PosixJNI.get_R_OK();
     /** Posix.access mode bit to test for write permission. */
@@ -14,6 +21,13 @@ public class Posix {
     public static final int X_OK = PosixJNI.get_X_OK();
     /** Posix.access mode bit to test for existence of file. */
     public static final int F_OK = PosixJNI.get_F_OK();
+    
+    /** File number of standard error. */
+    public static final int STDERR_FILENO = 2;
+    /** File number of standard in. */
+    public static final int STDIN_FILENO = 0;
+    /** File number of standard out. */
+    public static final int STDOUT_FILENO = 1;
     
     /**
      * Returns true if the requested access is permitted, false otherwise.
@@ -41,6 +55,22 @@ public class Posix {
      */
     public static int chmod(String path, int mode) {
         return PosixJNI.chmod(path, mode);
+    }
+    
+    /**
+     * Returns the process id of the calling process.
+     * This function is always successful and no return value is reserved to indicate an error.
+     */
+    public static int getpid() {
+        return PosixJNI.getpid();
+    }
+    
+    /**
+     * Returns the process id of the calling process' parent.
+     * This function is always successful and no return value is reserved to indicate an error.
+     */
+    public static int getppid() {
+        return PosixJNI.getppid();
     }
     
     /** Type of file. */

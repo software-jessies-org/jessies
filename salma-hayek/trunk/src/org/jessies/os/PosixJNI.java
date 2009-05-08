@@ -3,6 +3,10 @@ package org.jessies.os;
 class PosixJNI {
     static { e.util.FileUtilities.loadNativeLibrary("posix"); }
     
+    static native int get_SEEK_CUR();
+    static native int get_SEEK_END();
+    static native int get_SEEK_SET();
+    
     static native int get_R_OK();
     static native int get_W_OK();
     static native int get_X_OK();
@@ -23,6 +27,8 @@ class PosixJNI {
     static native int access(String path, int accessMode);
     static native int chown(String path, int uid, int gid);
     static native int chmod(String path, int mode);
+    static native int getpid();
+    static native int getppid();
     static native int stat(String path, Stat stat);
     static native int lstat(String path, Stat stat);
 }

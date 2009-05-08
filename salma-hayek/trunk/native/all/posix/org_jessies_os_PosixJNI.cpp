@@ -10,6 +10,10 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+jint org_jessies_os_PosixJNI::get_1SEEK_1CUR() { return SEEK_CUR; }
+jint org_jessies_os_PosixJNI::get_1SEEK_1END() { return SEEK_END; }
+jint org_jessies_os_PosixJNI::get_1SEEK_1SET() { return SEEK_SET; }
+
 jint org_jessies_os_PosixJNI::get_1R_1OK() { return R_OK; }
 jint org_jessies_os_PosixJNI::get_1W_1OK() { return W_OK; }
 jint org_jessies_os_PosixJNI::get_1X_1OK() { return X_OK; }
@@ -41,6 +45,14 @@ jint org_jessies_os_PosixJNI::chown(jstring javaPath, jint uid, jint gid) {
 
 jint org_jessies_os_PosixJNI::chmod(jstring javaPath, jint mode) {
     return translateResult(::chmod(JniString(m_env, javaPath).c_str(), mode));
+}
+
+jint org_jessies_os_PosixJNI::getpid() {
+    return ::getpid();
+}
+
+jint org_jessies_os_PosixJNI::getppid() {
+    return ::getppid();
 }
 
 static void translateStat(JNIEnv* env, jobject javaStat, const struct stat& sb) {
