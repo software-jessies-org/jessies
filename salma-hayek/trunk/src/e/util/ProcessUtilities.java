@@ -251,21 +251,6 @@ public class ProcessUtilities {
         return result.toArray(new String[result.size()]);
     }
     
-    /** The HUP (hang up) signal. */
-    public static final int SIGHUP = 1;
-    
-    /** The INT (interrupt) signal. */
-    public static final int SIGINT = 2;
-    
-    /** The QUIT (quit) signal. */
-    public static final int SIGQUIT = 3;
-    
-    /** The KILL (non-catchable, non-ignorable kill) signal. */
-    public static final int SIGKILL = 9;
-    
-    /** The TERM (soft termination) signal. */
-    public static final int SIGTERM = 15;
-    
     /**
      * Sends the given signal to the given process. Returns false if
      * the signal could not be sent.
@@ -277,8 +262,8 @@ public class ProcessUtilities {
         }
         try {
             System.out.println("killing " + pid);
-            Runtime.getRuntime().exec("kill -" + SIGTERM + " -" + pid);
-            Runtime.getRuntime().exec("kill -" + SIGTERM + " " + pid);
+            Runtime.getRuntime().exec("kill -" + Signal.SIGTERM + " -" + pid);
+            Runtime.getRuntime().exec("kill -" + Signal.SIGTERM + " " + pid);
             return true;
         } catch (IOException ex) {
             return false;
