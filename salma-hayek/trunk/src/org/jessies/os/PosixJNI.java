@@ -52,8 +52,11 @@ class PosixJNI {
     static native int get_SIGXFSZ();
     
     static native int access(String path, int accessMode);
-    static native int chown(String path, int uid, int gid);
     static native int chmod(String path, int mode);
+    static native int chown(String path, int uid, int gid);
+    static native int close(int fd);
+    static native int dup(int oldFd);
+    static native int dup2(int oldFd, int newFd);
     static native int getpid();
     static native int getppid();
     static native int stat(String path, Stat stat);

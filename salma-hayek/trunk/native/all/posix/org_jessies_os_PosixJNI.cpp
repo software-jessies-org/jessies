@@ -67,12 +67,24 @@ jint org_jessies_os_PosixJNI::access(jstring javaPath, jint accessMode) {
     return translateResult(::access(JniString(m_env, javaPath).c_str(), accessMode));
 }
 
+jint org_jessies_os_PosixJNI::chmod(jstring javaPath, jint mode) {
+    return translateResult(::chmod(JniString(m_env, javaPath).c_str(), mode));
+}
+
 jint org_jessies_os_PosixJNI::chown(jstring javaPath, jint uid, jint gid) {
     return translateResult(::chown(JniString(m_env, javaPath).c_str(), uid, gid));
 }
 
-jint org_jessies_os_PosixJNI::chmod(jstring javaPath, jint mode) {
-    return translateResult(::chmod(JniString(m_env, javaPath).c_str(), mode));
+jint org_jessies_os_PosixJNI::close(jint fd) {
+    return translateResult(::close(fd));
+}
+
+jint org_jessies_os_PosixJNI::dup(jint oldFd) {
+    return translateResult(::dup(oldFd));
+}
+
+jint org_jessies_os_PosixJNI::dup2(jint oldFd, jint newFd) {
+    return translateResult(::dup2(oldFd, newFd));
 }
 
 jint org_jessies_os_PosixJNI::getpid() {
