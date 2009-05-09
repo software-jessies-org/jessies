@@ -24,6 +24,33 @@ class PosixJNI {
     static native int get_S_ISUID();
     static native int get_S_ISGID();
     
+    static native int get_SIGABRT();
+    static native int get_SIGALRM();
+    static native int get_SIGBUS();
+    static native int get_SIGCHLD();
+    static native int get_SIGCONT();
+    static native int get_SIGFPE();
+    static native int get_SIGHUP();
+    static native int get_SIGILL();
+    static native int get_SIGINT();
+    static native int get_SIGKILL();
+    static native int get_SIGPIPE();
+    static native int get_SIGQUIT();
+    static native int get_SIGSEGV();
+    static native int get_SIGSTOP();
+    static native int get_SIGTERM();
+    static native int get_SIGTSTP();
+    static native int get_SIGTTIN();
+    static native int get_SIGTTOU();
+    static native int get_SIGUSR1();
+    static native int get_SIGUSR2();
+    static native int get_SIGPROF();
+    static native int get_SIGSYS();
+    static native int get_SIGTRAP();
+    static native int get_SIGURG();
+    static native int get_SIGXCPU();
+    static native int get_SIGXFSZ();
+    
     static native int access(String path, int accessMode);
     static native int chown(String path, int uid, int gid);
     static native int chmod(String path, int mode);

@@ -8,6 +8,7 @@
 #include "unix_exception.h"
 
 #include <sys/stat.h>
+#include <signal.h>
 #include <unistd.h>
 
 jint org_jessies_os_PosixJNI::get_1SEEK_1CUR() { return SEEK_CUR; }
@@ -30,6 +31,33 @@ jint org_jessies_os_PosixJNI::get_1S_1IFSOCK() { return S_IFSOCK; }
 
 jint org_jessies_os_PosixJNI::get_1S_1ISUID() { return S_ISUID; }
 jint org_jessies_os_PosixJNI::get_1S_1ISGID() { return S_ISGID; }
+
+jint org_jessies_os_PosixJNI::get_1SIGABRT() { return SIGABRT; }
+jint org_jessies_os_PosixJNI::get_1SIGALRM() { return SIGALRM; }
+jint org_jessies_os_PosixJNI::get_1SIGBUS() { return SIGBUS; }
+jint org_jessies_os_PosixJNI::get_1SIGCHLD() { return SIGCHLD; }
+jint org_jessies_os_PosixJNI::get_1SIGCONT() { return SIGCONT; }
+jint org_jessies_os_PosixJNI::get_1SIGFPE() { return SIGFPE; }
+jint org_jessies_os_PosixJNI::get_1SIGHUP() { return SIGHUP; }
+jint org_jessies_os_PosixJNI::get_1SIGILL() { return SIGILL; }
+jint org_jessies_os_PosixJNI::get_1SIGINT() { return SIGINT; }
+jint org_jessies_os_PosixJNI::get_1SIGKILL() { return SIGKILL; }
+jint org_jessies_os_PosixJNI::get_1SIGPIPE() { return SIGPIPE; }
+jint org_jessies_os_PosixJNI::get_1SIGQUIT() { return SIGQUIT; }
+jint org_jessies_os_PosixJNI::get_1SIGSEGV() { return SIGSEGV; }
+jint org_jessies_os_PosixJNI::get_1SIGSTOP() { return SIGSTOP; }
+jint org_jessies_os_PosixJNI::get_1SIGTERM() { return SIGTERM; }
+jint org_jessies_os_PosixJNI::get_1SIGTSTP() { return SIGTSTP; }
+jint org_jessies_os_PosixJNI::get_1SIGTTIN() { return SIGTTIN; }
+jint org_jessies_os_PosixJNI::get_1SIGTTOU() { return SIGTTOU; }
+jint org_jessies_os_PosixJNI::get_1SIGUSR1() { return SIGUSR1; }
+jint org_jessies_os_PosixJNI::get_1SIGUSR2() { return SIGUSR2; }
+jint org_jessies_os_PosixJNI::get_1SIGPROF() { return SIGPROF; }
+jint org_jessies_os_PosixJNI::get_1SIGSYS() { return SIGSYS; }
+jint org_jessies_os_PosixJNI::get_1SIGTRAP() { return SIGTRAP; }
+jint org_jessies_os_PosixJNI::get_1SIGURG() { return SIGURG; }
+jint org_jessies_os_PosixJNI::get_1SIGXCPU() { return SIGXCPU; }
+jint org_jessies_os_PosixJNI::get_1SIGXFSZ() { return SIGXFSZ; }
 
 static jint translateResult(int result) {
     return result == -1 ? -errno : 0;
