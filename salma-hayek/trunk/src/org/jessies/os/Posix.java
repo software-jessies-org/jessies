@@ -40,6 +40,15 @@ public class Posix {
     }
     
     /**
+     * Changes the permissions of 'path'.
+     * Returns 0 on success, -errno on error.
+     * http://www.opengroup.org/onlinepubs/000095399/functions/chmod.html
+     */
+    public static int chmod(String path, int mode) {
+        return PosixJNI.chmod(path, mode);
+    }
+    
+    /**
      * Changes the user and group ownership of 'path' to 'uid' and 'gid'.
      * Returns 0 on success, -errno on error.
      * http://www.opengroup.org/onlinepubs/000095399/functions/chown.html
@@ -49,12 +58,30 @@ public class Posix {
     }
     
     /**
-     * Changes the permissions of 'path'.
+     * Closes the file descriptor 'fd'.
      * Returns 0 on success, -errno on error.
-     * http://www.opengroup.org/onlinepubs/000095399/functions/chmod.html
+     * http://www.opengroup.org/onlinepubs/000095399/functions/close.html
      */
-    public static int chmod(String path, int mode) {
-        return PosixJNI.chmod(path, mode);
+    public static int close(int fd) {
+        return PosixJNI.close(fd);
+    }
+    
+    /**
+     * Duplicates the open file descriptor 'oldFd'.
+     * Returns 0 on success, -errno on error.
+     * http://www.opengroup.org/onlinepubs/000095399/functions/dup.html
+     */
+    public static int dup(int oldFd) {
+        return PosixJNI.dup(oldFd);
+    }
+    
+    /**
+     * Duplicates the open file descriptor 'oldFd' as 'newFd', closing 'newFd' first if necessary.
+     * Returns 0 on success, -errno on error.
+     * http://www.opengroup.org/onlinepubs/000095399/functions/dup2.html
+     */
+    public static int dup(int oldFd, int newFd) {
+        return PosixJNI.dup2(oldFd, newFd);
     }
     
     /**
