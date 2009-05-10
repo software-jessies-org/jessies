@@ -424,7 +424,11 @@ public class GuiUtilities {
             try {
                 setWindowOpacityMethod.invoke(null, (Window) frame, (float) alpha);
             } catch (Throwable th) {
-                Log.warn("com.sun.awt.AWTUtilities.setWindowOpacity failed.", th);
+                // We don't want to spam the log just because the system doesn't support transparency.
+                Throwable cause = th.getCause();
+                if (cause == null || cause instanceof UnsupportedOperationException == false) {
+                    Log.warn("com.sun.awt.AWTUtilities.setWindowOpacity failed.", th);
+                }
             }
             return;
         }
