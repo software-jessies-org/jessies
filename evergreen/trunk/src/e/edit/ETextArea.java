@@ -9,9 +9,4 @@ import javax.swing.*;
 public class ETextArea extends PTextArea {
     public ETextArea() {
     }
-    
-    @Override protected void updateFindResults() {
-        ETextWindow textWindow = (ETextWindow) SwingUtilities.getAncestorOfClass(ETextWindow.class, this);
-        FindAction.INSTANCE.repeatLastFind(textWindow);
-    }
 }

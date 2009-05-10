@@ -36,7 +36,13 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     // Each text window has its own current regular expression for finds, which may be null if there's no currently active search in that window.
     private String currentRegularExpression;
     
-    private Timer findResultsUpdater;
+    private Timer findResultsUpdateTimer;
+    private PFindListener findResultsUpdater = new PFindListener() {
+        public void aboutToFind() {
+            // FIXME: isn't this too conservative? shouldn't we check whether the timer is running? if it's not, aren't the results already up to date?
+            updateFindResults();
+        }
+    };
     
     /**
      * Ensures that the TagsPanel is empty if the focused window isn't an ETextWindow.
@@ -88,6 +94,8 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
                 return pastedText;
             }
         });
+        
+        textArea.addFindListener(findResultsUpdater);
         
         // Disable the default find action so we can offer our own.
         textArea.getActionMap().remove(PActionFactory.makeFindAction().getValue(Action.NAME));
@@ -199,14 +207,18 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     }
     
     private void initFindResultsUpdater() {
-        findResultsUpdater = new Timer(150, new ActionListener() {
+        findResultsUpdateTimer = new Timer(150, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                textArea.updateFindResults();
+                updateFindResults();
             }
         });
-        findResultsUpdater.setRepeats(false);
+        findResultsUpdateTimer.setRepeats(false);
     }
-
+    
+    private void updateFindResults() {
+        FindAction.INSTANCE.repeatLastFind(this);
+    }
+    
     private void initFocusListener() {
         textArea.addFocusListener(new FocusListener() {
             public void focusGained(FocusEvent e) {
@@ -465,9 +477,9 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     
     @Override
     public void windowWillClose() {
-        if (findResultsUpdater != null) {
-            findResultsUpdater.stop();
-            findResultsUpdater = null;
+        if (findResultsUpdateTimer != null) {
+            findResultsUpdateTimer.stop();
+            findResultsUpdateTimer = null;
         }
         Evergreen.getInstance().showStatus("Closed " + filename);
         // FIXME: what else needs doing to ensure that we give back memory?
@@ -557,8 +569,8 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     }
     
     public void textBecameDirty() {
-        if (findResultsUpdater != null) {
-            findResultsUpdater.restart();
+        if (findResultsUpdateTimer != null) {
+            findResultsUpdateTimer.restart();
         }
         getTitleBar().repaint();
     }
