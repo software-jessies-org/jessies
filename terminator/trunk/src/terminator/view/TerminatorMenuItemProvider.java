@@ -11,13 +11,16 @@ import terminator.*;
 public class TerminatorMenuItemProvider implements MenuItemProvider {
 	private final JTerminalPane terminalPane;
 	
-	// FIXME: mad points out that we need to recreate these if the preferences change to get the right keyboard equivalents.
 	private Action[] menuAndKeyActions = new Action[] {
 		new TerminatorMenuBar.CopyAction(),
 		new TerminatorMenuBar.PasteAction(),
 		null,
 		new TerminatorMenuBar.NewShellAction(),
-		new TerminatorMenuBar.NewTabAction(),
+		new TerminatorMenuBar.NewShellTabAction(),
+		null,
+		new TerminatorMenuBar.NewShellHereAction(),
+		new TerminatorMenuBar.NewShellTabHereAction(),
+		null,
 		new TerminatorMenuBar.CloseAction(),
 		null,
 		new TerminatorMenuBar.FindAction(),

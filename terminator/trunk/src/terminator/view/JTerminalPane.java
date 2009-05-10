@@ -8,6 +8,7 @@ import java.util.List;
 import javax.swing.*;
 import e.gui.*;
 import e.util.*;
+import org.jessies.os.*;
 import terminator.*;
 import terminator.model.*;
 import terminator.terminal.*;
@@ -88,6 +89,16 @@ public class JTerminalPane extends JPanel {
 			name = user + "@localhost";
 		}
 		return new JTerminalPane(name, workingDirectory, TerminalControl.getDefaultShell(), true);
+	}
+	
+	public JTerminalPane newShellHere() {
+		int fd = control.getPtyProcess().getFd();
+		int foregroundPid = Posix.tcgetpgrp(fd);
+		if (foregroundPid < 0) {
+			return null;
+		}
+		String workingDirectory = ProcessUtilities.findCurrentWorkingDirectory(foregroundPid);
+		return newShellWithName(null, workingDirectory);
 	}
 	
 	public Dimension getPaneSize() {

@@ -124,6 +124,10 @@ public class PtyProcess {
         return outStream;
     }
     
+    public int getFd() {
+        return fd;
+    }
+    
     public int getPid() {
         return pid;
     }

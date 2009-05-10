@@ -40,7 +40,7 @@ public class TerminatorMenuBar extends EMenuBar {
 		menu.add(new NewCommandAction());
 		
 		menu.addSeparator();
-		menu.add(new NewTabAction());
+		menu.add(new NewShellTabAction());
 		menu.add(new NewCommandTabAction());
 		
 		menu.addSeparator();
@@ -275,38 +275,62 @@ public class TerminatorMenuBar extends EMenuBar {
 		}
 		
 		public void actionPerformed(ActionEvent e) {
-			newShell();
-		}
-		
-		public static void newShell() {
 			Terminator.getSharedInstance().openFrame(JTerminalPane.newShell());
 		}
 	}
 	
-	public static class NewTabAction extends AbstractAction {
-		public NewTabAction() {
+	private static void addTab(JTerminalPane terminalPane) {
+		TerminatorFrame frame = getFocusedTerminatorFrame();
+		
+		// On Mac OS, if the user hits C-T multiple times in quick succession while we've got no window up, we end up here with no focused frame.
+		// Without this hack, that means that (on my machine) for three C-Ts, I get two in one new window and a third in a second new window.
+		// With this hack, the focus even seems to work itself out in the end.
+		// I don't know of any cleaner way to do this.
+		Frames frames = Terminator.getSharedInstance().getFrames();
+		if (frame == null && frames.isEmpty() == false) {
+			frame = (TerminatorFrame) frames.getFrame();
+		}
+		
+		if (frame != null) {
+			frame.addTab(terminalPane);
+		} else {
+			// There's no existing frame, so interpret "New Shell Tab..." as "New Shell...".
+			Terminator.getSharedInstance().openFrame(terminalPane);
+		}
+	}
+	
+	public static class NewShellTabAction extends AbstractAction {
+		public NewShellTabAction() {
 			super("New Shell Tab");
 			putValue(ACCELERATOR_KEY, makeKeyStroke("T"));
 		}
 		
 		public void actionPerformed(ActionEvent e) {
-			TerminatorFrame frame = getFocusedTerminatorFrame();
-			
-			// On Mac OS, if the user hits C-T multiple times in quick succession while we've got no window up, we end up here with no focused frame.
-			// Without this hack, that means that (on my machine) for three C-Ts, I get two in one new window and a third in a second new window.
-			// With this hack, the focus even seems to work itself out in the end.
-			// I don't know of any cleaner way to do this.
-			Frames frames = Terminator.getSharedInstance().getFrames();
-			if (frame == null && frames.isEmpty() == false) {
-				frame = (TerminatorFrame) frames.getFrame();
-			}
-			
-			if (frame != null) {
-				frame.addTab(JTerminalPane.newShell());
-			} else {
-				// There's no existing frame, so interpret "New Shell Tab..." as "New Shell...".
-				NewShellAction.newShell();
-			}
+			addTab(JTerminalPane.newShell());
+		}
+	}
+	
+	public static class NewShellHereAction extends AbstractPaneAction {
+		public NewShellHereAction() {
+			super("New Shell Here");
+		}
+		
+		@Override
+		protected void performPaneAction(JTerminalPane terminalPane) {
+			JTerminalPane newPane = terminalPane.newShellHere();
+			Terminator.getSharedInstance().openFrame(newPane);
+		}
+	}
+	
+	public static class NewShellTabHereAction extends AbstractPaneAction {
+		public NewShellTabHereAction() {
+			super("New Shell Tab Here");
+		}
+		
+		@Override
+		protected void performPaneAction(JTerminalPane terminalPane) {
+			JTerminalPane newPane = terminalPane.newShellHere();
+			addTab(newPane);
 		}
 	}
 	
