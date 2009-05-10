@@ -56,7 +56,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         this.filename = filename;
         this.file = FileUtilities.fileFromString(filename);
         this.textArea = new ETextArea();
-        textArea.getTextBuffer().addTextListener(this);
+        initTextArea();
         initTextAreaPopupMenu();
         
         this.watermarkViewPort = new WatermarkViewPort();
@@ -74,6 +74,25 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         fillWithContent();
         initUserConfigurableDefaults();
         initFindResultsUpdater();
+    }
+    
+    private void initTextArea() {
+        textArea.setPastedTextReformatter(new UnaryFunctor<String, String>() {
+            public String evaluate(String pastedText) {
+                // Turn non-breakable spaces into normal spaces.
+                // These are a problem if, for example, you paste a signature from JavaDoc.
+                pastedText = pastedText.replace('\u00a0', ' ');
+                // Turn old-style Mac line endings into something sensible.
+                // These are a problem if, for example, you paste example code from Apple's on-line documentation.
+                pastedText = pastedText.replaceAll("\r\n?", "\n");
+                return pastedText;
+            }
+        });
+        
+        // Disable the default find action so we can offer our own.
+        textArea.getActionMap().remove(PActionFactory.makeFindAction().getValue(Action.NAME));
+        
+        textArea.getTextBuffer().addTextListener(this);
     }
     
     private void initUserConfigurableDefaults() {
