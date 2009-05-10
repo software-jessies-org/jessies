@@ -288,6 +288,30 @@ public class ProcessUtilities {
         return result.toString();
     }
     
+    /**
+     * Silently returns null if the directory can't be determined.
+     */
+    public static String findCurrentWorkingDirectory(int pid) {
+        // Linux and Cygwin use a symlink of this form.
+        // gnome-terminal suggests that Solaris may use an extra "path" element.
+        // fileFromString canonicalizes the Cygwin symlink but gnome-terminal suggests that doing that on other platform, for consistency, would break Solaris.
+        File cwdLink = FileUtilities.fileFromString("/proc/" + pid + "/cwd");
+        if (cwdLink.exists()) {
+            return cwdLink.toString();
+        }
+        // Mac OS has no /proc but comes with lsof.
+        ArrayList<String> output = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<String>();
+        int status = backQuote(null, new String[] { "lsof", "-a", "-p", String.valueOf(pid), "-d", "cwd", "-F0n" }, output, errors);
+        if (status != 0) {
+            return null;
+        };
+        // p18316\0
+        // n/private/var/tmp\0
+        String cwdLine = output.get(1);
+        return cwdLine.substring(1, cwdLine.length() - 1);
+    }
+    
     /** Prevents instantiation. */
     private ProcessUtilities() {
     }
