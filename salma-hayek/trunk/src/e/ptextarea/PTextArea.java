@@ -44,6 +44,12 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     private ArrayList<PCaretListener> caretListeners = new ArrayList<PCaretListener>();
     private TreeMap<Integer, List<PLineSegment>> segmentCache = new TreeMap<Integer, List<PLineSegment>>();
     
+    private UnaryFunctor<String, String> pastedTextReformatter = new UnaryFunctor<String, String>() {
+        public String evaluate(String s) {
+            return s;
+        }
+    };
+    
     private int rowCount;
     private int columnCount;
     
@@ -1350,10 +1356,10 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     }
     
     /**
-     * Override this to modify pasted text before it replaces the selection.
+     * Sets the functor that reformats pasted text before it replaces the selection.
      */
-    protected String reformatPastedText(String pastedText) {
-        return pastedText;
+    public void setPastedTextReformatter(UnaryFunctor<String, String> pastedTextReformatter) {
+        this.pastedTextReformatter = pastedTextReformatter;
     }
     
     /**
@@ -1380,7 +1386,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         getLock().getReadLock();
         try {
             Transferable contents = clipboard.getContents(this);
-            String string = reformatPastedText((String) contents.getTransferData(DataFlavor.stringFlavor));
+            String string = pastedTextReformatter.evaluate((String) contents.getTransferData(DataFlavor.stringFlavor));
             pasteAndReIndent(string);
         } catch (Exception ex) {
             Log.warn("Couldn't paste.", ex);
