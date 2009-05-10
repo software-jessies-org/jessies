@@ -25,7 +25,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     
     private final String filename;
     private final File file;
-    private final ETextArea textArea;
+    private final PTextArea textArea;
     // Used to display a watermark to indicate such things as a read-only file.
     private final WatermarkViewPort watermarkViewPort;
     private final BirdView birdView;
@@ -61,7 +61,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         super(filename);
         this.filename = filename;
         this.file = FileUtilities.fileFromString(filename);
-        this.textArea = new ETextArea();
+        this.textArea = new PTextArea();
         initTextArea();
         initTextAreaPopupMenu();
         
@@ -470,8 +470,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         }
     }
     
-    @Override
-    public ETextArea getTextArea() {
+    @Override public PTextArea getTextArea() {
         return textArea;
     }
     

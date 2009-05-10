@@ -6,7 +6,7 @@ import e.util.*;
 import java.awt.event.*;
 
 /**
- * The ETextArea action that automatically corrects the current line's indentation.
+ * Automatically corrects the current line's indentation.
  */
 public class CorrectIndentationAction extends ETextAction {
     public CorrectIndentationAction() {

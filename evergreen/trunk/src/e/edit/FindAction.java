@@ -46,7 +46,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
     }
     
     public String getInitialValue() {
-        ETextArea textArea = currentTextWindow.getTextArea();
+        PTextArea textArea = currentTextWindow.getTextArea();
         this.initialSelectionStart = textArea.getSelectionStart();
         this.initialSelectionEnd = textArea.getSelectionEnd();
         String selectedText = textArea.getSelectedText();
@@ -110,7 +110,7 @@ public class FindAction extends ETextAction implements MinibufferUser {
     
     private void findAllMatches(String regularExpression) {
         currentTextWindow.setCurrentRegularExpression(regularExpression);
-        ETextArea textArea = currentTextWindow.getTextArea();
+        PTextArea textArea = currentTextWindow.getTextArea();
         try {
             textArea.findAllMatches(regularExpression, currentTextWindow.getBirdView());
             currentTextWindow.updateStatusLine();

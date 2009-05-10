@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.ptextarea.*;
 import java.io.*;
 import javax.swing.text.*;
 import javax.swing.text.html.*;
@@ -7,10 +8,10 @@ import javax.swing.text.html.*;
 public class HtmlTagger {
     private static final EditorKit KIT = new HTMLEditorKit();
     
-    private final ETextArea textArea;
+    private final PTextArea textArea;
     private final TagReader.TagListener listener;
     
-    public HtmlTagger(ETextArea textArea, TagReader.TagListener listener) {
+    public HtmlTagger(PTextArea textArea, TagReader.TagListener listener) {
         this.textArea = textArea;
         this.listener = listener;
     }

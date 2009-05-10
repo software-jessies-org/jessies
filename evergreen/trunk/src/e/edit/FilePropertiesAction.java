@@ -9,7 +9,7 @@ import java.util.*;
 import javax.swing.*;
 
 /**
- * The ETextArea action to open file properties dialog where you can view
+ * Opens the file properties dialog where you can view
  * or alter the end of line string, indentation string, and character
  * encoding.
  */
@@ -25,7 +25,7 @@ public class FilePropertiesAction extends ETextAction {
             return;
         }
         
-        final ETextArea textArea = window.getTextArea();
+        final PTextArea textArea = window.getTextArea();
         final PTextBuffer buffer = textArea.getTextBuffer();
         String endOfLineString = (String) buffer.getProperty(PTextBuffer.LINE_ENDING_PROPERTY);
         String initialEndOfLine = StringUtilities.escapeForJava(endOfLineString);

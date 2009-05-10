@@ -6,8 +6,8 @@ import java.awt.event.*;
 import javax.swing.*;
 
 /**
-The ETextArea close window action.
-*/
+ * Closes the current text window.
+ */
 public class CloseWindowAction extends ETextAction {
     public CloseWindowAction() {
         super("_Close", GuiUtilities.makeKeyStroke("W", false));

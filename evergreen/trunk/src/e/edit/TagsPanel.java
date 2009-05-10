@@ -1,6 +1,7 @@
 package e.edit;
 
 import e.gui.*;
+import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
 import javax.swing.*;
@@ -92,16 +93,16 @@ public class TagsPanel extends JPanel {
         };
         
         private TagReader.Tag tag;
-        private ETextArea textArea;
+        private PTextArea textArea;
         
-        public TagsTreeRenderer(ETextArea textArea) {
+        public TagsTreeRenderer(PTextArea textArea) {
             this.textArea = textArea;
             setClosedIcon(null);
             setLeafIcon(null);
             setOpenIcon(null);
         }
         
-        private ETextArea getTextArea() {
+        private PTextArea getTextArea() {
             return textArea;
         }
         

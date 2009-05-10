@@ -1,6 +1,7 @@
 package e.edit;
 
 import e.gui.*;
+import e.ptextarea.*;
 import e.util.*;
 import java.awt.event.*;
 
@@ -8,7 +9,7 @@ import java.awt.event.*;
  * Lets the user jump straight to the given line number in the current text.
  */
 public class GoToLineAction extends ETextAction implements MinibufferUser {
-    private ETextArea currentTextArea;
+    private PTextArea currentTextArea;
     private int initialCaretPosition;
     
     public GoToLineAction() {
