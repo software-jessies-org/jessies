@@ -5,6 +5,76 @@ package org.jessies.os;
  * http://www.opengroup.org/onlinepubs/000095399/basedefs/signal.h.html
  */
 public class Signal {
+    /**
+     * Translates a numeric signal number into a human-readable form such as "signal 2 (SIGINT)".
+     */
+    public static String toString(int signal) {
+        String result = "signal " + signal;
+        String signalName = signalName(signal);
+        if (signalName != null) {
+            result += " (" + signalName +")";
+        }
+        return result;
+    }
+    
+    private static String signalName(int signal) {
+        if (signal == SIGABRT) {
+            return "SIGABRT";
+        } else if (signal == SIGALRM) {
+            return "SIGALRM";
+        } else if (signal == SIGBUS) {
+            return "SIGBUS";
+        } else if (signal == SIGCHLD) {
+            return "SIGCHLD";
+        } else if (signal == SIGCONT) {
+            return "SIGCONT";
+        } else if (signal == SIGFPE) {
+            return "SIGFPE";
+        } else if (signal == SIGHUP) {
+            return "SIGHUP";
+        } else if (signal == SIGILL) {
+            return "SIGILL";
+        } else if (signal == SIGINT) {
+            return "SIGINT";
+        } else if (signal == SIGKILL) {
+            return "SIGKILL";
+        } else if (signal == SIGPIPE) {
+            return "SIGPIPE";
+        } else if (signal == SIGQUIT) {
+            return "SIGQUIT";
+        } else if (signal == SIGSEGV) {
+            return "SIGSEGV";
+        } else if (signal == SIGSTOP) {
+            return "SIGSTOP";
+        } else if (signal == SIGTERM) {
+            return "SIGTERM";
+        } else if (signal == SIGTSTP) {
+            return "SIGTSTP";
+        } else if (signal == SIGTTIN) {
+            return "SIGTTIN";
+        } else if (signal == SIGTTOU) {
+            return "SIGTTOU";
+        } else if (signal == SIGUSR1) {
+            return "SIGUSR1";
+        } else if (signal == SIGUSR2) {
+            return "SIGUSR2";
+        } else if (signal == SIGPROF) {
+            return "SIGPROF";
+        } else if (signal == SIGSYS) {
+            return "SIGSYS";
+        } else if (signal == SIGTRAP) {
+            return "SIGTRAP";
+        } else if (signal == SIGURG) {
+            return "SIGURG";
+        } else if (signal == SIGXCPU) {
+            return "SIGXCPU";
+        } else if (signal == SIGXFSZ) {
+            return "SIGXFSZ";
+        } else {
+            return null;
+        }
+    }
+    
     public static final int SIGABRT = PosixJNI.get_SIGABRT();
     public static final int SIGALRM = PosixJNI.get_SIGALRM();
     public static final int SIGBUS = PosixJNI.get_SIGBUS();
