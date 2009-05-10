@@ -260,14 +260,9 @@ public class ProcessUtilities {
         if (pid == -1) {
             return false;
         }
-        try {
-            System.out.println("killing " + pid);
-            Runtime.getRuntime().exec("kill -" + Signal.SIGTERM + " -" + pid);
-            Runtime.getRuntime().exec("kill -" + Signal.SIGTERM + " " + pid);
-            return true;
-        } catch (IOException ex) {
-            return false;
-        }
+        // FIXME: is this really what we want to do?
+        // FIXME: move this into Evergreen and have the "kill" button escalate from SIGINT to SIGTERM to SIGKILL?
+        return (Posix.kill(-pid, Signal.SIGTERM) == 0) && (Posix.kill(pid, Signal.SIGTERM) == 0);
     }
     
     /**
