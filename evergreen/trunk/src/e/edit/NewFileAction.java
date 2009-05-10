@@ -26,9 +26,18 @@ public class NewFileAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         ETextWindow window = ETextAction.getFocusedTextWindow();
         if (window != null) {
+            // Fill in the full path.
             final String filename = window.getFilename();
             filenameField.setPathname(filename);
-            filenameField.getPathnameField().select(window.getContext().length(), filename.length());
+            // Select only the basename (without extension).
+            // The user is highly likely to want to reuse the directory.
+            // The user is pretty likely to want to create another file of the same type.
+            // Selecting the basename helps in both cases, and at least puts the caret in a useful place if they actually want to create "file.cpp" to match "file.h".
+            int basenameLength = filename.indexOf('.');
+            if (basenameLength == -1) {
+                basenameLength = filename.length();
+            }
+            filenameField.getPathnameField().select(window.getContext().length(), basenameLength);
         } else {
             filenameField.setPathname(Evergreen.getInstance().getCurrentWorkspace().getRootDirectory());
         }
