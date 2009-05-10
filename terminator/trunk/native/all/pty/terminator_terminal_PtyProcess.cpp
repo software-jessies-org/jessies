@@ -89,6 +89,7 @@ void terminator_terminal_PtyProcess::nativeStartProcess(jstring javaExecutable, 
     // We work around this by explicitly blocking the parent until the child has opened the pty.
     // We can recognize this on Mac OS by the fact that a write would no longer block.
     // (The fd is writable on Linux even before the child has opened the pty.)
+    // FIXME: If the fd never becomes writable, for example because the specified working directory doesn't exist, then this locks up the whole Terminator.
     waitUntilFdWritable(fd.get());
     
     slavePtyName = newStringUtf8(ptyGenerator.getSlavePtyName());
