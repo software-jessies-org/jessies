@@ -672,6 +672,8 @@ public class JTerminalPane extends JPanel {
 
 		// Check if the only thing still running is the command we started, or that the pty has been closed.
 		// In either of those cases, there's no reason to hang around.
+		// We're trying to protect the user from accidentally killing or hiding some background process they've forgotten about.
+		// So does it really matter whether the one visible process is the one we started?
 		// FIXME: ideally, PtyProcess would give us a List<ProcessInfo>, but that opens a whole can of JNI worms. Hence the following hack.
 		final String[] processList = processesUsingTty.split(", ");
 		if (processList.length == 1 && (processList[0].matches("^.*\\(" + directChildPid + "\\)$") || processList[0].equals("(pty closed)"))) {
