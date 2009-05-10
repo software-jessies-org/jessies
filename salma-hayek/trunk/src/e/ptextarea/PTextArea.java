@@ -42,6 +42,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     private int rightHandMarginColumn = NO_MARGIN;
     
     private ArrayList<PCaretListener> caretListeners = new ArrayList<PCaretListener>();
+    private ArrayList<PFindListener> findListeners = new ArrayList<PFindListener>();
     private TreeMap<Integer, List<PLineSegment>> segmentCache = new TreeMap<Integer, List<PLineSegment>>();
     
     private UnaryFunctor<String, String> pastedTextReformatter = new UnaryFunctor<String, String>() {
@@ -1503,8 +1504,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         findNextOrPrevious(false);
     }
     
-    protected void findNextOrPrevious(boolean next) {
-        updateFindResults();
+    private void findNextOrPrevious(boolean next) {
+        fireAboutToFindEvent();
         PHighlight nextHighlight = highlights.getNextOrPreviousHighlight(PFind.MatchHighlight.HIGHLIGHTER_NAME, next, next ? getSelectionEnd() : getSelectionStart());
         if (nextHighlight != null) {
             selectHighlight(nextHighlight);
@@ -1515,12 +1516,18 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         return highlights.countHighlightsOfType(PFind.MatchHighlight.HIGHLIGHTER_NAME);
     }
     
-    /**
-     * Override this to update the find results just in time when the user
-     * tries to move to the next or previous match.
-     */
-    protected void updateFindResults() {
-        // Do nothing.
+    public void fireAboutToFindEvent() {
+        for (PFindListener findListener : findListeners) {
+            findListener.aboutToFind();
+        }
+    }
+    
+    public void addFindListener(PFindListener findListener) {
+        findListeners.add(findListener);
+    }
+    
+    public void removeFindListener(PFindListener findListener) {
+        findListeners.remove(findListener);
     }
     
     public EPopupMenu getPopupMenu() {
