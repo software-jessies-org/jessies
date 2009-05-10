@@ -1,8 +1,15 @@
 package org.jessies.os;
 
+/**
+ * POSIX error numbers, returned by POSIX API on failure.
+ * Note that class Posix uses the Linux kernel convention of negating errno values.
+ * For what errors can be reported by any given operation, see the POSIX specification of that operation.
+ * 
+ * http://www.opengroup.org/onlinepubs/009695399/basedefs/errno.h.html
+ */
 public class Errno {
     /**
-     * Translates error 'errno' to a human-readable string.
+     * Translates error 'errno' to a human-readable string, equivalent to strerror(3).
      */
     public static String toString(int errno) {
         return PosixJNI.strerror(errno);
