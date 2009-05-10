@@ -662,7 +662,7 @@ public class JTerminalPane extends JPanel {
 			return true;
 		}
 
-		final long directChildPid = ptyProcess.getPid();
+		final int directChildPid = ptyProcess.getPid();
 		final String processesUsingTty = ptyProcess.listProcessesUsingTty();
 
 		if (processesUsingTty.length() == 0) {

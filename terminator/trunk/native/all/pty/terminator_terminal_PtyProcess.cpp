@@ -183,13 +183,6 @@ void terminator_terminal_PtyProcess::sendResizeNotification(jobject sizeInChars,
     }
 }
 
-void terminator_terminal_PtyProcess::destroy() {
-    int status = killpg(pid.get(), SIGHUP);
-    if (status < 0) {
-        throw unix_exception("killpg(" + toString(pid.get()) + ", SIGHUP) failed");
-    }
-}
-
 void terminator_terminal_PtyProcess::nativeWaitFor() {
     // We now have no further use for the fd connecting us to the child,
     // which has probably exited.
