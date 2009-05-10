@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import java.io.*;
 import java.util.concurrent.*;
 import java.util.regex.*;
+import org.jessies.os.*;
 
 public class PtyProcess {
     private class PtyInputStream extends InputStream {
@@ -44,7 +45,7 @@ public class PtyProcess {
     }
     
     private int fd = -1;
-    private long pid;
+    private int pid;
     private String slavePtyName;
     
     private boolean didDumpCore = false;
@@ -123,7 +124,7 @@ public class PtyProcess {
         return outStream;
     }
     
-    public long getPid() {
+    public int getPid() {
         return pid;
     }
     
@@ -192,9 +193,15 @@ public class PtyProcess {
         return result;
     }
     
+    public void destroy() throws IOException {
+        int rc = Posix.killpg(pid, Signal.SIGHUP);
+        if (rc < 0) {
+            throw new IOException("killpg(" + pid + ", SIGHUP) failed: " + Errno.toString(-rc));
+        }
+    }
+    
     private native void nativeStartProcess(String executable, String[] argv, String workingDirectory) throws IOException;
     private native void nativeWaitFor() throws IOException;
-    public native void destroy() throws IOException;
     
     private native int nativeRead(byte[] destination, int arrayOffset, int desiredLength) throws IOException;
     private native void nativeWrite(byte[] bytes, int arrayOffset, int byteCount) throws IOException;
