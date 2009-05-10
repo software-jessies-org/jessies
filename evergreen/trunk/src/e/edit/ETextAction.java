@@ -23,20 +23,20 @@ public abstract class ETextAction extends AbstractAction {
         return KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
     }
     
-    public static ETextArea getFocusedTextArea() {
+    public static PTextArea getFocusedTextArea() {
         Component focusedComponent = getFocusedComponent();
-        if (focusedComponent instanceof ETextArea) {
-            return (ETextArea) focusedComponent;
+        if (focusedComponent instanceof PTextArea) {
+            return (PTextArea) focusedComponent;
         }
-        return (ETextArea) SwingUtilities.getAncestorOfClass(ETextArea.class, focusedComponent);
+        return (PTextArea) SwingUtilities.getAncestorOfClass(PTextArea.class, focusedComponent);
     }
     
     public static ETextWindow getFocusedTextWindow() {
         Component focusedComponent = getFocusedComponent();
-        if (focusedComponent instanceof ETextArea == false) {
+        if (focusedComponent instanceof PTextArea == false) {
             return null;
         }
-        ETextArea target = (ETextArea) focusedComponent;
+        PTextArea target = (PTextArea) focusedComponent;
         ETextWindow textWindow = (ETextWindow) SwingUtilities.getAncestorOfClass(ETextWindow.class, target);
         return textWindow;
     }
@@ -50,7 +50,7 @@ public abstract class ETextAction extends AbstractAction {
      * Returns the empty string if no text area has the focus.
      */
     public static String getSearchTerm() {
-        ETextArea textArea = ETextAction.getFocusedTextArea();
+        PTextArea textArea = ETextAction.getFocusedTextArea();
         if (textArea == null) {
             return "";
         }

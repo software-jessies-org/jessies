@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.ptextarea.*;
 import java.awt.*;
 import javax.swing.*;
 
@@ -23,7 +24,7 @@ public class EWindow extends JComponent {
         return false;
     }
     
-    public ETextArea getTextArea() {
+    public PTextArea getTextArea() {
         return null;
     }
     

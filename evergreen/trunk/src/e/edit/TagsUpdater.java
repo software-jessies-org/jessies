@@ -34,7 +34,7 @@ public class TagsUpdater {
     }
     
     private void installListeners() {
-        final ETextArea text = getTextArea();
+        final PTextArea text = getTextArea();
         // Rebuild tags when the document line count changes.
         text.getTextBuffer().addTextListener(new PTextListener() {
             private int lastLineCount;
@@ -81,7 +81,7 @@ public class TagsUpdater {
         });
     }
     
-    private void selectTagAtCaret(ETextArea text) {
+    private void selectTagAtCaret(PTextArea text) {
         // FIXME - selection
         int lineNumber = text.getLineOfOffset(text.getSelectionStart());
         selectTreeNode(getTagForLine(lineNumber));
@@ -136,7 +136,7 @@ public class TagsUpdater {
         return textWindow;
     }
     
-    public ETextArea getTextArea() {
+    public PTextArea getTextArea() {
         return getTextWindow().getTextArea();
     }
     

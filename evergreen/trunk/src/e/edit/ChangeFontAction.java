@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.ptextarea.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.regex.*;
@@ -75,7 +76,7 @@ public abstract class ChangeFontAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        ETextArea textArea = getFocusedTextArea();
+        PTextArea textArea = getFocusedTextArea();
         if (textArea != null) {
             textArea.setFont(getFont());
         }

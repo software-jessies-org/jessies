@@ -2,6 +2,7 @@ package e.edit;
 
 import e.forms.*;
 import e.gui.*;
+import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -11,7 +12,7 @@ import javax.swing.*;
 import org.jdesktop.swingworker.SwingWorker;
 
 /**
- * The ETextArea action to open a find and replace dialog.
+ * Opens a find and replace dialog.
  */
 public class FindAndReplaceAction extends ETextAction {
     private JTextField patternField = new JTextField(40);
@@ -32,7 +33,7 @@ public class FindAndReplaceAction extends ETextAction {
         initLists();
     }
     
-    private ETextArea currentTextArea;
+    private PTextArea currentTextArea;
 
     private boolean isSelectionMeantAsScope() {
         return currentTextArea.getSelectedText().contains("\n");

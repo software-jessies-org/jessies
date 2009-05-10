@@ -28,7 +28,7 @@ public class OpenImportAction extends ETextAction {
         if (path.length() == 0) {
             // There was no selection, so grab the whole of the current line.
             // FIXME: if we did this, and still find nothing, how about opening a dialog? sometimes it's easier to ask for a #include by name than to find an existing copy of the name (or add one somewhere).
-            final ETextArea textArea = textWindow.getTextArea();
+            final PTextArea textArea = textWindow.getTextArea();
             path = textArea.getLineText(textArea.getLineOfOffset(textArea.getSelectionStart()));
         }
         

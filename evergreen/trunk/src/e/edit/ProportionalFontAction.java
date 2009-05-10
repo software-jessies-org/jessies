@@ -3,7 +3,7 @@ package e.edit;
 import java.awt.*;
 
 /**
- * The ETextArea action to change to a proportional font.
+ * Changes to a proportional font.
  */
 public class ProportionalFontAction extends ChangeFontAction {
   public ProportionalFontAction() {

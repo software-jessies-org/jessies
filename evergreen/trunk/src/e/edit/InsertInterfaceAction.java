@@ -1,6 +1,6 @@
 package e.edit;
 
-import e.ptextarea.FileType;
+import e.ptextarea.*;
 import e.util.*;
 import java.awt.event.*;
 import java.lang.reflect.*;
@@ -33,7 +33,7 @@ public class InsertInterfaceAction extends ETextAction {
     
     private void pasteSourceCode() {
         // Get the line up to the caret.
-        ETextArea textArea = ETextAction.getFocusedTextArea();
+        PTextArea textArea = ETextAction.getFocusedTextArea();
         if (textArea == null) {
             Evergreen.getInstance().showAlert("Couldn't insert interface", "It wasn't possible to work out what file you're referring to.");
             return;

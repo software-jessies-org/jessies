@@ -3,9 +3,6 @@ package e.edit;
 import e.gui.*;
 import java.awt.event.*;
 
-/**
-The ETextArea revert-to-saved action.
-*/
 public class RevertToSavedAction extends ETextAction {
     public RevertToSavedAction() {
         super("_Revert to Saved", null);

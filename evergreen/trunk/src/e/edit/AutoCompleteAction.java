@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -19,7 +20,7 @@ public class AutoCompleteAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        ETextArea textArea = getFocusedTextArea();
+        PTextArea textArea = getFocusedTextArea();
         if (textArea != null) {
             offerCompletions(textArea);
         }
@@ -29,7 +30,7 @@ public class AutoCompleteAction extends ETextAction {
      * Returns the word up to but not past the caret. The intended use is
      * working out what to offer as completions in AutoCompleteAction.
      */
-    private static String getWordUpToCaret(ETextArea textArea) {
+    private static String getWordUpToCaret(PTextArea textArea) {
         CharSequence chars = textArea.getTextBuffer();
         // FIXME - selection
         int end = textArea.getSelectionStart();
@@ -44,7 +45,7 @@ public class AutoCompleteAction extends ETextAction {
         return chars.subSequence(start, end).toString();
     }
     
-    public void offerCompletions(final ETextArea textArea) {
+    public void offerCompletions(final PTextArea textArea) {
         String prefix = getWordUpToCaret(textArea);
         // FIXME - selection
         final int endPosition = textArea.getSelectionStart();
