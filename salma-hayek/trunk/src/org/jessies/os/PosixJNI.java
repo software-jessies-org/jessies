@@ -162,6 +162,8 @@ class PosixJNI {
     static native int getpgrp();
     static native int getpid();
     static native int getppid();
+    static native Passwd getpwnam(String name);
+    static native Passwd getpwuid(int uid);
     static native int getsid(int pid);
     static native int getuid();
     static native boolean isatty(int fd);

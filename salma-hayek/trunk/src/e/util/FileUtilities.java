@@ -44,11 +44,10 @@ public class FileUtilities {
             Pattern pattern = Pattern.compile("^~([^" + Pattern.quote(File.separator) + "]+)(.*)$");
             Matcher matcher = pattern.matcher(filename);
             if (matcher.find()) {
-                String user = matcher.group(1);
-                File home = fileFromString(getUserHomeDirectory());
-                File otherHome = fileFromParentAndString(home.getParent(), user);
-                if (otherHome.exists() && otherHome.isDirectory()) {
-                    result = otherHome.toString() + matcher.group(2);
+                final Passwd user = Passwd.fromName(matcher.group(1));
+                final String rest = matcher.group(2);
+                if (user != null) {
+                    result = user.pw_dir() + rest;
                 }
             }
         }
@@ -64,10 +63,8 @@ public class FileUtilities {
     }
     
     /**
-     * Strips the user's home directory from the beginning of the string
-     * if it's there, replacing it with ~. It would be nice to do other users'
-     * home directories too, but I can't think of a pure Java way to do
-     * that.
+     * Strips the user's home directory from the beginning of the string if it's there, replacing it with ~.
+     * (It would be nice to do other users' home directories too, but I can't think how to do that reverse lookup cheaply.)
      * Also adds a trailing separator to the name of a directory.
      */
     public static String getUserFriendlyName(String filename) {

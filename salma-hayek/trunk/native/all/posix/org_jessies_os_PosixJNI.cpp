@@ -9,6 +9,7 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <pwd.h>
 #include <signal.h>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -292,6 +293,37 @@ jint org_jessies_os_PosixJNI::truncate(jstring path, jlong length) {
 
 jint org_jessies_os_PosixJNI::unlink(jstring path) {
     return zeroOrMinusErrno(::unlink(JniString(m_env, path).c_str()));
+}
+
+static jobject translatePasswd(JNIEnv* env, const passwd& pw) {
+    jstring name(env->NewStringUTF(pw.pw_name));
+    jint uid(pw.pw_uid);
+    jint gid(pw.pw_gid);
+    jstring dir(env->NewStringUTF(pw.pw_dir));
+    jstring shell(env->NewStringUTF(pw.pw_shell));
+    jclass passwdClass = env->FindClass("org/jessies/os/Passwd");
+    jmethodID constructor = env->GetMethodID(passwdClass, "<init>", "(Ljava/lang/String;IILjava/lang/String;Ljava/lang/String;)V");
+    return env->NewObject(passwdClass, constructor, name, uid, gid, dir, shell);
+}
+
+jobject org_jessies_os_PosixJNI::getpwnam(jstring name) {
+    passwd pw;
+    passwd* pwp;
+    char buf[1024];
+    if (getpwnam_r(JniString(m_env, name).c_str(), &pw, buf, sizeof(buf), &pwp) != 0 || pwp == NULL) {
+        return NULL;
+    }
+    return translatePasswd(m_env, *pwp);
+}
+
+jobject org_jessies_os_PosixJNI::getpwuid(jint uid) {
+    passwd pw;
+    passwd* pwp;
+    char buf[1024];
+    if (getpwuid_r(uid, &pw, buf, sizeof(buf), &pwp) != 0 || pwp == NULL) {
+        return NULL;
+    }
+    return translatePasswd(m_env, *pwp);
 }
 
 static void translateStat(JNIEnv* env, jobject javaStat, const struct stat& sb) {
