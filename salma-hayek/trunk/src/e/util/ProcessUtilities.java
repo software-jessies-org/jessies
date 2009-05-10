@@ -302,7 +302,7 @@ public class ProcessUtilities {
         // Mac OS has no /proc but comes with lsof.
         ArrayList<String> output = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
-        int status = backQuote(null, new String[] { "lsof", "-a", "-p", String.valueOf(pid), "-d", "cwd", "-F0n" }, output, errors);
+        int status = backQuote(null, new String[] { "lsof", "-a", "-p", Integer.toString(pid), "-d", "cwd", "-F0n" }, output, errors);
         if (status != 0) {
             return null;
         };
