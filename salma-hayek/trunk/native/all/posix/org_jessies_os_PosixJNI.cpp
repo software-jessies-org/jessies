@@ -7,8 +7,11 @@
 #include "JniString.h"
 #include "unix_exception.h"
 
-#include <sys/stat.h>
+#include <errno.h>
+#include <fcntl.h>
 #include <signal.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 jint org_jessies_os_PosixJNI::get_1SEEK_1CUR() { return SEEK_CUR; }
@@ -59,32 +62,155 @@ jint org_jessies_os_PosixJNI::get_1SIGURG() { return SIGURG; }
 jint org_jessies_os_PosixJNI::get_1SIGXCPU() { return SIGXCPU; }
 jint org_jessies_os_PosixJNI::get_1SIGXFSZ() { return SIGXFSZ; }
 
-static jint translateResult(int result) {
+jint org_jessies_os_PosixJNI::get_1O_1CREAT() { return O_CREAT; }
+jint org_jessies_os_PosixJNI::get_1O_1EXCL() { return O_EXCL; }
+jint org_jessies_os_PosixJNI::get_1O_1NOCTTY() { return O_NOCTTY; }
+jint org_jessies_os_PosixJNI::get_1O_1TRUNC() { return O_TRUNC; }
+
+jint org_jessies_os_PosixJNI::get_1O_1APPEND() { return O_APPEND; }
+
+jint org_jessies_os_PosixJNI::get_1O_1RDONLY() { return O_RDONLY; }
+jint org_jessies_os_PosixJNI::get_1O_1RDWR() { return O_RDWR; }
+jint org_jessies_os_PosixJNI::get_1O_1WRONLY() { return O_WRONLY; }
+
+jint org_jessies_os_PosixJNI::get_1E2BIG() { return E2BIG; }
+jint org_jessies_os_PosixJNI::get_1EACCES() { return EACCES; }
+jint org_jessies_os_PosixJNI::get_1EADDRINUSE() { return EADDRINUSE; }
+jint org_jessies_os_PosixJNI::get_1EADDRNOTAVAIL() { return EADDRNOTAVAIL; }
+jint org_jessies_os_PosixJNI::get_1EAFNOSUPPORT() { return EAFNOSUPPORT; }
+jint org_jessies_os_PosixJNI::get_1EAGAIN() { return EAGAIN; }
+jint org_jessies_os_PosixJNI::get_1EALREADY() { return EALREADY; }
+jint org_jessies_os_PosixJNI::get_1EBADF() { return EBADF; }
+jint org_jessies_os_PosixJNI::get_1EBADMSG() { return EBADMSG; }
+jint org_jessies_os_PosixJNI::get_1EBUSY() { return EBUSY; }
+jint org_jessies_os_PosixJNI::get_1ECANCELED() { return ECANCELED; }
+jint org_jessies_os_PosixJNI::get_1ECHILD() { return ECHILD; }
+jint org_jessies_os_PosixJNI::get_1ECONNABORTED() { return ECONNABORTED; }
+jint org_jessies_os_PosixJNI::get_1ECONNREFUSED() { return ECONNREFUSED; }
+jint org_jessies_os_PosixJNI::get_1ECONNRESET() { return ECONNRESET; }
+jint org_jessies_os_PosixJNI::get_1EDEADLK() { return EDEADLK; }
+jint org_jessies_os_PosixJNI::get_1EDESTADDRREQ() { return EDESTADDRREQ; }
+jint org_jessies_os_PosixJNI::get_1EDOM() { return EDOM; }
+jint org_jessies_os_PosixJNI::get_1EDQUOT() { return EDQUOT; }
+jint org_jessies_os_PosixJNI::get_1EEXIST() { return EEXIST; }
+jint org_jessies_os_PosixJNI::get_1EFAULT() { return EFAULT; }
+jint org_jessies_os_PosixJNI::get_1EFBIG() { return EFBIG; }
+jint org_jessies_os_PosixJNI::get_1EHOSTUNREACH() { return EHOSTUNREACH; }
+jint org_jessies_os_PosixJNI::get_1EIDRM() { return EIDRM; }
+jint org_jessies_os_PosixJNI::get_1EILSEQ() { return EILSEQ; }
+jint org_jessies_os_PosixJNI::get_1EINPROGRESS() { return EINPROGRESS; }
+jint org_jessies_os_PosixJNI::get_1EINTR() { return EINTR; }
+jint org_jessies_os_PosixJNI::get_1EINVAL() { return EINVAL; }
+jint org_jessies_os_PosixJNI::get_1EIO() { return EIO; }
+jint org_jessies_os_PosixJNI::get_1EISCONN() { return EISCONN; }
+jint org_jessies_os_PosixJNI::get_1EISDIR() { return EISDIR; }
+jint org_jessies_os_PosixJNI::get_1ELOOP() { return ELOOP; }
+jint org_jessies_os_PosixJNI::get_1EMFILE() { return EMFILE; }
+jint org_jessies_os_PosixJNI::get_1EMLINK() { return EMLINK; }
+jint org_jessies_os_PosixJNI::get_1EMSGSIZE() { return EMSGSIZE; }
+jint org_jessies_os_PosixJNI::get_1EMULTIHOP() { return EMULTIHOP; }
+jint org_jessies_os_PosixJNI::get_1ENAMETOOLONG() { return ENAMETOOLONG; }
+jint org_jessies_os_PosixJNI::get_1ENETDOWN() { return ENETDOWN; }
+jint org_jessies_os_PosixJNI::get_1ENETRESET() { return ENETRESET; }
+jint org_jessies_os_PosixJNI::get_1ENETUNREACH() { return ENETUNREACH; }
+jint org_jessies_os_PosixJNI::get_1ENFILE() { return ENFILE; }
+jint org_jessies_os_PosixJNI::get_1ENOBUFS() { return ENOBUFS; }
+jint org_jessies_os_PosixJNI::get_1ENODEV() { return ENODEV; }
+jint org_jessies_os_PosixJNI::get_1ENOENT() { return ENOENT; }
+jint org_jessies_os_PosixJNI::get_1ENOEXEC() { return ENOEXEC; }
+jint org_jessies_os_PosixJNI::get_1ENOLCK() { return ENOLCK; }
+jint org_jessies_os_PosixJNI::get_1ENOLINK() { return ENOLINK; }
+jint org_jessies_os_PosixJNI::get_1ENOMEM() { return ENOMEM; }
+jint org_jessies_os_PosixJNI::get_1ENOMSG() { return ENOMSG; }
+jint org_jessies_os_PosixJNI::get_1ENOPROTOOPT() { return ENOPROTOOPT; }
+jint org_jessies_os_PosixJNI::get_1ENOSPC() { return ENOSPC; }
+jint org_jessies_os_PosixJNI::get_1ENOSYS() { return ENOSYS; }
+jint org_jessies_os_PosixJNI::get_1ENOTCONN() { return ENOTCONN; }
+jint org_jessies_os_PosixJNI::get_1ENOTDIR() { return ENOTDIR; }
+jint org_jessies_os_PosixJNI::get_1ENOTEMPTY() { return ENOTEMPTY; }
+jint org_jessies_os_PosixJNI::get_1ENOTSOCK() { return ENOTSOCK; }
+jint org_jessies_os_PosixJNI::get_1ENOTSUP() { return ENOTSUP; }
+jint org_jessies_os_PosixJNI::get_1ENOTTY() { return ENOTTY; }
+jint org_jessies_os_PosixJNI::get_1ENXIO() { return ENXIO; }
+jint org_jessies_os_PosixJNI::get_1EOPNOTSUPP() { return EOPNOTSUPP; }
+jint org_jessies_os_PosixJNI::get_1EOVERFLOW() { return EOVERFLOW; }
+jint org_jessies_os_PosixJNI::get_1EPERM() { return EPERM; }
+jint org_jessies_os_PosixJNI::get_1EPIPE() { return EPIPE; }
+jint org_jessies_os_PosixJNI::get_1EPROTO() { return EPROTO; }
+jint org_jessies_os_PosixJNI::get_1EPROTONOSUPPORT() { return EPROTONOSUPPORT; }
+jint org_jessies_os_PosixJNI::get_1EPROTOTYPE() { return EPROTOTYPE; }
+jint org_jessies_os_PosixJNI::get_1ERANGE() { return ERANGE; }
+jint org_jessies_os_PosixJNI::get_1EROFS() { return EROFS; }
+jint org_jessies_os_PosixJNI::get_1ESPIPE() { return ESPIPE; }
+jint org_jessies_os_PosixJNI::get_1ESRCH() { return ESRCH; }
+jint org_jessies_os_PosixJNI::get_1ESTALE() { return ESTALE; }
+jint org_jessies_os_PosixJNI::get_1ETIMEDOUT() { return ETIMEDOUT; }
+jint org_jessies_os_PosixJNI::get_1ETXTBSY() { return ETXTBSY; }
+jint org_jessies_os_PosixJNI::get_1EWOULDBLOCK() { return EWOULDBLOCK; }
+jint org_jessies_os_PosixJNI::get_1EXDEV() { return EXDEV; }
+
+static jint zeroOrMinusErrno(int result) {
     return result == -1 ? -errno : 0;
 }
 
+static jint resultOrMinusErrno(int result) {
+    return result == -1 ? -errno : result;
+}
+
 jint org_jessies_os_PosixJNI::access(jstring javaPath, jint accessMode) {
-    return translateResult(::access(JniString(m_env, javaPath).c_str(), accessMode));
+    return zeroOrMinusErrno(::access(JniString(m_env, javaPath).c_str(), accessMode));
 }
 
 jint org_jessies_os_PosixJNI::chmod(jstring javaPath, jint mode) {
-    return translateResult(::chmod(JniString(m_env, javaPath).c_str(), mode));
+    return zeroOrMinusErrno(::chmod(JniString(m_env, javaPath).c_str(), mode));
 }
 
 jint org_jessies_os_PosixJNI::chown(jstring javaPath, jint uid, jint gid) {
-    return translateResult(::chown(JniString(m_env, javaPath).c_str(), uid, gid));
+    return zeroOrMinusErrno(::chown(JniString(m_env, javaPath).c_str(), uid, gid));
 }
 
 jint org_jessies_os_PosixJNI::close(jint fd) {
-    return translateResult(::close(fd));
+    return zeroOrMinusErrno(::close(fd));
 }
 
 jint org_jessies_os_PosixJNI::dup(jint oldFd) {
-    return translateResult(::dup(oldFd));
+    return resultOrMinusErrno(::dup(oldFd));
 }
 
 jint org_jessies_os_PosixJNI::dup2(jint oldFd, jint newFd) {
-    return translateResult(::dup2(oldFd, newFd));
+    return resultOrMinusErrno(::dup2(oldFd, newFd));
+}
+
+jint org_jessies_os_PosixJNI::fchmod(jint fd, jint mode) {
+    return zeroOrMinusErrno(::fchmod(fd, mode));
+}
+
+jint org_jessies_os_PosixJNI::fchown(jint fd, jint uid, jint gid) {
+    return zeroOrMinusErrno(::fchown(fd, uid, gid));
+}
+
+jint org_jessies_os_PosixJNI::ftruncate(jint fd, jlong length) {
+    return zeroOrMinusErrno(::ftruncate(fd, length));
+}
+
+jint org_jessies_os_PosixJNI::getegid() {
+    return ::getegid();
+}
+
+jint org_jessies_os_PosixJNI::geteuid() {
+    return ::geteuid();
+}
+
+jint org_jessies_os_PosixJNI::getgid() {
+    return ::getgid();
+}
+
+jint org_jessies_os_PosixJNI::getpgid(jint pid) {
+    return resultOrMinusErrno(::getpgid(pid));
+}
+
+jint org_jessies_os_PosixJNI::getpgrp() {
+    return ::getpgrp();
 }
 
 jint org_jessies_os_PosixJNI::getpid() {
@@ -95,10 +221,92 @@ jint org_jessies_os_PosixJNI::getppid() {
     return ::getppid();
 }
 
+jint org_jessies_os_PosixJNI::getsid(jint pid) {
+    return resultOrMinusErrno(::getsid(pid));
+}
+
+jint org_jessies_os_PosixJNI::getuid() {
+    return ::getuid();
+}
+
+jboolean org_jessies_os_PosixJNI::isatty(jint fd) {
+    return ::isatty(fd) ? JNI_TRUE : JNI_FALSE;
+}
+
+jint org_jessies_os_PosixJNI::kill(jint pid, jint signal) {
+    return zeroOrMinusErrno(::kill(pid, signal));
+}
+
+jint org_jessies_os_PosixJNI::killpg(jint group, jint signal) {
+    return zeroOrMinusErrno(::killpg(group, signal));
+}
+
+jint org_jessies_os_PosixJNI::lchown(jstring javaPath, jint uid, jint gid) {
+    return zeroOrMinusErrno(::lchown(JniString(m_env, javaPath).c_str(), uid, gid));
+}
+
+jint org_jessies_os_PosixJNI::link(jstring oldPath, jstring newPath) {
+    return zeroOrMinusErrno(::link(JniString(m_env, oldPath).c_str(), JniString(m_env, newPath).c_str()));
+}
+
+jlong org_jessies_os_PosixJNI::lseek(jint fd, jlong offset, jint whence) {
+    const long result = ::lseek(fd, offset, whence);
+    return (result == -1) ? -errno : result;
+}
+
+jint org_jessies_os_PosixJNI::mkdir(jstring path, jint mode) {
+    return zeroOrMinusErrno(::mkdir(JniString(m_env, path).c_str(), mode));
+}
+
+jint org_jessies_os_PosixJNI::mkfifo(jstring path, jint mode) {
+    return zeroOrMinusErrno(::mkfifo(JniString(m_env, path).c_str(), mode));
+}
+
+jint org_jessies_os_PosixJNI::mknod(jstring path, jint mode, jlong device) {
+    return zeroOrMinusErrno(::mknod(JniString(m_env, path).c_str(), mode, device));
+}
+
+jint org_jessies_os_PosixJNI::rmdir(jstring path) {
+    return zeroOrMinusErrno(::rmdir(JniString(m_env, path).c_str()));
+}
+
+jint org_jessies_os_PosixJNI::open(jstring path, jint flags) {
+    return zeroOrMinusErrno(::open(JniString(m_env, path).c_str(), flags));
+}
+
+jint org_jessies_os_PosixJNI::open(jstring path, jint flags, jint mode) {
+    return zeroOrMinusErrno(::open(JniString(m_env, path).c_str(), flags, mode));
+}
+
+jint org_jessies_os_PosixJNI::symlink(jstring oldpath, jstring newpath) {
+    return zeroOrMinusErrno(::symlink(JniString(m_env, oldpath).c_str(), JniString(m_env, newpath).c_str()));
+}
+
+jint org_jessies_os_PosixJNI::tcgetpgrp(jint fd) {
+    return resultOrMinusErrno(::tcgetpgrp(fd));
+}
+
+jint org_jessies_os_PosixJNI::truncate(jstring path, jlong length) {
+    return zeroOrMinusErrno(::truncate(JniString(m_env, path).c_str(), length));
+}
+
+jint org_jessies_os_PosixJNI::unlink(jstring path) {
+    return zeroOrMinusErrno(::unlink(JniString(m_env, path).c_str()));
+}
+
 static void translateStat(JNIEnv* env, jobject javaStat, const struct stat& sb) {
     jclass statClass = env->FindClass("org/jessies/os/Stat");
     jmethodID setter = env->GetMethodID(statClass, "set", "(JJIJIIJJJJJJJ)V");
     env->CallVoidMethod(javaStat, setter, jlong(sb.st_dev), jlong(sb.st_ino), jint(sb.st_mode), jlong(sb.st_nlink), jint(sb.st_uid), jint(sb.st_gid), jlong(sb.st_rdev), jlong(sb.st_size), jlong(sb.st_atime), jlong(sb.st_mtime), jlong(sb.st_ctime), jlong(sb.st_blksize), jlong(sb.st_blocks));
+}
+
+jint org_jessies_os_PosixJNI::fstat(jint fd, jobject javaStat) {
+    struct stat sb;
+    if (::fstat(fd, &sb) != 0) {
+        return -errno;
+    }
+    translateStat(m_env, javaStat, sb);
+    return 0;
 }
 
 jint org_jessies_os_PosixJNI::lstat(jstring javaPath, jobject javaStat) {
@@ -117,4 +325,8 @@ jint org_jessies_os_PosixJNI::stat(jstring javaPath, jobject javaStat) {
     }
     translateStat(m_env, javaStat, sb);
     return 0;
+}
+
+jstring org_jessies_os_PosixJNI::strerror(jint error) {
+    return m_env->NewStringUTF(unix_exception::errnoToString(error).c_str());
 }

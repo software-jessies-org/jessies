@@ -12,7 +12,7 @@
 class unix_exception : public std::runtime_error {
 public:
     unix_exception(const std::string& message)
-    : std::runtime_error(message + (errno ? ": (" + errnoToString() + ")" : " (but errno is zero)"))
+    : std::runtime_error(message + (errno ? ": (" + errnoToString(errno) + ")" : " (but errno is zero)"))
     , m_errno(errno)
     {
     }
@@ -21,26 +21,7 @@ public:
         return m_errno;
     }
     
-private:
-    int gnuCompatibleStrerror(int (*strerror_r_fn)(int, char*, size_t), int errorNumber, char* messageBuffer, size_t bufferSize) {
-        return strerror_r_fn(errorNumber, messageBuffer, bufferSize);
-    }
-    
-    int gnuCompatibleStrerror(char* (*strerror_r_fn)(int, char*, size_t), int errorNumber, char* messageBuffer, size_t bufferSize) {
-        const char* intermediateBuffer = strerror_r_fn(errorNumber, messageBuffer, bufferSize);
-        // strncpy doesn't support copying over oneself.
-        if (intermediateBuffer != messageBuffer) {
-            strncpy(messageBuffer, intermediateBuffer, bufferSize);
-            messageBuffer[bufferSize - 1] = 0;
-        }
-        return 0;
-    }
-    
-    /** Converts the current value of 'errno' to a string. */
-    std::string errnoToString() {
-        // I'm concerned that errno may have changed by the time this function is called.
-        // I suppose there's no sense in paying for the solution for that problem until we have the problem.
-        int errorNumber = errno;
+    static std::string errnoToString(int errorNumber) {
         char messageBuffer[1024];
         if (gnuCompatibleStrerror(&strerror_r, errorNumber, &messageBuffer[0], sizeof(messageBuffer)) == -1) {
             int decodingError = errno;
@@ -62,7 +43,22 @@ private:
         }
     }
     
-    int m_errno;
+private:
+    static int gnuCompatibleStrerror(int (*strerror_r_fn)(int, char*, size_t), int errorNumber, char* messageBuffer, size_t bufferSize) {
+        return strerror_r_fn(errorNumber, messageBuffer, bufferSize);
+    }
+    
+    static int gnuCompatibleStrerror(char* (*strerror_r_fn)(int, char*, size_t), int errorNumber, char* messageBuffer, size_t bufferSize) {
+        const char* intermediateBuffer = strerror_r_fn(errorNumber, messageBuffer, bufferSize);
+        // strncpy doesn't support copying over oneself.
+        if (intermediateBuffer != messageBuffer) {
+            strncpy(messageBuffer, intermediateBuffer, bufferSize);
+            messageBuffer[bufferSize - 1] = 0;
+        }
+        return 0;
+    }
+    
+    const int m_errno;
 };
 
 #endif
