@@ -477,6 +477,11 @@ private:
         // Work around:
         // warning: ISO C++ forbids casting between pointer-to-function and pointer-to-object
         CreateJavaVM createJavaVM = reinterpret_cast<CreateJavaVM>(reinterpret_cast<long>(dlsym(sharedLibraryHandle, "JNI_CreateJavaVM")));
+        // If rt.jar is missing, then JNI_CreateJavaVM will write this on stdout:
+        // Error occurred during initialization of VM
+        // java/lang/NoClassDefFoundError: java/lang/Object
+        // On Windows, it will then cause the process to exit with success - we never get control back.
+        // The non-Cygwin java.exe does return a failure.
         if (createJavaVM == 0) {
             std::ostringstream os;
             // Hopefully our caller will report something more useful than the shared library handle.
