@@ -2,11 +2,59 @@ package e.util;
 
 import e.gui.*;
 import java.awt.*;
+import java.util.*;
+import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
+import org.jessies.test.*;
 
 public final class PatternUtilities {
+    /**
+     * The URL of our recommended documentation about regular expressions.
+     * Link to this in UI.
+     * @see addRegularExpressionHelpToComponent
+     */
     public static final String DOCUMENTATION_URL = "http://java.sun.com/javase/6/docs/api/java/util/regex/Pattern.html";
+    
+    // This character class and the regular expression below are based on the BNF in RFC 1738.
+    // Compromises have been made to fit the grammar into a fairly readable regular expression.
+    // If we needed to, I think we could write an exact regular expression.
+    private static final String SEARCH_CHARS = "[/A-Za-z0-9;:@&=%!*'(),$_.+-]";
+    
+    /**
+     * 
+     */
+    public static final Pattern HYPERLINK_PATTERN = Pattern.compile("\\b(https?://[A-Za-z0-9.:-]+[A-Za-z0-9](/~?"+SEARCH_CHARS+"*(\\?"+SEARCH_CHARS+"*)?)?(\\#"+SEARCH_CHARS+"+)?)(?<![),.])");
+    
+    @Test private static void testHyperlinkPattern() {
+        assertMatches("http://software.jessies.org");
+        assertMatches("http://software.jessies.org/");
+        assertMatches("http://software.jessies.org/software/make/manual/html_mono/make.html");
+        assertMatches("http://software.jessies.org/viewcvs/gtk%2B/gtk/gtkstock.h?view=markup");
+        assertMatches("<a href=\"http://software.jessies.org\">Software Jessies</a>", "http://software.jessies.org");
+        assertMatches("http://software.jessies.org");
+        assertMatches("(http://software.jessies.org)", "http://software.jessies.org");
+        assertMatches("(http://software.jessies.org/)", "http://software.jessies.org/");
+        assertMatches("<http://software.jessies.org>", "http://software.jessies.org");
+        assertMatches("http://software.jessies.org, http://software.jessies.org.", "http://software.jessies.org", "http://software.jessies.org");
+        assertMatches("http://software.jessies.org/, http://software.jessies.org/.", "http://software.jessies.org/", "http://software.jessies.org/");
+        assertMatches("http://software.jessies.org/~user/");
+        assertMatches("http://software.jessies.org/~user/page.html#target");
+    }
+    
+    @TestHelper private static void assertMatches(final String text) {
+        assertMatches(text, text);
+    }
+    
+    @TestHelper private static void assertMatches(final String text, final String... expectedUrls) {
+        final List<String> expected = Arrays.asList(expectedUrls);
+        final List<String> actual = new ArrayList<String>();
+        final Matcher matcher = HYPERLINK_PATTERN.matcher(text);
+        while (matcher.find()) {
+            actual.add(matcher.group(1));
+        }
+        Assert.equals(expected, actual);
+    }
     
     /**
      * Compiles the given regular expression into a Pattern that may or may not be case-sensitive, depending on the regular expression.
