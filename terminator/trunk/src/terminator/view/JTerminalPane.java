@@ -687,7 +687,10 @@ public class JTerminalPane extends JPanel {
 		// An SSH session remains a confusing case (Mac OS actually has a user-editable list of programs to ignore).
 		// FIXME: ideally, PtyProcess would give us a List<ProcessInfo>, but that opens a whole can of JNI worms. Hence the following hack.
 		final String[] processList = processesUsingTty.split(", ");
-		if (wasCreatedAsNewShell && processList.length == 1 && (processList[0].matches("^.*\\(" + directChildPid + "\\)$") || processList[0].equals("(pty closed)"))) {
+		if (wasCreatedAsNewShell && processList.length == 1 && processList[0].matches("^.*\\(" + directChildPid + "\\)$")) {
+			return true;
+		}
+		if (processList.length == 1 && processList[0].equals("(pty closed)")) {
 			return true;
 		}
 
