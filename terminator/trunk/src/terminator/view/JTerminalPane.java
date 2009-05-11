@@ -680,6 +680,9 @@ public class JTerminalPane extends JPanel {
 			// There's nothing still running, so just close.
 			return true;
 		}
+		if (processesUsingTty.equals("(pty closed)")) {
+			return true;
+		}
 
 		// Check if the only thing still running is the command we started, or that the pty has been closed.
 		// In either of those cases, there's no reason to hang around.
@@ -688,9 +691,6 @@ public class JTerminalPane extends JPanel {
 		// FIXME: ideally, PtyProcess would give us a List<ProcessInfo>, but that opens a whole can of JNI worms. Hence the following hack.
 		final String[] processList = processesUsingTty.split(", ");
 		if (wasCreatedAsNewShell && processList.length == 1 && processList[0].matches("^.*\\(" + directChildPid + "\\)$")) {
-			return true;
-		}
-		if (processList.length == 1 && processList[0].equals("(pty closed)")) {
 			return true;
 		}
 
