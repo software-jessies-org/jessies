@@ -62,6 +62,10 @@ public abstract class ETextAction extends AbstractAction {
         }
         
         // Otherwise, we use the word at the caret.
+        return getWordAtCaret(textArea);
+    }
+    
+    public static String getWordAtCaret(PTextArea textArea) {
         CharSequence chars = textArea.getTextBuffer();
         String stopChars = chooseStopChars();
         int caretPosition = textArea.getSelectionStart();
