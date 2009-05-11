@@ -8,6 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.jessies.test.Assert;
 import org.jessies.test.Test;
+import org.jessies.test.TestHelper;
 
 /**
  * Links to web sites from written-out URLs.
@@ -53,11 +54,11 @@ class HyperlinkStyleApplicator extends RegularExpressionStyleApplicator {
         assertMatches("http://software.jessies.org/~user/page.html#target");
     }
     
-    private static void assertMatches(final String text) {
+    @TestHelper private static void assertMatches(final String text) {
         assertMatches(text, text);
     }
     
-    private static void assertMatches(final String text, final String... expectedUrls) {
+    @TestHelper private static void assertMatches(final String text, final String... expectedUrls) {
         final List<String> expected = Arrays.asList(expectedUrls);
         final List<String> actual = new ArrayList<String>();
         final Matcher matcher = LINK_PATTERN.matcher(text);
