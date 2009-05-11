@@ -39,6 +39,10 @@ def isWorthyOfOutput(line)
     return true
   end
   
+  if line.match(/All \d+ tests passed/)
+    return true
+  end
+  
   return false
 end
 
