@@ -84,10 +84,12 @@ jint org_jessies_os_PosixJNI::get_1EALREADY() { return EALREADY; }
 jint org_jessies_os_PosixJNI::get_1EBADF() { return EBADF; }
 jint org_jessies_os_PosixJNI::get_1EBADMSG() { return EBADMSG; }
 jint org_jessies_os_PosixJNI::get_1EBUSY() { return EBUSY; }
+#ifdef __CYGWIN__
 // Not supported on Cygwin 1.5.25.
 // 140 is the value on Cygwin 1.7.0.
 #ifndef ECANCELED
 #define ECANCELED 140
+#endif
 #endif
 jint org_jessies_os_PosixJNI::get_1ECANCELED() { return ECANCELED; }
 jint org_jessies_os_PosixJNI::get_1ECHILD() { return ECHILD; }
