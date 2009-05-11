@@ -1,5 +1,18 @@
 UI
 
++ Pop-up menu on title bars? Handy place to put an option to "Copy File Location", and maybe "Open Terminal Here".
+
++ re: "Open Terminal Here", here's how to find what we should be calling on Linux:
+
+  lithium:~$ gconftool-2 --get /desktop/gnome/applications/terminal/exec
+  /home/elliotth/Projects/terminator/bin/terminator
+  lithium:~$ gconftool-2 --get /desktop/gnome/applications/terminal/exec_arg
+  -e
+
+  (sadly, update-alternatives(1) and x-terminal-emulator(1) is a completely separate mechanism.)
+  
+  what to do about --working-directory? (Terminator should support "--working-directory=/tmp" as well as "--working-directory /tmp", like gnome-terminal.) we could start anything else in the relevant directory; that should get xterm(1).
+
 + Don't show repository root prefix in title bars?
 
 + Intelligently truncate titles too long for the title bar?
@@ -12,9 +25,9 @@ UI
 
 + Fix the fact that you can slide windows off the bottom of the column, or behind the others at the bottom of a column. (this was fixed recently, but at the cost of making it really hard to scrunch a group of windows against the top or bottom.)
 
-+ We've removed most uses of "new File" and FileUtilities.parseUserFriendlyName in favor of FileUtilities.fileFromString, but should probably have something similar in the other direction, where special JFilenameField components would let us always show the user-friendly forms.
++ We've removed most uses of "new File" in favor of FileUtilities.fileFromString, but should probably have something similar in the other direction, where special JFilenameField components would let us always show the user-friendly forms.
 
-+ acme used to support an arbitrary number of columns. I never really saw the use for that at the time, but now the combination of 30" displays all round and an 80-column limit on code at work means I could probably make use of two (or maybe three) columns of code. I don't know it wouldn't be confusing, though. Why don't I just have a tall but narrow Evergreen window? Because I have a lot of workspaces, and wrapped tabs are unusable.
++ acme used to support an arbitrary number of columns. I never really saw the use for that at the time, but now the combination of 30" displays all round and an 80-column limit on code at work means I could probably make use of two (or maybe three) columns of code. I don't know it wouldn't be confusing, though. Why don't I just have a tall but narrow Evergreen window? Because I have a lot of workspaces, and wrapped tabs are unusable. (And I'd be able to open 2 or 3 times as many windows if I had 2 or 3 columns.)
 
 
 HELP/DOCUMENTATION
@@ -73,7 +86,7 @@ EXTERNAL TOOLS
 
 + ExternalTools should also let you specify which languages they apply to. 
 
-+ automatically check for keyboard equivalent collisions (both between multiple ExternalTools and between an ExternalTool and the main application itself).
++ automatically check for keyboard equivalent collisions (both between multiple ExternalTools and between an ExternalTool and the main application itself). one potential soft failure mode would be to allow it and simply pop up a menu if you use a duplicated keystroke.
 
 + add syntax for arbitrary modifier+key combinations (alt-f2, for example).
 
@@ -93,7 +106,7 @@ PREFERENCES
 
 + setting of regular expressions for excluded files, et cetera. text label explaining about the scripts we'll try to call to provide further customization.
 
-+ we handle site-wide customization reasonably well with the "echo" scripts (though that doesn't cover everything you can set in edit.properties, the idea could obviously be extended). we don't handle per-language customization well (it's pretty ad hoc). these scripts are called with the project root directory as an implicit argument, but that doesn't facilitate project-wide customization.
++ we handle site-wide customization reasonably well with the "echo" scripts (though that doesn't cover everything you can set in evergreen.properties, the idea could obviously be extended). we don't handle per-language customization well (it's pretty ad hoc). these scripts are called with the project root directory as an implicit argument, but that doesn't facilitate project-wide customization.
 
 
 
@@ -116,10 +129,11 @@ compile-command: "gcc -DSOMETHING -I../include -g -Wall test.cpp"
 End:
 */
 
-+ support this BBEdit mechanism for arbitrary counterparts (and maybe #line too?):
++ support this BBEdit mechanism for arbitrary counterparts? handy for generated files or for linking a Java class to the .cpp file implementing its native methods.
 
   -*- x-counterpart: file; -*-
 
++ support #line?
 
 
 OPENING
@@ -128,7 +142,7 @@ OPENING
 
 + it would be super-nice to be able to browse the file system at least as well as from Windows' "Run..." dialog.
 
-+ if we don't find an exact match (i.e. a longest common prefix that equals a workspace root), we could automatically create a new workspace with [what? the longest common prefix?] as its root". the trouble, as i've mentioned before, is that this doesn't do exactly what you want if you open an unspecific file (~/edit.properties, say) and then go to a more-specific file for which there's no better workspace (~/Projects/rarely-used-project/, say).
++ if we don't find an exact match (i.e. a longest common prefix that equals a workspace root), we could automatically create a new workspace with [what? the longest common prefix?] as its root". the trouble, as i've mentioned before, is that this doesn't do exactly what you want if you open an unspecific file (~/evergreen.properties, say) and then go to a more-specific file for which there's no better workspace (~/Projects/rarely-used-project/, say).
 
 + refuse to open another file on a workspace if it's full (there's no vertical space for another ETextWindow in the column)?
 
@@ -189,8 +203,6 @@ EDITING
 + Handle out-of-date files better: If we kept a copy of the file's contents last time we knew we were clean, we could also provide diffs to the common ancestor. Experience merging changes with BitKeeper shows that this isn't often useful but it's sometimes very useful. If we had that, we could notice that the file on disk was touched but its contents didn't change. This would help avoid spurious out-of-date watermarks. (Keeping the MD5, like the tags panel does, would suffice.)
 
 + the current removal of trailing whitespace on save is okay, but has a couple of problems. firstly, it can cause an annoying scroll bar jump if the file changes too much. secondly, it means you're accidentally affecting lines you haven't otherwise touched, which may or may not be your intention.
-
-+ you might want different margin widths for different languages. 80 columns for C++, 100 for Java, and none for HTML, say.
 
 
 
@@ -299,6 +311,7 @@ LANGUAGE-SPECIFIC TOOLS
 
 + for reference: GEdit plug-ins.
 
++ offer to make #! files executable if they're not? "chmod a+x" tool?
 
 
 AUTO COMPLETION
