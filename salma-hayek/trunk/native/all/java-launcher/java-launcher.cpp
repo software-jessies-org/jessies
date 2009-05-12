@@ -226,7 +226,7 @@ public:
         // though we got away for years with a Windows path containing forward slashes.
         // (We have some reason to believe that the UTF-16 Win32 file API doesn't support interchangable slashes
         // and we'd like Cygwin to be UTF-16 below so it could present UTF-8 above.)
-        std::string jreBin = javaHome + pathFromJavaHomeToJre + "\\bin\\";
+        std::string jreBin = javaHome + pathFromJavaHomeToJre + "\\bin";
         return jreBin;
     }
     
