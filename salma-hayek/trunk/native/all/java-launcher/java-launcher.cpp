@@ -466,18 +466,23 @@ public:
     }
 };
 
-template <class Fn>
-struct JvmHookOption : JavaVMOption {
-    JvmHookOption(const char* functionName, Fn fn) {
+template <class ExtraInfo>
+struct JvmOption : JavaVMOption {
+    JvmOption(const char* optionString0, ExtraInfo extraInfo0) {
         // I'm sure the JVM doesn't actually write to its options.
-        optionString = const_cast<char*>(functionName);
-        extraInfo = const_cast<void*>(reinterpret_cast<const void*>(reinterpret_cast<uintptr_t>(fn)));
+        optionString = const_cast<char*>(optionString0);
+        extraInfo = const_cast<void*>(reinterpret_cast<const void*>(reinterpret_cast<uintptr_t>(extraInfo0)));
     }
 };
 
-template <class Fn>
-JvmHookOption<Fn> makeJvmHookOption(const char* functionName, Fn fn) {
-    return JvmHookOption<Fn>(functionName, fn);
+template <class ExtraInfo>
+JvmOption<ExtraInfo> makeJvmOption(const char* optionString, ExtraInfo extraInfo) {
+    return JvmOption<ExtraInfo>(optionString, extraInfo);
+}
+
+JvmOption<void*> makeJvmOption(const char* optionString) {
+    void* extraInfo = 0;
+    return JvmOption<void*>(optionString, extraInfo);
 }
 
 struct JavaInvocation {
@@ -491,7 +496,7 @@ private:
         SharedLibraryHandle sharedLibraryHandle = launcherArguments.openJvmLibrary();
         // Work around:
         // warning: ISO C++ forbids casting between pointer-to-function and pointer-to-object
-        CreateJavaVM createJavaVM = reinterpret_cast<CreateJavaVM>(reinterpret_cast<long>(dlsym(sharedLibraryHandle, "JNI_CreateJavaVM")));
+        CreateJavaVM createJavaVM = reinterpret_cast<CreateJavaVM>(reinterpret_cast<uintptr_t>(dlsym(sharedLibraryHandle, "JNI_CreateJavaVM")));
         if (createJavaVM == 0) {
             std::ostringstream os;
             // Hopefully our caller will report something more useful than the shared library handle.
@@ -562,18 +567,17 @@ public:
     {
         typedef std::vector<JavaVMOption> JavaVMOptions; // Required to be contiguous.
         const NativeArguments& jvmArguments = launcherArguments.getJvmArguments();
-        JavaVMOptions javaVMOptions(jvmArguments.size());
+        JavaVMOptions javaVMOptions;
         for (size_t i = 0; i != jvmArguments.size(); ++i) {
-            // I'm sure the JVM doesn't actually write to its options.
-            javaVMOptions[i].optionString = const_cast<char*>(jvmArguments[i].c_str());
+            javaVMOptions.push_back(makeJvmOption(jvmArguments[i].c_str()));
         }
         // createJavaVM calls this if, for example, it can't find rt.jar.
         // We are a Cygwin process and, if we don't exit via a Cygwin function, it assumes that we succeeded.
-        javaVMOptions.push_back(makeJvmHookOption("abort", &abort));
+        javaVMOptions.push_back(makeJvmOption("abort", &abort));
         // Redirecting output into another C runtime's stdio implementation, well, crashes.
-        //javaVMOptions.push_back(makeJvmHookOption("vfprintf", &vfprintf));
+        //javaVMOptions.push_back(makeJvmOption("vfprintf", &vfprintf));
         // I think that System.exit() simply returns from the invocation of main, so we don't need to hook this.
-        //javaVMOptions.push_back(makeJvmHookOption("exit", &exit));
+        //javaVMOptions.push_back(makeJvmOption("exit", &exit));
         
         JavaVMInitArgs javaVMInitArgs;
         // Note that JNI version does not directly specify a JVM version, but needs to be at least 1.4 on Mac OS to get a modern JVM.
