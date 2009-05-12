@@ -42,6 +42,8 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 	*/
 	private ArrayList<ArrayList<Highlight>> lineHighlights = new ArrayList<ArrayList<Highlight>>();
 	
+	private List<Highlight> highlightsUnderMouse = Collections.emptyList();
+	
 	public TerminalView() {
 		TerminatorPreferences preferences = Terminator.getPreferences();
 		this.model = new TerminalModel(this, preferences.getInt(TerminatorPreferences.INITIAL_COLUMN_COUNT), preferences.getInt(TerminatorPreferences.INITIAL_ROW_COUNT));
@@ -74,22 +76,25 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 					return;
 				}
 				lastLocation = location;
-				Cursor cursor = null;
-				List<Highlight> highlights = getHighlightsForLocation(viewToModel(event.getPoint()));
-				for (Highlight highlight : highlights) {
+				List<Highlight> previousHighlights = highlightsUnderMouse;
+				highlightsUnderMouse = getHighlightsForLocation(viewToModel(event.getPoint()));
+				repaintHighlights(previousHighlights);
+				repaintHighlights(highlightsUnderMouse);
+				setCursor(getCursorForHighlightsUnderMouse());
+			}
+			
+			private Cursor getCursorForHighlightsUnderMouse() {
+				for (Highlight highlight : highlightsUnderMouse) {
 					if (highlight.getCursor() != null) {
-						cursor = highlight.getCursor();
-						break;
+						return highlight.getCursor();
 					}
 				}
-				if (cursor == null) {
-					cursor = Cursor.getDefaultCursor();
-				}
-				setCursor(cursor);
+				return Cursor.getDefaultCursor();
 			}
 		});
 		addMouseWheelListener(HorizontalScrollWheelListener.INSTANCE);
 		addHighlighter(new FindHighlighter());
+		addHighlighter(new UrlHighlighter());
 		becomeDropTarget();
 		cursorBlinker = new CursorBlinker(this);
 		selectionHighlighter = new SelectionHighlighter(this);
@@ -548,6 +553,12 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 		repaint(0, top, size.width, size.height - top);
 	}
 	
+	private void repaintHighlights(final Collection<Highlight> highlights) {
+		for (Highlight highlight : highlights) {
+			repaintHighlight(highlight);
+		}
+	}
+	
 	private void repaintHighlight(Highlight highlight) {
 		Point redrawStart = modelToView(highlight.getStart()).getLocation();
 		Rectangle endRect = modelToView(highlight.getEnd());
@@ -647,7 +658,11 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 				result.add(highlight);
 			}
 		}
-		return result;
+		return Collections.unmodifiableList(result);
+	}
+	
+	public boolean isHighlightUnderMouse(Highlight highlight) {
+		return highlightsUnderMouse.contains(highlight);
 	}
 	
 	/** Returns a (possibly empty) list containing all highlights in the indexed line. */
