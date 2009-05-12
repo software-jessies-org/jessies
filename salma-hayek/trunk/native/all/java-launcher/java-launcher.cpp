@@ -26,6 +26,7 @@
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include <stdint.h>
 #include <string>
 #include <stdlib.h>
 #include <stdio.h>
@@ -465,6 +466,20 @@ public:
     }
 };
 
+template <class Fn>
+struct JvmHookOption : JavaVMOption {
+    JvmHookOption(const char* functionName, Fn fn) {
+        // I'm sure the JVM doesn't actually write to its options.
+        optionString = const_cast<char*>(functionName);
+        extraInfo = const_cast<void*>(reinterpret_cast<const void*>(reinterpret_cast<uintptr_t>(fn)));
+    }
+};
+
+template <class Fn>
+JvmHookOption<Fn> makeJvmHookOption(const char* functionName, Fn fn) {
+    return JvmHookOption<Fn>(functionName, fn);
+}
+
 struct JavaInvocation {
 private:
     JavaVM* vm;
@@ -477,11 +492,6 @@ private:
         // Work around:
         // warning: ISO C++ forbids casting between pointer-to-function and pointer-to-object
         CreateJavaVM createJavaVM = reinterpret_cast<CreateJavaVM>(reinterpret_cast<long>(dlsym(sharedLibraryHandle, "JNI_CreateJavaVM")));
-        // If rt.jar is missing, then JNI_CreateJavaVM will write this on stdout:
-        // Error occurred during initialization of VM
-        // java/lang/NoClassDefFoundError: java/lang/Object
-        // On Windows, it will then cause the process to exit with success - we never get control back.
-        // The non-Cygwin java.exe does return a failure.
         if (createJavaVM == 0) {
             std::ostringstream os;
             // Hopefully our caller will report something more useful than the shared library handle.
@@ -557,6 +567,13 @@ public:
             // I'm sure the JVM doesn't actually write to its options.
             javaVMOptions[i].optionString = const_cast<char*>(jvmArguments[i].c_str());
         }
+        // createJavaVM calls this if, for example, it can't find rt.jar.
+        // We are a Cygwin process and, if we don't exit via a Cygwin function, it assumes that we succeeded.
+        javaVMOptions.push_back(makeJvmHookOption("abort", &abort));
+        // Redirecting output into another C runtime's stdio implementation, well, crashes.
+        //javaVMOptions.push_back(makeJvmHookOption("vfprintf", &vfprintf));
+        // I think that System.exit() simply returns from the invocation of main, so we don't need to hook this.
+        //javaVMOptions.push_back(makeJvmHookOption("exit", &exit));
         
         JavaVMInitArgs javaVMInitArgs;
         // Note that JNI version does not directly specify a JVM version, but needs to be at least 1.4 on Mac OS to get a modern JVM.
