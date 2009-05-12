@@ -45,7 +45,44 @@ extern "C" {
     typedef jint JNICALL (*CreateJavaVM)(JavaVM**, void**, void*);
 }
 
-static std::string ARGV0 = "<unknown>";
+struct ErrorReporter {
+public:
+    std::string ARGV0;
+    NativeArguments launcherArguments;
+    std::string sharedLibraryFilename;
+    
+private:
+    std::string getUsage() const;
+    void generateReport(const std::exception& ex, const std::string& usage) const;
+        
+public:
+    ErrorReporter()
+    : ARGV0("<unknown>"), sharedLibraryFilename("<not selected yet>") {
+    }
+    
+    void reportUsageError(const UsageError& ex) const {
+        generateReport(ex, getUsage());
+    }
+    
+    void reportFatalException(const std::exception& ex) const {
+        generateReport(ex, "");
+    }
+    
+    void abortJvm() const {
+        std::runtime_error ex("JVM aborted");
+        reportFatalException(ex);
+        // The JVM is about to call exit(1) in MSVCRT.
+        // We need to exit via Cygwin if we're to return a failure.
+        // abort() leaves a java-launcher.exe.stackdump file of dubious value.
+        exit(1);
+    }
+};
+
+static ErrorReporter errorReporter;
+
+static void abortJvm() {
+    errorReporter.abortJvm();
+}
 
 #ifdef __APPLE__
 
@@ -144,6 +181,7 @@ SharedLibraryHandle openSharedLibrary(const std::string& sharedLibraryFilename) 
 #endif
         throw std::runtime_error(os.str());
     }
+    errorReporter.sharedLibraryFilename = sharedLibraryFilename;
     return sharedLibraryHandle;
 }
 
@@ -573,7 +611,7 @@ public:
         }
         // createJavaVM calls this if, for example, it can't find rt.jar.
         // We are a Cygwin process and, if we don't exit via a Cygwin function, it assumes that we succeeded.
-        javaVMOptions.push_back(makeJvmOption("abort", &abort));
+        javaVMOptions.push_back(makeJvmOption("abort", &abortJvm));
         // Redirecting output into another C runtime's stdio implementation, well, crashes.
         //javaVMOptions.push_back(makeJvmOption("vfprintf", &vfprintf));
         // I think that System.exit() simply returns from the invocation of main, so we don't need to hook this.
@@ -623,7 +661,7 @@ public:
     }
 };
 
-static std::string getUsage() {
+std::string ErrorReporter::getUsage() const {
     std::ostringstream os;
     os << "Usage: " << ARGV0 << " [options] class [args...]" << std::endl;
     os << "where options are:" << std::endl;
@@ -642,7 +680,7 @@ static std::string getUsage() {
     return os.str();
 }
 
-static void reportFatalException(const NativeArguments& launcherArguments, const std::exception& ex, const std::string& usage) {
+void ErrorReporter::generateReport(const std::exception& ex, const std::string& usage) const {
     std::ostringstream os;
 #ifdef __CYGWIN__
     // As mentioned in the Terminator FAQ, the Windows JRE installer doesn't install Lucida Sans Typewriter by default.
@@ -652,6 +690,9 @@ static void reportFatalException(const NativeArguments& launcherArguments, const
     os << std::endl;
 #endif
     os << "Error: " << ex.what() << std::endl;
+    os << std::endl;
+    
+    os << "Selected JVM was: " << sharedLibraryFilename << std::endl;
     os << std::endl;
     
     os << usage;
@@ -671,10 +712,10 @@ static int runJvm(const NativeArguments& launcherArguments) {
         JavaInvocation javaInvocation(parser);
         return javaInvocation.invokeMain();
     } catch (const UsageError& ex) {
-        reportFatalException(launcherArguments, ex, getUsage());
+        errorReporter.reportUsageError(ex);
         return 1;
     } catch (const std::exception& ex) {
-        reportFatalException(launcherArguments, ex, "");
+        errorReporter.reportFatalException(ex);
         return 1;
     }
 }
@@ -683,10 +724,11 @@ int main(int, char* argv[]) {
     synchronizeWindowsEnvironment();
     
     NativeArguments launcherArguments;
-    ARGV0 = *argv++;
+    errorReporter.ARGV0 = *argv++;
     while (*argv != 0) {
         launcherArguments.push_back(*argv++);
     }
+    errorReporter.launcherArguments = launcherArguments;
     
 #ifdef __APPLE__
     return mac_runJvm(launcherArguments);
