@@ -67,6 +67,10 @@ public enum TagType {
         this.formatString = formatString;
     }
     
+    public String getName() {
+        return name;
+    }
+    
     public Shape getShape() {
         return shape;
     }
