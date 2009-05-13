@@ -5,6 +5,7 @@ import e.ptextarea.*;
 import e.util.*;
 import java.awt.event.*;
 import java.io.*;
+import java.security.MessageDigest;
 import java.util.*;
 import java.util.concurrent.*;
 import javax.swing.*;
@@ -25,8 +26,7 @@ public class TagsUpdater {
     
     private boolean followCaretChanges;
     
-    private File temporaryFile;
-    private String tagsDigest;
+    private byte[] tagsDigest = new byte[0];
     
     public TagsUpdater(ETextWindow textWindow) {
         this.textWindow = textWindow;
@@ -204,7 +204,7 @@ public class TagsUpdater {
     
     public class TreeModelBuilder extends SwingWorker<TreeModel, TagReader.Tag> implements TagReader.TagListener {
         private int serialNumber;
-        private String newDigest;
+        private MessageDigest md5;
         private boolean successful = true;
         private Stopwatch.Timer stopwatchTimer;
         private Timer progressTimer;
@@ -215,6 +215,11 @@ public class TagsUpdater {
         
         public TreeModelBuilder(int serialNumber) {
             this.serialNumber = serialNumber;
+            try {
+                this.md5 = MessageDigest.getInstance("MD5");
+            } catch (Exception ex) {
+                Log.warn("Your JDK doesn't support MD5!", ex);
+            }
         }
         
         @Override
@@ -257,21 +262,32 @@ public class TagsUpdater {
             }
             
             branch.add(leaf);
+            
+            md5.update(tag.identifier.getBytes());
+            md5.update(tag.type.getName().getBytes());
+            md5.update(tag.context.getBytes());
+            md5.update(tag.containingClass.getBytes());
+            md5.update(Integer.toString(tag.lineNumber).getBytes());
+            md5.update(Boolean.toString(tag.isStatic).getBytes());
+            md5.update(Boolean.toString(tag.isAbstract).getBytes());
+            md5.update(Boolean.toString(tag.isPrototype).getBytes());
         }
         
         public void taggingFailed(Exception ex) {
             successful = false;
             Evergreen.getInstance().getTagsPanel().showError("<b>Is Exuberant Ctags installed and on your path?</b><p>There was an error reading its output: " + ex.getMessage());
+            ex.printStackTrace();
         }
         
         public void scanTags() {
+            File temporaryFile = null;
             try {
-                FileType fileType = getTextWindow().getFileType();
+                final ETextWindow textWindow = getTextWindow();
+                final FileType fileType = textWindow.getFileType();
                 
                 // FIXME: generalize this and implement more taggers in Java?
                 if (fileType == FileType.XML) {
-                    HtmlTagger tagger = new HtmlTagger(getTextArea(), this);
-                    newDigest = tagger.scan();
+                    new HtmlTagger(getTextArea(), this).scan();
                     return;
                 }
                 
@@ -281,21 +297,22 @@ public class TagsUpdater {
                     return;
                 }
                 
-                // Ctags writes the name of the file into its output, so we need to use the same file each time so that md5 hashes can be compared.
-                if (temporaryFile == null) {
+                if (textWindow.isDirty()) {
                     temporaryFile = File.createTempFile("e.edit.TagsUpdater-", "");
                     temporaryFile.deleteOnExit();
+                    getTextArea().getTextBuffer().writeToFile(temporaryFile);
                 }
-                getTextArea().getTextBuffer().writeToFile(temporaryFile);
                 String charsetName = (String) getTextArea().getTextBuffer().getProperty(PTextBuffer.CHARSET_PROPERTY);
-                TagReader tagReader = new TagReader(temporaryFile, fileType, charsetName, tagsDigest, this);
-                newDigest = tagReader.getTagsDigest();
-                // See the comment above for why we don't delete our temporary files, except on exit.
-                //temporaryFile.delete();
+                final File inputFile = (temporaryFile != null) ? temporaryFile : FileUtilities.fileFromString(textWindow.getFilename());
+                TagReader tagReader = new TagReader(inputFile, fileType, charsetName, this);
             } catch (Exception ex) {
                 Evergreen.getInstance().getTagsPanel().showError("Couldn't make tags: " + ex.getMessage());
                 Log.warn("Couldn't make tags", ex);
                 successful = false;
+            } finally {
+                if (temporaryFile != null) {
+                    temporaryFile.delete();
+                }
             }
         }
         
@@ -306,7 +323,8 @@ public class TagsUpdater {
             }
             if (successful) {
                 showTags();
-                boolean tagsHaveChanged = (newDigest != null) && (newDigest.equals(tagsDigest) == false);
+                byte[] newDigest = md5.digest();
+                boolean tagsHaveChanged = !MessageDigest.isEqual(newDigest, tagsDigest);
                 if (tagsHaveChanged && serialNumber == latestSerialNumber) {
                     setTreeModel(treeModel);
                     tagsDigest = newDigest;

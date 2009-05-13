@@ -14,9 +14,8 @@ public class TagReader {
     private TagListener listener;
     private FileType fileType;
     private String charsetName;
-    private String digest;
     
-    public TagReader(File file, FileType fileType, String charsetName, String oldDigest, TagListener tagListener) {
+    public TagReader(File file, FileType fileType, String charsetName, TagListener tagListener) {
         this.listener = tagListener;
         this.fileType = fileType;
         this.charsetName = charsetName;
@@ -24,9 +23,7 @@ public class TagReader {
         File tagsFile = null;
         try {
             tagsFile = createTagsFileFor(file);
-            if (oldDigest == null || oldDigest.equals(digest) == false) {
-                readTagsFile(tagsFile);
-            }
+            readTagsFile(tagsFile);
         } catch (Exception ex) {
             listener.taggingFailed(ex);
         } finally {
@@ -73,7 +70,6 @@ public class TagReader {
             Log.warn("ctags: " + error);
         }
         
-        digest = FileUtilities.md5(tagsFile);
         return tagsFile;
     }
     
@@ -107,10 +103,6 @@ public class TagReader {
         } else {
             throw new RuntimeException("Don't know what ctags(1) calls \"" + fileType + "\"");
         }
-    }
-    
-    public String getTagsDigest() {
-        return digest;
     }
     
     private void readTagsFile(File tagsFile) throws IOException {
