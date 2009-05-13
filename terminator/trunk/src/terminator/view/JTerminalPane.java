@@ -684,13 +684,14 @@ public class JTerminalPane extends JPanel {
 			return true;
 		}
 
-		// Check if the only thing still running is the command we started, or that the pty has been closed.
-		// In either of those cases, there's no reason to hang around.
-		// We're trying to protect the user from accidentally killing or hiding some background process they've forgotten about, or killing something by accident.
+		// We're trying to protect the user from accidentally killing or hiding some background process they've forgotten about.
+		// We used to try to prevent them from killing something, other than a shell that we started, by accident.
+		// We stopped doing that because it was a pain confirming the desire to close connections to a serial port,
+		// where killing the connecting program kills nothing that's running behind the serial port.
 		// An SSH session remains a confusing case (Mac OS actually has a user-editable list of programs to ignore).
 		// FIXME: ideally, PtyProcess would give us a List<ProcessInfo>, but that opens a whole can of JNI worms. Hence the following hack.
 		final String[] processList = processesUsingTty.split(", ");
-		if (wasCreatedAsNewShell && processList.length == 1 && processList[0].matches("^.*\\(" + directChildPid + "\\)$")) {
+		if (processList.length == 1 && processList[0].matches("^.*\\(" + directChildPid + "\\)$")) {
 			return true;
 		}
 
