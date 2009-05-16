@@ -6,6 +6,11 @@ package org.jessies.os;
  * This is deliberately a very thin wrapper. Where possible, all policy should reside in Java code.
  */
 public class Posix {
+    /** Successful termination for System.exit. Must be 0. */
+    public static final int EXIT_SUCCESS = 0;
+    /** Unsuccessful termination for System.exit; evaluates to a non-zero value. */
+    public static final int EXIT_FAILURE = PosixJNI.get_EXIT_FAILURE();
+    
     /** Posix.lseek constant to set file offset to current offset plus 'offset'. */
     public static final int SEEK_CUR = PosixJNI.get_SEEK_CUR();
     /** Posix.lseek constant to set file offset to end of file plus 'offset'. */

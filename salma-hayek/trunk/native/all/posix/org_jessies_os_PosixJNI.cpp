@@ -11,9 +11,12 @@
 #include <fcntl.h>
 #include <pwd.h>
 #include <signal.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+jint org_jessies_os_PosixJNI::get_1EXIT_1FAILURE() { return EXIT_FAILURE; }
 
 jint org_jessies_os_PosixJNI::get_1SEEK_1CUR() { return SEEK_CUR; }
 jint org_jessies_os_PosixJNI::get_1SEEK_1END() { return SEEK_END; }
