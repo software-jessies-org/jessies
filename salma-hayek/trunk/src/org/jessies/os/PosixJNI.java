@@ -10,6 +10,8 @@ package org.jessies.os;
 class PosixJNI {
     static { e.util.FileUtilities.loadNativeLibrary("posix"); }
     
+    static native int get_EXIT_FAILURE();
+    
     static native int get_SEEK_CUR();
     static native int get_SEEK_END();
     static native int get_SEEK_SET();
