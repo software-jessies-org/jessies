@@ -7,6 +7,6 @@ import java.lang.annotation.*;
  * This is intended as a self-documenting convenience for humans.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target({ ElementType.TYPE, ElementType.METHOD })
 public @interface TestHelper {
 }
