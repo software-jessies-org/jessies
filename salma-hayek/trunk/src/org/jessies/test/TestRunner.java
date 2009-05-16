@@ -6,6 +6,7 @@ import java.net.*;
 import java.util.*;
 import java.lang.reflect.*;
 import org.jessies.cli.*;
+import org.jessies.os.*;
 
 /**
  * Runs tests for the simple Java unit testing framework.
@@ -42,10 +43,6 @@ import org.jessies.cli.*;
  * style, and that has never been an appropriate Java style. Let it go, dudes.
  */
 public class TestRunner {
-    // We're likely to be run by make(1), so we follow usual Unix status conventions.
-    private static final int EXIT_SUCCESS = 0;
-    private static final int EXIT_FAILURE = 1;
-    
     @Option(names = { "--color" })
     private boolean color = true;
     
@@ -177,16 +174,16 @@ public class TestRunner {
         final int testCount = testMethods.size();
         if (failCount == 0) {
             System.out.println(green("All " + testCount + " tests passed in " + TimeUtilities.nsToString(runningTime + setupTime) + "."));
-            return EXIT_SUCCESS;
+            return Posix.EXIT_SUCCESS;
         } else {
             System.out.printf(red("Tested: %d, Passed: %d, Failed: %d.\n"), testCount, testCount - failCount, failCount);
-            return EXIT_FAILURE;
+            return Posix.EXIT_FAILURE;
         }
     }
     
     private void error(String message) {
         System.err.println(red("ERROR:") + " " + message);
-        System.exit(EXIT_FAILURE);
+        System.exit(Posix.EXIT_FAILURE);
     }
     
     private String red(String message) {
