@@ -263,14 +263,24 @@ public class TagsUpdater {
             
             branch.add(leaf);
             
+            final byte SEPARATOR = 0;
             md5.update(tag.identifier.getBytes());
+            md5.update(SEPARATOR);
             md5.update(tag.type.getName().getBytes());
+            md5.update(SEPARATOR);
             md5.update(tag.context.getBytes());
+            md5.update(SEPARATOR);
             md5.update(tag.containingClass.getBytes());
+            md5.update(SEPARATOR);
             md5.update(Integer.toString(tag.lineNumber).getBytes());
-            md5.update(Boolean.toString(tag.isStatic).getBytes());
-            md5.update(Boolean.toString(tag.isAbstract).getBytes());
-            md5.update(Boolean.toString(tag.isPrototype).getBytes());
+            md5.update(SEPARATOR);
+            md5.update(booleanToByte(tag.isStatic));
+            md5.update(booleanToByte(tag.isAbstract));
+            md5.update(booleanToByte(tag.isPrototype));
+        }
+        
+        private byte booleanToByte(boolean b) {
+            return (byte) (b ? 1 : 0);
         }
         
         public void taggingFailed(Exception ex) {
