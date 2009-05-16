@@ -5,6 +5,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.lang.reflect.*;
+import org.jessies.cli.*;
 
 /**
  * Runs tests for the simple Java unit testing framework.
@@ -45,22 +46,30 @@ public class TestRunner {
     private static final int EXIT_SUCCESS = 0;
     private static final int EXIT_FAILURE = 1;
     
-    private boolean color = true; // FIXME: add a flag.
-    private boolean verbose = false; // FIXME: add a flag.
+    @Option(names = { "--color" })
+    private boolean color = true;
+    
+    @Option(names = { "-v", "--verbose" })
+    private boolean verbose = false;
     
     private long setupTime;
     private long runningTime;
     
     public static void main(String[] args) throws Exception {
-        new TestRunner().runTests(args);
+        new TestRunner(args);
     }
     
-    private void runTests(String[] directoryNames) throws Exception {
+    private TestRunner(String[] args) throws Exception {
+        final List<String> directories = new OptionParser(this).parse(args);
+        runTests(directories);
+    }
+    
+    private void runTests(List<String> directoryNames) throws Exception {
         // FIXME: parallelize; start running tests as they're found?
         System.exit(runTests(findTests(directoryNames)));
     }
     
-    private List<Method> findTests(String[] directoryNames) throws Exception {
+    private List<Method> findTests(List<String> directoryNames) throws Exception {
         this.setupTime = System.nanoTime();
         List<Method> testMethods = findTestMethods(makeClassLoader(directoryNames), findClassNames(directoryNames));
         this.setupTime = System.nanoTime() - setupTime;
@@ -69,15 +78,15 @@ public class TestRunner {
     }
     
     // Makes a ClassLoader that can load classes from the given directories.
-    private ClassLoader makeClassLoader(String[] classPathDirectoryNames) throws Exception {
-        final URL[] classPath = new URL[classPathDirectoryNames.length];
+    private ClassLoader makeClassLoader(List<String> classPathDirectoryNames) throws Exception {
+        final URL[] classPath = new URL[classPathDirectoryNames.size()];
         for (int i = 0; i < classPath.length; ++i) {
-            classPath[i] = new File(classPathDirectoryNames[i]).toURI().toURL();
+            classPath[i] = new File(classPathDirectoryNames.get(i)).toURI().toURL();
         }
         return new URLClassLoader(classPath, getClass().getClassLoader());
     }
     
-    private List<String> findClassNames(String[] directoryNames) {
+    private List<String> findClassNames(List<String> directoryNames) {
         List<String> result = new ArrayList<String>();
         for (String directoryName : directoryNames) {
             File directory = new File(directoryName);
