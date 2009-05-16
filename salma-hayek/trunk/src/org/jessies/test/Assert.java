@@ -1,9 +1,20 @@
 package org.jessies.test;
 
+import java.util.List;
+
 /**
  * Assertions for the simple Java unit testing framework.
  */
 public final class Assert {
+    public static void equals(List<?> lhs, List<?> rhs) {
+        if (lhs.size() != rhs.size()) {
+            throw new RuntimeException("lhs.size() (" + lhs.size() + ") != rhs.size() (" + rhs.size() + ")");
+        }
+        for (int i = 0; i < lhs.size(); ++i) {
+            Assert.equals(lhs.get(i), rhs.get(i));
+        }
+    }
+    
     public static void equals(Object lhs, Object rhs) {
         if (lhs == null && rhs == null) {
             // Okay, I guess.
