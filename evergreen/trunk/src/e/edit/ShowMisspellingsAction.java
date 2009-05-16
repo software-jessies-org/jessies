@@ -14,7 +14,7 @@ public class ShowMisspellingsAction extends PTextAction {
     }
     
     private static String regularExpressionForWord(String word) {
-        return "(?i)\\b" + StringUtilities.regularExpressionFromLiteral(word) + "\\b";
+        return "\\b" + StringUtilities.regularExpressionFromLiteral(word) + "\\b";
     }
     
     public void performOn(final PTextArea textArea) {
