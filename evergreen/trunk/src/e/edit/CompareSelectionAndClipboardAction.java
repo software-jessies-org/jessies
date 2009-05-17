@@ -39,7 +39,7 @@ public class CompareSelectionAndClipboardAction extends ETextAction {
         selection += "\n";
         clipboard += "\n";
         
-        SimplePatchDialog.showPatchBetween("Selection/Clipboard Comparison", "selection", selection, "clipboard", clipboard);
+        SimplePatchDialog.showPatchBetween("Selection/Clipboard Comparison", new Diffable("selection", selection), new Diffable("clipboard", clipboard));
     }
     
     private String getClipboardText() {

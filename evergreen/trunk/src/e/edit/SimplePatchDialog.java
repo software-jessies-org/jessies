@@ -28,17 +28,13 @@ public class SimplePatchDialog {
     private SimplePatchDialog() {
     }
     
-    public static JComponent makeScrollablePatchView(Font font, String fromName, String fromContent, String toName, String toContent) {
-        return new JScrollPane(makePatchView(font, fromName, fromContent, toName, toContent));
+    private static JComponent makeScrollablePatchView(Font font, Diffable from, Diffable to) {
+        return new JScrollPane(makePatchView(font, from, to));
     }
     
-    private static List<String> runDiff(String fromName, String fromContent, String toName, String toContent) {
-        final String PREFIX = "e.edit.SimplePatchDialog-";
-        final String fromFile = FileUtilities.createTemporaryFile(PREFIX, "file containing " + fromName, fromContent);
-        final String toFile = FileUtilities.createTemporaryFile(PREFIX, "file containing " + toName, toContent);
-        
-        final String[] command = new String[] { "diff", "-u", "-b", "-B", "-L", fromName, fromFile, "-L", toName, toFile };
-        //final String[] command = new String[] { Evergreen.getResourceFilename("lib", "scripts", "ediff.py"), fromName, fromFile, toName, toFile };
+    private static List<String> runDiff(Diffable from, Diffable to) {
+        final String[] command = new String[] { "diff", "-u", "-b", "-B", "-L", from.label(), from.filename(), "-L", to.label(), to.filename() };
+        //final String[] command = new String[] { Evergreen.getResourceFilename("lib", "scripts", "ediff.py"), from.label(), from.filename(), to.label(), to.filename() };
         final ArrayList<String> lines = new ArrayList<String>();
         final ArrayList<String> errors = new ArrayList<String>();
         final int status = ProcessUtilities.backQuote(null, command, lines, errors);
@@ -56,21 +52,21 @@ public class SimplePatchDialog {
             lines.add("diff(1) failed.");
         }
         
-        // Clean up the temporary files.
-        FileUtilities.fileFromString(fromFile).delete();
-        FileUtilities.fileFromString(toFile).delete();
+        // Clean up any temporary files.
+        from.dispose();
+        to.dispose();
         
         return lines;
     }
     
-    public static JComponent makePatchView(Font font, String fromName, String fromContent, String toName, String toContent) {
+    private static JComponent makePatchView(Font font, Diffable from, Diffable to) {
         final PTextArea textArea = new PTextArea(20, 80);
         textArea.setEditable(false);
         textArea.setFont(font);
         
         // Try to configure the text area appropriately for the specific content.
-        final String probableFilename = fromName.indexOf(File.separatorChar) != -1 ? fromName : toName;
-        final String probableContent = fromContent.length() > toContent.length() ? fromContent : toContent;
+        final String probableFilename = from.filename().indexOf(File.separatorChar) != -1 ? from.filename() : to.filename();
+        final String probableContent = from.content().length() > to.content().length() ? from.content() : to.content();
         FileType.guessFileType(probableFilename, probableContent).configureTextArea(textArea);
         // FIXME: BugDatabaseHighlighter?
         // FIXME: spelling exceptions?
@@ -78,7 +74,7 @@ public class SimplePatchDialog {
         final List<HighlightInfo> highlights = new ArrayList<HighlightInfo>();
         Color color = null;
         int lineNumber = 0; // Lines beginning with '?' don't count!
-        for (String line : runDiff(fromName, fromContent, toName, toContent)) {
+        for (String line : runDiff(from, to)) {
             if (line.startsWith("?")) {
                 // A '?' line always follows a '+' or '-' line, so choose the dark color corresponding to the last color we used.
                 highlightDifferencesInLine(highlights, textArea, (color == LIGHT_GREEN) ? DARK_GREEN : DARK_RED, lineNumber - 1, line);
@@ -146,14 +142,21 @@ public class SimplePatchDialog {
         }
     }
     
-    public static void showPatchBetween(String title, String fromName, String fromContent, String toName, String toContent) {
-        showPatchBetween(Evergreen.getInstance().getFrame(), ChangeFontAction.getConfiguredFixedFont(), title, fromName, fromContent, toName, toContent);
+    public static void showPatchBetween(String title, Diffable from, Diffable to) {
+        makeDialog(Evergreen.getInstance().getFrame(), ChangeFontAction.getConfiguredFixedFont(), title, null, from, to).showNonModal();
     }
     
-    public static void showPatchBetween(Frame parent, Font font, String title, String fromName, String fromContent, String toName, String toContent) {
+    public static boolean showPatchBetween(Frame parent, Font font, String title, String question, String buttonLabel, Diffable from, Diffable to) {
+        return makeDialog(parent, font, title, question, from, to).show(buttonLabel);
+    }
+    
+    private static FormBuilder makeDialog(Frame parent, Font font, String title, String question, Diffable from, Diffable to) {
         FormBuilder form = new FormBuilder(parent, title);
-        form.getFormPanel().addRow("Differences:", makeScrollablePatchView(font, fromName, fromContent, toName, toContent));
-        form.showNonModal();
+        if (question != null) {
+            form.getFormPanel().addRow("", new JLabel(question));
+        }
+        form.getFormPanel().addRow("Patch:", makeScrollablePatchView(font, from, to));
+        return form;
     }
     
     // For testing from the command line.
@@ -167,6 +170,6 @@ public class SimplePatchDialog {
         GuiUtilities.initLookAndFeel();
         final Font font = new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 12);
         final String title = "Patch between '" + file1 + "' and '" + file2 + "'";
-        showPatchBetween(null, font, title, file1, StringUtilities.readFile(file1), file2, StringUtilities.readFile(file2));
+        showPatchBetween(null, font, title, null, "Close", new Diffable(file1.toString(), file1), new Diffable(file2.toString(), file2));
     }
 }

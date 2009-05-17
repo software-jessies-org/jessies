@@ -419,37 +419,15 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     }
     
     private boolean showPatchAndAskForConfirmation(String verb, String question, boolean fromDiskToMemory) {
-        String diskLabel = "disk at " + FileUtilities.getLastModifiedTime(file);
-        String memoryLabel = "memory";
+        final Diffable disk = new Diffable("disk at " + FileUtilities.getLastModifiedTime(file), file);
+        final Diffable memory = new Diffable("memory", textArea.getTextBuffer().toString());
         
-        String diskContent;
-        try {
-            diskContent = StringUtilities.readFile(file);
-        } catch (Exception ex) {
-            Log.warn("Couldn't read file for patch", ex);
-            // Pretend that the file is empty. The most likely reason for being
-            // here is that the file has been deleted.
-            diskContent = "";
-            diskLabel = "(couldn't read file)";
-        }
-        String memoryContent = textArea.getTextBuffer().toString();
-        
-        String fromLabel = fromDiskToMemory ? diskLabel : memoryLabel;
-        String toLabel = fromDiskToMemory ? memoryLabel : diskLabel;
-        
-        String fromContent = fromDiskToMemory ? diskContent : memoryContent;
-        String toContent = fromDiskToMemory ? memoryContent : diskContent;
+        final Diffable from = fromDiskToMemory ? disk : memory;
+        final Diffable to = fromDiskToMemory ? memory : disk;
         
         // We reverse the from/to order because we want reverse patches.
-        JComponent patchView = SimplePatchDialog.makeScrollablePatchView(ChangeFontAction.getConfiguredFixedFont(), toLabel, toContent, fromLabel, fromContent);
-        
-        String title = verb;
-        String buttonLabel = verb;
-        FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), title);
-        FormPanel formPanel = form.getFormPanel();
-        formPanel.addRow("", new JLabel(question));
-        formPanel.addRow("Patch:", patchView);
-        return form.show(buttonLabel);
+        final String title = verb;
+        return SimplePatchDialog.showPatchBetween(Evergreen.getInstance().getFrame(), ChangeFontAction.getConfiguredFixedFont(), title, question, verb, to, from);
     }
     
     public boolean canRevertToSaved() {
