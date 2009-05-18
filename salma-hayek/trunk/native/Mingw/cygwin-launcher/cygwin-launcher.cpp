@@ -81,8 +81,8 @@ std::string findCygwinBin() {
     os << "We failed to find Cygwin, the errors were:\n";
     typedef std::deque<RegistryEntry> RegistryEntries;
     RegistryEntries registryEntries;
-    registryEntries.push_back(RegistryEntry("Software\\Cygwin\\Setup", "rootdir"));
     registryEntries.push_back(RegistryEntry("Software\\Cygnus Solutions\\Cygwin\\mounts v2\\/", "native"));
+    registryEntries.push_back(RegistryEntry("Software\\Cygwin\\Setup", "rootdir"));
     for (RegistryEntries::const_iterator it = registryEntries.begin(), en = registryEntries.end(); it != en; ++ it) {
         RegistryEntry registryEntry = *it;
         try {
