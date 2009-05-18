@@ -59,7 +59,7 @@ class InAppClient
     @host = host
   end
   
-  def trySendCommand(command)
+  def sendCommandWithoutExceptionHandling(command)
     IO.read(@serverPortPathname) =~ /^(.+):(\d+)$/
     host = @host != nil ? @host : $1
     require "socket"
@@ -82,6 +82,17 @@ class InAppClient
     end
     print(serverOutput.join(""))
     telnet.close()
+  end
+  
+  def trySendCommand(command)
+    sendCommandWithoutExceptionHandling(command)
+    return true
+  rescue Exception => ex
+    return false
+  end
+  
+  def sendCommand(command)
+    sendCommandWithoutExceptionHandling(command)
     return true
   rescue Exception => ex
     $stderr.puts(ex)
