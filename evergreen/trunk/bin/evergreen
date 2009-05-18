@@ -85,7 +85,7 @@ class Evergreen
     end
     
     def send_command(client, command)
-        return client.trySendCommand(command) ? 0 : 1
+        return client.sendCommand(command) ? 0 : 1
     end
 end
 
