@@ -16,14 +16,14 @@ else
             text = "#{title}\n\n#{message}"
             reported_okay = false
             
-            # Pango will fail to parse something like "undefined local variable or method `logging' for #<Java:0xb7c827bc>":
-            # (zenity:31203): Gtk-WARNING **: Failed to set text from markup due to error parsing markup: Unknown tag 'Java:0xb7c827bc' on line 6 char 1
-            # HTML-escaping the #<> part seems to fix it.
-            require "cgi"
-            html = CGI.escapeHTML(text)
-            
             # FIXME: this assumes that a KDE user doesn't have the GNOME zenity(1) installed. Which is probably true.
             if File.exist?("/usr/bin/zenity")
+                # Pango will fail to parse something like "undefined local variable or method `logging' for #<Java:0xb7c827bc>":
+                # (zenity:31203): Gtk-WARNING **: Failed to set text from markup due to error parsing markup: Unknown tag 'Java:0xb7c827bc' on line 6 char 1
+                # HTML-escaping the #<> part seems to fix it.
+                require "cgi"
+                html = CGI.escapeHTML(text)
+                
                 command = [ "zenity" ]
                 # The GNOME HIG suggests that dialog titles should be empty, but zenity(1) doesn't currently ensure this.
                 command << "--title="
@@ -35,7 +35,7 @@ else
             if reported_okay == false && File.exist?("/usr/bin/kdialog")
                 command = [ "kdialog" ]
                 command << "--msgbox"
-                command << html
+                command << text
                 reported_okay = system(*command)
             end
             if reported_okay == false
