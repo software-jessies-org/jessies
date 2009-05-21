@@ -341,7 +341,8 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 			return false;
 		}
 		TextLine line = model.getTextLine(location.getLineIndex());
-		if (location.getCharOffset() >= line.length()) {
+		// It is common for a selection to start after the last visible character on a line.
+		if (location.getCharOffset() > line.length()) {
 			return false;
 		}
 		return true;
