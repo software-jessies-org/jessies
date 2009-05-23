@@ -16,6 +16,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <vector>
 
 jint org_jessies_os_PosixJNI::get_1EXIT_1FAILURE() { return EXIT_FAILURE; }
 
@@ -403,3 +404,29 @@ jboolean org_jessies_os_PosixJNI::WIfSignaled(jint status) { return WIFSIGNALED(
 jboolean org_jessies_os_PosixJNI::WIfStopped(jint status) { return WIFSTOPPED(status); }
 jint org_jessies_os_PosixJNI::WStopSig(jint status) { return WSTOPSIG(status); }
 jint org_jessies_os_PosixJNI::WTermSig(jint status) { return WTERMSIG(status); }
+
+static jint doWrite(JNIEnv* env, jint fd, jbyteArray buffer, jint bufferOffset, jint byteCount, jlong fileOffset, bool isPWrite) {
+    // On Cygwin, on 2006-09-28, attempting a zero-byte write caused the JVM to crash with an EXCEPTION_ACCESS_VIOLATION in a "cygwin1.dll" stack frame.
+    // So let's make sure we never do that.
+    if (byteCount == 0) {
+        return 0;
+    }
+    
+    // Allocate memory to contain the bytes.
+    // GetByteArrayRegion requires less code than GetByteArrayElements/ReleaseByteArrayElements, and measurement shows that the construction of the std::vector is more expensive anyway.
+    std::vector<jbyte> nativeBuffer(byteCount);
+    env->GetByteArrayRegion(buffer, bufferOffset, byteCount, &nativeBuffer[0]);
+    if (env->ExceptionCheck()) {
+        return -1; // It doesn't matter what we return, because a Java exception will be thrown.
+    }
+    
+    return resultOrMinusErrno(isPWrite ? ::pwrite(fd, &nativeBuffer[0], byteCount, fileOffset) : ::write(fd, &nativeBuffer[0], byteCount));
+}
+
+jint org_jessies_os_PosixJNI::write(jint fd, jbyteArray buffer, jint bufferOffset, jint byteCount) {
+    return doWrite(m_env, fd, buffer, bufferOffset, byteCount, 0, false);
+}
+
+jint org_jessies_os_PosixJNI::pwrite(jint fd, jbyteArray buffer, jint bufferOffset, jint byteCount, jlong fileOffset) {
+    return doWrite(m_env, fd, buffer, bufferOffset, byteCount, fileOffset, true);
+}

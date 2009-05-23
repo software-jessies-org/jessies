@@ -366,7 +366,14 @@ public class Posix {
     
     // FIXME: pread.
     
-    // FIXME: pwrite.
+    /**
+     * Writes 'byteCount' bytes from 'bufferOffset' in 'buffer' to file descriptor 'fd' at offset 'fileOffset'.
+     * Returns the number of bytes written, -errno on error.
+     * http://www.opengroup.org/onlinepubs/000095399/functions/write.html
+     */
+    public static int pwrite(int fd, byte[] buffer, int bufferOffset, int byteCount, long fileOffset) {
+        return PosixJNI.pwrite(fd, buffer, bufferOffset, byteCount, fileOffset);
+    }
     
     // FIXME: read.
     
@@ -437,5 +444,15 @@ public class Posix {
         return PosixJNI.waitpid(pid, status, flags);
     }
     
-    // FIXME: write.
+    /**
+     * Writes 'byteCount' bytes from 'bufferOffset' in 'buffer' to file descriptor 'fd'.
+     * Returns the number of bytes written, -errno on error.
+     * http://www.opengroup.org/onlinepubs/000095399/functions/write.html
+     */
+    public static int write(int fd, byte[] buffer, int bufferOffset, int byteCount) {
+        if (bufferOffset > buffer.length || byteCount < 0 || bufferOffset + byteCount > buffer.length) {
+            throw new IllegalArgumentException("write out of bounds; buffer.length=" + buffer.length + ", bufferOffset=" + bufferOffset + ", byteCount=" + byteCount);
+        }
+        return PosixJNI.write(fd, buffer, bufferOffset, byteCount);
+    }
 }

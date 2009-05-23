@@ -194,6 +194,7 @@ class PosixJNI {
     static native int mknod(String path, int mode, long device);
     static native int open(String path, int flags);
     static native int open(String path, int flags, int mode);
+    static native int pwrite(int fd, byte[] buffer, int bufferOffset, int byteCount, long fileOffset);
     static native int rmdir(String path);
     static native int stat(String path, Stat stat);
     static native String strerror(int errno);
@@ -202,4 +203,5 @@ class PosixJNI {
     static native int truncate(String path, long length);
     static native int unlink(String path);
     static native int waitpid(int pid, WaitStatus status, int flags);
+    static native int write(int fd, byte[] buffer, int bufferOffset, int byteCount);
 }
