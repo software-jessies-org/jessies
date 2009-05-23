@@ -40,7 +40,26 @@ public class PtyProcess {
         
         @Override
         public void write(byte[] bytes, int arrayOffset, int byteCount) throws IOException {
-            nativeWrite(bytes, arrayOffset, byteCount);
+            // POSIX (http://www.opengroup.org/onlinepubs/000095399/functions/write.html) says:
+            // 1. we can be interrupted before any bytes are written (n == -1, errno == EINTR).
+            // 2. we can be interrupted after some bytes are written (n < requested n).
+            int offset = arrayOffset;
+            int remainingByteCount = byteCount;
+            int n = 0;
+            while (remainingByteCount > 0) {
+                n = Posix.write(fd, bytes, offset, byteCount);
+                if (n < 0 && n != -Errno.EINTR) {
+                    // This write failed, and not because we were interrupted before writing anything. Give up.
+                    break;
+                }
+                if (n > 0) {
+                    offset += n;
+                    remainingByteCount -= n;
+                }
+            }
+            if (remainingByteCount != 0) {
+                throw new IOException("write(" + fd + ", buffer, " + arrayOffset + ", " + byteCount + ") failed: " + Errno.toString(-n));
+            }
         }
     }
     
@@ -231,7 +250,6 @@ public class PtyProcess {
     private native void nativeStartProcess(String executable, String[] argv, String workingDirectory) throws IOException;
     
     private native int nativeRead(byte[] destination, int arrayOffset, int desiredLength) throws IOException;
-    private native void nativeWrite(byte[] bytes, int arrayOffset, int byteCount) throws IOException;
     
     public native void sendResizeNotification(Dimension sizeInChars, Dimension sizeInPixels) throws IOException;
     

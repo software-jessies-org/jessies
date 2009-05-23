@@ -126,47 +126,6 @@ jint terminator_terminal_PtyProcess::nativeRead(jbyteArray destination, jint arr
     return bytesTransferred;
 }
 
-void terminator_terminal_PtyProcess::nativeWrite(jbyteArray bytes, jint arrayOffset, jint byteCount) {
-    if (fd.get() == -1) {
-        throw unix_exception("nativeWrite called when fd == -1");
-    }
-    
-    // On Cygwin, on 2006-09-28, attempting a zero-byte write caused the JVM to crash with an EXCEPTION_ACCESS_VIOLATION in a "cygwin1.dll" stack frame.
-    // So let's make sure we never do that.
-    if (byteCount == 0) {
-        return;
-    }
-    
-    // This method isn't critical to performance. It's only native code because it has to be for Cygwin and is convenient elsewhere.
-    // GetByteArrayRegion requires less code than GetByteArrayElements/ReleaseByteArrayElements, and measurement shows that the construction of the std::vector is more expensive anyway.
-    std::vector<jbyte> buffer(byteCount);
-    m_env->GetByteArrayRegion(bytes, arrayOffset, byteCount, &buffer[0]);
-    if (m_env->ExceptionCheck()) {
-        return;
-    }
-    
-    // POSIX (http://www.opengroup.org/onlinepubs/000095399/functions/write.html) says:
-    // 1. we can be interrupted before any bytes are written (n == -1, errno == EINTR).
-    // 2. we can be interrupted after some bytes are written (n < requested n).
-    size_t offset = 0;
-    size_t remainingByteCount = byteCount;
-    while (remainingByteCount > 0) {
-        ssize_t n = ::write(fd.get(), &buffer[offset], remainingByteCount);
-        if (n == -1 && errno != EINTR) {
-            // This write failed, and not because we were interrupted before writing anything. Give up.
-            break;
-        }
-        if (n > 0) {
-            offset += n;
-            remainingByteCount -= n;
-        }
-    }
-    
-    if (remainingByteCount != 0) {
-        throw unix_exception("write(" + toString(fd.get()) + ", &buffer[" + toString(arrayOffset) + "], " + toString(byteCount) + ") failed");
-    }
-}
-
 void terminator_terminal_PtyProcess::sendResizeNotification(jobject sizeInChars, jobject sizeInPixels) {
     if (fd.get() == -1) {
         // We shouldn't read or write from a closed pty, but this will happen if the user resizes a window whose child has died.
