@@ -459,7 +459,10 @@ public class Posix {
         if (buffer == null) {
             throw new NullPointerException("buffer == null");
         }
-        if (bufferOffset > buffer.length || byteCount < 0 || bufferOffset + byteCount > buffer.length) {
+        if (bufferOffset < 0 || byteCount < 0) {
+            throw new IllegalArgumentException("arguments must be non-negative; bufferOffset=" + bufferOffset + ", byteCount=" + byteCount);
+        }
+        if (bufferOffset > buffer.length || bufferOffset + byteCount > buffer.length) {
             throw new IllegalArgumentException("write out of bounds; buffer.length=" + buffer.length + ", bufferOffset=" + bufferOffset + ", byteCount=" + byteCount);
         }
     }
