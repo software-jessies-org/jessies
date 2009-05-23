@@ -364,7 +364,15 @@ public class Posix {
         return PosixJNI.open(path, flags, mode);
     }
     
-    // FIXME: pread.
+    /**
+     * Reads 'byteCount' bytes from file descriptor 'fd' at offset 'fileOffset' into 'buffer' at 'bufferOffset'.
+     * Returns the number of bytes read, -errno on error.
+     * http://www.opengroup.org/onlinepubs/000095399/functions/pread.html
+     */
+    public static int pread(int fd, byte[] buffer, int bufferOffset, int byteCount, long fileOffset) {
+        checkBufferArgs(buffer, bufferOffset, byteCount);
+        return PosixJNI.pread(fd, buffer, bufferOffset, byteCount, fileOffset);
+    }
     
     /**
      * Writes 'byteCount' bytes from 'bufferOffset' in 'buffer' to file descriptor 'fd' at offset 'fileOffset'.
@@ -376,7 +384,15 @@ public class Posix {
         return PosixJNI.pwrite(fd, buffer, bufferOffset, byteCount, fileOffset);
     }
     
-    // FIXME: read.
+    /**
+     * Reads 'byteCount' bytes from file descriptor 'fd' into 'buffer' at 'bufferOffset'.
+     * Returns the number of bytes read, -errno on error.
+     * http://www.opengroup.org/onlinepubs/000095399/functions/read.html
+     */
+    public static int read(int fd, byte[] buffer, int bufferOffset, int byteCount) {
+        checkBufferArgs(buffer, bufferOffset, byteCount);
+        return PosixJNI.read(fd, buffer, bufferOffset, byteCount);
+    }
     
     // FIXME: readlink. How do we express the String-or-int return type? Pass in a String[] and assign to element 0?
     

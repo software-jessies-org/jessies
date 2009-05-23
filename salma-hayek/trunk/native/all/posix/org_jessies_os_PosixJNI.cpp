@@ -427,7 +427,7 @@ static jint doWrite(JNIEnv* env, jint fd, jbyteArray buffer, jint bufferOffset, 
         return 0;
     }
     
-    // Allocate memory to contain the bytes.
+    // Allocate C heap to contain the bytes, and copy them in.
     // GetByteArrayRegion requires less code than GetByteArrayElements/ReleaseByteArrayElements, and measurement shows that the construction of the std::vector is more expensive anyway.
     std::vector<jbyte> nativeBuffer(byteCount);
     env->GetByteArrayRegion(buffer, bufferOffset, byteCount, &nativeBuffer[0]);
@@ -444,4 +444,29 @@ jint org_jessies_os_PosixJNI::write(jint fd, jbyteArray buffer, jint bufferOffse
 
 jint org_jessies_os_PosixJNI::pwrite(jint fd, jbyteArray buffer, jint bufferOffset, jint byteCount, jlong fileOffset) {
     return doWrite(m_env, fd, buffer, bufferOffset, byteCount, fileOffset, true);
+}
+
+static jint doRead(JNIEnv* env, jint fd, jbyteArray buffer, jint bufferOffset, jint byteCount, jlong fileOffset, bool isPRead) {
+    // Zero byte reads seem to work even on Cygwin, but let's eliminate the opportunity for crashing in this corner case.
+    if (byteCount == 0) {
+        return 0;
+    }
+    
+    // Allocate C heap to contain the bytes, and read them in.
+    std::vector<jbyte> nativeBuffer(byteCount);
+    ssize_t bytesTransferred = isPRead ? ::pread(fd, &nativeBuffer[0], byteCount, fileOffset) : ::read(fd, &nativeBuffer[0], byteCount);
+    if (bytesTransferred > 0) {
+        // Copy any bytes transferred back in to the Java heap.
+        env->SetByteArrayRegion(buffer, bufferOffset, bytesTransferred, &nativeBuffer[0]);
+    }
+    
+    return resultOrMinusErrno(bytesTransferred);
+}
+
+jint org_jessies_os_PosixJNI::read(jint fd, jbyteArray buffer, jint bufferOffset, jint byteCount) {
+    return doRead(m_env, fd, buffer, bufferOffset, byteCount, 0, false);
+}
+
+jint org_jessies_os_PosixJNI::pread(jint fd, jbyteArray buffer, jint bufferOffset, jint byteCount, jlong fileOffset) {
+    return doRead(m_env, fd, buffer, bufferOffset, byteCount, fileOffset, true);
 }
