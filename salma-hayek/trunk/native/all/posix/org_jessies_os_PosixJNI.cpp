@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 jint org_jessies_os_PosixJNI::get_1EXIT_1FAILURE() { return EXIT_FAILURE; }
@@ -76,6 +77,10 @@ jint org_jessies_os_PosixJNI::get_1O_1APPEND() { return O_APPEND; }
 jint org_jessies_os_PosixJNI::get_1O_1RDONLY() { return O_RDONLY; }
 jint org_jessies_os_PosixJNI::get_1O_1RDWR() { return O_RDWR; }
 jint org_jessies_os_PosixJNI::get_1O_1WRONLY() { return O_WRONLY; }
+
+jint org_jessies_os_PosixJNI::get_1WCONTINUED() { return WCONTINUED; }
+jint org_jessies_os_PosixJNI::get_1WNOHANG() { return WNOHANG; }
+jint org_jessies_os_PosixJNI::get_1WUNTRACED() { return WUNTRACED; }
 
 jint org_jessies_os_PosixJNI::get_1E2BIG() { return E2BIG; }
 jint org_jessies_os_PosixJNI::get_1EACCES() { return EACCES; }
@@ -372,3 +377,29 @@ jint org_jessies_os_PosixJNI::stat(jstring javaPath, jobject javaStat) {
 jstring org_jessies_os_PosixJNI::strerror(jint error) {
     return m_env->NewStringUTF(unix_exception::errnoToString(error).c_str());
 }
+
+jint org_jessies_os_PosixJNI::waitpid(jint pid, jobject javaWaitStatus, jint flags) {
+    int status = 0;
+    const pid_t result = ::waitpid(pid, &status, flags);
+    if (result == -1) {
+        return -errno;
+    }
+    JniField<jint, false> statusField(m_env, javaWaitStatus, "status", "I");
+    statusField = status;
+    return result;
+}
+
+jboolean org_jessies_os_PosixJNI::WCoreDump(jint status) {
+#ifdef WCOREDUMP
+    return WCOREDUMP(status) ? JNI_TRUE : JNI_FALSE;
+#else
+    return JNI_FALSE;
+#endif
+}
+jint org_jessies_os_PosixJNI::WExitStatus(jint status) { return WEXITSTATUS(status); }
+jboolean org_jessies_os_PosixJNI::WIfContinued(jint status) { return WIFCONTINUED(status); }
+jboolean org_jessies_os_PosixJNI::WIfExited(jint status) { return WIFEXITED(status); }
+jboolean org_jessies_os_PosixJNI::WIfSignaled(jint status) { return WIFSIGNALED(status); }
+jboolean org_jessies_os_PosixJNI::WIfStopped(jint status) { return WIFSTOPPED(status); }
+jint org_jessies_os_PosixJNI::WStopSig(jint status) { return WSTOPSIG(status); }
+jint org_jessies_os_PosixJNI::WTermSig(jint status) { return WTERMSIG(status); }
