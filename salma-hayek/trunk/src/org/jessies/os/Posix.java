@@ -75,6 +75,13 @@ public class Posix {
     /** Posix.open flag to open for writing only. */
     public static final int O_WRONLY = PosixJNI.get_O_WRONLY();
     
+    /** Posix.waitpid flag to return if a stopped child has received SIGCONT. */
+    public static final int WCONTINUED = PosixJNI.get_WCONTINUED();
+    /** Posix.waitpid flag to not block if no status is yet available. */
+    public static final int WNOHANG = PosixJNI.get_WNOHANG();
+    /** Posix.waitpid flag to also return if a child is merely stopped. */
+    public static final int WUNTRACED = PosixJNI.get_WUNTRACED();
+    
     /**
      * Returns true if the requested access is permitted, false otherwise.
      * The 'accessMode' should be a bitwise or of the R_OK, W_OK, X_OK, and F_OK constants.
@@ -417,6 +424,17 @@ public class Posix {
      */
     public static int unlink(String path) {
         return PosixJNI.rmdir(path);
+    }
+    
+    /**
+     * Waits for a child process to stop or terminate.
+     * Returns >= 0 on success (see documentation), -errno on error.
+     * http://www.opengroup.org/onlinepubs/000095399/functions/waitpid.html
+     * 
+     * FIXME: implement waitid(2) instead, and deprecate waitpid(2)?
+     */
+    public static int waitpid(int pid, WaitStatus status, int flags) {
+        return PosixJNI.waitpid(pid, status, flags);
     }
     
     // FIXME: write.

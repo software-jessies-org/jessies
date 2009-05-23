@@ -71,6 +71,10 @@ class PosixJNI {
     static native int get_O_RDWR();
     static native int get_O_WRONLY();
     
+    static native int get_WCONTINUED();
+    static native int get_WNOHANG();
+    static native int get_WUNTRACED();
+    
     static native int get_E2BIG();
     static native int get_EACCES();
     static native int get_EADDRINUSE();
@@ -147,6 +151,16 @@ class PosixJNI {
     static native int get_EWOULDBLOCK();
     static native int get_EXDEV();
     
+    // These are all macros, so we have to manually mangle their names for the benefit of the JNI.
+    static native boolean WCoreDump(int status);
+    static native int WExitStatus(int status);
+    static native boolean WIfContinued(int status);
+    static native boolean WIfExited(int status);
+    static native boolean WIfSignaled(int status);
+    static native boolean WIfStopped(int status);
+    static native int WStopSig(int status);
+    static native int WTermSig(int status);
+    
     static native int access(String path, int accessMode);
     static native int chmod(String path, int mode);
     static native int chown(String path, int uid, int gid);
@@ -187,4 +201,5 @@ class PosixJNI {
     static native int tcgetpgrp(int fd);
     static native int truncate(String path, long length);
     static native int unlink(String path);
+    static native int waitpid(int pid, WaitStatus status, int flags);
 }
