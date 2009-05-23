@@ -108,7 +108,7 @@ void terminator_terminal_PtyProcess::sendResizeNotification(jobject sizeInChars,
 
 // Mac OS doesn't support /proc, but it does have a convenient sysctl(3).
 
-void listProcessesUsingTty(std::vector<std::string>& processNames, std::string ttyFilename) {
+void listProcessesUsingTty(std::vector<std::string>& processNames, const std::string& ttyFilename) {
     // Which tty?
     struct stat sb;
     if (stat(ttyFilename.c_str(), &sb) != 0) {
@@ -189,7 +189,7 @@ std::string getProcessName(const std::string& pid) {
     return processName;
 }
 
-void listProcessesUsingTty(std::vector<std::string>& processNames, std::string ttyFilename) {
+void listProcessesUsingTty(std::vector<std::string>& processNames, const std::string& ttyFilename) {
     for (DirectoryIterator it("/proc"); it.isValid(); ++it) {
         std::string pid(it->getName());
         if (isInteger(pid) && processHasFileOpen(pid, ttyFilename)) {
