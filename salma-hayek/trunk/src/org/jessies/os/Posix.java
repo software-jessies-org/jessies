@@ -372,6 +372,7 @@ public class Posix {
      * http://www.opengroup.org/onlinepubs/000095399/functions/write.html
      */
     public static int pwrite(int fd, byte[] buffer, int bufferOffset, int byteCount, long fileOffset) {
+        checkBufferArgs(buffer, bufferOffset, byteCount);
         return PosixJNI.pwrite(fd, buffer, bufferOffset, byteCount, fileOffset);
     }
     
@@ -450,9 +451,16 @@ public class Posix {
      * http://www.opengroup.org/onlinepubs/000095399/functions/write.html
      */
     public static int write(int fd, byte[] buffer, int bufferOffset, int byteCount) {
+        checkBufferArgs(buffer, bufferOffset, byteCount);
+        return PosixJNI.write(fd, buffer, bufferOffset, byteCount);
+    }
+    
+    private static void checkBufferArgs(byte[] buffer, int bufferOffset, int byteCount) {
+        if (buffer == null) {
+            throw new NullPointerException("buffer == null");
+        }
         if (bufferOffset > buffer.length || byteCount < 0 || bufferOffset + byteCount > buffer.length) {
             throw new IllegalArgumentException("write out of bounds; buffer.length=" + buffer.length + ", bufferOffset=" + bufferOffset + ", byteCount=" + byteCount);
         }
-        return PosixJNI.write(fd, buffer, bufferOffset, byteCount);
     }
 }
