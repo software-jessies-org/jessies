@@ -24,8 +24,14 @@ public class PtyProcess {
          * returns.
          */
         @Override
-        public int read(byte[] destination, int arrayOffset, int desiredLength) throws IOException {
-            return nativeRead(destination, arrayOffset, desiredLength);
+        public int read(byte[] bytes, int arrayOffset, int byteCount) throws IOException {
+            int n = 0;
+            while ((n = Posix.read(fd, bytes, arrayOffset, byteCount)) < 0) {
+                if (n != -Errno.EINTR) {
+                    throw new IOException("read(" + fd + ", buffer, " + arrayOffset + ", " + byteCount + ") failed: " + Errno.toString(-n));
+                }
+            }
+            return n;
         }
     }
     
@@ -248,8 +254,6 @@ public class PtyProcess {
     }
     
     private native void nativeStartProcess(String executable, String[] argv, String workingDirectory) throws IOException;
-    
-    private native int nativeRead(byte[] destination, int arrayOffset, int desiredLength) throws IOException;
     
     public native void sendResizeNotification(Dimension sizeInChars, Dimension sizeInPixels) throws IOException;
     

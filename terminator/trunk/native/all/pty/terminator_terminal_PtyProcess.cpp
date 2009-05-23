@@ -11,23 +11,16 @@
 #include "toString.h"
 #include "unix_exception.h"
 
-#include <signal.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <termios.h>
-
-#include <sys/types.h>
 #include <sys/stat.h>
 #ifdef __APPLE__ // sysctl.h doesn't exist on Cygwin.
 #include <sys/sysctl.h>
 #endif
-#include <sys/wait.h>
+#include <sys/types.h>
+#include <termios.h>
 
 #include <deque>
 #include <fstream>
-#include <iostream>
-#include <sstream>
-#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -93,37 +86,6 @@ void terminator_terminal_PtyProcess::nativeStartProcess(jstring javaExecutable, 
     waitUntilFdWritable(fd.get());
     
     slavePtyName = newStringUtf8(ptyGenerator.getSlavePtyName());
-}
-
-jint terminator_terminal_PtyProcess::nativeRead(jbyteArray destination, jint arrayOffset, jint desiredLength) {
-    if (fd.get() == -1) {
-        throw unix_exception("nativeRead called when fd == -1");
-    }
-    
-    // Zero byte reads worked for me on Cygwin 1.5.25 but let's eliminate the opportunity for crashing in this corner case.
-    if (desiredLength == 0) {
-        return 0;
-    }
-    
-    jbyte buffer[8192];
-    if (desiredLength > jint(sizeof(buffer))) {
-        throw std::runtime_error("can't read more than " + toString(sizeof(buffer)) + " bytes at once; desiredLength=" + toString(desiredLength));
-    }
-    
-    ssize_t bytesTransferred;
-    do {
-        bytesTransferred = ::read(fd.get(), &buffer[0], desiredLength);
-    } while (bytesTransferred == -1 && errno == EINTR);
-    
-    if (bytesTransferred == -1) {
-        throw unix_exception("read(" + toString(fd.get()) + ", &buffer[0], " + toString(desiredLength) + ") failed");
-    }
-    if (bytesTransferred == 0) {
-        return -1;
-    }
-    
-    m_env->SetByteArrayRegion(destination, arrayOffset, bytesTransferred, &buffer[0]);
-    return bytesTransferred;
 }
 
 void terminator_terminal_PtyProcess::sendResizeNotification(jobject sizeInChars, jobject sizeInPixels) {
