@@ -63,10 +63,10 @@ public class TestRunner {
     
     private void runTests(List<String> directoryNames) throws Exception {
         // FIXME: parallelize; start running tests as they're found?
-        System.exit(runTests(findTests(directoryNames)));
+        System.exit(runTestMethods(findTestMethods(directoryNames)));
     }
     
-    private List<Method> findTests(List<String> directoryNames) throws Exception {
+    private List<Method> findTestMethods(List<String> directoryNames) throws Exception {
         this.setupTime = System.nanoTime();
         List<Method> testMethods = findTestMethods(makeClassLoader(directoryNames), findClassNames(directoryNames));
         this.setupTime = System.nanoTime() - setupTime;
@@ -144,7 +144,7 @@ public class TestRunner {
         }
     }
     
-    private int runTests(List<Method> testMethods) {
+    private int runTestMethods(List<Method> testMethods) {
         this.runningTime = System.nanoTime();
         
         int failCount = 0;
