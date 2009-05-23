@@ -194,7 +194,9 @@ class PosixJNI {
     static native int mknod(String path, int mode, long device);
     static native int open(String path, int flags);
     static native int open(String path, int flags, int mode);
+    static native int pread(int fd, byte[] buffer, int bufferOffset, int byteCount, long fileOffset);
     static native int pwrite(int fd, byte[] buffer, int bufferOffset, int byteCount, long fileOffset);
+    static native int read(int fd, byte[] buffer, int bufferOffset, int byteCount);
     static native int rmdir(String path);
     static native int stat(String path, Stat stat);
     static native String strerror(int errno);
