@@ -184,52 +184,6 @@ void terminator_terminal_PtyProcess::sendResizeNotification(jobject sizeInChars,
     }
 }
 
-void terminator_terminal_PtyProcess::nativeWaitFor() {
-    // We now have no further use for the fd connecting us to the child,
-    // which has probably exited.
-    // Even if it hasn't, we're no longer reading its output, which may cause the child to block in the kernel,
-    // preventing it from terminating, even if root sends it SIGKILL.
-    // If we close the pipe before waiting, then we may let it finish and collect an exit status.
-    close(fd.get());
-    fd = -1;
-    
-    // Loop until waitpid(2) returns a status or a real error.
-    int status = 0;
-    errno = 0;
-    pid_t result;
-    do {
-        // Don't block indefinitely, even if the child is still running.
-        // At this point we've lost the ability to talk to it.
-        result = waitpid(pid.get(), &status, 0);
-    } while (result == -1 && errno == EINTR);
-    
-    // Did something really go wrong?
-    if (result == -1) {
-        throw unix_exception("waitpid(" + toString(pid.get()) + ", &status, 0) failed");
-    }
-    
-    // We must check "result" to distinguish the case where the child is still running,
-    // from the case where the child exited normally.
-    if (result == 0) {
-        return;
-    }
-    
-    // Tell our Java peer how the process died.
-    if (WIFEXITED(status)) {
-        exitValue = WEXITSTATUS(status);
-        didExitNormally = true;
-    }
-    if (WIFSIGNALED(status)) {
-        exitValue = WTERMSIG(status);
-        wasSignaled = true;
-#ifdef WCOREDUMP // WCOREDUMP is not POSIX.  The Linux man page recommends this #ifdef.
-        if (WCOREDUMP(status)) {
-            didDumpCore = true;
-        }
-#endif
-    }
-}
-
 #ifdef __APPLE__
 
 // Mac OS doesn't support /proc, but it does have a convenient sysctl(3).

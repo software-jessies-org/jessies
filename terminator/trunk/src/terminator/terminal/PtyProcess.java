@@ -141,7 +141,7 @@ public class PtyProcess {
         invoke(new Callable<Exception>() {
             public Exception call() {
                 try {
-                    nativeWaitFor();
+                    waitFor0();
                     return null;
                 } catch (Exception ex) {
                     return ex;
@@ -149,6 +149,38 @@ public class PtyProcess {
             }
         });
         executorService.shutdownNow();
+    }
+    
+    private void waitFor0() throws IOException {
+        // FIXME: rewrite this to be more like the JDK's Process.waitFor, both in behavior and implementation.
+        
+        // We now have no further use for the fd connecting us to the child, which has probably exited.
+        // Even if it hasn't, we're no longer reading its output, which may cause the child to block in the kernel,
+        // preventing it from terminating, even if root sends it SIGKILL.
+        // If we close the pipe before waiting, then we may let it finish and collect an exit status.
+        Posix.close(fd);
+        fd = -1;
+        
+        // Loop until waitpid(2) returns a status or a real error.
+        WaitStatus status = new WaitStatus();
+        int result;
+        while ((result = Posix.waitpid(pid, status, 0)) < 0) {
+            if (result != -Errno.EINTR) {
+                // Something really went wrong; give up.
+                throw new IOException("waitpid(" + pid + ") failed: " + Errno.toString(-result));
+            }
+        }
+        
+        // Translate the status.
+        if (status.WIFEXITED()) {
+            exitValue = status.WEXITSTATUS();
+            didExitNormally = true;
+        }
+        if (status.WIFSIGNALED()) {
+            exitValue = status.WTERMSIG();
+            wasSignaled = true;
+            didDumpCore = status.WCOREDUMP();
+        }
     }
     
     /**
@@ -197,7 +229,6 @@ public class PtyProcess {
     }
     
     private native void nativeStartProcess(String executable, String[] argv, String workingDirectory) throws IOException;
-    private native void nativeWaitFor() throws IOException;
     
     private native int nativeRead(byte[] destination, int arrayOffset, int desiredLength) throws IOException;
     private native void nativeWrite(byte[] bytes, int arrayOffset, int byteCount) throws IOException;
