@@ -79,6 +79,14 @@ jint org_jessies_os_PosixJNI::get_1O_1RDONLY() { return O_RDONLY; }
 jint org_jessies_os_PosixJNI::get_1O_1RDWR() { return O_RDWR; }
 jint org_jessies_os_PosixJNI::get_1O_1WRONLY() { return O_WRONLY; }
 
+#ifdef __CYGWIN__
+// Not supported on Cygwin 1.5.25.
+// Not supported on Cygwin 1.7.0.
+// 8 is the value on Linux and Cygwin generally follows Linux.
+#ifndef WCONTINUED
+#define WCONTINUED 8
+#endif
+#endif
 jint org_jessies_os_PosixJNI::get_1WCONTINUED() { return WCONTINUED; }
 jint org_jessies_os_PosixJNI::get_1WNOHANG() { return WNOHANG; }
 jint org_jessies_os_PosixJNI::get_1WUNTRACED() { return WUNTRACED; }
@@ -398,6 +406,13 @@ jboolean org_jessies_os_PosixJNI::WCoreDump(jint status) {
 #endif
 }
 jint org_jessies_os_PosixJNI::WExitStatus(jint status) { return WEXITSTATUS(status); }
+#ifdef __CYGWIN__
+// Not supported on Cygwin 1.5.25.
+// Not supported on Cygwin 1.7.0.
+#ifndef WIFCONTINUED
+#define WIFCONTINUED(status) ((void) (status), false)
+#endif
+#endif
 jboolean org_jessies_os_PosixJNI::WIfContinued(jint status) { return WIFCONTINUED(status); }
 jboolean org_jessies_os_PosixJNI::WIfExited(jint status) { return WIFEXITED(status); }
 jboolean org_jessies_os_PosixJNI::WIfSignaled(jint status) { return WIFSIGNALED(status); }
