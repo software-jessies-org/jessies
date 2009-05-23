@@ -185,13 +185,19 @@ private:
         closeFileDescriptors();
         fixEnvironment(term);
         
-        /*
-         * rxvt resets these signal handlers, and we'll do the same, because it magically
-         * fixes the bug where ^c doesn't work if we're launched from KDE or Gnome's
-         * launcher program.  I don't quite understand why - maybe bash reads the existing
-         * SIGINT setting, and if it's set to something other than DFL it lets the parent process
-         * take care of job control.
-         */
+        // rxvt resets these signal handlers, and we'll do the same, because it magically
+        // fixes the bug where ^c doesn't work if we're launched from KDE or Gnome's
+        // launcher program.  I don't quite understand why - maybe bash reads the existing
+        // SIGINT setting, and if it's set to something other than DFL it lets the parent process
+        // take care of job control.
+        
+        // David Korn asks us to consider the case where...
+        // ...a process has SIGCHLD set to SIG_IGN and then execs a new
+        // process.  A conforming application would not set  SIGCHLD to SIG_IGN
+        // since the standard leaves this behavior unspecified.  An application
+        // that does set SIGCHLD to SIG_IGN  should set it back to SIG_DFL
+        // before the call to exec.
+        // http://www.pasc.org/interps/unofficial/db/p1003.1/pasc-1003.1-132.html
         signal(SIGINT, SIG_DFL);
         signal(SIGQUIT, SIG_DFL);
         signal(SIGCHLD, SIG_DFL);
