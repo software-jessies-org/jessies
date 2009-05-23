@@ -19,6 +19,10 @@
 #include <sys/types.h>
 #include <termios.h>
 
+// Deque is the default choice of container in C++.
+// Using vector connotes a requirement for contiguity.
+// See http://www.gotw.ca/gotw/054.htm.
+#include <deque>
 #include <fstream>
 #include <string>
 #include <vector>
@@ -108,7 +112,7 @@ void terminator_terminal_PtyProcess::sendResizeNotification(jobject sizeInChars,
 
 // Mac OS doesn't support /proc, but it does have a convenient sysctl(3).
 
-void listProcessesUsingTty(std::vector<std::string>& processNames, const std::string& ttyFilename) {
+void listProcessesUsingTty(std::deque<std::string>& processNames, const std::string& ttyFilename) {
     // Which tty?
     struct stat sb;
     if (stat(ttyFilename.c_str(), &sb) != 0) {
@@ -189,7 +193,7 @@ std::string getProcessName(const std::string& pid) {
     return processName;
 }
 
-void listProcessesUsingTty(std::vector<std::string>& processNames, const std::string& ttyFilename) {
+void listProcessesUsingTty(std::deque<std::string>& processNames, const std::string& ttyFilename) {
     for (DirectoryIterator it("/proc"); it.isValid(); ++it) {
         std::string pid(it->getName());
         if (isInteger(pid) && processHasFileOpen(pid, ttyFilename)) {
@@ -208,7 +212,7 @@ jstring terminator_terminal_PtyProcess::nativeListProcessesUsingTty() {
         return newStringUtf8("(pty closed)");
     }
     
-    std::vector<std::string> processNames;
+    std::deque<std::string> processNames;
     std::string ttyFilename(JniString(m_env, slavePtyName.get()));
     
     listProcessesUsingTty(processNames, ttyFilename);
