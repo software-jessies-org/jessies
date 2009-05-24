@@ -72,10 +72,11 @@ public class UrlHighlighter implements Highlighter {
         return "URL highlighter";
     }
 
-    public void highlightClicked(final TerminalView view, final Highlight highlight, final String highlitText, final MouseEvent event) {
+    public void highlightClicked(final TerminalView view, final Highlight highlight, final MouseEvent event) {
         if (event.isControlDown()) {
             try {
-                BrowserLauncher.openURL(highlitText);
+                final String url = view.getTabbedString(highlight);
+                BrowserLauncher.openURL(url);
             } catch (Throwable th) {
                 SimpleDialog.showDetails(view, "Problem opening URL", th);
             }

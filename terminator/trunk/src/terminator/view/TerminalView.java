@@ -63,7 +63,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 			public void highlightClicked(MouseEvent event) {
 				List<Highlight> highlights = getHighlightsForLocation(viewToModel(event.getPoint()));
 				for (Highlight highlight : highlights) {
-					highlight.getHighlighter().highlightClicked(TerminalView.this, highlight, getTabbedString(highlight), event);
+					highlight.getHighlighter().highlightClicked(TerminalView.this, highlight, event);
 				}
 			}
 		});
