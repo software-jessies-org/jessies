@@ -11,6 +11,8 @@ import org.jessies.os.*;
  * Provides utilities for dealing with files and paths.
  */
 public class FileUtilities {
+    private static final String LIBS_SYSTEM_PROPERTY = "org.jessies.libraryDirectories";
+    
     /**
      * Returns a new File for the given filename, coping with "~/".
      * Try not to ever use "new File(String)": use this instead.
@@ -363,21 +365,45 @@ public class FileUtilities {
     }
 
     public static void loadNativeLibrary(String libraryName) {
-        String fileName = System.mapLibraryName(libraryName);
-        String directories = System.getProperty("org.jessies.libraryDirectories");
+        final String directories = System.getProperty(LIBS_SYSTEM_PROPERTY);
+        if (directories == null) {
+            // Fall back to System.loadLibrary, which is useful for integration with OSGI.
+            // Terminator embedded in Eclipse relies on this to load its JNI libraries from its JAR file.
+            try {
+                System.loadLibrary(libraryName);
+                return;
+            } catch (UnsatisfiedLinkError cause) {
+                throwUnsatisfiedLinkError(libraryName, directories, cause);
+            }
+        }
+        
+        // Manually iterate along the search path specified in the system property.
+        Throwable cause = null;
+        final String fileName = System.mapLibraryName(libraryName);
         for (String directory : directories.split(File.pathSeparator)) {
             File candidatePath = new File(directory, fileName);
             try {
                 System.load(candidatePath.getAbsolutePath());
                 return;
             } catch (Throwable ex) {
-                // Perhaps we should collect ex.getMessage() for re-throwing later
-                // if we fail to load from all directories.
-                ex = ex;
+                // Link each failure back to the previous one, so we can see all failures.
+                // The output will be a little misleading with all its "caused by"s, but it'll be complete.
+                // Note that if any of the exceptions comes with its own cause, we'll accidentally hide that.
+                if (cause != null) {
+                    ex.initCause(cause);
+                }
+                cause = ex;
             }
         }
+        throwUnsatisfiedLinkError(fileName, directories, cause);
+    }
+    
+    private static void throwUnsatisfiedLinkError(String library, String directories, Throwable cause) {
         final String arch = System.getProperty("os.arch");
-        throw new UnsatisfiedLinkError("Failed to load " + fileName + " for " + arch + " from " + directories);
+        final String extra = (directories != null) ? "from \"" + directories + "\"" : "(" + LIBS_SYSTEM_PROPERTY +  "was not set)";
+        final UnsatisfiedLinkError unsatisfiedLinkError = new UnsatisfiedLinkError("Failed to load \"" + library + "\" for " + arch + " " + extra);
+        unsatisfiedLinkError.initCause(cause);
+        throw unsatisfiedLinkError;
     }
     
     // By analogy with System.mapLibraryName.
