@@ -20,13 +20,14 @@ public class TerminatorPreferences extends Preferences {
     public static final String BLINK_CURSOR = "cursorBlink";
     public static final String BLOCK_CURSOR = "blockCursor";
     public static final String FANCY_BELL = "fancyBell";
-    public static final String VISUAL_BELL = "visualBell";
     public static final String FONT = "font";
     public static final String HIDE_MOUSE_WHEN_TYPING = "hideMouseWhenTyping";
     public static final String INITIAL_COLUMN_COUNT = "initialColumnCount";
     public static final String INITIAL_ROW_COUNT = "initialRowCount";
+    public static final String PALETTE = "palette";
     public static final String SCROLL_ON_KEY_PRESS = "scrollKey";
     public static final String SCROLL_ON_TTY_OUTPUT = "scrollTtyOutput";
+    public static final String VISUAL_BELL = "visualBell";
     
     /**
      * Whether or not the alt key should be meta.
@@ -48,6 +49,7 @@ public class TerminatorPreferences extends Preferences {
     
     protected void initPreferences() {
         setHelperForClass(Double.class, new AlphaHelper());
+        setHelperForClass(Color[].class, new PaletteHelper());
         
         addPreference(ALPHA, Double.valueOf(1.0), "Terminal opacity");
         addPreference(ANTI_ALIAS, Boolean.FALSE, "Anti-alias text");
@@ -62,6 +64,8 @@ public class TerminatorPreferences extends Preferences {
         addPreference(SCROLL_ON_KEY_PRESS, Boolean.TRUE, "Scroll to bottom on key press");
         addPreference(SCROLL_ON_TTY_OUTPUT, Boolean.FALSE, "Scroll to bottom on output");
         addPreference(USE_ALT_AS_META, Boolean.FALSE, "Use alt key as meta key (for Emacs)");
+        
+        addPreference(PALETTE, Palettes.fromString("ANSI"), "Palette");
         
         // Defaults reminiscent of SGI's xwsh(1).
         addPreference(BACKGROUND_COLOR, VERY_DARK_BLUE, "Background");
@@ -151,6 +155,30 @@ public class TerminatorPreferences extends Preferences {
             // Only enable the slider if the JVM seems likely to support setFrameAlpha.
             slider.setEnabled(GuiUtilities.canSetFrameAlpha());
             formPanels.get(1).addRow(description + ":", slider);
+        }
+    }
+    
+    private class PaletteHelper implements PreferencesHelper {
+        public String encode(String key) {
+            return Palettes.toString((Color[]) get(key));
+        }
+        
+        public Object decode(String valueString) {
+            return Palettes.fromString(valueString);
+        }
+        
+        public void addRow(List<FormPanel> formPanels, final String key, final String description) {
+            final JComboBox choices = new JComboBox();
+            for (String paletteName : Palettes.names()) {
+                choices.addItem(paletteName);
+            }
+            choices.setSelectedItem(encode(key));
+            choices.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    put(key, decode((String) choices.getSelectedItem()));
+                }
+            });
+            formPanels.get(1).addRow(description + ":", choices);
         }
     }
 }
