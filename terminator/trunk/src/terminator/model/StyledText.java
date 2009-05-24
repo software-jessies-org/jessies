@@ -70,14 +70,14 @@ public class StyledText {
 			if (hasSpecifiedColor == false && isForeground) {
 				result = Terminator.getSharedInstance().getBoldColor();
 			} else if (colorIndex < 8) {
-				result = AnsiColor.byIndex(colorIndex + 8);
+				result = Palettes.getColor(colorIndex, true);
 			}
 		}
 		if (result == null && hasSpecifiedColor == false) {
 			result = Terminator.getPreferences().getColor(isForeground ? TerminatorPreferences.FOREGROUND_COLOR : TerminatorPreferences.BACKGROUND_COLOR);
 		}
 		if (result == null) {
-			result = AnsiColor.byIndex(colorIndex);
+			result = Palettes.getColor(colorIndex, false);
 		}
 		return result;
 	}
