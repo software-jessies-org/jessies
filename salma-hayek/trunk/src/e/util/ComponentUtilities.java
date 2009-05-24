@@ -3,6 +3,7 @@ package e.util;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 import javax.swing.*;
 
 public class ComponentUtilities {
@@ -108,9 +109,15 @@ s     */
     
     /**
      * Ensures that all buttons are the same size, and that the chosen size is sufficient to contain the content of any.
-     * Most look and feels 
      */
     public static void tieButtonSizes(JButton... buttons) {
+        tieButtonSizes(Arrays.asList(buttons));
+    }
+    
+    /**
+     * Ensures that all buttons are the same size, and that the chosen size is sufficient to contain the content of any.
+     */
+    public static void tieButtonSizes(List<JButton> buttons) {
         int maxWidth = 0;
         int maxHeight = 0;
         for (JButton button : buttons) {
@@ -127,6 +134,6 @@ s     */
             button.setSize(maxButtonSize);
         }
     }
-    
+        
     private ComponentUtilities() { /* Not instantiable. */ }
 }
