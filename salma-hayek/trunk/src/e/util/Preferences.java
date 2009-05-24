@@ -28,18 +28,30 @@ import javax.swing.*;
 public abstract class Preferences {
     private static final Pattern RESOURCE_PATTERN = Pattern.compile("(?:\\S+(?:\\*|\\.))?(\\S+):\\s*(.+)");
     
+    private static class KeyAndTab {
+        String key;
+        String tab;
+        
+        KeyAndTab(String key, String tab) {
+            this.key = key;
+            this.tab = tab;
+        }
+    }
+    
     // Mutable at any time.
     private HashMap<String, Object> preferences = new HashMap<String, Object>();
     // Immutable after initialization.
-    private HashMap<String, Object> defaults = new HashMap<String, Object>();
+    private final HashMap<String, Object> defaults = new HashMap<String, Object>();
     
-    private HashMap<String, String> descriptions = new HashMap<String, String>();
-    private ArrayList<String> keysInUiOrder = new ArrayList<String>();
+    private final HashMap<String, String> descriptions = new HashMap<String, String>();
+    private final ArrayList<KeyAndTab> keysInUiOrder = new ArrayList<KeyAndTab>();
     
-    private HashMap<Class<?>, PreferencesHelper> helpers = new HashMap<Class<?>, PreferencesHelper>();
-    private HashMap<String, JComponent> customUis = new HashMap<String, JComponent>();
+    private final ArrayList<String> tabTitles = new ArrayList<String>();
     
-    private ArrayList<Listener> listeners = new ArrayList<Listener>();
+    private final HashMap<Class<?>, PreferencesHelper> helpers = new HashMap<Class<?>, PreferencesHelper>();
+    private final HashMap<String, JComponent> customUis = new HashMap<String, JComponent>();
+    
+    private final ArrayList<Listener> listeners = new ArrayList<Listener>();
     
     // Non-null if the preferences dialog is currently showing.
     private FormBuilder form;
@@ -73,15 +85,27 @@ public abstract class Preferences {
         }
     }
     
+    protected void addTab(String tabTitle) {
+        tabTitles.add(tabTitle);
+    }
+    
     protected void addPreference(String key, Object value, String description) {
+        addPreference(null, key, value, description);
+    }
+    
+    protected void addPreference(String tabName, String key, Object value, String description) {
         put(key, value);
         defaults.put(key, value);
         descriptions.put(key, description);
-        keysInUiOrder.add(key);
+        keysInUiOrder.add(new KeyAndTab(key, tabName));
     }
     
     protected void addSeparator() {
-        keysInUiOrder.add(null);
+        addSeparator(null);
+    }
+    
+    protected void addSeparator(String tabName) {
+        keysInUiOrder.add(new KeyAndTab(null, tabName));
     }
     
     public void setCustomUiForKey(String key, JComponent ui) {
@@ -189,38 +213,25 @@ public abstract class Preferences {
             }
         }
         
-        // FIXME: this isn't very general. what if we want a bunch of related (non-color) configuration on its own tab?
-        boolean hasColors = false;
-        for (String key : keysInUiOrder) {
-            if (key != null && preferences.get(key) instanceof Color) {
-                hasColors = true;
-                break;
-            }
-        }
-        
-        if (hasColors) {
-            form = new FormBuilder(parent, "Preferences", new String[] { "General", "Colors" });
-        } else {
-            form = new FormBuilder(parent, "Preferences");
-        }
+        form = new FormBuilder(parent, "Preferences", tabTitles.size() > 0 ? tabTitles : Arrays.asList("<anonymous>"));
         
         final List<FormPanel> formPanels = form.getFormPanels();
-        final FormPanel generalPanel = formPanels.get(0);
         
         willAddRows(formPanels);
         
-        for (String key : keysInUiOrder) {
-            if (key == null) {
-                // FIXME: what if we're currently in the color keys?
-                generalPanel.addEmptyRow();
+        for (KeyAndTab keyAndTab : keysInUiOrder) {
+            final FormPanel formPanel = formPanels.get(indexOfTab(keyAndTab.tab));
+            if (keyAndTab == null) {
+                formPanel.addEmptyRow();
                 continue;
             }
-            String description = descriptions.get(key);
+            final String key = keyAndTab.key;
+            final String description = descriptions.get(key);
             if (description != null) {
                 if (customUis.get(key) != null) {
-                    generalPanel.addRow(description + ":", customUis.get(key));
+                    formPanel.addRow(description + ":", customUis.get(key));
                 } else {
-                    helperForKey(key).addRow(formPanels, key, description);
+                    helperForKey(key).addRow(formPanel, key, description);
                 }
             }
         }
@@ -256,6 +267,13 @@ public abstract class Preferences {
         
         form.getFormDialog().setRememberBounds(false);
         form.show("Save");
+    }
+    
+    private int indexOfTab(String tabName) {
+        if (tabName == null) {
+            return 0;
+        }
+        return tabTitles.indexOf(tabName);
     }
     
     // Override this to add rows before the automatic ones.
@@ -335,7 +353,8 @@ public abstract class Preferences {
             org.w3c.dom.Element root = document.createElement("preferences");
             document.appendChild(root);
             
-            for (String key : keysInUiOrder) {
+            for (KeyAndTab keyAndTab : keysInUiOrder) {
+                final String key = keyAndTab.key;
                 if (key == null) {
                     continue;
                 }
@@ -369,7 +388,7 @@ public abstract class Preferences {
     public interface PreferencesHelper {
         public String encode(String key);
         public Object decode(String valueString);
-        public void addRow(List<FormPanel> formPanels, String key, final String description);
+        public void addRow(FormPanel formPanel, String key, final String description);
     }
     
     protected void setHelperForClass(Class<?> c, PreferencesHelper helper) {
@@ -393,14 +412,14 @@ public abstract class Preferences {
             return Boolean.valueOf(valueString);
         }
         
-        public void addRow(List<FormPanel> formPanels, final String key, final String description) {
+        public void addRow(FormPanel formPanel, final String key, final String description) {
             final JCheckBox checkBox = new JCheckBox(description, getBoolean(key));
             checkBox.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     put(key, checkBox.isSelected());
                 }
             });
-            formPanels.get(0).addRow("", checkBox);
+            formPanel.addRow("", checkBox);
         }
     }
     
@@ -423,7 +442,7 @@ public abstract class Preferences {
             return Font.decode(valueString);
         }
         
-        public void addRow(List<FormPanel> formPanels, final String key, final String description) {
+        public void addRow(FormPanel formPanel, final String key, final String description) {
             final JComboBox fontNameComboBox = makeFontNameComboBox(key);
             final JComboBox fontSizeComboBox = makeFontSizeComboBox(key);
             
@@ -458,7 +477,7 @@ public abstract class Preferences {
             JPanel fontChooser = new JPanel(new BorderLayout(2, 0));
             fontChooser.add(fontNameComboBox, BorderLayout.CENTER);
             fontChooser.add(fontSizeComboBox, BorderLayout.EAST);
-            formPanels.get(0).addRow(description + ":", fontChooser);
+            formPanel.addRow(description + ":", fontChooser);
         }
         
         private JComboBox makeFontNameComboBox(String key) {
@@ -499,7 +518,7 @@ public abstract class Preferences {
             return Color.decode(valueString);
         }
         
-        public void addRow(List<FormPanel> formPanels, final String key, final String description) {
+        public void addRow(FormPanel formPanel, final String key, final String description) {
             final ColorSwatchIcon icon = new ColorSwatchIcon(getColor(key), new Dimension(60, 20));
             final JButton button = new JButton(icon);
             button.addActionListener(new ActionListener() {
@@ -522,7 +541,7 @@ public abstract class Preferences {
                 button.putClientProperty("JButton.buttonType", "gradient"); // Mac OS 10.5
             }
             
-            formPanels.get(1).addRow(description + ":", button);
+            formPanel.addRow(description + ":", button);
         }
     }
     
@@ -535,7 +554,7 @@ public abstract class Preferences {
             return Integer.valueOf(valueString);
         }
         
-        public void addRow(List<FormPanel> formPanels, final String key, final String description) {
+        public void addRow(FormPanel formPanel, final String key, final String description) {
             final JTextField textField = new JTextField(preferences.get(key).toString());
             textField.getDocument().addDocumentListener(new DocumentAdapter() {
                 public void documentChanged() {
@@ -552,7 +571,7 @@ public abstract class Preferences {
                     textField.setForeground(okay ? UIManager.getColor("TextField.foreground") : Color.RED);
                 }
             });
-            formPanels.get(0).addRow(description + ":", textField);
+            formPanel.addRow(description + ":", textField);
         }
     }
     
@@ -565,7 +584,7 @@ public abstract class Preferences {
             return valueString;
         }
         
-        public void addRow(List<FormPanel> formPanels, final String key, final String description) {
+        public void addRow(FormPanel formPanel, final String key, final String description) {
             final JTextField textField = new JTextField(preferences.get(key).toString(), 20);
             textField.getDocument().addDocumentListener(new DocumentAdapter() {
                 public void documentChanged() {
@@ -573,7 +592,7 @@ public abstract class Preferences {
                 }
             });
             textField.setCaretPosition(0);
-            formPanels.get(0).addRow(description + ":", textField);
+            formPanel.addRow(description + ":", textField);
         }
     }
 }
