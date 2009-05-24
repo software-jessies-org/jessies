@@ -17,13 +17,13 @@ import javax.swing.*;
  * text fields. See FormPanel and FormDialog for more customization details.
  */
 public class FormBuilder {
-    private static final String[] DEFAULT_UI = { "<default-anonymous-panel>" };
+    private static final List<String> SINGLE_ANONYMOUS_TAB = Arrays.asList("<default-anonymous-panel>");
     
     private FormPanel[] formPanels;
     private FormDialog formDialog;
     
     // FormDialog wants read access to this, but there's no need for it to be publicly available.
-    String[] tabTitles;
+    List<String> tabTitles;
     // FormDialog wants read/write access to this, but it shouldn't be publicly available.
     JComponent statusBar;
     // FormDialog wants read access to this, but there's no need for it to be publicly available.
@@ -34,7 +34,7 @@ public class FormBuilder {
      * This form does not contain multiple tabs.
      */
     public FormBuilder(Frame parent, String title) {
-        this(parent, title, DEFAULT_UI);
+        this(parent, title, SINGLE_ANONYMOUS_TAB);
     }
     
     /**
@@ -42,14 +42,14 @@ public class FormBuilder {
      * This form contains as many tabs as you supply tab titles.
      * You should use getFormPanels to access the tabs' form panels; indexes correspond to the supplied tab titles.
      */
-    public FormBuilder(Frame parent, String title, String[] tabTitles) {
-        this.tabTitles = tabTitles;
+    public FormBuilder(Frame parent, String title, Collection<String> tabTitles) {
+        this.tabTitles = Collections.unmodifiableList(new ArrayList<String>(tabTitles));
         this.formPanels = makeFormPanels();
         this.formDialog = new FormDialog(this, parent, title);
     }
     
     private FormPanel[] makeFormPanels() {
-        FormPanel[] result = new FormPanel[tabTitles.length];
+        FormPanel[] result = new FormPanel[tabTitles.size()];
         for (int i = 0; i < result.length; ++i) {
             result[i] = new FormPanel();
         }

@@ -209,7 +209,7 @@ public class FormDialog {
             FormPanel panel = formPanels.get(i);
             panel.setBorder(BorderFactory.createEmptyBorder(0, 10, 16, 10));
             
-            tabbedPane.add(builder.tabTitles[i], panel);
+            tabbedPane.add(builder.tabTitles.get(i), panel);
         }
         
         for (FormPanel child : formPanels) {
