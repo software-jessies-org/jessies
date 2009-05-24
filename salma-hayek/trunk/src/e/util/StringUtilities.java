@@ -57,18 +57,18 @@ public class StringUtilities {
      * Writes the given lines to the given File, overwriting any existing content.
      * Returns the text of the exception message on failure, null on success.
      */
-    public static String writeFile(File file, List<String> lines) {
+    public static String writeFile(File file, Iterable<?> lines) {
         return writeFile0(file, null, lines);
     }
     
-    private static String writeFile0(File file, CharSequence content, List<String> lines) {
+    private static String writeFile0(File file, CharSequence content, Iterable<?> lines) {
         PrintWriter out = null;
         try {
             out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
             if (content != null) {
                 out.print(content);
             } else {
-                for (String line : lines) {
+                for (Object line : lines) {
                     // We could use println, but we'd probably want to make readFile smarter first.
                     out.print(line);
                     out.print("\n");
@@ -334,13 +334,17 @@ public class StringUtilities {
     /**
      * Joins the strings in 'strings' with 'separator' between each.
      */
-    public static String join(List<?> strings, CharSequence separator) {
+    public static String join(Iterable<?> strings, CharSequence separator) {
         StringBuilder result = new StringBuilder();
-        for (int i = 0; i < strings.size(); ++i) {
-            if (i > 0) {
+        boolean first = true;
+        Iterator<?> it = strings.iterator();
+        while (it.hasNext()) {
+            if (first) {
+                first = false;
+            } else {
                 result.append(separator);
             }
-            result.append(strings.get(i));
+            result.append(it.next());
         }
         return result.toString();
     }
