@@ -64,7 +64,7 @@ public class TagsUpdater {
         });
         // Select the corresponding tag in the tree when the focus is gained or the caret moves.
         text.addFocusListener(new FocusAdapter() {
-            public void focusGained(FocusEvent e) {
+            @Override public void focusGained(FocusEvent e) {
                 followCaretChanges = true;
                 createUi();
                 updateTags();
@@ -112,7 +112,7 @@ public class TagsUpdater {
         
         tree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
         tree.addMouseListener(new MouseAdapter() {
-            public void mousePressed(MouseEvent e) {
+            @Override public void mousePressed(MouseEvent e) {
                 TreePath path = tree.getPathForLocation(e.getX(), e.getY());
                 if (path == null) {
                     return;
@@ -351,7 +351,7 @@ public class TagsUpdater {
             super(userObject);
         }
         
-        public void add(MutableTreeNode node) {
+        @Override public void add(MutableTreeNode node) {
             Object o = ((DefaultMutableTreeNode) node).getUserObject();
             if (o instanceof TagReader.Tag) {
                 insert(node, getInsertIndex((TagReader.Tag) o));
