@@ -63,7 +63,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
             }
         }
         
-        public String toString() {
+        @Override public String toString() {
             return line;
         }
     }
@@ -133,7 +133,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
             }
         }
         
-        public String toString() {
+        @Override public String toString() {
             StringBuilder result = new StringBuilder(file.getName());
             if (matchCount != 0) {
                 result.append(" (");
@@ -479,7 +479,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
             setLeafIcon(null);
         }
         
-        public Component getTreeCellRendererComponent(JTree tree, Object value, boolean isSelected, boolean isExpanded, boolean isLeaf,  int row,  boolean hasFocus) {
+        @Override public Component getTreeCellRendererComponent(JTree tree, Object value, boolean isSelected, boolean isExpanded, boolean isLeaf,  int row,  boolean hasFocus) {
             Component c = super.getTreeCellRendererComponent(tree, value, isSelected, isExpanded, isLeaf, row, hasFocus);
             
             // Unlike the foreground Color, the Font gets remembered, so we
