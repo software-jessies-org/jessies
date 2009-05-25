@@ -104,7 +104,7 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
     private void initMatchList() {
         matchList = new JList();
         matchList.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
+            @Override public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     int index = matchList.locationToIndex(e.getPoint());
                     openFileAtIndex(index);
