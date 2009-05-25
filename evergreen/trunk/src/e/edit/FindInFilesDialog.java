@@ -18,25 +18,25 @@ import java.util.List;
 import org.jdesktop.swingworker.SwingWorker;
 
 public class FindInFilesDialog implements WorkspaceFileList.Listener {
-    private JTextField regexField = new JTextField(40);
-    private JTextField filenameRegexField = new JTextField(40);
-    private JLabel status = new JLabel(" ");
-    private ETree matchView;
-    private JButton rescanButton;
-    
-    private DefaultTreeModel matchTreeModel;
-    
-    /** Which workspace is this "Find in Files" for? */
-    private Workspace workspace;
-    
     /** How our worker threads know whether they're still relevant. */
     private static final AtomicInteger currentSequenceNumber = new AtomicInteger(0);
     
     /** We share these between all workspaces, to make it harder to accidentally launch a denial-of-service attack against ourselves. */
     private static final ExecutorService definitionFinderExecutor = ThreadUtilities.newFixedThreadPool(8, "Find Definitions");
     
+    /** Which workspace is this "Find in Files" for? */
+    private final Workspace workspace;
+    
+    private final JTextField regexField = new JTextField(40);
+    private final JTextField filenameRegexField = new JTextField(40);
+    private final JLabel status = new JLabel(" ");
+    private final JButton rescanButton;
+    private final ETree matchView;
+    
+    private final DefaultTreeModel matchTreeModel;
+    
     /** Holds all the UI. The actual "dialog" is in here! */
-    private FormBuilder form;
+    private final FormBuilder form;
     
     public interface ClickableTreeItem {
         public void open();
@@ -420,9 +420,6 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
     }
     
     private void initMatchList() {
-        matchTreeModel = new DefaultTreeModel(null);
-        matchView = new ETree(matchTreeModel);
-
         matchView.setRootVisible(false);
         matchView.setShowsRootHandles(true);
         matchView.putClientProperty("JTree.lineStyle", "None");
@@ -523,6 +520,9 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
     public FindInFilesDialog(Workspace workspace) {
         this.workspace = workspace;
         this.rescanButton = RescanWorkspaceAction.makeRescanButton(workspace);
+        this.matchTreeModel = new DefaultTreeModel(null);
+        this.matchView = new ETree(matchTreeModel);
+        this.form = new FormBuilder(Evergreen.getInstance().getFrame(), "Find in Files in " + workspace.getWorkspaceName());
         
         initMatchList();
         initForm();
@@ -532,7 +532,6 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
     }
     
     private void initForm() {
-        this.form = new FormBuilder(Evergreen.getInstance().getFrame(), "Find in Files in " + workspace.getWorkspaceName());
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Files Containing:", regexField);
         formPanel.addRow("Whose Names Match:", filenameRegexField);
