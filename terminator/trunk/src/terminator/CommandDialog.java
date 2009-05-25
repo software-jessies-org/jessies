@@ -17,7 +17,7 @@ import terminator.view.*;
  * Used by the "New Command..." and "New Command Tab..." menu items.
  */
 public class CommandDialog {
-    private static StringHistory history = new StringHistory(getHistoryFilename());
+    private static final StringHistory history = new StringHistory(getHistoryFilename());
     
     private FormBuilder form;
     private JTextField commandField;
