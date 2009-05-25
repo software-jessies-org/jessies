@@ -56,7 +56,7 @@ public class FindAndReplaceAction extends ETextAction {
     private void initLists() {
         this.matchList = new JList();
         matchList.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
+            @Override public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     int index = matchList.locationToIndex(e.getPoint());
                     DisplayableMatch match = (DisplayableMatch) matchList.getModel().getElementAt(index);
@@ -158,7 +158,7 @@ public class FindAndReplaceAction extends ETextAction {
             super(true);
         }
 
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+        @Override public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             
             // If there were captured groups, set the tool tip.
@@ -212,7 +212,7 @@ public class FindAndReplaceAction extends ETextAction {
             return buffer.toString();
         }
 
-        public String toString() {
+        @Override public String toString() {
             return html;
         }
 
