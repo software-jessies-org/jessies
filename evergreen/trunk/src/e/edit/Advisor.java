@@ -13,7 +13,7 @@ import org.jdesktop.swingworker.SwingWorker;
 public class Advisor extends JPanel {
     private static Advisor instance;
     
-    private static ArrayList<WorkspaceResearcher> researchers = new ArrayList<WorkspaceResearcher>();
+    private static final ArrayList<WorkspaceResearcher> researchers = new ArrayList<WorkspaceResearcher>();
     
     /** The advice window. */
     private AdvisorHtmlPane advicePane = new AdvisorHtmlPane();
