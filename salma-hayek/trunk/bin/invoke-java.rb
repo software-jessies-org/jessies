@@ -148,7 +148,7 @@ class Java
     # We've seen a number of systems which run an i386 JVM on an amd64 kernel.
     add_pathnames_property("org.jessies.libraryDirectories", Dir.glob("{#{@project_root},#{@salma_hayek}}/.generated/*_#{target_os()}/lib"))
     # But an i386 JVM on an amd64 kernel will run amd64 binaries.
-    add_pathname_property("org.jessies.binaryDirectory", "#{@salma_hayek}/.generated/#{target_directory()}/bin")
+    add_pathname_property("org.jessies.binaryDirectory", chooseSupportBinaryDirectory())
     
     set_icons(name)
     
@@ -156,7 +156,7 @@ class Java
     if target_os() == "Cygwin" || ENV["USE_JAVA_LAUNCHER"] != nil
       # We need to load jvm.dll from a Cygwin executable to get a reliable Cygwin JNI experience.
       # This launcher doesn't use the same algorithm as Sun's for picking a jvm.dll.
-      @launcher = "#{@salma_hayek}/.generated/#{target_directory()}/bin/java-launcher"
+      @launcher = findSupportBinary("java-launcher")
     end
     if false && target_os() == "Darwin"
       # For Sparkle to work, we need our [NSBundle mainBundle] to point to our .app bundle.
@@ -167,7 +167,7 @@ class Java
       else
         # We're probably running from a developer's working copy.
         # Better to run without Sparkle than not run at all.
-        @launcher = "#{@salma_hayek}/.generated/#{target_directory()}/bin/java-launcher"
+        @launcher = findSupportBinary("java-launcher")
       end
     end
   end
@@ -326,30 +326,11 @@ class Java
     @class_path.concat(jars.to_a())
   end
   
-  def getExtraPathComponents()
-    subProjectRoots = [ @project_root, @salma_hayek ]
-    executableSubDirectories = [ "bin" ]
-    extraPathComponents = []
-    subProjectRoots.each() {
-      |subProjectRoot|
-      executableSubDirectories.each() {
-        |executableSubDirectory|
-        directory = "#{subProjectRoot}/#{executableSubDirectory}"
-        if FileTest.directory?(directory)
-          extraPathComponents << directory
-        end
-      }
-    }
-    return extraPathComponents
-  end
-  
   def subvertPath()
     # File::PATH_SEPARATOR is the right choice here for Cygwin (":") and native Windows Ruby (";").
     originalPathComponents = ENV["PATH"].split(File::PATH_SEPARATOR)
     newPathComponents = []
     # Experience suggests that various startup files are likely to reset the PATH in terminator shells.
-    # FIXME: If we can live with this commented out for a week from 2009-04-15, then getExtraPathComponents can be deleted.
-    #newPathComponents.concat(getExtraPathComponents())
     newPathComponents.concat(originalPathComponents)
     # Find cygwin1.dll.
     newPathComponents << "/bin"
@@ -364,8 +345,12 @@ class Java
     report_exceptions(@dock_name) { launch() }
   end
   
+  def chooseSupportBinaryDirectory()
+    return "#{@salma_hayek}/.generated/#{target_directory()}/bin"
+  end
+  
   def findSupportBinary(binaryName)
-    return "#{@salma_hayek}/.generated/#{target_directory()}/bin/#{binaryName}"
+    return "#{chooseSupportBinaryDirectory()}/#{binaryName}"
   end
   
   def launch()
@@ -380,7 +365,7 @@ class Java
 
     add_pathnames_property("java.class.path", @class_path)
     
-    # Fix the path so that our support binaries are on it.
+    # Fix the path so that cygwin1.dll is on it.
     subvertPath()
     
     # Since we're often started from the command line or from other programs, set up startup notification ourselves if it looks like we should.
