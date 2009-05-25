@@ -11,13 +11,13 @@ import org.jdesktop.swingworker.SwingWorker;
 
 public class WorkspaceFileList {
     private final Workspace workspace;
+    private final ArrayList<Listener> listeners = new ArrayList<Listener>();
+    
     private FileIgnorer fileIgnorer;
     private ArrayList<String> fileList;
     
     private FileAlterationMonitor fileAlterationMonitor;
     private ExecutorService fileListUpdateExecutorService;
-    
-    private ArrayList<Listener> listeners = new ArrayList<Listener>();
     
     public WorkspaceFileList(Workspace workspace) {
         this.workspace = workspace;
