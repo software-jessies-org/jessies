@@ -147,7 +147,6 @@ class Java
     # We don't know the JVM's architecture at this point.
     # We've seen a number of systems which run an i386 JVM on an amd64 kernel.
     add_pathnames_property("org.jessies.libraryDirectories", Dir.glob("{#{@project_root},#{@salma_hayek}}/.generated/*_#{target_os()}/lib"))
-    # But an i386 JVM on an amd64 kernel will run amd64 binaries.
     add_pathname_property("org.jessies.binaryDirectory", chooseSupportBinaryDirectory())
     
     set_icons(name)
@@ -346,7 +345,9 @@ class Java
   end
   
   def chooseSupportBinaryDirectory()
-    return "#{@salma_hayek}/.generated/#{target_directory()}/bin"
+    # An i386 JVM on an amd64 kernel will run amd64 binaries.
+    # But only the i386 binaries are likely to be installed (with dpkg --force-architecture).
+    return Dir.glob("#{@salma_hayek}/.generated/{#{target_directory()},*_#{target_os()}}/bin")[0]
   end
   
   def findSupportBinary(binaryName)
