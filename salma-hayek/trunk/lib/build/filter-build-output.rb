@@ -42,6 +42,15 @@ def isWorthyOfOutput(line)
   if line.match(/All \d+ tests passed/)
     return true
   end
+
+  # Obeying the hint in this "info" stanza turned out to be necessary:
+  # Info: resolving typeinfo for std::runtime_error by linking to __imp___ZTISt13runtime_error (auto-import)
+  # Info: resolving typeinfo for std::exception by linking to __imp___ZTISt9exception (auto-import)
+  # Info: resolving std::cerr  by linking to __imp___ZSt4cerr (auto-import/usr/lib/gcc/i686-pc-cygwin/4.3.2/../../../../i686-pc-cygwin/bin/ld: warning: auto-importing has been activated without --enable-auto-import specified on the command line.
+  # This should work unless it involves constant data structures referencing symbols from auto-imported DLLs.)
+  if line.match(/^Info: /)
+    return true
+  end
   
   return false
 end
@@ -63,7 +72,7 @@ def filterBuildOutput(inputIo)
     # Match Compiling, Generating etc.
     if line.match(/^[A-Z][a-z]+ing\b.*\.\.\./)
       progressLine = line
-    elsif line.match(/^(?:cc|g\+\+) .*?\/([^\/ ]+)$/)
+    elsif line.match(/^(?:\S+-)?(?:cc|g\+\+)(?:-\d+)? .*?\/([^\/ ]+)$/)
       # I don't want to override the built-in rules for compilation and it's hard to hook them to do extra echoing.
       # The regular expression above might be ugly but at least it's small, isolated and won't cause a build failure if it breaks.
       sourceFile = $1
