@@ -400,7 +400,7 @@ public class FileUtilities {
     
     private static void throwUnsatisfiedLinkError(String library, String directories, Throwable cause) {
         final String arch = System.getProperty("os.arch");
-        final String extra = (directories != null) ? "from \"" + directories + "\"" : "(" + LIBS_SYSTEM_PROPERTY +  "was not set)";
+        final String extra = (directories != null) ? "from \"" + directories + "\"" : "(" + LIBS_SYSTEM_PROPERTY +  " was not set)";
         final UnsatisfiedLinkError unsatisfiedLinkError = new UnsatisfiedLinkError("Failed to load \"" + library + "\" for " + arch + " " + extra);
         unsatisfiedLinkError.initCause(cause);
         throw unsatisfiedLinkError;
