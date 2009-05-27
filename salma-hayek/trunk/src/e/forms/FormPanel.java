@@ -27,21 +27,27 @@ public class FormPanel extends JPanel {
     
     /**
      * Adds a row consisting of a label and a corresponding component.
+     * If you want an empty label, use "". (This is the more common case.)
+     * If you don't want even a space for a label, and want 'component' to take up the entire row, use null.
+     * FIXME: it would probably be better to refactor so that the basic dialog stuff takes a JComponent content pane, and FormPanel is just one possible content pane.
      */
     public void addRow(String text, Component component) {
         // Text components are automatically listened to for changes; see setTypingTimeoutAction.
         addTextComponentChildren(component);
         
-        JLabel label = new JLabel(text);
-        label.setLabelFor(component);
-
-        GridBagConstraints labelConstraints = new GridBagConstraints();
-        labelConstraints.gridx = 0;
-        labelConstraints.gridy = nextRow;
-        labelConstraints.insets = new Insets(GuiUtilities.getComponentSpacing(), GuiUtilities.getComponentSpacing(), 0, 0);
-        labelConstraints.anchor = (component instanceof JScrollPane) ? GridBagConstraints.NORTHEAST : GridBagConstraints.EAST;
-        labelConstraints.fill = GridBagConstraints.NONE;
-        add(label, labelConstraints);
+        // Add the label, unless the caller doesn't want one.
+        if (text != null) {
+            JLabel label = new JLabel(text);
+            label.setLabelFor(component);
+            
+            GridBagConstraints labelConstraints = new GridBagConstraints();
+            labelConstraints.gridx = 0;
+            labelConstraints.gridy = nextRow;
+            labelConstraints.insets = new Insets(GuiUtilities.getComponentSpacing(), GuiUtilities.getComponentSpacing(), 0, 0);
+            labelConstraints.anchor = (component instanceof JScrollPane) ? GridBagConstraints.NORTHEAST : GridBagConstraints.EAST;
+            labelConstraints.fill = GridBagConstraints.NONE;
+            add(label, labelConstraints);
+        }
 
         // Add the component with its constraints
         GridBagConstraints componentConstraints = new GridBagConstraints();
