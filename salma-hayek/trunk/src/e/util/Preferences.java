@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
+import javax.swing.event.*;
 
 /**
  * Manages application preferences.
@@ -518,17 +519,37 @@ public abstract class Preferences {
             return Color.decode(valueString);
         }
         
-        public void addRow(FormPanel formPanel, final String key, final String description) {
-            final ColorSwatchIcon icon = new ColorSwatchIcon(getColor(key), new Dimension(60, 20));
+        public void addRow(final FormPanel formPanel, final String key, final String description) {
+            final Color originalColor = getColor(key);
+            final ColorSwatchIcon icon = new ColorSwatchIcon(originalColor, new Dimension(60, 20));
             final JButton button = new JButton(icon);
             button.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    Color newColor = JColorChooser.showDialog(button, "Colors", getColor(key));
-                    if (newColor != null) {
-                        put(key, newColor);
-                        icon.setColor(newColor);
-                        button.repaint();
+                    // JColorChooser.showDialog looks terrible, and doesn't let us dynamically respond to the user's choice.
+                    final JColorChooser colorChooser = new JColorChooser(getColor(key));
+                    // No platform uses anything like Swing's hideous preview panel...
+                    colorChooser.setPreviewPanel(new JPanel());
+                    // ...and we want to provide a live preview ourselves.
+                    colorChooser.getSelectionModel().addChangeListener(new ChangeListener() {
+                        public void stateChanged(ChangeEvent e) {
+                            setColor(colorChooser.getColor());
+                        }
+                    });
+                    // Use FormBuilder to provide a decent dialog.
+                    final Frame parent = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, formPanel);
+                    final String title = description;
+                    final FormBuilder form = new FormBuilder(parent, title);
+                    form.getFormPanel().addRow(null, colorChooser);
+                    if (form.show("OK") == false) {
+                        // Reset the color if the user hit "Cancel".
+                        setColor(originalColor);
                     }
+                }
+                
+                private void setColor(final Color newColor) {
+                    put(key, newColor);
+                    icon.setColor(newColor);
+                    button.repaint();
                 }
             });
             // Remove the over-wide horizontal margins most LAFs use. They're trying to give text some breathing room, but we have no text.
