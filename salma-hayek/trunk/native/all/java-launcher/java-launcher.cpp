@@ -165,7 +165,27 @@ SharedLibraryHandle openSharedLibrary(const std::string& sharedLibraryFilename) 
     // This could cause a problem if we try to load an amd64 DLL before going on to try to load an i386 DLL.
     // At least it would be an overt problem rather than the silent failure we got when MSVCR71.DLL wasn't in the current directory and wasn't on the PATH.
     WindowsDllErrorModeChange windowsDllErrorModeChange;
+#if defined(__CYGWIN__)
+    // As of winsup/cygwin/dlfcn.cc revision 1.41, dlopen uses LoadLibraryW.
+    // The code to generate wide character filenames prepends \\?\.
+    // This wasn't done before, when dlopen was using LoadLibrary.
+    // (This lets Cygwin load libraries from long and MBCS paths.)
+    // The JVM deduces the location of rt.jar from the filename via which it was loaded.
+    // If loaded with a name that starts \\?\, the JVM fails to open rt.jar.
+    // It's the prefix that causes this, not the LibraryW.
+    // It's not clear whether that's due to a path parsing infelicity in the JVM
+    // or due to a deficiency in some Windows API call.
+    // According to "File Names, Paths, And Namespaces (Windows)" on MSDN
+    // 'Many but not all file APIs support "\\?\"'
+    // There's no list of broken ones.
+    // Fortunately, we don't require any of dlopen's functionality.
+    // We don't need Cygwin paths translating or symlinks following,
+    // nor do we need an LD_LIBRARY_PATH search.
+    // dlopen doesn't currently do anything clever with the returned value.
+    void* sharedLibraryHandle = LoadLibrary(sharedLibraryFilename.c_str());
+#else
     void* sharedLibraryHandle = dlopen(sharedLibraryFilename.c_str(), RTLD_LAZY);
+#endif
     if (sharedLibraryHandle == 0) {
         std::ostringstream os;
         os << "dlopen(\"" << sharedLibraryFilename << "\") failed with " << dlerror() << ".";
