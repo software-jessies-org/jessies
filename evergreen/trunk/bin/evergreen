@@ -75,13 +75,13 @@ class Evergreen
             exit(send_command(client, "#{shouldBlock ? 'openAndBlock' : 'open'} #{File.expand_path(filename)}"))
         end
         
-        invoker = Java.new("Evergreen", "e/util/Launcher")
+        invoker = Java.new("Evergreen", "e/edit/Evergreen")
         invoker.log_filename = "/tmp/edit.log.#$$"
         invoker.add_pathname_property("preferencesDirectory", dot_directory)
         invoker.add_property("e.gui.HelpMenu.hasManual", "true")
         invoker.add_property("e.gui.HelpMenu.supportAddress", "evergreen-users@googlegroups.com")
         invoker.add_property("e.gui.HelpMenu.supportSite", "http://groups.google.com/group/evergreen-users")
-        invoker.invoke([ "Evergreen", "e.edit.EvergreenLaunchable" ])
+        invoker.invoke()
     end
     
     def send_command(client, command)
