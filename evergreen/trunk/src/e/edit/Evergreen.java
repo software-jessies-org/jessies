@@ -877,4 +877,16 @@ public class Evergreen {
             }
         });
     }
+    
+    public static void main(final String[] args) {
+        EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                GuiUtilities.initLookAndFeel();
+                final Evergreen editor = Evergreen.getInstance();
+                for (String arg : args) {
+                    editor.openFile(arg);
+                }
+            }
+        });
+    }
 }
