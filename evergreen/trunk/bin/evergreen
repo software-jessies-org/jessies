@@ -17,8 +17,19 @@ class Evergreen
         report_exceptions("Evergreen") { launch0() }
     end
     
+    def help()
+        puts("usage: evergreen [--block] FILE[:LINE]")
+        puts("       evergreen --new-workspace DIR [NAME]")
+        puts("       evergreen --close-workspace NAME")
+        exit(1)
+    end
+    
     def launch0()
         home = ENV["HOME"]
+        
+        if ARGV[0] == "--help"
+            help()
+        end
         
         shouldBlock = false
         if ARGV[0] == "--block"
@@ -27,15 +38,22 @@ class Evergreen
         end
         
         shouldCreateNewWorkspace = false
-        if ARGV[0] == "--new-workspace"
+        if ARGV[0] == "--new-workspace" || ARGV[0] == "--add-workspace"
             ARGV.shift()
             workspace_root = ARGV.shift()
+            if workspace_root == nil
+                help()
+            end
+            workspace_root = Pathname.new(workspace_root).realpath()
             workspace_name = ARGV.shift()
+            if workspace_name == nil
+                workspace_name = workspace_root.basename()
+            end
             shouldCreateNewWorkspace = true
         end
         
         shouldCloseWorkspace = false
-        if ARGV[0] == "--close-workspace"
+        if ARGV[0] == "--close-workspace" || ARGV[0] == "--remove-workspace"
             ARGV.shift()
             workspace_name = ARGV.shift()
             shouldCloseWorkspace = true
