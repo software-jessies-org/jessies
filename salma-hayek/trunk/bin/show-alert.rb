@@ -3,7 +3,7 @@
 if defined?(show_alert)
     # Allow this library to be multiply included without warning.
 else
-    def show_alert(title, message)
+    def show_alert(title, message, support_address = nil)
         require "pathname.rb"
         salma_hayek = Pathname.new(__FILE__).realpath().dirname().dirname()
         
@@ -44,81 +44,94 @@ else
         elsif target_os() == "Cygwin" || target_os() == "Windows"
             platformMessageLines = []
             platformMessageLines << message
-            platformMessageLines << ""
-            platformMessageLines << "Please copy this message to the clipboard with Ctrl-C and mail it to software@jessies.org.";
-            platformMessageLines << "(Windows won't let you select the text but Ctrl-C works anyway.)";
+            # Some alerts are self-explanatory.
+            if support_address != nil
+                platformMessageLines << ""
+                platformMessageLines << "Please copy this message to the clipboard with Ctrl-C and mail it to #{support_address}.";
+                platformMessageLines << "(Windows won't let you select the text but Ctrl-C works anyway.)";
+            end
             require "Win32API"
             Win32API.new('user32', 'MessageBox', %w(p p p i), 'i').call(0, platformMessageLines.join("\n"), title, 0)
         end
     end
     
-    # Shows a dialog reporting that the exception "ex" was caught while starting application "app_name".
-    def show_uncaught_exception(app_name, ex)
-        # exit() throws a SystemExit exception.
-        # We're only interested in unintentional exceptions here.
-        if ex.class() == SystemExit
-            raise()
-        end
-        # I like seeing the Ruby backtrace on the console but throwing a GUI alert confuses end users.
-        if ex.class() == Interrupt
-            raise()
-        end
-        # Ron Pagani managed to get the Dock to kill Terminator with SIGTERM.
-        if ex.class() == SignalException && ex.message() == "SIGTERM"
-            raise()
-        end
-        # Based on the idea in http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/21530
-        prefix = "\tat "
-        message = "An error occurred in #{app_name}:\n"
-        message << "\n"
-        message << "Exception #{ex.class}: #{ex.message}\n"
-        message << "#{prefix}" << ex.backtrace.join("\n#{prefix}")
-        show_alert("Uncaught exception", message)
-    end
-    
-    def run_in_home_directory(app_name, block)
-        # This happens more often on Cygwin than users of other operating systems would think.
-        # Perhaps often enough to warrant all this code to detect and report on the situation in a friendly way.
-        chdirSucceeded = false
-        begin
-            Dir.chdir() {
-                chdirSucceeded = true
-                block.call()
-            }
-        rescue Exception => ex
-            if chdirSucceeded
+    class ExceptionReporter
+        # Shows a dialog reporting that the exception "ex" was caught.
+        def show_uncaught_exception(ex)
+            # exit() throws a SystemExit exception.
+            # We're only interested in unintentional exceptions here.
+            if ex.class() == SystemExit
                 raise()
             end
-            messageLines = []
-            messageLines << "#{app_name} failed to change to your home directory."
-            messageLines << ""
-            messageLines << "Exception #{ex.class}: #{ex.message}"
-            messageLines << ""
-            messageLines << "Perhaps you need to double click on the Cygwin shortcut again?"
-            messageLines << "See http://software.jessies.org/salma-hayek/cygwin-setup.html"
-            show_alert("Home directory problem", messageLines.join("\n"))
-            # If the user has no home directory, then they might be happy starting in /bin,
-            # but Terminator will fail when it can't create ~/.terminator,
-            # so perhaps we're best off predictably exiting here.
-            exit(1)
+            # I like seeing the Ruby backtrace on the console but throwing a GUI alert confuses end users.
+            if ex.class() == Interrupt
+                raise()
+            end
+            # Ron Pagani managed to get the Dock to kill Terminator with SIGTERM.
+            if ex.class() == SignalException && ex.message() == "SIGTERM"
+                raise()
+            end
+            # Based on the idea in http://blade.nagaokaut.ac.jp/cgi-bin/scat.rb/ruby/ruby-talk/21530
+            prefix = "\tat "
+            message = "An error occurred in #{@app_name}:\n"
+            message << "\n"
+            message << "Exception #{ex.class}: #{ex.message}\n"
+            message << "#{prefix}" << ex.backtrace.join("\n#{prefix}")
+            show_alert("Uncaught exception", message, @support_address)
+        end
+        
+        def run_in_home_directory(block)
+            # This happens more often on Cygwin than users of other operating systems would think.
+            # Perhaps often enough to warrant all this code to detect and report on the situation in a friendly way.
+            chdirSucceeded = false
+            begin
+                Dir.chdir() {
+                    chdirSucceeded = true
+                    block.call()
+                }
+            rescue Exception => ex
+                if chdirSucceeded
+                    raise()
+                end
+                messageLines = []
+                messageLines << "#{app_name} failed to change to your home directory."
+                messageLines << ""
+                messageLines << "Exception #{ex.class}: #{ex.message}"
+                messageLines << ""
+                messageLines << "Perhaps you need to double click on the Cygwin shortcut again?"
+                messageLines << "See http://software.jessies.org/salma-hayek/cygwin-setup.html"
+                show_alert("Home directory problem", messageLines.join("\n"), @support_address)
+                # If the user has no home directory, then they might be happy starting in /bin,
+                # but Terminator will fail when it can't create ~/.terminator,
+                # so perhaps we're best off predictably exiting here.
+                exit(1)
+            end
+        end
+        
+        # Use this to report exceptions thrown by the given block.
+        def initialize(app_name, support_address, &block)
+            @app_name = app_name
+            @support_address = support_address
+            begin
+                # Our Windows desktop shortcuts get started from Cygwin's /bin directory.
+                # We want to behave as if started from the invoking user's home directory.
+                if ENV["RUBY_LAUNCHER_INVOKING"]
+                    ENV["RUBY_LAUNCHER_INVOKING"] = nil
+                    run_in_home_directory(block)
+                else
+                    block.call()
+                end
+            rescue Exception => ex
+                show_uncaught_exception(ex)
+                exit(1)
+            end
         end
     end
     
-    # Use this to report exceptions thrown by the given block.
-    def report_exceptions(app_name, &block)
-        begin
-            # Our Windows desktop shortcuts get started from Cygwin's /bin directory.
-            # We want to behave as if started from the invoking user's home directory.
-            if ENV["RUBY_LAUNCHER_INVOKING"]
-                ENV["RUBY_LAUNCHER_INVOKING"] = nil
-                run_in_home_directory(app_name, block)
-            else
-                block.call()
-            end
-        rescue Exception => ex
-            show_uncaught_exception(app_name, ex)
-            exit(1)
-        end
+    # There are two callers that don't specify the address.
+    # One would be hard to eliminate.
+    def report_exceptions(app_name, support_address = "software@jessies.org", &block)
+        ExceptionReporter.new(app_name, support_address, &block)
     end
 end
 
