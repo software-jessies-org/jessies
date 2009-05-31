@@ -16,12 +16,15 @@
 #include <iostream>
 #include <sstream>
 
-void reportFatalErrorViaGui(const std::string& programName, const std::string& applicationMessage) {
+inline void reportFatalErrorViaGui(const std::string& programName, const std::string& applicationMessage, std::string supportAddress) {
+    if (supportAddress.empty()) {
+        supportAddress = "software@jessies.org";
+    }
     std::ostringstream os;
     os << applicationMessage;
 #if USE_MESSAGE_BOX
     os << std::endl;
-    os << "Please copy this message to the clipboard with Ctrl-C and mail it to software@jessies.org.";
+    os << "Please copy this message to the clipboard with Ctrl-C and mail it to " << supportAddress << ".";
     os << std::endl;
     os << "(Windows won't let you select the text but Ctrl-C works anyway.)";
     os << std::endl;
@@ -37,6 +40,10 @@ void reportFatalErrorViaGui(const std::string& programName, const std::string& a
     (void)programName;
 #endif
     std::cerr << platformMessage;
+}
+
+inline void reportFatalErrorViaGui(const std::string& programName, const std::string& applicationMessage) {
+    reportFatalErrorViaGui(programName, applicationMessage, "");
 }
 
 #endif
