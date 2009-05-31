@@ -8,13 +8,16 @@ class Evergreen
         # Cope with symbolic links to this script.
         @project_root = Pathname.new(__FILE__).realpath().dirname().dirname()
         @salma_hayek = Pathname.new("#{@project_root}/../salma-hayek").realpath()
+        
         require "#{@salma_hayek}/bin/invoke-java.rb"
         require "#{@salma_hayek}/bin/target-os.rb"
         require "#{@salma_hayek}/bin/show-alert.rb"
+        
+        @supportAddress = "evergreen-users@googlegroups.com"
     end
     
     def launch()
-        report_exceptions("Evergreen") { launch0() }
+        report_exceptions("Evergreen", @supportAddress) { launch0() }
     end
     
     def help()
@@ -97,9 +100,9 @@ class Evergreen
         invoker.log_filename = "/tmp/edit.log.#$$"
         invoker.add_pathname_property("preferencesDirectory", dot_directory)
         invoker.add_property("e.gui.HelpMenu.hasManual", "true")
-        invoker.add_property("e.gui.HelpMenu.supportAddress", "evergreen-users@googlegroups.com")
+        invoker.add_property("e.gui.HelpMenu.supportAddress", @supportAddress)
         invoker.add_property("e.gui.HelpMenu.supportSite", "http://groups.google.com/group/evergreen-users")
-        invoker.invoke()
+        invoker.launch()
     end
     
     def send_command(client, command)
