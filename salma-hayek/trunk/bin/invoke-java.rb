@@ -141,6 +141,7 @@ class Java
     require "#{@salma_hayek}/bin/show-alert.rb"
     
     @extra_java_arguments = []
+    @extra_app_arguments = []
 
     init_default_heap_size()
     init_default_class_path()
