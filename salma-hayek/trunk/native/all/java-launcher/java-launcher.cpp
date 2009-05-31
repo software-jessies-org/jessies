@@ -24,6 +24,7 @@
 #include <dlfcn.h>
 #include <fstream>
 #include <iostream>
+#include <map>
 #include <sstream>
 #include <stdexcept>
 #include <stdint.h>
@@ -49,6 +50,7 @@ struct ErrorReporter {
 public:
     std::string ARGV0;
     NativeArguments launcherArguments;
+    std::string supportAddress;
     std::string sharedLibraryFilename;
     
 private:
@@ -438,20 +440,41 @@ public:
     }
 };
 
+bool startsWith(const std::string& st, const std::string& prefix) {
+    return st.substr(0, prefix.size()) == prefix;
+}
+
+struct Properties : public std::map<std::string, std::string> {
+    void parse(const NativeArguments& arguments) {
+        for (NativeArguments::const_iterator it = arguments.begin(), en = arguments.end(); it != en; ++ it) {
+            std::string option = *it;
+            if (startsWith(option, "-D") == false) {
+                continue;
+            }
+            size_t offset = option.find('=');
+            if (offset == std::string::npos) {
+                continue;
+            }
+            std::string name = option.substr(2, offset - 2);
+            std::string value = option.substr(offset + 1);
+            (*this)[name] = value;
+        }
+    }
+};
+
 class LauncherArgumentParser {
 private:
+    Properties properties;
     bool isClient;
     NativeArguments jvmArguments;
     std::string className;
     NativeArguments mainArguments;
     
-private:
-    static bool startsWith(const std::string& st, const std::string& prefix) {
-        return st.substr(0, prefix.size()) == prefix;
-    }
-    
 public:
     LauncherArgumentParser(const NativeArguments& launcherArguments) {
+        properties.parse(launcherArguments);
+        // Try to set the mailing list address before reporting errors.
+        errorReporter.supportAddress = properties["e.gui.HelpMenu.supportAddress"];
         isClient = true;
         NativeArguments::const_iterator it = launcherArguments.begin();
         NativeArguments::const_iterator end = launcherArguments.end();
@@ -501,7 +524,7 @@ public:
         oss << "APP_" << key << "_" << getpid();
         setenv(oss.str().c_str(), value.c_str(), 1);
     }
-    
+        
     SharedLibraryHandle openJvmLibrary() const {
         const char* jvmSharedLibrary = getenv("ORG_JESSIES_LAUNCHER_JVM_SHARED_LIBRARY");
         if (jvmSharedLibrary != 0) {
@@ -723,7 +746,7 @@ void ErrorReporter::generateReport(const std::exception& ex, const std::string& 
     os << join(" ", launcherArguments);
     os << std::endl;
     
-    reportFatalErrorViaGui("Java Launcher", os.str());
+    reportFatalErrorViaGui("Java Launcher", os.str(), supportAddress);
 }
 
 static int runJvm(const NativeArguments& launcherArguments) {
