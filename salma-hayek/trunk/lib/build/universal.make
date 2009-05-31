@@ -857,10 +857,15 @@ $(INSTALLER.gz): $(MACHINE_PROJECT_NAME).app
 	VERSION_STRING=$(VERSION_STRING) \
 	candle -nologo -out $(call convertToNativeFilenames,$@ $<)
 
+# Cygwin 1.7 removes all inheritable security when it creates directories.
+# This causes the .msi (but, for no obvious reason, not the .wixobj) to be unreadable.
+# This prevents msiexec from running the installer.
+# ug+r is not enough (perhaps it has to be readable by SYSTEM or some such).
 $(INSTALLER.msi): $(WIX_COMPILATION_DIRECTORY)/$(MACHINE_PROJECT_NAME).wixobj $(BUILD_TARGETS)
 	@echo Creating Windows installer...
 	cd $(PACKAGING_DIRECTORY) && \
-	light -nologo -out $(call convertToNativeFilenames,$(abspath $@) $(abspath $<))
+	light -nologo -out $(call convertToNativeFilenames,$(abspath $@) $(abspath $<)) && \
+	chmod a+r $@
 
 $(WIX_COMPILATION_DIRECTORY)/$(MACHINE_PROJECT_NAME).wxs: $(SALMA_HAYEK)/lib/build/installer.wxs
 	$(COPY_RULE)
