@@ -12,10 +12,12 @@ class Terminator
         require "#{@salma_hayek}/bin/invoke-java.rb"
         require "#{@salma_hayek}/bin/show-alert.rb"
         require "#{@salma_hayek}/bin/target-os.rb"
+        
+        @support_address = "terminator-users@googlegroups.com"
     end
     
     def launch()
-        report_exceptions("Terminator") { launch0() }
+        report_exceptions("Terminator", @support_address) { launch0() }
     end
     
     def launch0()
@@ -87,10 +89,10 @@ class Terminator
         invoker.add_pathname_property("org.jessies.terminator.serverPortFileName", server_port_file_name)
         invoker.add_pathname_property("org.jessies.terminator.optionsFile", options_pathname)
         
-        invoker.add_property("e.gui.HelpMenu.supportAddress", "terminator-users@googlegroups.com")
+        invoker.add_property("e.gui.HelpMenu.supportAddress", @support_address)
         invoker.add_property("e.gui.HelpMenu.supportSite", "http://groups.google.com/group/terminator-users")
         
-        invoker.invoke()
+        invoker.launch()
     end
     
     def make_directory(pathname, make_safe)
