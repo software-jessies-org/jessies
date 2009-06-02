@@ -23,5 +23,6 @@ class HyperlinkStyleApplicator extends RegularExpressionStyleApplicator {
     protected void configureSegment(PTextSegment segment, Matcher matcher) {
         String url = matcher.group(1);
         segment.setLinkAction(new WebLinkAction("Web Link", url));
+        // FIXME: call setToolTip? is there precedent, or only where the text isn't the URL? does anything say something like "control-click to open link"?
     }
 }
