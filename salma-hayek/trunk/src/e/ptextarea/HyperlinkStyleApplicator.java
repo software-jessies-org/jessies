@@ -1,6 +1,7 @@
 package e.ptextarea;
 
 import e.gui.WebLinkAction;
+import e.util.GuiUtilities;
 import e.util.PatternUtilities;
 import java.util.regex.Matcher;
 
@@ -23,6 +24,8 @@ class HyperlinkStyleApplicator extends RegularExpressionStyleApplicator {
     protected void configureSegment(PTextSegment segment, Matcher matcher) {
         String url = matcher.group(1);
         segment.setLinkAction(new WebLinkAction("Web Link", url));
-        // FIXME: call setToolTip? is there precedent, or only where the text isn't the URL? does anything say something like "control-click to open link"?
+        // The Windows text comes verbatim from Outlook (though they spell "ctrl" in all-caps).
+        // The Linux/Mac OS text is just a guess.
+        segment.setToolTip(GuiUtilities.isWindows() ? "Ctrl+click to follow link" : "Control-click to follow link");
     }
 }

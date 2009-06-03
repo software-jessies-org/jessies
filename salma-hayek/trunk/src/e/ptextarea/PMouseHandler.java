@@ -107,8 +107,10 @@ public class PMouseHandler implements MouseInputListener {
         Cursor newCursor = null;
         String newToolTip = null;
         PLineSegment segment = textArea.getLineSegmentAtLocation(lastKnownPosition);
-        if (segment != null && isControlDown && segment.getStyle() == PStyle.HYPERLINK) {
-            newCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+        if (segment != null) {
+            if (isControlDown && segment.getStyle() == PStyle.HYPERLINK) {
+                newCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
+            }
             newToolTip = ((PTextSegment) segment).getToolTip();
         }
         textArea.setCursor(newCursor);
@@ -122,7 +124,7 @@ public class PMouseHandler implements MouseInputListener {
         }
         // A click without control down means "I want to position the caret inside this link, not follow it".
         // MS Word, Eclipse, and gnome-terminal work this way, and Terminator followed the latter two.
-        // FIXME: switch sense depending on whether the text area was meant for viewing or editing (as some mailers do)? isEditable is perhaps a good enough heuristic.
+        // FIXME: switch sense depending on whether the text area was meant for viewing or editing (as some mailers do)? isEditable is perhaps a good enough heuristic. this is what Outlook does. (note you'll need to make the tool tip correspond to the mode.)
         if (!e.isControlDown()) {
             // FIXME: some way of visually showing the link's two states, stronger than just changing the mouse cursor? Eclipse does a really bad job.
             // FIXME: should be possible to follow the link from the context menu, because that's a common first reaction.
