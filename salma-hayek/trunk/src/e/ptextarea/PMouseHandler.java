@@ -111,7 +111,9 @@ public class PMouseHandler implements MouseInputListener {
             if (isControlDown && segment.getStyle() == PStyle.HYPERLINK) {
                 newCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
             }
-            newToolTip = ((PTextSegment) segment).getToolTip();
+            if (segment instanceof PTextSegment) {
+                newToolTip = ((PTextSegment) segment).getToolTip();
+            }
         }
         textArea.setCursor(newCursor);
         textArea.setToolTipText(newToolTip);
