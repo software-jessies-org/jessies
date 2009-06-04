@@ -14,11 +14,18 @@
 <p>Download the <a href="http://www.cygwin.com/setup.exe">Cygwin setup.exe</a> (and keep it for later, because you'll want it to update your installation too). Run it now, and hit Next. Answer "Install from Internet" and hit Next. Answer "c:\cygwin", "All Users", "Unix / binary", and hit Next. I don't think the local package directory matters, so just hit Next. Hit Next again. Choose a nearby server and hit Next.
 
 <h3>Basic packages</h3>
-<p>You'll now be asked to select packages. The interface is a nightmare along the lines of a mouse-driven dselect(1), and not scriptable in any way. Most people seem to have trouble guessing how to use it, so read the next few paragraphs before you start clicking.
+<p>You'll now be asked to select packages. The interface is a nightmare along the lines of a mouse-driven dselect(1). Most people seem to have trouble guessing how to use it, so read the next few paragraphs before you start clicking.
 
-<p>Click the "View" button until the label next to it says "Full". This flattens out the list of packages and makes it easier to peruse. Click once on each of the weird circular icons on the lines with packages you want. (The weird circular icons cycle between various of Skip, available version numbers, Keep, Uninstall, Reinstall and Source, depending on what's available and already installed. You want the first version number offered. If you accidentally click past it, keep clicking until it cycles round again.)
+<p>For the initial installation, don't select any (extra) packages, just hit Next. When the main part of the installation completes, allow the installer to create a desktop shortcut.
 
-<p>You might want to install the following packages:
+<p>Cygwin is now installed.
+
+<p>In future, assuming you only want to update the packages already on your system, rather than adding new ones, you can simply start the installer and keep hitting "Next" without any other interaction. It remembers what you've already told it.
+Also, now setup.exe has been primed with your preferences, you can update and add to your installation using "unattended" mode with -q.
+
+<p>You might want to make use of that right away to install extra packages.
+We suggest:
+
 <pre>
 inetutils  # telnet(1)
 ncurses    # see Terminator FAQ
@@ -29,27 +36,38 @@ ruby       # run Perl, Python, or Ruby scripts
 vim        # edit stuff locally
 </pre>
 
+<p>Setup needs to be run from a cmd window, not from bash.
+Drag the shortcut to setup.exe from your Desktop into the cmd window.
+-P takes a list of extra packages.
+
+<pre>
+...\setup.exe -q -P inetutils,ncurses,openssh,perl,python,ruby,vim
+</pre>
+
 <p>In the unlikely event that you want to build our projects, you also need:
 
 <pre>
-gcc-g++
-make
-mingw-runtime
-subversion
+gcc-g++,make,mingw-runtime,subversion
 </pre>
 
 <p>To use Evergreen in its full glory, you also want:
 
 <pre>
-aspell-en
-ctags
+aspell-en,ctags
 </pre>
 
-<p>When you've selected all the packages you want, hit Next. When the main part of the installation completes, allow the installer to create a desktop shortcut.
+<p>To install all the packages recommended on this page, then:
 
-<p>Cygwin is now installed.
+<pre>
+...\setup.exe -q -P inetutils,ncurses,openssh,perl,python,ruby,vim,gcc-g++,make,mingw-runtime,subversion,aspell-en,ctags,rxvt
+</pre>
 
-<p>(In future, assuming you only want to update the packages already on your system, rather than adding new ones, you can simply start the installer and keep hitting "Next" without any other interaction. It remembers what you've already told it.)
+<p>Should you ever have to do battle with Cygwin-1.5's package browser, click the "View" button until the label next to it says "Full". This flattens out the list of packages and makes it easier to peruse.
+
+<p>Cygwin-1.7's version has an edit control in the top left, the contents of which are searched for in package names.
+A substring match puts the package onto the shortlist, which is then much more manageable.
+
+<p>Click once on each of the weird circular icons on the lines with packages you want. The weird circular icons cycle between various of Skip, available version numbers, Keep, Uninstall, Reinstall and Source, depending on what's available and already installed. You want the first version number offered. If you accidentally click past it, keep clicking until it cycles round again.
 
 <h2>Configuration</h2>
 
@@ -107,12 +125,5 @@ chmod o-w /cygdrive/c
 grep -e 'Installing .*cygwin-[0-9].*\.bz2' /var/log/setup.log
 </pre>
 <p>The log contains details of all the packages you've installed, in case you're interested in something other than the base.
-
-<h3>Easier package installation with cyg-apt(1)</h3>
-<p>If you find yourself making heavy use of Cygwin, and you're used to Debian-based Linux distributions, you might want to check out cyg-apt(1). Sadly, there's no Cygwin package for it, so you'll have to download it yourself, and you'll have to install the "python" and "wget" packages first.
-
-<p>Once you've run <tt>cyg-apt setup</tt>, you'll have something approximating apt-get(1). "update" and "install" work as you'd expect, and "cyg-apt search" is like "apt-cache search".
-
-<p>There's also "cyg-apt upgrade", but it's not as useful as its analog on Linux: Windows doesn't let you update files while they're in use, meaning cyg-apt(1) can't update itself or its dependencies. You're better off using Cygwin's setup.exe to update your installation.
 
 <!--#include virtual="/salma-hayek/footer.html" -->
