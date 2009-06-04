@@ -288,16 +288,36 @@ public class ProcessUtilities {
         return result.toString();
     }
     
+    private static String checkCandidateDirectory(String path) {
+        try {
+            // fileFromString canonicalizes the path on Cygwin.
+            File directory = FileUtilities.fileFromString(path).getCanonicalFile();
+            // If Terminator can't start a process with this as the cwd, then it's no use to us.
+            if (directory.canRead()) {
+                return directory.toString();
+            }
+        } catch (IOException ex) {
+            ex = ex;
+        }
+        return null;
+    }
+    
     /**
      * Silently returns null if the directory can't be determined.
      */
     public static String findCurrentWorkingDirectory(int pid) {
-        // Linux and Cygwin use a symlink of this form.
-        // gnome-terminal suggests that Solaris may use an extra "path" element.
-        // fileFromString canonicalizes the Cygwin symlink but gnome-terminal suggests that doing that on other platform, for consistency, would break Solaris.
-        File cwdLink = FileUtilities.fileFromString("/proc/" + pid + "/cwd");
-        if (cwdLink.exists()) {
-            return cwdLink.toString();
+        String[] paths = new String[] {
+            // Solaris 10 exposes the path in a readable form here.
+            // All versions of Solaris make readlink("/proc/<pid>/cwd") return an empty string, though it can be successfully used with opendir.
+            "/proc/" + pid + "/path/cwd",
+            // Linux and Cygwin use a symlink of this form.
+            "/proc/" + pid + "/cwd"
+        };
+        for (String path : paths) {
+            String checkedPath = checkCandidateDirectory(path);
+            if (checkedPath != null) {
+                return checkedPath;
+            }
         }
         // Mac OS has no /proc but comes with lsof.
         ArrayList<String> output = new ArrayList<String>();
@@ -309,7 +329,8 @@ public class ProcessUtilities {
         // p18316\0
         // n/private/var/tmp\0
         String cwdLine = output.get(1);
-        return cwdLine.substring(1, cwdLine.length() - 1);
+        String path = cwdLine.substring(1, cwdLine.length() - 1);
+        return checkCandidateDirectory(path);
     }
     
     /** Prevents instantiation. */
