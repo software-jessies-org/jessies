@@ -57,4 +57,8 @@ final class SplitLine {
         }
         return parent.subSequence(offset, end);
     }
+    
+    @Override public String toString() {
+        return "SplitLine[lineIndex=" + lineIndex + ",offset=" + offset + ",length=" + length + "]";
+    }
 }
