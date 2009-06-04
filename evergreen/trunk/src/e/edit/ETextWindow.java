@@ -26,6 +26,8 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     private final String filename;
     private final File file;
     private final PTextArea textArea;
+    private final PLineNumberPanel lineNumbers;
+    private final JScrollPane scrollPane;
     // Used to display a watermark to indicate such things as a read-only file.
     private final WatermarkViewPort watermarkViewPort;
     private final BirdView birdView;
@@ -67,8 +69,11 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         
         this.watermarkViewPort = new WatermarkViewPort();
         watermarkViewPort.setView(textArea);
-        JScrollPane scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        
+        this.scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setViewport(watermarkViewPort);
+        
+        this.lineNumbers = new PLineNumberPanel(textArea);
         
         initCaretListener();
         initFocusListener();
@@ -135,6 +140,8 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         textArea.setShouldHideMouseWhenTyping(preferences.getBoolean(EvergreenPreferences.HIDE_MOUSE_WHEN_TYPING));
         //textArea.setBackground(preferences.getColor(EvergreenPreferences.BACKGROUND_COLOR));
         //textArea.setForeground(preferences.getColor(EvergreenPreferences.FOREGROUND_COLOR));
+        
+        scrollPane.setRowHeaderView(preferences.getBoolean(EvergreenPreferences.SHOW_LINE_NUMBERS) ? lineNumbers : null);
         
         final int defaultMargin = Parameters.getInteger("default.margin", 80);
         final int margin = Parameters.getInteger(getFileType().getName() + ".margin", defaultMargin);
