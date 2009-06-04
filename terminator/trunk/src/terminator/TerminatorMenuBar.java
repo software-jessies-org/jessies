@@ -318,6 +318,9 @@ public class TerminatorMenuBar extends EMenuBar {
 		@Override
 		protected void performPaneAction(JTerminalPane terminalPane) {
 			JTerminalPane newPane = terminalPane.newShellHere();
+			if (newPane == null) {
+				return;
+			}
 			Terminator.getSharedInstance().openFrame(newPane);
 		}
 	}
@@ -330,6 +333,9 @@ public class TerminatorMenuBar extends EMenuBar {
 		@Override
 		protected void performPaneAction(JTerminalPane terminalPane) {
 			JTerminalPane newPane = terminalPane.newShellHere();
+			if (newPane == null) {
+				return;
+			}
 			addTab(newPane);
 		}
 	}
