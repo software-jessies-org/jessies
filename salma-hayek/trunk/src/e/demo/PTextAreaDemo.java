@@ -49,7 +49,11 @@ public class PTextAreaDemo {
         
         textArea.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, IndentationGuesser.guessIndentationFromFile(content, "    "));
         
-        JFrame frame = JFrameUtilities.makeScrollableContentWindow(file.getPath() + " - PTextAreaDemo", textArea);
+        JScrollPane ui = new JScrollPane(textArea);
+        ui.setRowHeaderView(new PLineNumberPanel(textArea));
+        ui.setBorder(null);
+        
+        JFrame frame = JFrameUtilities.makeSimpleWindow(file.getPath() + " - PTextAreaDemo", ui);
         frame.setSize(new Dimension(600, 600));
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
