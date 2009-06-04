@@ -178,8 +178,6 @@ SELECTION
 
 VIEW
 
-+ Show Line Numbers - should probably apply to the whole editor, and persist. (alt-command-L) 
-
 + Show Invisibles (alt-command-I) could show newlines and spaces. tabs we already show anyway.
 
 + Kate, BBEdit, SubEthaEdit, and others are all implementing the "indent wrapped lines" idea we never got round to.
