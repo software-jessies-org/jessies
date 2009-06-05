@@ -291,6 +291,9 @@ public class ProcessUtilities {
     private static String checkCandidateDirectory(String path) {
         try {
             // fileFromString canonicalizes the path on Cygwin.
+            // If we want to reopen terminals in the directory they were in when closed,
+            // or otherwise "bookmark" them, then we need to canonicalize on all platforms.
+            // Matt Hillsdon's Eclipse embedding does this and Costantino mentioned it too.
             File directory = FileUtilities.fileFromString(path).getCanonicalFile();
             // If Terminator can't start a process with this as the cwd, then it's no use to us.
             if (directory.canRead()) {
