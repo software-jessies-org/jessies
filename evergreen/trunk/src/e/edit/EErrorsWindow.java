@@ -101,9 +101,13 @@ public class EErrorsWindow extends JFrame {
     private void initTextArea() {
         textArea = new PTextArea(20, 80);
         initFont();
-        // But no margin, because all the text should be machine-generated.
+        // No margin, because all the text should be machine-generated.
         textArea.showRightHandMarginAt(PTextArea.NO_MARGIN);
         textArea.addStyleApplicator(new ErrorLinkStyler(textArea));
+        // Traditionally we were editable in imitation of acme.
+        // PTextArea currently decides whether you have to hold down control to follow a link based on whether the text area is editable.
+        // The easiest fix, which may or may not be sufficient, is to make errors windows non-editable.
+        textArea.setEditable(false);
         textArea.setWrapStyleWord(true);
         initTextAreaPopupMenu();
     }
