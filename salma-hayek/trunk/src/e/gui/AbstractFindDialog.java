@@ -14,7 +14,7 @@ public abstract class AbstractFindDialog {
     public void showFindDialog(Component parent, final JTextField findField) {
         Frame frame = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, parent);
         
-        final JLabel findStatus = new JLabel(" ");
+        final ELabel findStatus = new ELabel();
         
         FormBuilder form = new FormBuilder(frame, "Find");
         form.setStatusBar(findStatus);
@@ -41,7 +41,7 @@ public abstract class AbstractFindDialog {
         
         findField.selectAll();
         findField.requestFocus();
-        findStatus.setText(" ");
+        findStatus.setText("");
     }
     
     /**

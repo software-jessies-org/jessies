@@ -349,7 +349,7 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
                     JDialog dialog = new JDialog(frame, "Modal dialog", true);
                     dialog.setLayout(new FlowLayout());
                     dialog.add(new JLabel("Close this dialog!"));
-                    final JLabel label = new JLabel(" ");
+                    final ELabel label = new ELabel();
                     dialog.add(label);
                     dialog.pack();
                     dialog.setLocation(frame.getX() - 100, frame.getY());

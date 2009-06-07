@@ -21,10 +21,10 @@ public class FatBits extends MainFrame {
     private RepeatingComponentTimer timer;
     private ScaledImagePanel scaledImagePanel;
     
-    private JLabel positionLabel;
+    private ELabel positionLabel;
     
-    private JLabel colorLabel;
-    private JLabel colorSwatchLabel;
+    private ELabel colorLabel;
+    private ELabel colorSwatchLabel;
     private ColorSwatchIcon colorSwatch;
     
     public FatBits() {
@@ -111,7 +111,7 @@ public class FatBits extends MainFrame {
     }
     
     private void initPositionLabel() {
-        this.positionLabel = new JLabel(" ");
+        this.positionLabel = new ELabel();
         positionLabel.setFont(colorLabel.getFont());
     }
     
@@ -137,12 +137,12 @@ public class FatBits extends MainFrame {
     }
     
     private void initColorLabel() {
-        this.colorLabel = new JLabel(" ");
+        this.colorLabel = new ELabel();
         Font font = colorLabel.getFont();
         colorLabel.setFont(new Font(GuiUtilities.getMonospacedFontName(), font.getStyle(), font.getSize()));
         int height = colorLabel.getPreferredSize().height - 2;
         this.colorSwatch = new ColorSwatchIcon(null, new Dimension(20, height));
-        this.colorSwatchLabel = new JLabel(colorSwatch);
+        this.colorSwatchLabel = new ELabel(colorSwatch);
     }
     
     private void updateCenterColor(int argb) {
@@ -162,7 +162,7 @@ public class FatBits extends MainFrame {
         });
         Hashtable<Integer, JComponent> labels = new Hashtable<Integer, JComponent>();
         for (int i = scaleSlider.getMinimum(); i <= scaleSlider.getMaximum(); ++i) {
-            labels.put(i, new JLabel(Integer.toString(1 << i) + "x"));
+            labels.put(i, new ELabel(Integer.toString(1 << i) + "x"));
         }
         scaleSlider.setLabelTable(labels);
         scaleSlider.setPaintLabels(true);
