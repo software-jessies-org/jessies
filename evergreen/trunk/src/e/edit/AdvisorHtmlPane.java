@@ -271,7 +271,7 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
         if (e.getEventType() == HyperlinkEvent.EventType.ENTERED) {
             statusBar.setText("Open " + stringFromHyperlinkEvent(e));
         } else if (e.getEventType() == HyperlinkEvent.EventType.EXITED) {
-            statusBar.clearStatusBar();
+            statusBar.setText("");
         } else if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             if (e instanceof HTMLFrameHyperlinkEvent) {
                 ((HTMLDocument) textPane.getDocument()).processHTMLFrameHyperlinkEvent((HTMLFrameHyperlinkEvent) e);
