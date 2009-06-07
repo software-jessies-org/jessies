@@ -24,8 +24,11 @@ class HyperlinkStyleApplicator extends RegularExpressionStyleApplicator {
     protected void configureSegment(PTextSegment segment, Matcher matcher) {
         String url = matcher.group(1);
         segment.setLinkAction(new WebLinkAction("Web Link", url));
-        // The Windows text comes verbatim from Outlook (though they spell "ctrl" in all-caps).
-        // The Linux/Mac OS text is just a guess.
-        segment.setToolTip(GuiUtilities.isWindows() ? "Ctrl+click to follow link" : "Control-click to follow link");
+        
+        if (textArea.isEditable()) {
+            // The Windows text comes verbatim from Outlook (though they spell "ctrl" in all-caps).
+            // The Linux/Mac OS text is just a guess.
+            segment.setToolTip(GuiUtilities.isWindows() ? "Ctrl+click to follow link" : "Control-click to follow link");
+        }
     }
 }
