@@ -7,7 +7,15 @@ import javax.swing.*;
  */
 public class ELabel extends JLabel {
     public ELabel() {
-        super(" ");
+        this(" ");
+    }
+    
+    public ELabel(Icon icon) {
+        super(icon);
+    }
+    
+    public ELabel(String initialText) {
+        super(initialText);
     }
     
     /**
