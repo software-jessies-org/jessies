@@ -18,7 +18,7 @@ import org.jdesktop.swingworker.SwingWorker;
 public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
     private JTextField filenameField = new JTextField(40);
     private JList matchList;
-    private JLabel status = new JLabel(" ");
+    private ELabel status = new ELabel();
     private JButton rescanButton;
     
     /** Which workspace is this "Open Quickly" for? */

@@ -8,13 +8,12 @@ import javax.swing.*;
 import javax.swing.event.*;
 
 public class Minibuffer extends JPanel implements FocusListener {
+    private final ELabel prompt = new ELabel();
+    private final JTextField textField = new JTextField("");
+    private final Timer typingTimer;
+    
     private MinibufferUser minibufferUser;
     private Component previousFocusOwner;
-    
-    private Timer typingTimer;
-    
-    private JLabel prompt;
-    private JTextField textField;
     
     private StringHistory history;
     private int historyIndex;
@@ -22,10 +21,6 @@ public class Minibuffer extends JPanel implements FocusListener {
     
     public Minibuffer() {
         super(new BorderLayout());
-        
-        // It's important that the prompt not be the empty string, because then the minibuffer would be zero-height.
-        prompt = new JLabel(" ");
-        textField = new JTextField("");
         
         typingTimer = new Timer(500, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -199,8 +194,8 @@ public class Minibuffer extends JPanel implements FocusListener {
         typingTimer.stop();
         minibufferUser = null;
         
-        prompt.setText(" ");
-        textField.setText(" ");
+        prompt.setText("");
+        textField.setText("");
         
         hideComponents();
         
