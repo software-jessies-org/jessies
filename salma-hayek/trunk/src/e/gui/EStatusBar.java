@@ -34,9 +34,4 @@ public class EStatusBar extends JLabel {
         
         super.setText(status);
     }
-    
-    /** Clears the status bar. */
-    public void clearStatusBar() {
-        super.setText(" ");
-    }
 }
