@@ -108,7 +108,7 @@ public class PMouseHandler implements MouseInputListener {
         String newToolTip = null;
         PLineSegment segment = textArea.getLineSegmentAtLocation(lastKnownPosition);
         if (segment != null) {
-            if (isControlDown && segment.getStyle() == PStyle.HYPERLINK) {
+            if (segment.getStyle() == PStyle.HYPERLINK && needControlDownToFollowLink() == isControlDown) {
                 newCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
             }
             if (segment instanceof PTextSegment) {
@@ -119,23 +119,30 @@ public class PMouseHandler implements MouseInputListener {
         textArea.setToolTipText(newToolTip);
     }
     
+    // A click on a hyperlink changes meaning depending on whether or not the text area is editable (as in Outlook).
+    // When editable, a click without control down means "I want to position the caret inside this link, not follow it".
+    // When non-editable, the opposite is true.
+    private boolean needControlDownToFollowLink() {
+        return textArea.isEditable();
+    }
+    
+    private boolean shouldFollowLink(MouseEvent e) {
+        // You can only follow a link with a left-click. Middle clicks are for pasting, and right clicks are for menus.
+        if (!SwingUtilities.isLeftMouseButton(e)) {
+            return false;
+        }
+        return (needControlDownToFollowLink() == e.isControlDown());
+    }
+    
     private void handleHyperlinks(MouseEvent e) {
-        if (SwingUtilities.isLeftMouseButton(e) == false) {
-            // You can only follow a link with a left-click. Middle clicks are for pasting, and right clicks are for menus.
-            return;
-        }
-        // A click without control down means "I want to position the caret inside this link, not follow it".
-        // MS Word, Eclipse, and gnome-terminal work this way, and Terminator followed the latter two.
-        // FIXME: switch sense depending on whether the text area was meant for viewing or editing (as some mailers do)? isEditable is perhaps a good enough heuristic. this is what Outlook does. (note you'll need to make the tool tip correspond to the mode.)
-        if (!e.isControlDown()) {
-            // FIXME: some way of visually showing the link's two states, stronger than just changing the mouse cursor? Eclipse does a really bad job.
-            // FIXME: should be possible to follow the link from the context menu, because that's a common first reaction.
-            return;
-        }
-        PLineSegment segment = textArea.getLineSegmentAtLocation(lastKnownPosition);
-        if (segment != null && segment.getStyle() == PStyle.HYPERLINK) {
-            ((PTextSegment) segment).linkClicked();
-            e.consume();
+        // FIXME: some way of visually showing the link's two states, stronger than just changing the mouse cursor? Eclipse does a really bad job.
+        // FIXME: should be possible to follow the link from the context menu, because that's a common first reaction.
+        if (shouldFollowLink(e)) {
+            PLineSegment segment = textArea.getLineSegmentAtLocation(lastKnownPosition);
+            if (segment != null && segment.getStyle() == PStyle.HYPERLINK) {
+                ((PTextSegment) segment).linkClicked();
+                e.consume();
+            }
         }
     }
     
