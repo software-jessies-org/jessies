@@ -152,16 +152,13 @@ export TERM=$TERM
 </pre>
 
 <h3>Terminfo problems specific to Cygwin</h3>
-<p>Cygwin's less(1) still uses a termcap-based ncurses library.
-If less(1)&nbsp;&ndash; and hence man(1)&nbsp;&ndash; say "WARNING: terminal is not fully functional", try:
+<p>Cygwin-1.5's less(1) still uses a termcap-based ncurses library.
+If less(1)&nbsp;&ndash; and hence man(1)&nbsp;&ndash; say "WARNING: terminal is not fully functional" and upgrading to Cygwin-1.7 is not an option, then try:
 <pre>
 infocmp -C >> ~/.termcap
 </pre>
 
 <p>infocmp is provided by Cygwin's ncurses package.
-
-<p>The use of termcap instead of terminfo is a <a href="http://www.cygwin.com/ml/cygwin/2000-05/msg01012.html">deliberate decision</a> on the part of the Cygwin maintainers,
-though it has inconvenienced <a href="http://www.google.com/search?hl=en&safe=off&c2coff=1&q=cygwin+less+terminfo+site%3Acygwin.com%2Fml&btnG=Search">quite a few people</a>.
 
 <h3>Terminfo problems specific to Fedora/RedHat/CentOS</h3>
 <p>RedHat installs vim-minimal to provide /bin/vi.
