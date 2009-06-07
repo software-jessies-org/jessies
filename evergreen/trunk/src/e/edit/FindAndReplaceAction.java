@@ -17,7 +17,7 @@ import org.jdesktop.swingworker.SwingWorker;
 public class FindAndReplaceAction extends ETextAction {
     private JTextField patternField = new JTextField(40);
     private JTextField replacementField = new JTextField(40);
-    private JLabel statusLabel = new JLabel(" ");
+    private ELabel statusLabel = new ELabel();
     private JList matchList;
     private JList replacementsList;
     private JScrollPane matchPane;

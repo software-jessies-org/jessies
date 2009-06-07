@@ -29,7 +29,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
     
     private final JTextField regexField = new JTextField(40);
     private final JTextField filenameRegexField = new JTextField(40);
-    private final JLabel status = new JLabel(" ");
+    private final ELabel status = new ELabel();
     private final JButton rescanButton;
     private final ETree matchView;
     
