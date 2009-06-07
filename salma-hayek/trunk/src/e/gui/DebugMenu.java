@@ -314,7 +314,7 @@ public class DebugMenu {
         public void actionPerformed(ActionEvent e) {
             JButton gcButton = new JButton(new GcAction());
             JButton histogramButton = new JButton(new HistogramAction());
-            JLabel currentHeapUsageLabel = new JLabel(" ");
+            ELabel currentHeapUsageLabel = new ELabel();
             JPanel buttonPanel = makeButtonPanel(gcButton, histogramButton, Box.createHorizontalStrut(10), currentHeapUsageLabel);
             
             JFrame frame = showFrameWithButtonPanel(Log.getApplicationName() + " Heap Usage", buttonPanel, new HeapView(currentHeapUsageLabel), new Dimension(400, 200));
