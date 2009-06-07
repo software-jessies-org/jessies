@@ -1,6 +1,7 @@
 package terminator;
 
 import e.forms.*;
+import e.gui.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -14,7 +15,7 @@ public class FindDialog {
     
     private FormDialog formDialog;
     private JTextField findField;
-    private JLabel findStatus = new JLabel(" ");
+    private ELabel findStatus = new ELabel();
     private TerminalView textToFindIn;
     private TerminatorMenuBar.BindableAction findNextAction;
     private TerminatorMenuBar.BindableAction findPreviousAction;
@@ -92,7 +93,7 @@ public class FindDialog {
         
         findField.selectAll();
         findField.requestFocus();
-        findStatus.setText(" ");
+        clearStatus();
     }
     
     public FindHighlighter getFindHighlighter() {
@@ -129,6 +130,6 @@ public class FindDialog {
     }
     
     private void clearStatus() {
-        setStatus(" ", false);
+        setStatus("", false);
     }
 }
