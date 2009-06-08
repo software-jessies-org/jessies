@@ -198,20 +198,6 @@ public class FileUtilities {
         return isTextFile;
     }
     
-    public static String findFileByNameSearchingUpFrom(String leafName, String startPath) {
-        while (startPath.length() > 0) {
-            String filename = startPath + File.separatorChar + leafName;
-            File file = FileUtilities.fileFromString(filename);
-            if (file.exists()) {
-                return filename;
-            }
-            int lastSeparator = startPath.lastIndexOf(File.separatorChar);
-            if (lastSeparator == -1) break;
-            startPath = startPath.substring(0, lastSeparator);
-        }
-        return null;
-    }
-    
     /**
      * Returns the md5 digest of the given file, or null if there's a problem.
      * The string is in the same form as the digest produced by the md5sum(1)
