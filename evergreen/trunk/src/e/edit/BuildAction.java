@@ -51,7 +51,7 @@ public class BuildAction extends ETextAction {
             if (pathPattern != null && buildTool != null) {
                 String directory = getMakefileSearchStartDirectory();
                 if (directory.matches(pathPattern)) {
-                    makefileName = directory + File.separator;
+                    makefileName = directory + File.separator + "bogus-file-name";
                     command = buildTool;
                 }
             }
@@ -72,7 +72,8 @@ public class BuildAction extends ETextAction {
             command = "ant -emacs -quiet";
         }
         
-        invokeBuildTool(workspace, makefileName, command);
+        final File directory = FileUtilities.fileFromString(makefileName).getParentFile();
+        invokeBuildTool(workspace, directory, command);
     }
     
     private static String getMakefileSearchStartDirectory() {
@@ -97,12 +98,11 @@ public class BuildAction extends ETextAction {
         return makefileName;
     }
     
-    private void invokeBuildTool(Workspace workspace, String makefileName, String command) {
-        String makefileDirectoryName = makefileName.substring(0, makefileName.lastIndexOf(File.separatorChar));
+    private void invokeBuildTool(Workspace workspace, File directory, String command) {
         command = addTarget(workspace, command);
         try {
             final ShellCommand shellCommand = new ShellCommand(workspace, command, ToolInputDisposition.NO_INPUT, ToolOutputDisposition.ERRORS_WINDOW);
-            shellCommand.setContext(makefileDirectoryName);
+            shellCommand.setContext(directory.toString());
             shellCommand.setLaunchRunnable(new Runnable() {
                 public void run() {
                     building = true;
