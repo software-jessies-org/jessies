@@ -4,17 +4,10 @@ import e.gui.*;
 import e.util.*;
 import java.awt.event.*;
 import java.io.*;
+import java.util.*;
 
 /**
- * Our build-project action.
- * We have built-in support for either Ant or make.
- * 
- * As an extension to support weird custom build tools, we look at a couple of special properties.
- * If the build directory path matches the given regular expression, we run the given custom build tool.
- * There may be a better solution, but this is the least worst hack that's come to mind.
- * It's certainly better than having to leave bogus Makefiles all over.
- * We'll need to see at least one other custom build system to get a feel for whether this is generally useful.
- * If it is, we should support an arbitrary number of such custom build tools, similar to the ExternalTool situation.
+ * Implements "Build Project" and "Build and Test Project".
  */
 public class BuildAction extends ETextAction {
     private final boolean test;
@@ -30,54 +23,55 @@ public class BuildAction extends ETextAction {
     public void actionPerformed(ActionEvent e) {
         buildProject();
     }
-
+    
+    public static class BuildTool {
+        // The name of the "makefile" (which may be, say, an Ant "build.xml" file).
+        String makefileName;
+        // The command to build this kind of "makefile".
+        String command;
+        
+        BuildTool(String makefileName, String command) {
+            this.makefileName = makefileName;
+            this.command = command;
+        }
+    }
+    
+    // Returns a map from filenames to build tools.
+    // The filenames are "Makefile" 
+    private static Map<String, BuildTool> getBuildTools() {
+        final HashMap<String, BuildTool> result = new HashMap<String, BuildTool>();
+        for (Map.Entry<String, String> tool : Parameters.getStrings("build.").entrySet()) {
+            final String key = tool.getKey().substring("build.".length());
+            result.put(key, new BuildTool(key, tool.getValue()));
+        }
+        return result;
+    }
+    
     private void buildProject() {
-        Workspace workspace = Evergreen.getInstance().getCurrentWorkspace();
+        final Workspace workspace = Evergreen.getInstance().getCurrentWorkspace();
+        
         if (building) {
             // FIXME: work harder to recognize possibly-deliberate duplicate builds (different targets or makefiles, for example).
             Evergreen.getInstance().showAlert("A target is already being built", "Please wait for the current build to complete before starting another.");
             return;
         }
-        
-        // Assume we'll be building with GNU Make.
-        String command = "make --print-directory";
-        
-        String makefileName = findMakefile();
-        
-        // See if we've got special fall-back instructions.
-        if (makefileName == null) {
-            String pathPattern = Parameters.getString("build.specialPathPattern", null);
-            String buildTool = Parameters.getString("build.specialBuildTool", null);
-            if (pathPattern != null && buildTool != null) {
-                String directory = getMakefileSearchStartDirectory();
-                if (directory.matches(pathPattern)) {
-                    makefileName = directory + File.separator + "bogus-file-name";
-                    command = buildTool;
-                }
-            }
-        }
-        
-        if (makefileName == null) {
-            Evergreen.getInstance().showAlert("Build instructions not found", "Neither a Makefile for make(1) nor a build.xml for Ant could be found.");
-            return;
-        }
-        
-        boolean shouldContinue = workspace.prepareForAction("Save before building?", "Some files are currently modified but not saved.");
+        final boolean shouldContinue = workspace.prepareForAction("Save before building?", "Some files are currently modified but not saved.");
         if (shouldContinue == false) {
             return;
         }
         
-        // Does it look like we should be using Ant?
-        if (makefileName.endsWith("build.xml")) {
-            command = "ant -emacs -quiet";
+        final BuildTool buildTool = chooseBuildTool();
+        if (buildTool == null) {
+            // FIXME: list supported kinds of build instructions.
+            Evergreen.getInstance().showAlert("Build instructions not found", "No build instructions could be found.");
+            return;
         }
         
-        final File directory = FileUtilities.fileFromString(makefileName).getParentFile();
-        invokeBuildTool(workspace, directory, command);
+        invokeBuildTool(workspace, buildTool);
     }
     
     private static String getMakefileSearchStartDirectory() {
-        ETextWindow focusedTextWindow = getFocusedTextWindow();
+        final ETextWindow focusedTextWindow = getFocusedTextWindow();
         if (focusedTextWindow != null) {
             return focusedTextWindow.getContext();
         } else {
@@ -85,23 +79,27 @@ public class BuildAction extends ETextAction {
         }
     }
     
-    public static String findMakefile() {
-        String startDirectory = getMakefileSearchStartDirectory();
-        if (startDirectory == null) {
-            return null;
+    public static BuildTool chooseBuildTool() {
+        final Map<String, BuildTool> buildTools = getBuildTools();
+        File directory = FileUtilities.fileFromString(getMakefileSearchStartDirectory());
+        while (directory != null) {
+            for (String filename : directory.list()) {
+                final BuildTool buildTool = buildTools.get(filename);
+                if (buildTool != null) {
+                    buildTool.makefileName = directory.toString() + File.separator + buildTool.makefileName;
+                    return buildTool;
+                }
+            }
+            directory = directory.getParentFile();
         }
-        
-        String makefileName = FileUtilities.findFileByNameSearchingUpFrom("Makefile", startDirectory);
-        if (makefileName == null) {
-            makefileName = FileUtilities.findFileByNameSearchingUpFrom("build.xml", startDirectory);
-        }
-        return makefileName;
+        return null;
     }
     
-    private void invokeBuildTool(Workspace workspace, File directory, String command) {
-        command = addTarget(workspace, command);
+    private void invokeBuildTool(Workspace workspace, BuildTool tool) {
+        addTarget(workspace, tool);
         try {
-            final ShellCommand shellCommand = new ShellCommand(workspace, command, ToolInputDisposition.NO_INPUT, ToolOutputDisposition.ERRORS_WINDOW);
+            final ShellCommand shellCommand = new ShellCommand(workspace, tool.command, ToolInputDisposition.NO_INPUT, ToolOutputDisposition.ERRORS_WINDOW);
+            final File directory = FileUtilities.fileFromString(tool.makefileName).getParentFile();
             shellCommand.setContext(directory.toString());
             shellCommand.setLaunchRunnable(new Runnable() {
                 public void run() {
@@ -116,23 +114,19 @@ public class BuildAction extends ETextAction {
             shellCommand.runCommand();
         } catch (IOException ex) {
             Evergreen.getInstance().showAlert("Unable to invoke build tool", "Can't start task (" + ex.getMessage() + ").");
-            Log.warn("Couldn't start \"" + command + "\"", ex);
+            Log.warn("Couldn't start \"" + tool.command + "\"", ex);
         }
     }
     
-    private String addTarget(Workspace workspace, String command) {
-        String result = command;
-        
+    private void addTarget(Workspace workspace, BuildTool tool) {
         // FIXME: it would be good if we better understood what was being specified here. Personally, I mainly pass "-j".
-        String workspaceTarget = workspace.getBuildTarget();
+        final String workspaceTarget = workspace.getBuildTarget();
         if (workspaceTarget.length() != 0) {
-            result += " " + workspaceTarget;
+            tool.command += " " + workspaceTarget;
         }
         // FIXME: does this work for Ant?
         if (test) {
-            result += " test";
+            tool.command += " test";
         }
-        
-        return result;
     }
 }
