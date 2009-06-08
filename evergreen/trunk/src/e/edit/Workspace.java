@@ -271,10 +271,10 @@ public class Workspace extends JPanel {
         if (findInFilesDialog == null) {
             findInFilesDialog = new FindInFilesDialog(this);
         }
-        if (pattern != null && pattern.length() > 0) {
+        if (!pattern.isEmpty()) {
             findInFilesDialog.setPattern(pattern);
         }
-        if (filenamePattern != null && filenamePattern.length() > 0) {
+        if (!filenamePattern.isEmpty()) {
             findInFilesDialog.setFilenamePattern(filenamePattern);
         }
         findInFilesDialog.showDialog();
@@ -291,7 +291,7 @@ public class Workspace extends JPanel {
         if (openQuicklyDialog == null) {
             openQuicklyDialog = new OpenQuicklyDialog(this);
         }
-        if (filenamePattern != null && filenamePattern.length() > 0 && filenamePattern.contains("\n") == false) {
+        if (!filenamePattern.isEmpty()) {
             openQuicklyDialog.setFilenamePattern(filenamePattern);
         }
         openQuicklyDialog.showDialog();

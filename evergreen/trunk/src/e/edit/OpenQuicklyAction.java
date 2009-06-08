@@ -19,12 +19,12 @@ public class OpenQuicklyAction extends AbstractAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        String filename = ETextAction.getSelectedText();
+        final String filename = ETextAction.getSelectedText();
         if (filename.startsWith("~") || filename.startsWith("/")) {
             // If we have an absolute name, we can go straight there.
             Evergreen.getInstance().openFile(filename);
-        } else {
-            Evergreen.getInstance().getCurrentWorkspace().showOpenQuicklyDialog(StringUtilities.regularExpressionFromLiteral(filename));
+            return;
         }
+        Evergreen.getInstance().getCurrentWorkspace().showOpenQuicklyDialog(ETextAction.getSelectedRegularExpression());
     }
 }

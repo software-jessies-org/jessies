@@ -19,21 +19,11 @@ public class FindInFilesAction extends AbstractAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        Workspace workspace = Evergreen.getInstance().getCurrentWorkspace();
-        
-        // Get the selection, stripping trailing newlines.
-        // ETextAction.getSelectedText returns the empty string if no text window has focus.
-        String selection = ETextAction.getSelectedText();
-        selection = selection.replaceAll("\n$", "");
-        
-        // Only use the selection as a pattern if there are no embedded newlines.
-        String pattern = null;
-        if (selection.length() > 0 && selection.contains("\n") == false) {
-            pattern = StringUtilities.regularExpressionFromLiteral(selection);
-        }
-        String directory = guessDirectoryToSearchIn();
-        String filenamePattern = StringUtilities.regularExpressionFromLiteral(directory);
-        workspace.showFindInFilesDialog(pattern, filenamePattern);
+        final Workspace workspace = Evergreen.getInstance().getCurrentWorkspace();
+        final String regularExpression = ETextAction.getSelectedRegularExpression();
+        final String directory = guessDirectoryToSearchIn();
+        final String filenameRegularExpression = StringUtilities.regularExpressionFromLiteral(directory);
+        workspace.showFindInFilesDialog(regularExpression, filenameRegularExpression);
     }
     
     public String guessDirectoryToSearchIn() {
