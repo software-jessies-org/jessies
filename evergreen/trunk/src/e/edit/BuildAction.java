@@ -37,7 +37,6 @@ public class BuildAction extends ETextAction {
     }
     
     // Returns a map from filenames to build tools.
-    // The filenames are "Makefile" 
     private static Map<String, BuildTool> getBuildTools() {
         final HashMap<String, BuildTool> result = new HashMap<String, BuildTool>();
         for (Map.Entry<String, String> tool : Parameters.getStrings("build.").entrySet()) {
