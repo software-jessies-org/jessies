@@ -215,7 +215,7 @@ Icons for abstract classes or methods are hollow.
 
 <h3><a name="build-basic">Basic Building</a></h3>
 
-<p>To build the current project, use "Workspace" > "Build Project", accessible from the keyboard with control-b. Evergreen will search up from the directory containing the current file until it finds build instructions (a <tt>Makefile</tt> or <tt>build.xml</tt>). It will run the appropriate build tool in that directory. This works great if you have a single file of build instructions, at the top of your project. If you have, say, makefiles at multiple levels, you'll have to bear in mind that what file you have selected when you start a build will influence which subtree of your project is rebuilt. This is sometimes useful (because projects large enough to have multiple sets of build instructions are usually large enough to be too expensive to totally rebuild), but it's sometimes annoying (because at some point you may want to rebuild a larger part of the system than the part you're currently working on). Two common workarounds are to have the top-level makefile open, and start a build from there when need be, or to use the shell to do top-level builds.
+<p>To build the current project, use "Workspace" > "Build Project", accessible from the keyboard with control-b. Evergreen will search up from the directory containing the current file until it finds build instructions (by default, <tt>Makefile</tt> or <tt>build.xml</tt>). It will run the appropriate build tool in that directory. This works great if you have a single file of build instructions, at the top of your project. If you have, say, makefiles at multiple levels, you'll have to bear in mind that what file you have selected when you start a build will influence which subtree of your project is rebuilt. This is sometimes useful (because projects large enough to have multiple sets of build instructions are usually large enough to be too expensive to totally rebuild), but it's sometimes annoying (because at some point you may want to rebuild a larger part of the system than the part you're currently working on). Two common workarounds are to have the top-level makefile open, and start a build from there when need be, or to use the shell to do top-level builds.
 
 <p>To build the equivalent "test" target, use "Workspace" > "Build and Test Project", accessible from the keyboard with control-shift-b. This behaves the same as "Build Project" but adds <tt>" test"</tt> to the end of the command line.
 
@@ -328,7 +328,11 @@ Note that we use the file type mode's name ("XML") rather than, say, the specifi
 
 <h3><a name="configuration-build">Build Tools</a></h3>
 
-<p>If you don't use make(1) or ant(1), Evergreen has limited support for alternatives. You can set the <tt>build.specialPathPattern</tt> property to a regular expression that matches paths containing files to be built by your special tool. You'll also need to set <tt>build.specialBuildTool</tt> to the name of the tool to be run if the pattern matches. Note that your tool will be started in the directory containing the current file when the user asks for a build, so any searching for the appropriate build instructions is down to you. You may find it necessary to actually call a script that works out the appropriate arguments for the real build tool.
+<p>If you don't use make(1) or ant(1), Evergreen has limited support for alternatives. You can set the <tt>build.<i>file</i>=<i>tool</i></tt> properties to educate it.
+
+<p>For example, to add support for calling mk(1) when Evergreen finds a <tt>mkfile</tt>, you'd use <tt>build.mkfile=mk</tt>.
+
+<p>Your tool will be started in the directory containing the build instructions. You may find it necessary to actually call a script that works out the appropriate arguments for the real build tool.
 
 <p>If you think the tool is a common one that Evergreen should automatically support, please let us know so that we can add it to the built-in list so everyone benefits.
 
