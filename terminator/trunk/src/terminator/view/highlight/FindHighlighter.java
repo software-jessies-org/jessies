@@ -45,7 +45,7 @@ public class FindHighlighter implements Highlighter {
 		findStatusDisplay.setStatus("", false);
 		
 		// Is that all we're here for?
-		if (newRegularExpression.isEmpty()) {
+		if (newRegularExpression.length() == 0) {
 			return;
 		}
 		
