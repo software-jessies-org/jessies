@@ -73,6 +73,8 @@ public class PKeyHandler implements KeyListener {
     
     private void maybeUpdateCursorAndToolTip(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_CONTROL) {
+            // This isn't as effective as we might like, because we assume the mouse is over the text area receiving key events.
+            // FIXME: forward to the PMouseHandler of the text area under the mouse.
             mouseHandler.updateCursorAndToolTip(e.isControlDown());
         }
     }
