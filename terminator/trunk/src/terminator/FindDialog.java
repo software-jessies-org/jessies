@@ -5,12 +5,11 @@ import e.gui.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.regex.*;
 import javax.swing.*;
 import terminator.view.*;
 import terminator.view.highlight.*;
 
-public class FindDialog {
+public class FindDialog implements FindStatusDisplay {
     private static final FindDialog INSTANCE = new FindDialog();
     
     private FormDialog formDialog;
@@ -93,7 +92,6 @@ public class FindDialog {
         
         findField.selectAll();
         findField.requestFocus();
-        clearStatus();
     }
     
     public FindHighlighter getFindHighlighter() {
@@ -101,35 +99,11 @@ public class FindDialog {
     }
     
     private void find() {
-        String regularExpression = findField.getText();
-        
-        // Don't waste time re-finding all the current matches.
-        if (regularExpression.equals(getFindHighlighter().getRegularExpression())) {
-            return;
-        }
-        
-        // Check that we can actually compile the new regular expression.
-        Pattern pattern = null;
-        if (regularExpression.length() > 0) {
-            try {
-                pattern = PatternUtilities.smartCaseCompile(regularExpression);
-                clearStatus();
-            } catch (PatternSyntaxException ex) {
-                setStatus(ex.getDescription(), true);
-                return;
-            }
-        }
-        
-        // Hand it over to the find highlighter, which does the real work.
-        getFindHighlighter().setPattern(textToFindIn, regularExpression, pattern, findStatus);
+        getFindHighlighter().setPattern(textToFindIn, findField.getText(), this);
     }
     
-    private void setStatus(String text, boolean isError) {
+    public void setStatus(String text, boolean isError) {
         findField.setForeground(isError ? Color.RED : UIManager.getColor("TextField.foreground"));
         findStatus.setText(text);
-    }
-    
-    private void clearStatus() {
-        setStatus("", false);
     }
 }

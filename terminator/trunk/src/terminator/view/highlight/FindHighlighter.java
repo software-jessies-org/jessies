@@ -5,7 +5,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.concurrent.*;
 import java.util.regex.*;
-import javax.swing.*;
 import org.jdesktop.swingworker.SwingWorker;
 import terminator.model.*;
 import terminator.view.*;
@@ -20,7 +19,7 @@ public class FindHighlighter implements Highlighter {
 	private final Style style = new Style(Color.black, Color.yellow, null, null, false);
 
 	private Pattern pattern;
-	private String regularExpression;
+	private String regularExpression = "";
 	
 	public String getName() {
 		return "Find Highlighter";
@@ -31,18 +30,34 @@ public class FindHighlighter implements Highlighter {
 	 * be removed, matches in the current text will be found, and future
 	 * matches will be found as they appear.
 	 * 
-	 * 'newPattern' can be null to cancel match highlighting.
+	 * 'newRegularExpression' can be "" to cancel match highlighting.
 	 * 
-	 * Returns the current number of matches.
+	 * Status changes will be reported to 'findStatusDisplay' on the EDT.
 	 */
-	public void setPattern(final TerminalView view, String regularExpression, Pattern newPattern, final JLabel statusLine) {
-		forgetPattern(view);
-		if (newPattern == null) {
+	public void setPattern(final TerminalView view, String newRegularExpression, final FindStatusDisplay findStatusDisplay) {
+		// Don't waste time re-finding all the current matches.
+		if (newRegularExpression.equals(regularExpression)) {
 			return;
 		}
 		
-		this.pattern = newPattern;
-		this.regularExpression = regularExpression;
+		// Cancel the current find.
+		forgetPattern(view);
+		findStatusDisplay.setStatus("", false);
+		
+		// Is that all we're here for?
+		if (newRegularExpression.isEmpty()) {
+			return;
+		}
+		
+		// Check that we can actually compile the new regular expression.
+		try {
+			this.pattern = PatternUtilities.smartCaseCompile(newRegularExpression);
+			this.regularExpression = newRegularExpression;
+		} catch (PatternSyntaxException ex) {
+			findStatusDisplay.setStatus(ex.getDescription(), true);
+			return;
+		}
+		
 		executorService.execute(new SwingWorker<Object, Object>() {
 			private int matchCount;
 			
@@ -54,7 +69,7 @@ public class FindHighlighter implements Highlighter {
 			
 			@Override
 			protected void done() {
-				statusLine.setText("Matches: " + matchCount);
+				findStatusDisplay.setStatus("Matches: " + matchCount, false);
 			}
 		});
 	}
@@ -62,11 +77,7 @@ public class FindHighlighter implements Highlighter {
 	public void forgetPattern(TerminalView view) {
 		view.removeHighlightsFrom(this, 0);
 		this.pattern = null;
-		this.regularExpression = null;
-	}
-	
-	public String getRegularExpression() {
-		return regularExpression;
+		this.regularExpression = "";
 	}
 	
 	/** Request to add highlights to all lines of the view from the index given onwards. */
@@ -77,8 +88,8 @@ public class FindHighlighter implements Highlighter {
 	/**
 	 * Returns the number of highlights added.
 	 */
-    private int addHighlightsInternal(TerminalView view, int firstLineIndex) {
-        if (pattern == null) {
+	private int addHighlightsInternal(TerminalView view, int firstLineIndex) {
+		if (pattern == null) {
 			return 0;
 		}
 		view.getBirdView().setValueIsAdjusting(true);
