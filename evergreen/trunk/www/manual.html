@@ -44,6 +44,8 @@
 
 <p>Workspace configuration is stored in Evergreen's dot-directory in your home directory, not under the workspace root itself, so you don't need to worry about telling your version control system to ignore anything.
 
+<p>If you want a workspace's root to be a directory that contains a collection of related projects, it can sometimes be useful to create a simple Makefile to build all the contained projects.
+
 <h3><a name="workspaces-indexing">Workspace Indexing</a></h3>
 
 <p>One reason why Evergreen asks you to name workspaces up front is that it indexes all the source files. It doesn't index their content, just their names. The index is updated when you start Evergreen, if the root directory of a workspace is modified (that is, either a modification in the real directory on the file system, or the workspace root is changed to point to another directory), or if you manually ask for a rescan.
@@ -51,8 +53,6 @@
 <p>To ask Evergreen to rescan a workspace, select that workspace and choose "Workspace" > "Rescan Files" from the menu. This option is also available by right-clicking on a workspace's tab.
 
 <p>Any dialog whose functionality relies on the index will also offer a "Rescan" button, accessible from the keyboard with alt-r.
-
-<p>Evergreen will only index a workspace that looks like a project: it must have a Makefile (or equivalent) or be under revision control. There's no reason you can't create an empty Makefile as a hint to Evergreen if you want a workspace's root to be a directory that contains a collection of related projects, or it can sometimes be useful to create a simple Makefile to build all the contained projects. Evergreen doesn't look at Makefile content, so it doesn't care.
 
 <p>When indexing, symbolic links are ignored. A symbolic link to a file won't be added to the index. A symbolic link to a directory won't be followed. For links within your workspace, this means (barring hard links) that each file has a unique name, reducing clutter when displaying search results and the like. For links outside your workspace, this means you'll need to find an alternative way of expressing what you mean. You might find the idea in the previous paragraph about creating a parent directory to collect various sub-projects together useful if you were using symbolic links for this purpose.
 
