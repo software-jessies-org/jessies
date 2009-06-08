@@ -7,6 +7,7 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
+import terminator.terminal.*;
 import terminator.view.*;
 
 public class TerminatorTabbedPane extends TabbedPane {
@@ -132,16 +133,21 @@ public class TerminatorTabbedPane extends TabbedPane {
     private synchronized void updateSpinnerVisibilities() {
         int index = getSelectedIndex();
         if (index != -1) {
-            JTerminalPane visibleTerminal = (JTerminalPane) getComponentAt(index);
-            visibleTerminal.getOutputSpinner().setPainted(false);
+            TerminatorTabComponent component = (TerminatorTabComponent) getTabComponentAt_safe(index);
+            if (component != null) {
+                component.stopActivityDisplay();
+            }
         }
     }
     
-    private static class TerminatorTabComponent extends JPanel {
-        private JLabel label;
+    private static class TerminatorTabComponent extends JPanel implements ChangeListener {
+        private final JTerminalPane terminalPane;
+        private final JLabel label;
+        private final JAsynchronousProgressIndicator outputSpinner;
         
         private TerminatorTabComponent(JTerminalPane terminalPane) {
             super(new BorderLayout());
+            this.terminalPane = terminalPane;
             this.label = new JLabel(terminalPane.getName());
             
             label.setOpaque(false);
@@ -149,7 +155,22 @@ public class TerminatorTabbedPane extends TabbedPane {
             
             ((BorderLayout) getLayout()).setHgap(4);
             add(label, BorderLayout.CENTER);
-            add(terminalPane.getOutputSpinner(), BorderLayout.EAST);
+            
+            this.outputSpinner = new JAsynchronousProgressIndicator();
+            outputSpinner.setDisplayedWhenStopped(true);
+            add(outputSpinner, BorderLayout.EAST);
+            terminalPane.getControl().addChangeListener(this);
+        }
+        
+        public void stopActivityDisplay() {
+            outputSpinner.setPainted(false);
+        }
+
+        public void stateChanged(ChangeEvent e) {
+            if (!terminalPane.isShowing()) {
+                outputSpinner.setPainted(true);
+                outputSpinner.animateOneFrame();
+            }
         }
         
         public void setTitle(String title) {
