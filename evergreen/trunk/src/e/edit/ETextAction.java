@@ -46,6 +46,22 @@ public abstract class ETextAction extends AbstractAction {
     }
     
     /**
+     * Returns a regular expression that would match the selection (less trailing newlines), or the empty string.
+     * The empty string is returned if no text area has focus, the focused text area has no selection, or the selection contains newlines.
+     */
+    public static String getSelectedRegularExpression() {
+        // Get the selection, stripping trailing newlines.
+        // ETextAction.getSelectedText returns the empty string if no text area has focus.
+        final String selection = ETextAction.getSelectedText().replaceAll("\n$", "");
+        
+        // Only use the selection as a regular expression if there are no embedded newlines.
+        if (selection.isEmpty() || selection.contains("\n")) {
+            return "";
+        }
+        return StringUtilities.regularExpressionFromLiteral(selection);
+    }
+    
+    /**
      * Returns the currently-selected text, or the word at the caret, from the text area with the focus.
      * Returns the empty string if no text area has the focus.
      */
