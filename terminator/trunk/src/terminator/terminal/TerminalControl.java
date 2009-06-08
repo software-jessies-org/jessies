@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
+import javax.swing.event.*;
 import terminator.*;
 import terminator.model.*;
 import terminator.view.*;
@@ -35,6 +36,7 @@ public class TerminalControl {
 	private static BufferedReader stepModeReader;
 	
 	private JTerminalPane pane;
+	private List<ChangeListener> changeListeners = new ArrayList<ChangeListener>();
 	private TerminalModel model;
 	private PtyProcess ptyProcess;
 	private boolean processIsRunning;
@@ -315,11 +317,7 @@ public class TerminalControl {
 		logWriter.append(buffer, size, sawNewline);
 		flushLineBuffer();
 		flushTerminalActions();
-		
-		if (pane.isShowing() == false) {
-			pane.getOutputSpinner().setPainted(true);
-			pane.getOutputSpinner().animateOneFrame();
-		}
+		fireChangeListeners();
 	}
 	
 	private synchronized void flushTerminalActions() {
@@ -618,5 +616,22 @@ public class TerminalControl {
 	
 	public PtyProcess getPtyProcess() {
 		return ptyProcess;
+	}
+	
+	/**
+	 * Adds a change listener to be notified when the terminal's content changes.
+	 */
+	public void addChangeListener(final ChangeListener l) {
+		changeListeners.add(l);
+	}
+	
+	public void removeChangeListener(final ChangeListener l) {
+		changeListeners.remove(l);
+	}
+	
+	private void fireChangeListeners() {
+		for (ChangeListener l : changeListeners) {
+			l.stateChanged(null);
+		}
 	}
 }

@@ -30,7 +30,6 @@ public class JTerminalPane extends JPanel {
 	private String name;
 	private boolean wasCreatedAsNewShell;
 	private Dimension currentSizeInChars;
-	private JAsynchronousProgressIndicator outputSpinner;
 	private MenuItemProvider menuItemProvider;
 	
 	/**
@@ -127,8 +126,6 @@ public class JTerminalPane extends JPanel {
 		view = new TerminalView();
 		view.addKeyListener(new KeyHandler());
 		
-		initOutputSpinner();
-		
 		EPopupMenu popupMenu = new EPopupMenu(view);
 		// Indirection because we've not yet created the real MenuItemProvider.  
 		popupMenu.addMenuItemProvider(new MenuItemProvider() {
@@ -203,15 +200,6 @@ public class JTerminalPane extends JPanel {
 			}
 		}
 	};
-	
-	private void initOutputSpinner() {
-		outputSpinner = new JAsynchronousProgressIndicator();
-		outputSpinner.setDisplayedWhenStopped(true);
-	}
-	
-	public JAsynchronousProgressIndicator getOutputSpinner() {
-		return outputSpinner;
-	}
 	
 	private void initSizeMonitoring() {
 		class SizeMonitor extends ComponentAdapter {
