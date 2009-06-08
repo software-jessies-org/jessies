@@ -129,6 +129,19 @@ public class Parameters {
         return (value != null) ? value : defaultValue;
     }
     
+    /**
+     * Returns a (copy of a) subset of this map containing only those entries whose keys start with 'prefix'.
+     */
+    public static synchronized Map<String, String> getStrings(String prefix) {
+        final Map<String, String> result = new HashMap<String, String>();
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            if (entry.getKey().startsWith(prefix)) {
+                result.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return result;
+    }
+    
     public static synchronized boolean getBoolean(String name, boolean defaultValue) {
         // Yet again, the total lack of thought that went into java.lang.Boolean bites us.
         final String value = getString(name, defaultValue ? "true" : "false");

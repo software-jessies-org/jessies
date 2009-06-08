@@ -8,9 +8,9 @@ public class OpenMakefileAction extends ETextAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        String makefileName = BuildAction.findMakefile();
-        if (makefileName != null) {
-            Evergreen.getInstance().openFile(makefileName);
+        final BuildAction.BuildTool buildTool = BuildAction.chooseBuildTool();
+        if (buildTool != null) {
+            Evergreen.getInstance().openFile(buildTool.makefileName);
         }
     }
 }
