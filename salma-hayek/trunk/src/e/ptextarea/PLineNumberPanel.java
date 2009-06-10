@@ -77,7 +77,7 @@ public class PLineNumberPanel extends JComponent {
             g.addRenderingHints(map);
         }
         
-        final FontMetrics fontMetrics = getFontMetrics(textArea.getFont());
+        final FontMetrics fontMetrics = textArea.getFontMetrics(Font.PLAIN);
         final Insets insets = getInsets();
         final int actualWidth = getWidth() - insets.left - insets.right;
         
@@ -85,7 +85,7 @@ public class PLineNumberPanel extends JComponent {
         final Rectangle bounds = g.getClipBounds();
         final int lineHeight = textArea.getLineHeight();
         final int maxSplitLine = textArea.getSplitLineCount() - 1;
-        final int minLine = Math.max(0, Math.min(maxSplitLine, (bounds.y - insets.top) / lineHeight - 1));
+        final int minLine = Math.max(0, Math.min(maxSplitLine, (bounds.y - insets.top) / lineHeight));
         final int maxLine = Math.min(maxSplitLine, (bounds.y - insets.top + bounds.height) / lineHeight);
         
         //System.err.println("paint size=" + getSize() + " bounds=" + bounds + " lines=" + minLine + ".." + maxLine);
@@ -95,6 +95,7 @@ public class PLineNumberPanel extends JComponent {
         g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
         
         g.setColor(getForeground());
+        g.setFont(textArea.getFont());
         for (int i = minLine; i <= maxLine; i++) {
             final SplitLine splitLine = textArea.getSplitLine(i);
             // Check this isn't the continuation of a wrapped line.
