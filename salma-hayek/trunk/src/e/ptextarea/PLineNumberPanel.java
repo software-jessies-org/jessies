@@ -54,23 +54,13 @@ public class PLineNumberPanel extends JComponent {
         if (getHeight() != textArea.getHeight() && !textArea.isLineWrappingInvalid()) {
             // The text area changed height, implying the number of lines changed.
             // Make sure we have enough space for the largest line number.
-            final int stringSize = Math.max(stringSize(textArea.getLineCount()), 4);
+            final int stringSize = Math.max(Integer.toString(textArea.getLineCount()).length(), 4);
             final int width = getFontMetrics(textArea.getFont()).charWidth('0') * stringSize;
             final Insets insets = getInsets();
             final Dimension size = textArea.getSize();
             size.width = insets.left + width + insets.right;
             setSize(size);
             setPreferredSize(size);
-        }
-    }
-    
-    // From java.lang.Integer.
-    private static final int sizeTable[] = { 9, 99, 999, 9999, 99999, 999999, 9999999, 99999999, 999999999, Integer.MAX_VALUE };
-    private static int stringSize(int x) {
-        for (int i=0; ; i++) {
-            if (x <= sizeTable[i]) {
-                return i+1;
-            }
         }
     }
     
