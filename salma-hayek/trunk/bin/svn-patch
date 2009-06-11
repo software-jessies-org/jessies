@@ -1,0 +1,13 @@
+#!/usr/bin/ruby -w
+
+# Output the changes to files that are already in the repository.
+system("svn diff")
+
+# Manually include all the new files too.
+`svn status`.split("\n").each() {
+    |line|
+    if line =~ /^\?      (\S+)$/
+        new_file = $1
+        system("diff -u --label #{new_file} /dev/null #{new_file}")
+    end
+}
