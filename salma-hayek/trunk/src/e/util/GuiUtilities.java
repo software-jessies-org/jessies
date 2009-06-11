@@ -322,7 +322,12 @@ public class GuiUtilities {
             // Work around Sun bug 6389282 which prevents Java 6 applications that would use the GTK LAF from displaying on remote X11 displays.
             UIManager.getInstalledLookAndFeels();
             
-            String lafClassName = UIManager.getSystemLookAndFeelClassName();
+            // Use the system LAF by default, unless the user has set the swing.defaultlaf property (also understood by UIManager).
+            // http://java.sun.com/docs/books/tutorial/uiswing/lookandfeel/plaf.html
+            String lafClassName = System.getProperty("swing.defaultlaf");
+            if (lafClassName == null){
+            	lafClassName = UIManager.getSystemLookAndFeelClassName();
+            }
             
             // FIXME: when we move to 1.6, remove this completely. The GTK LAF is okay there.
             if (lafClassName.contains("GTK") && System.getProperty("java.specification.version").equals("1.5")) {
