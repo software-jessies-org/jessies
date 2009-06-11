@@ -80,7 +80,13 @@ We definitely <i>do not</i> recommend that you turn automatic updates off.
 
 <p>The <a href="ChangeLog.html">salma-hayek ChangeLog</a> is available separately.
 
-<p>The source distribution is here (<a href="salma-hayek-source.tar.gz">salma-hayek-source.tar.gz</a>).
+<p>Anonymous read-only Subversion access is available. Copy and paste these commands to get everything you need:
+<pre>
+mkdir ~/jessies &amp;&amp; cd ~/jessies
+svn checkout http://software.jessies.org/svn/salma-hayek/trunk/ salma-hayek
+make -C salma-hayek
+</pre>
+<p>There's also a source distribution, <a href="salma-hayek-source.tar.gz">salma-hayek-source.tar.gz</a>, but Subversion makes it easier for you to keep up to date, and makes it easier to submit patches.
 
 <p>If you just want to look, you can <a href="/svn/salma-hayek/trunk/">browse the repository</a>.
 
