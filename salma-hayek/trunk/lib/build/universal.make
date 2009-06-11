@@ -997,3 +997,7 @@ gcj:
 findbugs: build
 	@echo Running findbugs...
 	findbugs -textui -emacs -auxclasspath $(call makeNativePath,$(EXTRA_JARS)) -sourcepath $(subst $(SPACE),:,$(foreach PROJECT_ROOT,$(DISTINCT_PROJECT_ROOTS),$(PROJECT_ROOT)/src)) $(foreach PROJECT_ROOT,$(DISTINCT_PROJECT_ROOTS),$(PROJECT_ROOT)/.generated/classes)
+
+# A rule for preprocessing C++.
+%.i: %.cpp
+	$(filter-out -c,$(COMPILE.cpp)) -E -dD $< -o $@
