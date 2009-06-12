@@ -36,7 +36,7 @@ public class ComponentUtilities {
     
     /**
      * Binds an ActionListener to both double-click and the enter key in the given component.
-s     */
+     */
     public static void bindDoubleClickAndEnter(final JComponent component, final ActionListener listener) {
         component.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
