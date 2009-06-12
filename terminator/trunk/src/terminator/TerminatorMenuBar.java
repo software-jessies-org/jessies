@@ -479,7 +479,7 @@ public class TerminatorMenuBar extends EMenuBar {
 		
 		@Override
 		protected void performPaneAction(JTerminalPane terminalPane) {
-			FindDialog.getSharedInstance().showFindDialogFor(terminalPane);
+			terminalPane.getFindPanel().showFindPanel();
 		}
 	}
 	
