@@ -10,26 +10,12 @@ def convert_to_jvm_compatible_pathname(pathname)
     return pathname
   end
   
-  # We know we're on Win32, and we're assuming we have Cygwin.
-  # If we run cygpath(1) from a non-console Win32 application, we'll cause
-  # console windows to flash up, which is distracting and ugly. So we invoke
-  # the Cygwin functions directly from the DLL.
-  require "Win32API"
-  path_list_buf_size = Win32API.new("cygwin1.dll", "cygwin_posix_to_win32_path_list_buf_size", [ "p" ], "i")
-  to_win32_path = Win32API.new("cygwin1.dll", "cygwin_conv_to_full_win32_path", [ "p", "p" ], "v")
-  
-  # Create a mutable copy, which seems to be required by the DLL calls.
-  pathname = pathname.dup()
-  
-  # Create a large enough buffer for the conversion.
-  buf_size = path_list_buf_size.Call(pathname)
-  buf = "\0" * buf_size
-  
-  # Do the conversion and tidy up the result (in case the suggested buffer
-  # size was too large).
-  to_win32_path.Call(pathname, buf)
-  buf.delete!("\0")
-  return buf
+  # We used to call now-deprecated functions directly from cygwin1.dll.
+  # That was in order to prevent cygpath causing a console window to flash up.
+  # That was only believed to be an issue when run from a non-console Win32 application.
+  # Now our shortcuts run Ruby via ruby-launcher, a Cygwin application.
+  # That program ensures that stdout and stderr are open, which I now think is the active ingredient.
+  return `cygpath --windows '#{pathname}'`.chomp()
 end
 
 # Takes a list of POSIX pathnames and returns a string suitable for use
