@@ -11,8 +11,9 @@ else
         def initialize()
             require "rbconfig.rb"
             # Avoid calling the console-subsystem uname(1) program on Cygwin.
-            # (Calling a console subsystem program from a desktop shortcut causes a console window to appear briefly.)
+            # We used to do this to prevent a console window from appearing when started from a desktop shortcut.
             # We've also seen Cygwin's uname report both "CYGWIN_NT-5.0" and "CYGWIN_NT-5.1".
+            # A dependency on uname would be a dependency on Cygwin.
             ruby_os_name = Config::CONFIG["target_os"]
             if ruby_os_name == "cygwin"
                 @os_name = "Cygwin"

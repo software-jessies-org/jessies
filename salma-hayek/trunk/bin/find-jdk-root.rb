@@ -100,6 +100,10 @@ else
     nil
   end
   
+  def convertWindowsFilenameToUnix(windowsFilename)
+    return `cygpath --unix '#{windowsFilename}'`.chomp()
+  end
+  
   def find_jdk_root()
     require "pathname.rb"
     
@@ -120,12 +124,11 @@ else
       acceptableMajorVersions = [6, 5]
       acceptableMajorVersions.each() {
         |majorVersion|
-        # This returns a native path, but universal.make already copes with that.
         registryKeyFile = "/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Development Kit/1.#{majorVersion}/JavaHome"
         if File.exists?(registryKeyFile)
           contents = IO.read(registryKeyFile);
           # Cygwin's representation of REG_SZ keys contains the null terminator.
-          return contents.chomp("\0")
+          return convertWindowsFilenameToUnix(contents.chomp("\0"))
         end
       }
     end
