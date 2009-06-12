@@ -123,6 +123,9 @@ findMakeFriendlyEquivalentName = $(findMakeFriendlyEquivalentName.$(TARGET_OS))
 JDK_ROOT_SCRIPT = $(SCRIPT_PATH)/find-jdk-root.rb
 SCRIPTS_WHICH_AFFECT_COMPILER_FLAGS += $(JDK_ROOT_SCRIPT)
 JDK_ROOT := $(call findMakeFriendlyEquivalentName,$(shell ruby $(JDK_ROOT_SCRIPT)))
+ifeq "$(wildcard $(JDK_ROOT)/include/*/jni_md.h)" ""
+	JDK_ROOT := $(error $(JDK_ROOT) is not a sane location for JDK headers)
+endif
 
 # ----------------------------------------------------------------------------
 # We use our own replacement for javah(1).
