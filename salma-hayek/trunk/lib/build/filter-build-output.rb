@@ -72,18 +72,19 @@ def filterBuildOutput(inputIo)
     # Match Compiling, Generating etc.
     if line.match(/^[A-Z][a-z]+ing\b.*\.\.\./)
       progressLine = line
+      lines = []
     elsif line.match(/^(?:\S+-)?(?:cc|g\+\+)(?:-\d+)? .*?\/([^\/ ]+)$/)
       # I don't want to override the built-in rules for compilation and it's hard to hook them to do extra echoing.
       # The regular expression above might be ugly but at least it's small, isolated and won't cause a build failure if it breaks.
       sourceFile = $1
       progressLine = "Compiling #{sourceFile}..."
+      lines = [line]
     else
       next
     end
     # TODO: Stamping each line with the time since invocation would be a neat way of quantifying which is the most expensive part of the build.
     puts(progressLine)
     $stdout.flush()
-    lines = []
   end
 end
 
