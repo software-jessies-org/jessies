@@ -75,6 +75,22 @@ public class TerminatorTabbedPane extends TabbedPane {
         if (GuiUtilities.isMacOs()) {
             setOpaque(true);
         }
+        
+        // Enable bringing up the info dialog when the user double-clicks on a tab.
+        showInfoOnDoubleClick();
+    }
+    
+    private void showInfoOnDoubleClick() {
+        addMouseListener(new MouseAdapter() {
+            @Override public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    final int index = indexAtLocation(e.getX(), e.getY());
+                    if (index != -1) {
+                        InfoDialog.getSharedInstance().showInfoDialogFor((JTerminalPane) getComponentAt(index));
+                    }
+                }
+            }
+        });
     }
     
     @Override protected void provideMenuItems(int index, Collection<Action> actions) {
