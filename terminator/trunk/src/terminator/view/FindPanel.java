@@ -91,7 +91,8 @@ public class FindPanel extends JPanel implements FindStatusDisplay {
         if (statusWindow == null) {
             final JFrame owner = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, this);
             statusWindow = new JWindow(owner);
-            statusWindow.setBackground(UIManager.getColor("TextField.background"));
+            // This has no effect with the GTK LAF, but the default colors look fine anyway.
+            statusWindow.setBackground(UIManager.getColor("ToolTip.background"));
         }
         statusWindow.setContentPane(findStatus);
         statusWindow.pack();
