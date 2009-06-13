@@ -36,6 +36,11 @@ public class FindPanel extends JPanel implements FindStatusDisplay {
                 typingTimer.restart();
             }
         });
+        findField.addFocusListener(new FocusAdapter() {
+            @Override public void focusLost(FocusEvent e) {
+                hideFindPanel();
+            }
+        });
         
         initKeyBindings();
         
