@@ -69,7 +69,7 @@ public class FindHighlighter implements Highlighter {
 			
 			@Override
 			protected void done() {
-				findStatusDisplay.setStatus("Matches: " + matchCount, false);
+				findStatusDisplay.setStatus(StringUtilities.pluralize(matchCount, "match", "matches"), false);
 			}
 		});
 	}

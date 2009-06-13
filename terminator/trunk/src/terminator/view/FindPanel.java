@@ -10,11 +10,9 @@ import terminator.*;
 import terminator.view.highlight.*;
 
 public class FindPanel extends JPanel implements FindStatusDisplay {
-    private static JWindow statusWindow;
-    
     private final JTerminalPane terminalPane;
     
-    private final JTextField findField = new JTextField();
+    private final JTextField findField = new JTextField(20);
     private final ELabel findStatus = new ELabel();
     
     private final Timer typingTimer;
@@ -44,12 +42,19 @@ public class FindPanel extends JPanel implements FindStatusDisplay {
         
         initKeyBindings();
         
-        setLayout(new BorderLayout());
-        add(findField, BorderLayout.CENTER);
+        setLayout(new BorderLayout(8, 0));
+        add(Box.createVerticalStrut(2), BorderLayout.NORTH);
+        add(labeledComponent("Find:", findField), BorderLayout.WEST);
+        add(findStatus, BorderLayout.CENTER);
         
         findStatus.setFont(UIManager.getFont("ToolTip.font"));
-        findStatus.setBackground(UIManager.getColor("ToolTip.background"));
-        findStatus.setForeground(UIManager.getColor("ToolTip.foreground"));
+    }
+    
+    private JComponent labeledComponent(String label, JComponent component) {
+        final JPanel result = new JPanel(new BorderLayout(4, 0));
+        result.add(new ELabel(label), BorderLayout.WEST);
+        result.add(component, BorderLayout.CENTER);
+        return result;
     }
     
     private void initKeyBindings() {
@@ -61,6 +66,8 @@ public class FindPanel extends JPanel implements FindStatusDisplay {
         
         ComponentUtilities.initKeyBinding(findField, KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), new EnterAction());
         ComponentUtilities.initKeyBinding(findField, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), new EscapeAction());
+        
+        // FIXME: add up- and down-arrow bindings to pull old searches from a StringHistory.
     }
     
     private class EnterAction extends AbstractAction {
@@ -87,34 +94,8 @@ public class FindPanel extends JPanel implements FindStatusDisplay {
     }
     
     private void hideFindPanel() {
-        hideStatusWindow();
         terminalPane.requestFocus();
         setVisible(false);
-    }
-    
-    private void showStatusWindow() {
-        if (statusWindow == null) {
-            final JFrame owner = (JFrame) SwingUtilities.getAncestorOfClass(JFrame.class, this);
-            statusWindow = new JWindow(owner);
-            // This has no effect with the GTK LAF, but the default colors look fine anyway.
-            statusWindow.setBackground(UIManager.getColor("ToolTip.background"));
-        }
-        statusWindow.setContentPane(findStatus);
-        statusWindow.pack();
-        
-        final int x = findField.getWidth() - statusWindow.getWidth() - findField.getInsets().right;
-        final int y = (findField.getHeight() - statusWindow.getHeight()) / 2;
-        final Point location = new Point(x, y);
-        SwingUtilities.convertPointToScreen(location, findField);
-        statusWindow.setLocation(location);
-        statusWindow.setVisible(true);
-    }
-    
-    private void hideStatusWindow() {
-        if (statusWindow != null) {
-            statusWindow.setVisible(false);
-            statusWindow.dispose();
-        }
     }
     
     private void updateResults() {
@@ -134,17 +115,10 @@ public class FindPanel extends JPanel implements FindStatusDisplay {
         findField.selectAll();
         setVisible(true);
         findField.requestFocus();
-        showStatusWindow();
     }
     
     public void setStatus(String text, boolean isError) {
         findField.setForeground(isError ? Color.RED : UIManager.getColor("TextField.foreground"));
         findStatus.setText(text);
-        
-        if (text.length() == 0) {
-            hideStatusWindow();
-        } else {
-            showStatusWindow();
-        }
     }
 }
