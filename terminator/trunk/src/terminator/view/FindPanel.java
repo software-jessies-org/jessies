@@ -14,7 +14,7 @@ public class FindPanel extends JPanel implements FindStatusDisplay {
     
     private final JTerminalPane terminalPane;
     
-    private final JTextField findField = new JTextField(40);
+    private final JTextField findField = new JTextField();
     private final ELabel findStatus = new ELabel();
     
     private final Timer typingTimer;
@@ -39,7 +39,8 @@ public class FindPanel extends JPanel implements FindStatusDisplay {
         
         initKeyBindings();
         
-        add(findField);
+        setLayout(new BorderLayout());
+        add(findField, BorderLayout.CENTER);
         
         findStatus.setFont(UIManager.getFont("ToolTip.font"));
         findStatus.setBackground(UIManager.getColor("ToolTip.background"));
