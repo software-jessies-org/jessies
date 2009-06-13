@@ -219,12 +219,7 @@ public class JTerminalPane extends JPanel {
 				updateTerminalSize();
 			}
 		};
-		// It's a mistake to listen to the JScrollPane's viewport, as
-		// we used to, because that changes size when the horizontal
-		// scrollbar appears. This caused us to lose data by moving
-		// the cursor back over already-output text if that chunk made
-		// the scrollbar appear.
-		addComponentListener(new SizeMonitor());
+		scrollPane.getViewport().addComponentListener(new SizeMonitor());
 	}
 	
 	private void updateTerminalSize() {
