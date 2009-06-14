@@ -100,12 +100,21 @@ public class TerminatorFrame extends JFrame implements TerminalPaneHost {
 	}
 	
 	private void initTerminals() {
-		// We always have one terminal...
+		// Set up the basic single-pane UI...
 		switchToSinglePane();
-		
-		// And sometimes we have more...
+		// Add any other terminals...
 		for (int i = 1; i < terminals.size(); ++i) {
 			addPaneToUI(terminals.get(i));
+		}
+		// And make sure the user got what they wanted...
+		updateTabbedPane();
+	}
+	
+	private void updateTabbedPane() {
+		if (terminals.size() == 1 && !Terminator.getPreferences().getBoolean(TerminatorPreferences.ALWAYS_SHOW_TABS)) {
+			switchToSinglePane();
+		} else {
+			switchToTabbedPane();
 		}
 	}
 	
@@ -257,9 +266,9 @@ public class TerminatorFrame extends JFrame implements TerminalPaneHost {
 		if (tabbedPane.getTabCount() == 0) {
 			// FIXME: how can we ever get here?
 			setVisible(false);
-		} else if (tabbedPane.getTabCount() == 1) {
-			switchToSinglePane();
 		} else {
+			// Switch back to a single terminal if appropriate.
+			updateTabbedPane();
 			// Just hand focus to the visible tab's terminal. We
 			// do this later because otherwise Swing seems to give
 			// the focus to the tab itself, rather than the
@@ -379,6 +388,7 @@ public class TerminatorFrame extends JFrame implements TerminalPaneHost {
 		updateBackground();
 		updateTransparency();
 		updateMenuBar();
+		updateTabbedPane();
 		for (JTerminalPane terminal : terminals) {
 			terminal.optionsDidChange();
 		}

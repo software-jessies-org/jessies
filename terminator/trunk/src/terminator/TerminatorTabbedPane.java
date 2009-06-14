@@ -174,6 +174,9 @@ public class TerminatorTabbedPane extends TabbedPane {
             
             this.outputSpinner = new JAsynchronousProgressIndicator();
             outputSpinner.setDisplayedWhenStopped(true);
+            // The ChangeListener will start us up if necessary.
+            // We need to default to "stopped" in case the user's set "always show tabs".
+            stopActivityDisplay();
             add(outputSpinner, BorderLayout.EAST);
             terminalPane.getControl().addChangeListener(this);
         }
