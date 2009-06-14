@@ -322,8 +322,7 @@ public class EColumn extends JPanel {
         
         // Ensure all the components in the column have the same width.
         final Component[] components = getComponents();
-        for (int i = 0; i < components.length - 1; ++i) {
-            Component c = components[i];
+        for (Component c : components) {
             if (c.getWidth() != getWidth()) {
                 reshapeAndRevalidate(c, c.getX(), c.getY(), getWidth(), c.getHeight());
             }
