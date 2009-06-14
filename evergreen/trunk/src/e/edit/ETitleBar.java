@@ -35,31 +35,6 @@ public class ETitleBar extends JPanel {
     
     public static final int TITLE_HEIGHT = 20;
     
-    private static final Color activeForeground;
-    private static final Color activeBackground;
-    private static final Color inactiveForeground;
-    private static final Color inactiveBackground;
-    
-    static {
-        if (GuiUtilities.isGtk()) {
-            // The Java 6 GTK+ LAF doesn't offer useful InternalFrame colors.
-            // The TabbedPane colors might seem more sensible, but somehow that
-            // ends up looking the wrong way round; dark seems more "focused".
-            // The TextArea colors seem reasonable, at least for the Solaris 10
-            // default theme. I don't know how much this is likely to be
-            // affected by other themes.
-            activeBackground = UIManager.getColor("TextArea.selectionBackground");
-            activeForeground = UIManager.getColor("TextArea.selectionForeground");
-            inactiveBackground = UIManager.getColor("TextArea.background");
-            inactiveForeground = UIManager.getColor("TextArea.foreground");
-        } else {
-            activeBackground = UIManager.getColor("InternalFrame.activeTitleBackground");
-            activeForeground = UIManager.getColor("InternalFrame.activeTitleForeground");
-            inactiveBackground = UIManager.getColor("InternalFrame.inactiveTitleBackground");
-            inactiveForeground = UIManager.getColor("InternalFrame.inactiveTitleForeground");
-        }
-    }
-    
     private final EWindow window;
     private final JLabel titleLabel;
     private final JPanel buttonsPanel;
@@ -141,20 +116,40 @@ public class ETitleBar extends JPanel {
         updateColors();
     }
     
+    // FIXME: can we arrange to get this called whenever the system theme changes?
     private void updateColors() {
-        /*
-         * Use the JInternalFrame colors to distinguish focused from unfocused
-         * windows.
-         * 
-         * On Mac OS, although you might expect that this gives exactly the
-         * result you see with JInternalFrame, it doesn't. As of 1.4.2, Apple
-         * invoke apple.laf.AquaImageFactory's drawFrameTitleBackground method
-         * rather than using these colors. We could use reflection to do the
-         * same, but that seems unnecessarily fragile.
-         * 
-         * We set the title label foreground to affect the text, and the buttons'
-         * panel's foreground for the benefit of the buttons.
-         */
+        Color activeForeground;
+        Color activeBackground;
+        Color inactiveForeground;
+        Color inactiveBackground;
+        if (GuiUtilities.isGtk()) {
+            // The Java 6 GTK+ LAF doesn't offer useful InternalFrame colors.
+            // The TabbedPane colors might seem more sensible, but somehow that
+            // ends up looking the wrong way round; dark seems more "focused".
+            // The TextArea colors seem reasonable, at least for the Solaris 10
+            // default theme. I don't know how much this is likely to be
+            // affected by other themes.
+            activeBackground = UIManager.getColor("TextArea.selectionBackground");
+            activeForeground = UIManager.getColor("TextArea.selectionForeground");
+            inactiveBackground = UIManager.getColor("TextArea.background");
+            inactiveForeground = UIManager.getColor("TextArea.foreground");
+        } else {
+            activeBackground = UIManager.getColor("InternalFrame.activeTitleBackground");
+            activeForeground = UIManager.getColor("InternalFrame.activeTitleForeground");
+            inactiveBackground = UIManager.getColor("InternalFrame.inactiveTitleBackground");
+            inactiveForeground = UIManager.getColor("InternalFrame.inactiveTitleForeground");
+        }
+        
+        // Use the JInternalFrame colors to distinguish focused from unfocused windows.
+        //
+        // On Mac OS, although you might expect that this gives exactly the
+        // result you see with JInternalFrame, it doesn't. As of 1.4.2, Apple
+        // invoke apple.laf.AquaImageFactory's drawFrameTitleBackground method
+        // rather than using these colors. We could use reflection to do the
+        // same, but that seems unnecessarily fragile.
+        // 
+        // We set the title label foreground to affect the text, and the button
+        // panel's foreground for the benefit of the buttons.
         if (isActive) {
             setBackground(activeBackground);
             buttonsPanel.setForeground(activeForeground);
