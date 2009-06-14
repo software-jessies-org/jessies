@@ -162,23 +162,23 @@ public class TerminatorTabbedPane extends TabbedPane {
         private final JAsynchronousProgressIndicator outputSpinner;
         
         private TerminatorTabComponent(JTerminalPane terminalPane) {
-            super(new BorderLayout());
+            super(new BorderLayout(4, 0));
+            
             this.terminalPane = terminalPane;
             this.label = new JLabel(terminalPane.getName());
             
             label.setOpaque(false);
             setOpaque(false);
             
-            ((BorderLayout) getLayout()).setHgap(4);
-            add(label, BorderLayout.CENTER);
-            
             this.outputSpinner = new JAsynchronousProgressIndicator();
             outputSpinner.setDisplayedWhenStopped(true);
             // The ChangeListener will start us up if necessary.
             // We need to default to "stopped" in case the user's set "always show tabs".
             stopActivityDisplay();
-            add(outputSpinner, BorderLayout.EAST);
             terminalPane.getControl().addChangeListener(this);
+            
+            add(label, BorderLayout.CENTER);
+            add(outputSpinner, BorderLayout.EAST);
         }
         
         public void stopActivityDisplay() {
