@@ -42,9 +42,17 @@ public class FindPanel extends JPanel implements FindStatusDisplay {
         
         initKeyBindings();
         
+        JComponent findComponent;
+        if (GuiUtilities.isMacOs() && System.getProperty("os.version").startsWith("10.4") == false) {
+            putClientProperty("JTextField.variant", "search");
+            findComponent = findField;
+        } else {
+            findComponent = labeledComponent("Find:", findField);
+        }
+        
         setLayout(new BorderLayout(8, 0));
         add(Box.createVerticalStrut(2), BorderLayout.NORTH);
-        add(labeledComponent("Find:", findField), BorderLayout.WEST);
+        add(findComponent, BorderLayout.WEST);
         add(findStatus, BorderLayout.CENTER);
         
         findStatus.setFont(UIManager.getFont("ToolTip.font"));
