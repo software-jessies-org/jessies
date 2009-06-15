@@ -55,7 +55,7 @@ public abstract class ETextAction extends AbstractAction {
         final String selection = ETextAction.getSelectedText().replaceAll("\n$", "");
         
         // Only use the selection as a regular expression if there are no embedded newlines.
-        if (selection.isEmpty() || selection.contains("\n")) {
+        if (selection.length() == 0 || selection.contains("\n")) {
             return "";
         }
         return StringUtilities.regularExpressionFromLiteral(selection);
