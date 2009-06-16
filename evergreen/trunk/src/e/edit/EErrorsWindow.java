@@ -90,7 +90,7 @@ public class EErrorsWindow extends JFrame {
     }
     
     private void initKillButton() {
-        killButton = StopIcon.makeStopButton();
+        killButton = Buttons.makeStopButton();
         killButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 ProcessUtilities.terminateProcess(process);
