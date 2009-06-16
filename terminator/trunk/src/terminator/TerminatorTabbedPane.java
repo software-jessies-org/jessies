@@ -25,27 +25,31 @@ public class TerminatorTabbedPane extends TabbedPane {
             
             final int oldIndex = tabbedPane.getSelectedIndex();
             int newIndex = tabbedPane.indexAtLocation(e.getX(), e.getY());
-            if (newIndex != -1 && newIndex != oldIndex) {
-                // Hysteresis to prevent bad behavior when moving a small tab over a larger one (which would then be under the mouse, causing the opposite move).
-                // This is less unpleasant than using java.awt.Robot to move the pointer to a safe spot.
-                // (gnome-terminal sidesteps this problem by forcing all tabs to be the same width.)
-                javax.swing.plaf.TabbedPaneUI ui = tabbedPane.getUI();
-                Rectangle newRectangle = ui.getTabBounds(tabbedPane, newIndex);
-                if (oldIndex < newIndex) {
-                    // Moving left-to-right.
-                    if (e.getX() < newRectangle.x + newRectangle.width/2) {
-                        return;
-                    }
-                } else {
-                    // Moving right-to-left.
-                    if (e.getX() > newRectangle.x + newRectangle.width/2) {
-                        return;
-                    }
-                }
-                
-                // The move's okay.
-                tabbedPane.moveTab(oldIndex, newIndex);
+            if (newIndex == -1) {
+                return;
             }
+            if (newIndex == oldIndex) {
+                return;
+            }
+            // Hysteresis to prevent bad behavior when moving a small tab over a larger one (which would then be under the mouse, causing the opposite move).
+            // This is less unpleasant than using java.awt.Robot to move the pointer to a safe spot.
+            // (gnome-terminal sidesteps this problem by forcing all tabs to be the same width.)
+            javax.swing.plaf.TabbedPaneUI ui = tabbedPane.getUI();
+            Rectangle newRectangle = ui.getTabBounds(tabbedPane, newIndex);
+            if (oldIndex < newIndex) {
+                // Moving left-to-right.
+                if (e.getX() < newRectangle.x + newRectangle.width/2) {
+                    return;
+                }
+            } else {
+                // Moving right-to-left.
+                if (e.getX() > newRectangle.x + newRectangle.width/2) {
+                    return;
+                }
+            }
+            
+            // The move's okay.
+            tabbedPane.moveTab(oldIndex, newIndex);
         }
         
         @Override
