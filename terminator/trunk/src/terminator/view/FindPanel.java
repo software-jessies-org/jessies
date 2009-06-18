@@ -44,7 +44,7 @@ public class FindPanel extends JPanel implements FindStatusDisplay {
         
         JComponent findComponent;
         if (GuiUtilities.isMacOs() && System.getProperty("os.version").startsWith("10.4") == false) {
-            putClientProperty("JTextField.variant", "search");
+            findField.putClientProperty("JTextField.variant", "search");
             findComponent = findField;
         } else {
             findComponent = labeledComponent("Find:", findField);
