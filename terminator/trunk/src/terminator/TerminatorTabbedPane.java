@@ -66,6 +66,11 @@ public class TerminatorTabbedPane extends TabbedPane {
         public void mouseMoved(MouseEvent e) { }
     }
     
+    static {
+        // Normally we use small tabbed panes on Mac OS, but activity indicators and close buttons need more space.
+        UIManager.put("TabbedPane.useSmallLayout", Boolean.FALSE);
+    }
+
     public TerminatorTabbedPane() {
         addChangeListener(new TerminalFocuser());
         
