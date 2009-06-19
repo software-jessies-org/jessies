@@ -171,23 +171,66 @@ public class TerminatorTabbedPane extends TabbedPane {
         private final JAsynchronousProgressIndicator outputSpinner;
         
         private TerminatorTabComponent(JTerminalPane terminalPane) {
+            // FIXME: would BoxLayout make more sense?
             super(new BorderLayout(4, 0));
             
             this.terminalPane = terminalPane;
-            this.label = new JLabel(terminalPane.getName());
             
+            this.label = new JLabel(terminalPane.getName());
             label.setOpaque(false);
             setOpaque(false);
             
             this.outputSpinner = new JAsynchronousProgressIndicator();
             outputSpinner.setDisplayedWhenStopped(true);
-            // The ChangeListener will start us up if necessary.
+            // The ChangeListener will start the spinner if necessary.
             // We need to default to "stopped" in case the user's set "always show tabs".
             stopActivityDisplay();
             terminalPane.getControl().addChangeListener(this);
             
-            add(label, BorderLayout.CENTER);
-            add(outputSpinner, BorderLayout.EAST);
+            final JButton closeButton = makeCloseButton();
+            
+            if (GuiUtilities.isMacOs()) {
+                // FIXME: does this look okay?
+                add(closeButton, BorderLayout.WEST);
+                add(label, BorderLayout.CENTER);
+                add(outputSpinner, BorderLayout.EAST);
+            } else {
+                add(label, BorderLayout.WEST);
+                add(outputSpinner, BorderLayout.CENTER);
+                add(closeButton, BorderLayout.EAST);
+            }
+        }
+        
+        private JButton makeCloseButton() {
+            final JButton button = GuiUtilities.isGtk() ? makeGtkCloseButton() : Buttons.makeCloseTabButton();
+            button.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    terminalPane.doCheckedCloseAction();
+                }
+            });
+            return button;
+        }
+        
+        private JButton makeGtkCloseButton() {
+            final JButton button = new JButton(GnomeStockIcon.getStockIcon("gtk-close", GnomeStockIcon.Size.GTK_ICON_SIZE_MENU));
+            // In Firefox and GEdit, the only Gnome applications I know with closeable tabs...
+            // ...the border is pulled tight around the icon...
+            button.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
+            // ...and is only visible on rollover.
+            button.setContentAreaFilled(false);
+            button.addMouseListener(new MouseAdapter() {
+                @Override public void mouseEntered(MouseEvent e) {
+                    button.setContentAreaFilled(true);
+                }
+                
+                @Override public void mouseExited(MouseEvent e) {
+                    button.setContentAreaFilled(false);
+                }
+            });
+            // We don't want a focus ring, nor do we want to accept the focus.
+            button.setFocusPainted(false);
+            button.setFocusable(false);
+            return button;
         }
         
         public void stopActivityDisplay() {
