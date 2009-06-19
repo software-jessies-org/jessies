@@ -23,7 +23,7 @@ public class Buttons {
      * A "close tab" button. Based on the same button in Google Chrome.
      */
     public static JButton makeCloseTabButton() {
-        final JButton button = makeButton(new CrossIcon(null, new Color(0xb7b8ba), 1.5f));
+        final JButton button = makeButton(new CrossIcon(null, new Color(0x808080), 1.5f));
         button.setPressedIcon(new CrossIcon(Color.BLACK, Color.WHITE, 1.5f));
         button.setRolloverIcon(new CrossIcon(new Color(0xc13535), Color.WHITE, 1.5f));
         button.setRolloverEnabled(true);
