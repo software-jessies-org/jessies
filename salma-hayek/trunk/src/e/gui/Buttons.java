@@ -50,10 +50,22 @@ public class Buttons {
     }
     
     public static void main(String[] arguments) {
-        MainFrame frame = new MainFrame();
-        frame.setLayout(new FlowLayout());
-        frame.add(makeStopButton());
-        frame.add(makeCloseTabButton());
+        // These colors measured with FatBits from screenshots found on the web.
+        final Color windows2000 = new Color(0xd4d0c8);
+        final Color windowsXP = new Color(0xece9d8);
+        final Color windowsVista = new Color(0xf0f0f0);
+        
+        final MainFrame frame = new MainFrame();
+        final JPanel ui = new JPanel();
+        ui.setLayout(new BoxLayout(ui, BoxLayout.Y_AXIS));
+        for (Color background : new Color[] { null, windows2000, windowsXP, windowsVista }) {
+            final JPanel row = new JPanel(new FlowLayout());
+            row.setBackground(background);
+            row.add(makeStopButton());
+            row.add(makeCloseTabButton());
+            ui.add(row);
+        }
+        frame.setContentPane(ui);
         frame.pack();
         frame.setVisible(true);
     }
