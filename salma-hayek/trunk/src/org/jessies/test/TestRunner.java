@@ -2,9 +2,10 @@ package org.jessies.test;
 
 import e.util.*;
 import java.io.*;
+import java.lang.reflect.*;
 import java.net.*;
 import java.util.*;
-import java.lang.reflect.*;
+import java.util.concurrent.*;
 import org.jessies.cli.*;
 import org.jessies.os.*;
 
@@ -49,29 +50,67 @@ public class TestRunner {
     @Option(names = { "-v", "--verbose" })
     private boolean verbose = false;
     
-    private long setupTime;
-    private long runningTime;
+    private final long startTime = System.nanoTime();
+    
+    private final ExecutorService executor;
+    private final ArrayList<TestResult> successes;
+    private final ArrayList<TestResult> failures;
     
     public static void main(String[] args) throws Exception {
         new TestRunner(args);
     }
     
     private TestRunner(String[] args) throws Exception {
+        this.executor = ThreadUtilities.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), "test runner");
+        this.successes = new ArrayList<TestResult>();
+        this.failures = new ArrayList<TestResult>();
+        
         final List<String> directories = new OptionParser(this).parse(args);
-        runTests(directories);
+        
+        scheduleTests(directories);
+        
+        executor.shutdown();
+        try {
+            executor.awaitTermination(60, TimeUnit.SECONDS);
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
+        }
+        
+        reportResults();
     }
     
-    private void runTests(List<String> directoryNames) throws Exception {
-        // FIXME: parallelize; start running tests as they're found?
-        System.exit(runTestMethods(findTestMethods(directoryNames)));
+    private void reportResults() {
+        final long runningTime = System.nanoTime() - startTime;
+        verbose("Running time: " + TimeUtilities.nsToString(runningTime));
+        
+        // Sort the results because a consistent output order is useful for human observers.
+        Collections.sort(successes);
+        Collections.sort(failures);
+        
+        // Show successes first, then failures, since the latter are more likely to need investigation.
+        for (TestResult success : successes) {
+            success.print();
+        }
+        for (TestResult failure : failures) {
+            failure.print();
+        }
+        
+        final int failCount = failures.size();
+        final int testCount = successes.size() + failCount;
+        if (testCount == 0) {
+            System.out.println(red("No tests found!\n"));
+            System.exit(Posix.EXIT_FAILURE);
+        } else if (failCount == 0) {
+            System.out.println(green("All " + testCount + " tests passed in " + TimeUtilities.nsToString(runningTime) + "."));
+            System.exit(Posix.EXIT_SUCCESS);
+        } else {
+            System.out.printf(red("Tested: %d, Passed: %d, Failed: %d.\n"), testCount, testCount - failCount, failCount);
+            System.exit(Posix.EXIT_FAILURE);
+        }
     }
     
-    private List<Method> findTestMethods(List<String> directoryNames) throws Exception {
-        this.setupTime = System.nanoTime();
-        List<Method> testMethods = findTestMethods(makeClassLoader(directoryNames), findClassNames(directoryNames));
-        this.setupTime = System.nanoTime() - setupTime;
-        verbose("Setup time: " + TimeUtilities.nsToString(setupTime));
-        return testMethods;
+    private void scheduleTests(List<String> directoryNames) throws Exception {
+        findTestMethods(makeClassLoader(directoryNames), findClassNames(directoryNames));
     }
     
     // Makes a ClassLoader that can load classes from the given directories.
@@ -93,7 +132,7 @@ public class TestRunner {
                 error("'" + directoryName + "' is not a directory");
             }
         }
-        verbose("Total classes found: " + result.size());
+        verbose("Total classes scanned: " + result.size());
         return result;
     }
     
@@ -115,20 +154,84 @@ public class TestRunner {
         }
     }
     
-    private List<Method> findTestMethods(ClassLoader classLoader, List<String> classNames) throws Exception {
-        List<Method> result = new ArrayList<Method>();
+    private void findTestMethods(ClassLoader classLoader, List<String> classNames) throws Exception {
         for (String className : classNames) {
             final Class<?> testClass = classLoader.loadClass(className);
             for (Method method : testClass.getDeclaredMethods()) {
                 if (method.isAnnotationPresent(Test.class)) {
                     ensureTestMethodIsSuitable(method);
                     method.setAccessible(true);
-                    result.add(method);
+                    executor.execute(new TestRunnable(method));
                 }
             }
         }
-        verbose("Total tests found: " + result.size());
-        return result;
+    }
+    
+    private class TestRunnable implements Runnable {
+        private final Method testMethod;
+        
+        public TestRunnable(Method testMethod) {
+            this.testMethod = testMethod;
+        }
+        
+        public void run() {
+            final String testName = testMethod.getDeclaringClass().getName() + "." + testMethod.getName();
+            try {
+                testMethod.invoke(null);
+                synchronized (successes) {
+                    successes.add(new TestResult(testName));
+                }
+            } catch (InvocationTargetException wrappedEx) {
+                final Throwable ex = wrappedEx.getCause();
+                synchronized (failures) {
+                    failures.add(new TestResult(testName, ex));
+                }
+            } catch (IllegalAccessException ex) {
+                // This can't happen, so just rethrow and bail out.
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+    
+    private class TestResult implements Comparable<TestResult> {
+        private final String name;
+        private final Throwable ex;
+        
+        // For passes.
+        public TestResult(String name) {
+            this(name, null);
+        }
+        
+        // For failures.
+        public TestResult(String name, Throwable ex) {
+            this.name = name;
+            this.ex = ex;
+        }
+        
+        public boolean isFailure() {
+            return (ex != null);
+        }
+        
+        public void print() {
+            if (isFailure()) {
+                System.out.println(red("FAIL") + " " + name);
+                // FIXME: we can print this a lot more nicely:
+                // * remove the leading "java.lang.RuntimeException: " from the message.
+                // * don't print the (bottom) part of the stack that's us invoking the method.
+                // * maybe don't print the (top) part of the stack that's in our Assert class?
+                ex.printStackTrace();
+            } else {
+                System.out.println(green("PASS") + " " + name);
+            }
+        }
+        
+        public int compareTo(TestResult rhs) {
+            return name.compareTo(rhs.name);
+        }
+        
+        @Override public boolean equals(Object rhs) {
+            return (rhs instanceof TestResult) && name.equals(((TestResult) rhs).name);
+        }
     }
     
     // Check that the given method, which was annotated with @Test, is actually suitable to be a test method.
@@ -141,43 +244,6 @@ public class TestRunner {
         }
         if (testMethod.getParameterTypes().length > 0) {
             error("test methods should take no arguments; got " + testMethod);
-        }
-    }
-    
-    private int runTestMethods(List<Method> testMethods) {
-        this.runningTime = System.nanoTime();
-        
-        int failCount = 0;
-        for (Method testMethod : testMethods) {
-            final String testName = testMethod.getDeclaringClass().getName() + "." + testMethod.getName();
-            try {
-                testMethod.invoke(null);
-                System.out.println(green("PASS") + " " + testName);
-            } catch (InvocationTargetException wrappedEx) {
-                ++failCount;
-                System.out.println(red("FAIL") + " " + testName);
-                final Throwable ex = wrappedEx.getCause();
-                // FIXME: we can print this a lot more nicely:
-                // * remove the leading "java.lang.RuntimeException: " from the message.
-                // * don't print the (bottom) part of the stack that's us invoking the method.
-                // * maybe don't print the (top) part of the stack that's in our Assert class?
-                ex.printStackTrace();
-            } catch (IllegalAccessException ex) {
-                // This can't happen, so just rethrow and bail out.
-                throw new RuntimeException(ex);
-            }
-        }
-        
-        this.runningTime = System.nanoTime() - runningTime;
-        verbose("Running time: " + TimeUtilities.nsToString(runningTime));
-        
-        final int testCount = testMethods.size();
-        if (failCount == 0) {
-            System.out.println(green("All " + testCount + " tests passed in " + TimeUtilities.nsToString(runningTime + setupTime) + "."));
-            return Posix.EXIT_SUCCESS;
-        } else {
-            System.out.printf(red("Tested: %d, Passed: %d, Failed: %d.\n"), testCount, testCount - failCount, failCount);
-            return Posix.EXIT_FAILURE;
         }
     }
     
