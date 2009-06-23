@@ -49,6 +49,14 @@ public class BuildAction extends ETextAction {
     private void buildProject() {
         final Workspace workspace = Evergreen.getInstance().getCurrentWorkspace();
         
+        // Choosing the build tool relies on the focused text window, so do it before we risk popping up dialogs.
+        final BuildTool buildTool = chooseBuildTool();
+        if (buildTool == null) {
+            // FIXME: list supported kinds of build instructions.
+            Evergreen.getInstance().showAlert("Build instructions not found", "No build instructions could be found.");
+            return;
+        }
+        
         if (building) {
             // FIXME: work harder to recognize possibly-deliberate duplicate builds (different targets or makefiles, for example).
             Evergreen.getInstance().showAlert("A target is already being built", "Please wait for the current build to complete before starting another.");
@@ -56,13 +64,6 @@ public class BuildAction extends ETextAction {
         }
         final boolean shouldContinue = workspace.prepareForAction("Save before building?", "Some files are currently modified but not saved.");
         if (shouldContinue == false) {
-            return;
-        }
-        
-        final BuildTool buildTool = chooseBuildTool();
-        if (buildTool == null) {
-            // FIXME: list supported kinds of build instructions.
-            Evergreen.getInstance().showAlert("Build instructions not found", "No build instructions could be found.");
             return;
         }
         
