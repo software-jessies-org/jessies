@@ -292,10 +292,7 @@ public class EErrorsWindow extends JFrame {
     private class HideRunnable implements Runnable {
         public void run() {
             setVisible(false);
-            if (process == null) {
-                workspace.destroyErrorsWindow(EErrorsWindow.this);
-                dispose();
-            }
+            dispose();
         }
     }
     

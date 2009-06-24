@@ -98,9 +98,8 @@ public class BuildAction extends ETextAction {
     private void invokeBuildTool(Workspace workspace, BuildTool tool) {
         addTarget(workspace, tool);
         try {
-            final ShellCommand shellCommand = new ShellCommand(workspace, tool.command, ToolInputDisposition.NO_INPUT, ToolOutputDisposition.ERRORS_WINDOW);
-            final File directory = FileUtilities.fileFromString(tool.makefileName).getParentFile();
-            shellCommand.setContext(directory.toString());
+            final String directory = FileUtilities.fileFromString(tool.makefileName).getParentFile().toString();
+            final ShellCommand shellCommand = workspace.makeShellCommand(null, directory, tool.command, ToolInputDisposition.NO_INPUT, ToolOutputDisposition.ERRORS_WINDOW);
             shellCommand.setLaunchRunnable(new Runnable() {
                 public void run() {
                     building = true;

@@ -12,16 +12,16 @@ import org.jdesktop.swingworker.SwingWorker;
 
 public class ShellCommand {
     private String command;
+    private final Map<String, String> environmentAdditions;
     private final ToolInputDisposition inputDisposition;
     private final ToolOutputDisposition outputDisposition;
     
-    private final Workspace workspace;
     private final EErrorsWindow errorsWindow;
     
     private final StringBuilder capturedOutput = new StringBuilder();
     
-    private ETextWindow textWindow;
-    private String context;
+    private final PTextArea textArea;
+    private final String context;
     
     private Process process;
     
@@ -37,41 +37,20 @@ public class ShellCommand {
      * Until you invoke runCommand, you're at liberty to change any of the
      * command's properties through the relevant accessor methods.
      */
-    public ShellCommand(Workspace workspace, String command, ToolInputDisposition inputDisposition, ToolOutputDisposition outputDisposition) {
-        this.workspace = workspace;
-        this.errorsWindow = workspace.createErrorsWindow("Command Output"); // FIXME: be more specific.
+    public ShellCommand(PTextArea textArea, EErrorsWindow errorsWindow, String context, String command, Map<String, String> environmentAdditions, ToolInputDisposition inputDisposition, ToolOutputDisposition outputDisposition) {
+        this.textArea = textArea;
+        this.errorsWindow = errorsWindow;
+        this.context = context;
         setCommand(command);
+        this.environmentAdditions = environmentAdditions;
         this.inputDisposition = inputDisposition;
         this.outputDisposition = outputDisposition;
-        setTextWindow(null);
-        setContext(System.getProperty("java.io.tmpdir"));
-    }
-    
-    private String canonicalizePath(String path) {
-        return FileUtilities.fileFromString(path).toString();
     }
     
     private ProcessBuilder makeProcessBuilder() {
-        ProcessBuilder processBuilder = new ProcessBuilder(ProcessUtilities.makeShellCommandArray(command));
+        final ProcessBuilder processBuilder = new ProcessBuilder(ProcessUtilities.makeShellCommandArray(command));
         processBuilder.directory(FileUtilities.fileFromString(context));
-        Map<String, String> environment = processBuilder.environment();
-        environment.put("EVERGREEN_CURRENT_DIRECTORY", canonicalizePath(context));
-        environment.put("EVERGREEN_LAUNCHER", Evergreen.getResourceFilename("bin", "evergreen"));
-        environment.put("EVERGREEN_WORKSPACE_ROOT", canonicalizePath(workspace.getRootDirectory()));
-        if (textWindow != null) {
-            environment.put("EVERGREEN_CURRENT_FILENAME", canonicalizePath(textWindow.getFilename()));
-            
-            // Humans number lines from 1, text components from 0.
-            // FIXME: we should pass full selection information.
-            PTextArea textArea = textWindow.getTextArea();
-            final int currentLineNumber = 1 + textArea.getLineOfOffset(textArea.getSelectionStart());
-            environment.put("EVERGREEN_CURRENT_LINE_NUMBER", Integer.toString(currentLineNumber));
-            
-            environment.put("EVERGREEN_CURRENT_WORD", ETextAction.getWordAtCaret(textArea));
-            if (textArea.getSelectionEnd() - textArea.getSelectionStart() < 1024) {
-                environment.put("EVERGREEN_CURRENT_SELECTION", textArea.getSelectedText());
-            }
-        }
+        processBuilder.environment().putAll(environmentAdditions);
         return processBuilder;
     }
 
@@ -128,8 +107,7 @@ public class ShellCommand {
     
     private String chooseStandardInputData() {
         String result = "";
-        if (textWindow != null) {
-            PTextArea textArea = textWindow.getTextArea();
+        if (textArea != null) {
             switch (inputDisposition) {
             case NO_INPUT:
                 break;
@@ -243,10 +221,9 @@ public class ShellCommand {
             // We dealt with the sub-process output as we went along.
             break;
         case INSERT:
-            textWindow.getTextArea().replaceSelection(capturedOutput);
+            textArea.replaceSelection(capturedOutput);
             break;
         case REPLACE:
-            PTextArea textArea = textWindow.getTextArea();
             if (textArea.hasSelection()) {
                 textArea.replaceSelection(capturedOutput);
             } else {
@@ -283,20 +260,6 @@ public class ShellCommand {
         if (openStreamCount == 0) {
             processFinished();
         }
-    }
-    
-    public void setTextWindow(ETextWindow textWindow) {
-        this.textWindow = textWindow;
-    }
-    
-    /** Returns the context (current working directory) for this task. */
-    public String getContext() {
-        return this.context;
-    }
-    
-    /** Sets the context (current working directory) for this task. */
-    public void setContext(String newContext) {
-        this.context = newContext;
     }
     
     public String getCommand() {
