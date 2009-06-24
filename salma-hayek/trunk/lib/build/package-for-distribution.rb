@@ -324,8 +324,9 @@ if target_os() == "Linux"
     # gdebi(1) understands that if there's no Installed-Size the size is unknown.
     # apt-get(1) thinks it implies that the installed size is zero bytes.
     # Either way, the user's better off if we declare our installed size because nothing tries to guess from the size of the package.
-    # Note that .deb packages' Installed-Size field is measured in kB (not bytes, nor even KiB).
-    installed_size = `du -s --block-size=1000 #{tmp_dir}`.split()[0]
+    # Note that .deb packages' Installed-Size field is measured in KiB (debian-policy says "decimal kilobytes" but means "binary kibibytes"; see the source of dpkg-gencontrol).
+    # FIXME: maybe we should use dpkg-gencontrol(1); i've no reason to think it's slow, and we're not able to "cross-compile" packages on other systems anyway.
+    installed_size = `du -s -k #{tmp_dir}`.split()[0]
     
     # Make the directory for the package metadata.
     Dir.mkdir("#{tmp_dir}/DEBIAN")
