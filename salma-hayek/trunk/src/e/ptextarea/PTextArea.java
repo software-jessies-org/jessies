@@ -100,7 +100,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     private void initListeners() {
         this.mouseHandler = new PMouseHandler(this);
         addComponentListener(new Rewrapper(this));
-        addCaretListener(new PMatchingBracketHighlighter(this));
+        addCaretListener(new PMatchingBracketHighlighter());
         addKeyListener(new PKeyHandler(this, mouseHandler));
         addMouseListener(mouseHandler);
         addMouseMotionListener(mouseHandler);
