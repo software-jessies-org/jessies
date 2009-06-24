@@ -11,17 +11,15 @@ import java.util.List;
 import org.jdesktop.swingworker.SwingWorker;
 
 public class ShellCommand {
-    private String command;
+    private final PTextArea textArea;
+    private final EErrorsWindow errorsWindow;
+    private final String context;
+    private final String command;
     private final Map<String, String> environmentAdditions;
     private final ToolInputDisposition inputDisposition;
     private final ToolOutputDisposition outputDisposition;
     
-    private final EErrorsWindow errorsWindow;
-    
     private final StringBuilder capturedOutput = new StringBuilder();
-    
-    private final PTextArea textArea;
-    private final String context;
     
     private Process process;
     
@@ -41,7 +39,7 @@ public class ShellCommand {
         this.textArea = textArea;
         this.errorsWindow = errorsWindow;
         this.context = context;
-        setCommand(command);
+        this.command = command.trim();
         this.environmentAdditions = environmentAdditions;
         this.inputDisposition = inputDisposition;
         this.outputDisposition = outputDisposition;
@@ -264,10 +262,6 @@ public class ShellCommand {
     
     public String getCommand() {
         return this.command;
-    }
-    
-    public void setCommand(String newCommand) {
-        this.command = newCommand.trim();
     }
     
     /**
