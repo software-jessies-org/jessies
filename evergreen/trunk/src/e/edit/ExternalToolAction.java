@@ -11,7 +11,6 @@ public class ExternalToolAction extends ETextAction {
     private ToolOutputDisposition outputDisposition;
     private boolean checkEverythingSaved;
     private boolean needsFile;
-    private boolean requestConfirmation;
     
     private JTextField commandField;
     private JTextField contextField;
@@ -25,15 +24,7 @@ public class ExternalToolAction extends ETextAction {
         this.outputDisposition = outputDisposition;
         this.command = command;
         this.checkEverythingSaved = false;
-        this.requestConfirmation = false;
         this.needsFile = false;
-    }
-    
-    /**
-     * Sets whether or not the user will be asked to confirm the running of this command. Defaults to false.
-     */
-    public void setRequestConfirmation(boolean newState) {
-        this.requestConfirmation = newState;
     }
     
     /**
@@ -64,18 +55,15 @@ public class ExternalToolAction extends ETextAction {
         }
         
         final Workspace workspace = (textWindow != null) ? textWindow.getWorkspace() : Evergreen.getInstance().getCurrentWorkspace();
-        final ShellCommand shellCommand = new ShellCommand(workspace, command, inputDisposition, outputDisposition);
+        final String context = (textWindow != null) ? textWindow.getContext() : workspace.getRootDirectory();
+        final ShellCommand shellCommand = workspace.makeShellCommand(textWindow, context, command, inputDisposition, outputDisposition);
         if (textWindow != null) {
-            shellCommand.setTextWindow(textWindow);
-            shellCommand.setContext(textWindow.getContext());
             shellCommand.setCompletionRunnable(new Runnable() {
                 public void run() {
                     textWindow.updateWatermarkAndTitleBar();
                     textWindow.repaint();
                 }
             });
-        } else {
-            shellCommand.setContext(workspace.getRootDirectory());
         }
         runCommand(shellCommand);
     }
@@ -85,31 +73,6 @@ public class ExternalToolAction extends ETextAction {
     }
     
     private void runCommand(ShellCommand shellCommand) {
-        if (requestConfirmation) {
-            confirmRunCommand(shellCommand);
-        } else {
-            safeRunCommand(shellCommand);
-        }
-    }
-
-    private void confirmRunCommand(ShellCommand shellCommand) {
-        if (commandField == null) {
-            commandField = new JTextField(shellCommand.getCommand(), 40);
-            contextField = new JTextField(shellCommand.getContext(), 40);
-        }
-        FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), (String) getValue(Action.NAME));
-        FormPanel formPanel = form.getFormPanel();
-        formPanel.addRow("Command:", commandField);
-        formPanel.addRow("Directory:", contextField);
-        boolean shouldRun = form.show("Run");
-        if (shouldRun) {
-            shellCommand.setCommand(commandField.getText());
-            shellCommand.setContext(contextField.getText());
-            safeRunCommand(shellCommand);
-        }
-    }
-
-    private void safeRunCommand(ShellCommand shellCommand) {
         try {
             shellCommand.runCommand();
         } catch (IOException ex) {

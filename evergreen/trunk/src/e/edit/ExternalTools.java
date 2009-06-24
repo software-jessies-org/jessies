@@ -126,7 +126,6 @@ public class ExternalTools {
         
         boolean checkEverythingSaved = false;
         boolean needsFile = false;
-        boolean requestConfirmation = false;
         boolean showOnPopUpMenu = false;
         
         for (String line : StringUtilities.readLinesFromFile(file)) {
@@ -152,8 +151,6 @@ public class ExternalTools {
                 checkEverythingSaved = Boolean.valueOf(value);
             } else if (key.equals("needsFile")) {
                 needsFile = Boolean.valueOf(value);
-            } else if (key.equals("requestConfirmation")) {
-                requestConfirmation = Boolean.valueOf(value);
             } else if (key.equals("showOnPopUpMenu")) {
                 showOnPopUpMenu = Boolean.valueOf(value);
             } else {
@@ -206,7 +203,6 @@ public class ExternalTools {
         final ExternalToolAction action = new ExternalToolAction(name, inputDisposition, outputDisposition, command);
         action.setCheckEverythingSaved(checkEverythingSaved);
         action.setNeedsFile(needsFile);
-        action.setRequestConfirmation(requestConfirmation);
         
         configureKeyboardEquivalent(action, keyboardEquivalent);
         configureIcon(action, stockIcon, icon);

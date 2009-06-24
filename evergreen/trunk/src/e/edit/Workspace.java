@@ -1,6 +1,7 @@
 package e.edit;
 
 import e.gui.*;
+import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -413,12 +414,17 @@ public class Workspace extends JPanel {
     public EErrorsWindow createErrorsWindow(String windowTitle) {
         synchronized (errorsWindows) {
             final EErrorsWindow errorsWindow = new EErrorsWindow(this, windowTitle);
+            errorsWindow.addWindowListener(new WindowAdapter() {
+                public void windowClosed(WindowEvent e) {
+                    destroyErrorsWindow(errorsWindow);
+                }
+            });
             errorsWindows.add(errorsWindow);
             return errorsWindow;
         }
     }
     
-    public void destroyErrorsWindow(EErrorsWindow errorsWindow) {
+    private void destroyErrorsWindow(EErrorsWindow errorsWindow) {
         synchronized (errorsWindows) {
             errorsWindows.remove(errorsWindow);
         }
@@ -430,5 +436,34 @@ public class Workspace extends JPanel {
                 errorsWindows.get(errorsWindows.size() - 1).clearErrors();
             }
         }
+    }
+    
+    public ShellCommand makeShellCommand(ETextWindow textWindow, String directory, String command, ToolInputDisposition inputDisposition, ToolOutputDisposition outputDisposition) {
+        final Map<String, String> environment = new TreeMap<String, String>();
+        environment.put("EVERGREEN_CURRENT_DIRECTORY", canonicalizePath(directory));
+        environment.put("EVERGREEN_LAUNCHER", Evergreen.getResourceFilename("bin", "evergreen"));
+        environment.put("EVERGREEN_WORKSPACE_ROOT", canonicalizePath(getRootDirectory()));
+        PTextArea textArea = null;
+        if (textWindow != null) {
+            environment.put("EVERGREEN_CURRENT_FILENAME", canonicalizePath(textWindow.getFilename()));
+            
+            // Humans number lines from 1, text components from 0.
+            // FIXME: we should pass full selection information.
+            textArea = textWindow.getTextArea();
+            final int currentLineNumber = 1 + textArea.getLineOfOffset(textArea.getSelectionStart());
+            environment.put("EVERGREEN_CURRENT_LINE_NUMBER", Integer.toString(currentLineNumber));
+            
+            environment.put("EVERGREEN_CURRENT_WORD", ETextAction.getWordAtCaret(textArea));
+            if (textArea.getSelectionEnd() - textArea.getSelectionStart() < 1024) {
+                environment.put("EVERGREEN_CURRENT_SELECTION", textArea.getSelectedText());
+            }
+        }
+        
+        final EErrorsWindow errorsWindow = createErrorsWindow("Command Output"); // FIXME: be more specific.
+        return new ShellCommand(textArea, errorsWindow, directory, command, environment, inputDisposition, outputDisposition);
+    }
+    
+    private static String canonicalizePath(String path) {
+        return FileUtilities.fileFromString(path).toString();
     }
 }
