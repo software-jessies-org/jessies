@@ -89,6 +89,7 @@ class Terminator
         invoker.add_pathname_property("org.jessies.terminator.serverPortFileName", server_port_file_name)
         invoker.add_pathname_property("org.jessies.terminator.optionsFile", options_pathname)
         
+        invoker.add_property("e.gui.HelpMenu.hasManual", "true")
         invoker.add_property("e.gui.HelpMenu.supportAddress", @support_address)
         invoker.add_property("e.gui.HelpMenu.supportSite", "http://groups.google.com/group/terminator-users")
         
