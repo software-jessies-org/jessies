@@ -30,10 +30,15 @@ public class ShellCommand {
     private Runnable completionRunnable = new NoOpRunnable();
     
     /**
-     * Creates a ShellCommand that, when runCommand is invoked, will start a
-     * new task in the system's temporary directory (probably /tmp on Unix).
-     * Until you invoke runCommand, you're at liberty to change any of the
-     * command's properties through the relevant accessor methods.
+     * Creates a ShellCommand that, when runCommand is invoked, will spawn 'command' (via the user's shell) in the directory 'context'.
+     * 
+     * The map 'environmentAdditions' will be added to the current environment to determine the child's starting environment.
+     * 
+     * Any Runnable supplied to setLaunchRunnable will be run as soon as the child process has been created.
+     * Any Runnable supplied to setCompletionRunnable will be run as soon as the child process exits.
+     * 
+     * The 'inputDisposition' and 'outputDisposition' determine where the child's standard input comes from, and what will be done with its standard output and error.
+     * It is always necessary to supply an 'errorsWindow', but 'textArea' is only needed for certain input/output dispositions.
      */
     public ShellCommand(PTextArea textArea, EErrorsWindow errorsWindow, String context, String command, Map<String, String> environmentAdditions, ToolInputDisposition inputDisposition, ToolOutputDisposition outputDisposition) {
         this.textArea = textArea;
@@ -260,6 +265,9 @@ public class ShellCommand {
         }
     }
     
+    /**
+     * Returns the command supplied to the constructor.
+     */
     public String getCommand() {
         return this.command;
     }
