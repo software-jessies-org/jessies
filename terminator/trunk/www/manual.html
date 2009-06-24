@@ -1,0 +1,57 @@
+<!--#set var="PAGE_TITLE" value="Terminator User Manual" -->
+<!--#include virtual="/salma-hayek/header.html" -->
+
+<!--FIXME: Screenshots. This is pretty dry material, and it would probably be easier to follow (and easier on the eye) if we had some screenshots. At least one for every dialog. -->
+<!--FIXME: CSS cleverness to mark up and visually distinguish keystrokes and menu options? -->
+<!--FIXME: Is there a better way to deal with keystroke differences between platforms? A big table at the end, with a column for each platform? That would be a useful reference anyway. -->
+
+<!--Anyone can edit this file, but try to follow these conventions (both for the convenience of the reader, and so we can maybe write scripts to extract special-purpose indexes): -->
+<!--1. refer to menu options in this way: choose "File" > "Close". -->
+<!--2. always follow a menu option that has a keyboard equivalent with ", accessible from the keyboard with <keystroke>". -->
+<!--3. use all lowercase when describing keystrokes, and list modifiers first, and in alphabetical order. -->
+<!--4. until we have a better solution, always give Linux keystrokes. -->
+<!--5. remember to mention any pop-up menu the option is also available from. -->
+<!--6. link to configuration documentation with the formula "There's more on <a href="#configuration-anchor">configuring subject</a> later." -->
+<!--Feel free to add other useful conventions. -->
+
+<!-- Test locally with:
+
+       ~/Projects/salma-hayek/bin/ssi.rb www/manual.html > /tmp/manual.html
+       gnome-open /tmp/manual.html
+-->
+
+<h1>Terminator User Manual</h1>
+
+<p><i>(Note: the keystrokes in this manual correspond to the Linux version's default settings. Some keystrokes may be slightly different on Cygwin or Mac OS, to better fit that platform.)</i>
+
+<p id="generated-toc" class="generate_from_h2"></p>
+
+<h2><a name="scrollback">Scrollback</a></h2>
+
+<p>Terminator has unlimited scrollback. To clear the scrollback for the current terminal, use "Scrollback" > "Clear Scrollback", accessible from the keyboard with alt-k.
+
+<h2><a name="find">Find</a></h2>
+<!-- this section copied from the Evergreen manual, lightly edited -->
+<p>To search for a string, choose "Edit" > "Find..." from the menu, accessible with alt-f from the keyboard. If there's a selection, it's used as the search term. Regardless, you can edit the regular expression in the text field that appears at the bottom of the main window.
+
+<p>All matches in the current file will be highlighted, and tiny notches next to the scroll bar will show the distribution of matches throughout the file. (You can click on a notch to jump to that match.)
+
+<p>Most conveniently, the keys either side of 'f' can be used to rapidly scan backwards and forwards through the matches. Use alt-d to move to the previous match, and alt-g to move to the next match. These operations don't wrap, so you can tell when you've hit the first or last match. (These operations are also available from the "Find" menu, but they're only there to help you learn the keystrokes.)
+
+<p>You can keep a find active by dismissing the text field with return. (Pressing alt-d or alt-g also dismisses the text field while keeping the find active.)
+
+<p>You can cancel the find (and remove the highlighting) by dismissing the text field with escape. While a find is active, the matches will be updated as you interact with the terminal.
+
+<h2><a name="logging">Logging</a></h2>
+
+FIXME: What we log. When we log. Where we log. How to suspend logging (in the info dialog).
+
+<h2><a name="tabs">Tabs</a></h2>
+
+<p>Like most modern terminal emulators, Terminator supports multiple tabs in each window.
+
+<p>You can drag tabs to rearrange them within their window. It's not currently possible to drag tabs between windows.
+
+<p>Double-clicking on a tab brings up the info dialog for that tab.
+
+<!--#include virtual="/salma-hayek/footer.html" -->
