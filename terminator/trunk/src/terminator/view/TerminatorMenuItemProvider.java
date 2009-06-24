@@ -12,9 +12,11 @@ public class TerminatorMenuItemProvider implements MenuItemProvider {
 	private final JTerminalPane terminalPane;
 	
 	private Action[] menuAndKeyActions = new Action[] {
+		// I know there are people who copy & paste from pop-up menus, but would any of them even know what a terminal emulator is?
 		new TerminatorMenuBar.CopyAction(),
 		new TerminatorMenuBar.PasteAction(),
 		null,
+		// These two items don't seem as pertinent as their obviously context-specific relatives below.
 		new TerminatorMenuBar.NewShellAction(),
 		new TerminatorMenuBar.NewShellTabAction(),
 		null,
@@ -23,14 +25,7 @@ public class TerminatorMenuItemProvider implements MenuItemProvider {
 		null,
 		new TerminatorMenuBar.CloseAction(),
 		null,
-		new TerminatorMenuBar.FindAction(),
-		new TerminatorMenuBar.FindNextAction(),
-		new TerminatorMenuBar.FindPreviousAction(),
-		null,
 		new TerminatorMenuBar.ClearScrollbackAction(),
-		null,
-		new TerminatorMenuBar.CycleTabAction(1),
-		new TerminatorMenuBar.CycleTabAction(-1),
 		null,
 		new TerminatorMenuBar.ShowInfoAction(),
 		new TerminatorMenuBar.ResetAction()
