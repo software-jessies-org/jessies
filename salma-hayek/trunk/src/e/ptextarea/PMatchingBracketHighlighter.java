@@ -1,6 +1,7 @@
 package e.ptextarea;
 
 import java.awt.*;
+import java.util.*;
 
 /**
  * Highlights matching pairs of bracket characters in a text area.
@@ -11,28 +12,37 @@ public class PMatchingBracketHighlighter implements PCaretListener {
     private static final Color FAILED_MATCH_COLOR = new Color(0.78f, 0.10f, 0.10f, 0.5f);
     private static final String HIGHLIGHTER_NAME = "PMatchingBracketHighlighter";
 
-    private PTextArea textArea;
-    private PColoredHighlight[] highlights = new PColoredHighlight[2];
+    private final ArrayList<PColoredHighlight> highlights;
     
-    public PMatchingBracketHighlighter(PTextArea textArea) {
-        this.textArea = textArea;
+    public PMatchingBracketHighlighter() {
+        this.highlights = new ArrayList<PColoredHighlight>();
     }
     
     public void caretMoved(PTextArea textArea, int selectionStart, int selectionEnd) {
-        removeHighlights();
+        recalculateHighlights(textArea, selectionStart, selectionEnd);
+        for (PHighlight highlight : highlights) {
+            textArea.addHighlight(highlight);
+        }
+    }
+    
+    private void recalculateHighlights(PTextArea textArea, int selectionStart, int selectionEnd) {
+        removeHighlights(textArea);
         if (selectionStart != selectionEnd) {
             return;
         }
         
-        int offset = selectionStart;
+        final int offset = selectionStart;
         
         // Look for a bracket to match with.
         if (PBracketUtilities.beforeCloseBracket(textArea.getTextBuffer(), offset)) {
-            highlights[0] = new MatchingBracketHighlight(textArea, offset, offset + 1);
-        } else if (PBracketUtilities.afterOpenBracket(textArea.getTextBuffer(), offset)) {
-            highlights[0] = new MatchingBracketHighlight(textArea, offset - 1, offset);
-        } else {
-            // We're not next to a bracket, so we've nothing to match.
+            highlights.add(new MatchingBracketHighlight(textArea, offset, offset + 1));
+        }
+        if (PBracketUtilities.afterOpenBracket(textArea.getTextBuffer(), offset)) {
+            highlights.add(new MatchingBracketHighlight(textArea, offset - 1, offset));
+        }
+        
+        if (highlights.isEmpty() || highlights.size() == 2) {
+            // We're not next to a bracket, or we're between two matching brackets, so we've nothing to match.
             return;
         }
         
@@ -41,28 +51,17 @@ public class PMatchingBracketHighlighter implements PCaretListener {
         if (matchingBracketOffset != -1) {
             int start = matchingBracketOffset;
             int end = start + 1;
-            highlights[1] = new MatchingBracketHighlight(textArea, start, end);
+            highlights.add(new MatchingBracketHighlight(textArea, start, end));
         } else {
-            highlights[0].setColor(FAILED_MATCH_COLOR);
-        }
-        
-        // Add any highlights now. We may only have one, if we detected a
-        // mis-match.
-        for (PHighlight highlight : highlights) {
-            if (highlight != null) {
-                textArea.addHighlight(highlight);
-            }
+            highlights.get(0).setColor(FAILED_MATCH_COLOR);
         }
     }
     
-    private void removeHighlights() {
-        for (int i = 0; i < highlights.length; ++i) {
-            PHighlight highlight = highlights[i];
-            if (highlight != null) {
-                textArea.removeHighlight(highlight);
-            }
-            highlights[i] = null;
+    private void removeHighlights(PTextArea textArea) {
+        for (PHighlight highlight : highlights) {
+            textArea.removeHighlight(highlight);
         }
+        highlights.clear();
     }
     
     public static class MatchingBracketHighlight extends PColoredHighlight {
