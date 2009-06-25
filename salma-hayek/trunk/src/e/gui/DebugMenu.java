@@ -303,7 +303,10 @@ public class DebugMenu {
         private class HistogramAction extends AbstractAction {
             public HistogramAction() {
                 GuiUtilities.configureAction(this, "_Histogram", null);
-                setEnabled(System.getProperty("java.specification.version").equals("1.5") == false);
+                // You need a Java 6 (or later) JDK.
+                // (A JRE is insufficient, but I don't know how to recognize one.)
+                // On Windows, ProcessUtilities.getVmProcessId doesn't return a pid we can give to jmap.
+                setEnabled(System.getProperty("java.specification.version").equals("1.5") == false && GuiUtilities.isWindows() == false);
             }
             
             public void actionPerformed(ActionEvent e) {
