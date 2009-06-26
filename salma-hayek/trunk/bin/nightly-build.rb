@@ -10,8 +10,14 @@ require "pathname.rb"
 # ----------------------------------------------------------------------------
 # Parse command line.
 # ----------------------------------------------------------------------------
+should_update = true
+if ARGV[0] == "--no-update"
+  ARGV.shift()
+  should_update = false
+end
 projects_root = Pathname.new(__FILE__).realpath().dirname().dirname().dirname()
 if ARGV.empty?() == false
+  # Must be an absolute path.
   projects_root = ARGV.shift()
 end
 targets = ARGV
@@ -88,22 +94,24 @@ projects.each() {
   |project|
   project.directory() =~ /.*\/([^\/]+)\/$/
   project_name = $1
-  print("-- Updating \"#{project_name}\"\n")
   Dir.chdir(project.directory())
-  project.update()
-  if $? != 0
-    failed_updates << project_name
-  else
-    if (Pathname.new(project.directory()) + "Makefile").exist?()
-      print("-- Building \"#{project_name}\"\n")
-      commands = targets.map() {
-        |target|
-        "make #{target}"
-      }
-      system(commands.join(" && "))
-      if $? != 0
-        failed_builds << project_name
-      end
+  if should_update
+    print("-- Updating \"#{project_name}\"\n")
+    project.update()
+    if $? != 0
+      failed_updates << project_name
+      next
+    end
+  end
+  if (Pathname.new(project.directory()) + "Makefile").exist?()
+    print("-- Building \"#{project_name}\"\n")
+    commands = targets.map() {
+      |target|
+      "make #{target}"
+    }
+    system(commands.join(" && "))
+    if $? != 0
+      failed_builds << project_name
     end
   end
 }
