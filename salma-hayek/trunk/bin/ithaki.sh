@@ -19,9 +19,9 @@ rm *.deb
 # This has the advantage that the update won't overwrite the running script - which Ruby doesn't like.
 NIGHTLY_BUILD_SCRIPT=~martind/software.jessies.org/work/salma-hayek/bin/nightly-build.rb
 NIGHTLY_BUILD_TREE=~martind/software.jessies.org/nightlies/
-$NIGHTLY_BUILD_SCRIPT $NIGHTLY_BUILD_TREE clean
+$NIGHTLY_BUILD_SCRIPT --no-update $NIGHTLY_BUILD_TREE clean
 echo $NIGHTLY_BUILD_SCRIPT $NIGHTLY_BUILD_TREE native-dist | ssh whitewater bash --login
-$NIGHTLY_BUILD_SCRIPT $NIGHTLY_BUILD_TREE native-dist
+$NIGHTLY_BUILD_SCRIPT --no-update $NIGHTLY_BUILD_TREE native-dist
 find $NIGHTLY_BUILD_TREE -name "*.deb" | xargs cp --target-directory=.
 
 # When the version number hasn't changed, we must use the same binary, so we put the same md5sum in the Packages file.
