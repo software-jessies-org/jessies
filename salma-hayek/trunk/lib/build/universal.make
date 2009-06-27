@@ -485,7 +485,7 @@ JAVAC_FLAGS += $(JAVAC_FLAGS.$(notdir $(JAVA_COMPILER)))
 
 # It's not helpful to list all the Java source files.
 define BUILD_JAVA
-  @echo "Compiling Java source..."
+  @echo "-- Compiling Java source..."
   $(RM) -r classes && \
   $(RM) -r .generated/classes && \
   mkdir -p .generated/classes
@@ -795,13 +795,13 @@ $(MACHINE_PROJECT_NAME).app: $(BUILD_TARGETS) .generated/build-revision.txt
 # For a comparison of the major choices available at the time, see:
 # http://elliotth.blogspot.com/2007/05/choosing-best-disk-image-format-on-mac.html
 $(INSTALLER.dmg): $(MACHINE_PROJECT_NAME).app
-	@echo "Creating Mac OS .dmg disk image..."
+	@echo "-- Creating Mac OS .dmg disk image..."
 	mkdir -p $(@D) && \
 	$(RM) $@ && \
 	hdiutil create -fs HFSX -format UDZO -volname $(HUMAN_PROJECT_NAME) -srcfolder $(PACKAGING_DIRECTORY) $@
 
 $(INSTALLER.pkg): $(MACHINE_PROJECT_NAME).app
-	@echo "Creating package stream..."
+	@echo "-- Creating package stream..."
 	mkdir -p $(@D) && \
 	$(RM) $@  && \
 	pkgmk -o -d $(@D) -f $(PACKAGING_DIRECTORY)/prototype -r $(PACKAGING_DIRECTORY)/root/ && \
@@ -809,21 +809,21 @@ $(INSTALLER.pkg): $(MACHINE_PROJECT_NAME).app
 	pkginfo -l -d $@
 
 $(INSTALLER.deb): $(MACHINE_PROJECT_NAME).app
-	@echo "Creating GNU/Linux .deb package..."
+	@echo "-- Creating GNU/Linux .deb package..."
 	mkdir -p $(@D) && \
 	$(RM) $@ && \
 	fakeroot dpkg-deb --build $(PACKAGING_DIRECTORY) $@ && \
 	dpkg-deb --info $@ # && dpkg-deb --contents $@
 
 $(INSTALLER.rpm): $(INSTALLER.deb)
-	@echo "Creating GNU/Linux .rpm package..."
+	@echo "-- Creating GNU/Linux .rpm package..."
 	mkdir -p $(@D) && \
 	$(RM) $@ && \
 	cd $(@D) && \
 	fakeroot alien --to-rpm $(abspath $<)
 
 $(INSTALLER.gz): $(MACHINE_PROJECT_NAME).app
-	@echo "Creating .tar.gz distribution..."
+	@echo "-- Creating .tar.gz distribution..."
 	mkdir -p $(@D) && \
 	$(RM) $@ && \
 	tar -zcf $@ -C $(PACKAGING_DIRECTORY)/.. $(notdir $(PACKAGING_DIRECTORY))
@@ -845,7 +845,7 @@ $(INSTALLER.gz): $(MACHINE_PROJECT_NAME).app
 	mv $@.tmp $@
 
 %.wixobj: %.wxs $(patsubst %,$(WIX_COMPILATION_DIRECTORY)/component-%.wxi,references definitions)
-	@echo Compiling $(notdir $<)...
+	@echo "-- Compiling $(notdir $<)..."
 	HUMAN_PROJECT_NAME=$(HUMAN_PROJECT_NAME) \
 	MACHINE_PROJECT_NAME=$(MACHINE_PROJECT_NAME) \
 	OPEN_HERE_GUID=$(makeGuid) \
@@ -862,7 +862,7 @@ $(INSTALLER.gz): $(MACHINE_PROJECT_NAME).app
 # This prevents msiexec from running the installer.
 # ug+r is not enough (perhaps it has to be readable by SYSTEM or some such).
 $(INSTALLER.msi): $(WIX_COMPILATION_DIRECTORY)/$(MACHINE_PROJECT_NAME).wixobj $(BUILD_TARGETS)
-	@echo Creating Windows installer...
+	@echo "-- Creating Windows installer..."
 	cd $(PACKAGING_DIRECTORY) && \
 	light -nologo -out $(call convertToNativeFilenames,$(abspath $@) $(abspath $<)) && \
 	chmod a+r $@
@@ -919,7 +919,7 @@ install installer native-dist: $(BUILD_TARGETS)
 # If you want to upload a new installer, then please check-in first, so the version number changes.
 .PHONY: upload.%
 $(addprefix upload.,$(PUBLISHABLE_INSTALLERS)): upload.%: %
-	@echo Testing for $(<F) on the server... && \
+	@echo "-- Testing for $(<F) on the server..." && \
 	ssh $(DIST_SSH_USER_AND_HOST) mkdir -p $(DIST_DIRECTORY)  '&&' test -f $(DIST_DIRECTORY)/$(<F) && { \
 		echo Leaving $(<F) alone...; \
 	} || { \
@@ -933,7 +933,7 @@ $(addprefix upload.,$(PUBLISHABLE_INSTALLERS)): upload.%: %
 $(addprefix symlink-latest.,$(PUBLISHABLE_INSTALLERS)): symlink-latest.%: upload.%
 .PHONY: symlink-latest.%
 $(addprefix symlink-latest.,$(PUBLISHABLE_INSTALLERS)): symlink-latest.%: %
-	@echo Symlinking the latest $(LATEST_INSTALLER_LINK)...
+	@echo "-- Symlinking the latest $(LATEST_INSTALLER_LINK)..."
 	ssh $(DIST_SSH_USER_AND_HOST) $(RM) $(DIST_DIRECTORY)/$(LATEST_INSTALLER_LINK) '&&' \
 	ln -s $(<F) $(DIST_DIRECTORY)/$(LATEST_INSTALLER_LINK) '&&' \
 	ls -t $(DIST_DIRECTORY)/$(call makeInstallerName$(suffix $<),'*') '|' tail +8 '|' xargs $(RM)
@@ -948,12 +948,12 @@ remove: $(addprefix run-remover,$(suffix $(PUBLISHABLE_INSTALLERS)))
 
 .PHONY: run-installer.pkg
 run-installer.pkg:
-	@echo Running Solaris installer...
+	@echo "-- Running Solaris installer..."
 	yes | sudo /usr/sbin/pkgadd -G -d $(INSTALLER.pkg) all
 
 .PHONY: run-installer.deb
 run-installer.deb:
-	@echo Running Debian installer...
+	@echo "-- Running Debian installer..."
 	sudo dpkg -i $(INSTALLER.deb)
 
 # We use Debian packaging tools to build RPM installers, so "make installer" is unlikely work on RedHat.
@@ -965,12 +965,12 @@ run-installer.rpm:;
 
 .PHONY: run-installer.dmg
 run-installer.dmg:
-	@echo Running Mac OS installer...
+	@echo "-- Running Mac OS installer..."
 	open -a DiskImageMounter $(INSTALLER.dmg)
 
 .PHONY: run-installer.msi
 run-installer.msi:
-	@echo Running Windows installer...
+	@echo "-- Running Windows installer..."
 	msiexec /i $(NATIVE_NAME_FOR_MSI_INSTALLER)
 
 # This only works if this is precisely the same version that was installed.
@@ -985,7 +985,7 @@ run-remover.msi:
 
 .PHONY: test
 test: build
-	@echo Running unit tests...
+	@echo "-- Running unit tests..."
 	# Beware of passing absolute Cygwin paths to Java.
 	$(SCRIPT_PATH)/org.jessies.TestRunner .generated/classes
 
@@ -995,7 +995,7 @@ gcj:
 
 .PHONY: findbugs
 findbugs: build
-	@echo Running findbugs...
+	@echo "-- Running findbugs..."
 	findbugs -textui -emacs -auxclasspath $(call makeNativePath,$(EXTRA_JARS)) -sourcepath $(subst $(SPACE),:,$(foreach PROJECT_ROOT,$(DISTINCT_PROJECT_ROOTS),$(PROJECT_ROOT)/src)) $(foreach PROJECT_ROOT,$(DISTINCT_PROJECT_ROOTS),$(PROJECT_ROOT)/.generated/classes)
 
 # A rule for preprocessing C++.

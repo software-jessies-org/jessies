@@ -69,9 +69,9 @@ def filterBuildOutput(inputIo)
       break
     end
     progressLine = nil
-    # Match Compiling, Generating etc.
-    if line.match(/^[A-Z][a-z]+ing\b.*\.\.\./)
-      progressLine = line
+    # Match progress messages such as "-- Compiling some/file.cpp", all of which start with "-- ".
+    if line.match(/^-- .*\.\.\.$/)
+      progressLine = line[3..-1]
       lines = []
     elsif line.match(/^(?:\S+-)?(?:cc|g\+\+)(?:-\d+)? .*?\/([^\/ ]+)$/)
       # I don't want to override the built-in rules for compilation and it's hard to hook them to do extra echoing.
