@@ -76,14 +76,27 @@ public class ProcessUtilities {
      * Lines written to standard error are passed to 'errorLineListener'.
      *
      * If directory is null, the subprocess inherits our working directory.
-     *
-     * You can use the same ArrayList for 'lines' and 'errors'. All the error
-     * lines will appear after all the output lines.
      */
     public static int backQuote(final File directory, final String[] commandArray, final LineListener outputLineListener, final LineListener errorLineListener) {
+        return runCommand(directory, commandArray, null, outputLineListener, errorLineListener);
+    }
+    
+    /**
+     * Runs 'command'. Returns the command's exit status.
+     * Any 'processListener' will be notified when the process starts and exits.
+     * Lines written to standard output are passed to 'outputLineListener'.
+     * Lines written to standard error are passed to 'errorLineListener'.
+     * 
+     * If directory is null, the subprocess inherits our working directory.
+     */
+    public static int runCommand(final File directory, final String[] commandArray, final ProcessListener processListener, final LineListener outputLineListener, final LineListener errorLineListener) {
         List<String> command = Arrays.asList(commandArray);
+        int status = 1; // FIXME: should we signal "something went wrong" more distinctively?
         try {
             final Process p = exec(command, directory);
+            if (processListener != null) {
+                processListener.processStarted(p);
+            }
             p.getOutputStream().close();
             Thread errorReaderThread = new Thread(new Runnable() {
                 public void run() {
@@ -93,11 +106,15 @@ public class ProcessUtilities {
             errorReaderThread.start();
             readLinesFromStream(outputLineListener, p.getInputStream());
             errorReaderThread.join();
-            return p.waitFor();
+            status = p.waitFor();
         } catch (Exception ex) {
             feedExceptionToLineListener(errorLineListener, ex);
-            return 1;
+        } finally {
+            if (processListener != null) {
+                processListener.processExited(status);
+            }
         }
+        return status;
     }
     
     public interface LineListener {
@@ -129,7 +146,7 @@ public class ProcessUtilities {
     /**
      * Runs a command and ignores the output.
      * The Process corresponding to the command is returned.
-     * 'listener' may be null, but if supplied will be notified when the process exits.
+     * 'listener' may be null, but if supplied will be notified when the process starts and exits.
      */
     public static Process spawn(final File directory, final String[] commandArray, final ProcessListener listener) {
         final List<String> command = Arrays.asList(commandArray);
@@ -137,6 +154,9 @@ public class ProcessUtilities {
         Process result = null;
         try {
             final Process p = exec(command, directory);
+            if (listener != null) {
+                listener.processStarted(p);
+            }
             result = p;
             new Thread("Process Spawn: " + quotedCommand) {
                 public void run() {
@@ -160,6 +180,7 @@ public class ProcessUtilities {
     }
 
     public interface ProcessListener {
+        public void processStarted(Process process);
         public void processExited(int status);
     }
     
