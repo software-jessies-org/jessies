@@ -10,8 +10,8 @@ import java.util.regex.*;
 import javax.swing.*;
 import org.jessies.os.*;
 
-// make && java -cp .generated/classes/ e.tools.BuildUi 'cd ~/Projects/ctags/trunk;make clean;make --print-directory'
-// make && java -cp .generated/classes/ e.tools.BuildUi 'cd ~/Projects/terminator;make clean;make --print-directory'
+// make && ./bin/build-ui 'cd ~/Projects/ctags/trunk;make clean;make --print-directory'
+// make && ./bin/build-ui .generated/classes/ e.tools.BuildUi 'cd ~/Projects/terminator;make clean;make --print-directory'
 
 public class BuildUi extends MainFrame {
     
