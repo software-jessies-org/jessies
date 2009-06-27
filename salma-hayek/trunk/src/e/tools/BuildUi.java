@@ -5,8 +5,10 @@ import e.gui.*;
 import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.util.regex.*;
 import javax.swing.*;
+import org.jessies.os.*;
 
 // make && java -cp .generated/classes/ e.tools.BuildUi 'cd ~/Projects/ctags/trunk;make clean;make --print-directory'
 // make && java -cp .generated/classes/ e.tools.BuildUi 'cd ~/Projects/terminator;make clean;make --print-directory'
@@ -30,9 +32,12 @@ public class BuildUi extends MainFrame {
     private final ELabel currentActionLabel;
     
     private final JProgressBar progressBar;
+    private final JButton stopButton;
     
     private final PTextArea errors;
     private final PTextArea transcript;
+    
+    private Process runningProcess;
     
     public BuildUi(String command) {
         setTitle("BuildUi");
@@ -41,6 +46,7 @@ public class BuildUi extends MainFrame {
         this.commandLabel = new ELabel();
         this.currentActionLabel = new ELabel("Starting up...");
         this.progressBar = makeProgressBar();
+        this.stopButton = makeStopButton();
         this.errors = makeErrors();
         this.transcript = makeTranscript();
         
@@ -56,7 +62,7 @@ public class BuildUi extends MainFrame {
         final RowLayer rowLayer = new RowLayer(panel);
         rowLayer.add(2, commandLabel, 0);
         rowLayer.add(0, currentActionLabel, 0);
-        rowLayer.add(4, progressBar, 0);
+        rowLayer.add(4, makeProgressAndStopPanel(), 0);
         rowLayer.addGreedyComponent(10, makeTabbedPane(), 0);
         return panel;
     }
@@ -65,6 +71,30 @@ public class BuildUi extends MainFrame {
         final JProgressBar progressBar = new JProgressBar();
         progressBar.setIndeterminate(true);
         return progressBar;
+    }
+    
+    private JButton makeStopButton() {
+        final JButton stopButton = new JButton("Stop");
+        
+        // Make it a nice easy target.
+        final Dimension newSize = stopButton.getPreferredSize();
+        newSize.width *= 1.5;
+        stopButton.setPreferredSize(newSize);
+        
+        stopButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                stopBuild();
+            }
+        });
+        
+        return stopButton;
+    }
+    
+    private JPanel makeProgressAndStopPanel() {
+        final JPanel panel = new JPanel(new BorderLayout(8, 0));
+        panel.add(progressBar, BorderLayout.CENTER);
+        panel.add(stopButton, BorderLayout.EAST);
+        return panel;
     }
     
     private static class RowLayer {
@@ -132,18 +162,37 @@ public class BuildUi extends MainFrame {
     public void startBuild() {
         new Thread(new Runnable() {
             public void run() {
+                final ProcessUtilities.ProcessListener processListener = new ProcessListener();
                 final ProcessUtilities.LineListener stdoutListener = new LineListener();
                 final ProcessUtilities.LineListener stderrListener = stdoutListener; // FIXME: differentiate the two streams. different colors?
-                final int status = ProcessUtilities.backQuote(null, ProcessUtilities.makeShellCommandArray(command), stdoutListener, stderrListener);
+                final int status = ProcessUtilities.runCommand(null, ProcessUtilities.makeShellCommandArray(command), processListener, stdoutListener, stderrListener);
                 EventQueue.invokeLater(new Runnable() {
                     public void run() {
+                        runningProcess = null;
                         currentActionLabel.setText("Finished."); // FIXME: cull something more useful from the transcript? at least include the exit status?
                         currentActionLabel.setForeground(status == 0 ? new Color(0x008800) : Color.RED);
                         progressBar.setIndeterminate(false); // FIXME: and setVisible(false)?
+                        stopButton.setEnabled(false);
                     }
                 });
             }
         }).start();
+    }
+    
+    public void stopBuild() {
+        final int pid = ProcessUtilities.getProcessId(runningProcess);
+        Posix.killpg(pid, Signal.SIGINT);
+        Posix.killpg(pid, Signal.SIGTERM);        
+    }
+    
+    private class ProcessListener implements ProcessUtilities.ProcessListener {
+        public void processStarted(Process process) {
+            runningProcess = process;
+        }
+        
+        public void processExited(int status) {
+            // We don't care. We're blocked waiting for this notification elsewhere anyway.
+        }
     }
     
     private class LineListener implements ProcessUtilities.LineListener {
