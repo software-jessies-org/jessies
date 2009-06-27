@@ -152,7 +152,7 @@ missing-prerequisites.$(BASE_NAME): RULE := $(MISSING_PREREQUISITES_RULE)
 # ----------------------------------------------------------------------------
 
 $(EXECUTABLES) $(SHARED_LIBRARY): $(OBJECTS)
-	@echo Linking $(notdir $@)...
+	@echo "-- Linking $(notdir $@)..."
 	mkdir -p $(@D) && \
 	$(LD) $^ -o $@ $(LDFLAGS)
 
@@ -163,7 +163,7 @@ $(EXECUTABLES) $(SHARED_LIBRARY): $(OBJECTS)
 ifneq "$(JNI_SOURCE)" ""
 
 $(NEW_JNI_HEADER): $(PROJECT_ROOT)/.generated/java.build-finished $(JAVAHPP) $(SALMA_HAYEK)/.generated/java.build-finished $(SALMA_HAYEK)/.generated/$(TARGET_DIRECTORY)/bin/java-launcher$(EXE_SUFFIX)
-	@echo "Generating JNI header $(JNI_BASE_NAME).h..."
+	@echo "-- Generating JNI header $(JNI_BASE_NAME).h..."
 	mkdir -p $(@D) && \
 	$(RM) $@ && \
 	$(JAVAHPP) -classpath .generated/classes $(JNI_CLASS_NAME) > $@.tmp && \
