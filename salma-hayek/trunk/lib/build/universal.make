@@ -90,11 +90,11 @@ NATIVE_PATH_SEPARATOR = $(NATIVE_PATH_SEPARATOR.$(TARGET_OS))
 
 convertToNativeFilenames.$(TARGET_OS) = $(1)
 # javac is happy with forward slashes (as is the underlying Win32 API).
-convertToNativeFilenames.Cygwin = $(if $(1),$(shell cygpath --mixed $(1)))
+convertToNativeFilenames.Cygwin = $(foreach file,$(1),'$(shell cygpath --mixed $(file))')
 convertToNativeFilenames = $(convertToNativeFilenames.$(TARGET_OS))
 
 searchPath = $(shell which $(1) 2> /dev/null)
-makeNativePath = $(subst $(SPACE),$(NATIVE_PATH_SEPARATOR),$(call convertToNativeFilenames,$(strip $(1))))
+makeNativePath = $(subst ' ','$(NATIVE_PATH_SEPARATOR)',$(foreach file,$(1),$(call convertToNativeFilenames,$(file))))
 
 define SYMLINK_RULE
 	mkdir -p $(@D) && \
@@ -564,7 +564,7 @@ PUBLISHABLE_INSTALLERS.salma-hayek =
 PUBLISHABLE_INSTALLERS = $(PUBLISHABLE_INSTALLERS.$(MACHINE_PROJECT_NAME))
 
 # Among its many breakages, msiexec is more restrictive about slashes than Win32.
-NATIVE_NAME_FOR_MSI_INSTALLER := '$(subst /,\,$(call convertToNativeFilenames,$(INSTALLER.msi)))'
+NATIVE_NAME_FOR_MSI_INSTALLER := $(subst /,\,$(call convertToNativeFilenames,$(INSTALLER.msi)))
 
 # We copy the files we want to install into a directory tree whose layout mimics where they'll be installed.
 PACKAGING_DIRECTORY = .generated/native/$(TARGET_DIRECTORY)/$(MACHINE_PROJECT_NAME)
