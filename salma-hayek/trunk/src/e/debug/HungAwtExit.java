@@ -3,7 +3,10 @@ package e.debug;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.lang.management.*;
+import java.util.*;
 import java.util.List;
+import javax.management.*;
 import javax.swing.Timer;
 
 /**
@@ -19,7 +22,44 @@ import javax.swing.Timer;
  * In a constructor, something like <code>e.debug.HungAwtExit.explain(this);</code>
  * would do it.
  */
-public class HungAwtExit {
+public class HungAwtExit implements HungAwtExitMBean {
+    public static void initMBean() {
+        try {
+            final MBeanServer server = ManagementFactory.getPlatformMBeanServer();
+            server.registerMBean(new HungAwtExit(), new ObjectName("e.debug:type=HungAwtExitMBean"));
+        } catch (Exception ex) {
+            Log.warn("Couldn't initialize HungAwtExit MBean", ex);
+        }
+    }
+    
+    public int getExtantFrameCount() {
+        return Frame.getFrames().length;
+    }
+    
+    public String[] getDisplayableFrames() {
+        final Frame[] frames = Frame.getFrames();
+        final ArrayList<String> result = new ArrayList<String>();
+        int displayableFrameCount = 0;
+        for (Frame frame : frames) {
+            if (frame.isDisplayable()) {
+                result.add("Displayable frame: " + frame);
+                ++displayableFrameCount;
+            }
+        }
+        result.add("Problem (displayable) frames: " + displayableFrameCount);
+        return result.toArray(new String[result.size()]);
+    }
+    
+    public String[] getSwingTimers() {
+        final List<Timer> timers = TimerUtilities.getQueuedSwingTimers();
+        final ArrayList<String> result = new ArrayList<String>();
+        for (Timer timer : timers) {
+            result.add(TimerUtilities.toString(timer));
+        }
+        result.add("Problem (extant) timers: " + timers.size());
+        return result.toArray(new String[result.size()]);
+    }
+    
     public static void showDisplayableFrames() {
         System.err.println("*** Examining Frames...");
         Frame[] frames = Frame.getFrames();
