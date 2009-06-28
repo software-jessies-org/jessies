@@ -27,33 +27,19 @@ public final class PatternUtilities {
     public static final Pattern HYPERLINK_PATTERN = Pattern.compile("\\b(https?://[A-Za-z0-9.:-]+[A-Za-z0-9](/~?"+SEARCH_CHARS+"*(\\?"+SEARCH_CHARS+"*)?)?(\\#"+SEARCH_CHARS+"+)?)(?<![),.])");
     
     @Test private static void testHyperlinkPattern() {
-        assertMatches("http://software.jessies.org");
-        assertMatches("http://software.jessies.org/");
-        assertMatches("http://software.jessies.org/software/make/manual/html_mono/make.html");
-        assertMatches("http://software.jessies.org/viewcvs/gtk%2B/gtk/gtkstock.h?view=markup");
-        assertMatches("<a href=\"http://software.jessies.org\">Software Jessies</a>", "http://software.jessies.org");
-        assertMatches("http://software.jessies.org");
-        assertMatches("(http://software.jessies.org)", "http://software.jessies.org");
-        assertMatches("(http://software.jessies.org/)", "http://software.jessies.org/");
-        assertMatches("<http://software.jessies.org>", "http://software.jessies.org");
-        assertMatches("http://software.jessies.org, http://software.jessies.org.", "http://software.jessies.org", "http://software.jessies.org");
-        assertMatches("http://software.jessies.org/, http://software.jessies.org/.", "http://software.jessies.org/", "http://software.jessies.org/");
-        assertMatches("http://software.jessies.org/~user/");
-        assertMatches("http://software.jessies.org/~user/page.html#target");
-    }
-    
-    @TestHelper private static void assertMatches(final String text) {
-        assertMatches(text, text);
-    }
-    
-    @TestHelper private static void assertMatches(final String text, final String... expectedUrls) {
-        final List<String> expected = Arrays.asList(expectedUrls);
-        final List<String> actual = new ArrayList<String>();
-        final Matcher matcher = HYPERLINK_PATTERN.matcher(text);
-        while (matcher.find()) {
-            actual.add(matcher.group(1));
-        }
-        Assert.equals(expected, actual);
+        Assert.matches(HYPERLINK_PATTERN, "pre http://software.jessies.org post", "http://software.jessies.org");
+        Assert.matches(HYPERLINK_PATTERN, "pre http://software.jessies.org/ post", "http://software.jessies.org/");
+        Assert.matches(HYPERLINK_PATTERN, "pre http://software.jessies.org/software/make/manual/html_mono/make.html post", "http://software.jessies.org/software/make/manual/html_mono/make.html");
+        Assert.matches(HYPERLINK_PATTERN, "pre http://software.jessies.org/viewcvs/gtk%2B/gtk/gtkstock.h?view=markup post", "http://software.jessies.org/viewcvs/gtk%2B/gtk/gtkstock.h?view=markup");
+        Assert.matches(HYPERLINK_PATTERN, "<a href=\"http://software.jessies.org\">Software Jessies</a>", "http://software.jessies.org");
+        Assert.matches(HYPERLINK_PATTERN, "pre http://software.jessies.org post", "http://software.jessies.org");
+        Assert.matches(HYPERLINK_PATTERN, "(http://software.jessies.org)", "http://software.jessies.org");
+        Assert.matches(HYPERLINK_PATTERN, "(http://software.jessies.org/)", "http://software.jessies.org/");
+        Assert.matches(HYPERLINK_PATTERN, "<http://software.jessies.org>", "http://software.jessies.org");
+        Assert.matches(HYPERLINK_PATTERN, "http://software.jessies.org, http://software.jessies.org.", "http://software.jessies.org", "http://software.jessies.org");
+        Assert.matches(HYPERLINK_PATTERN, "http://software.jessies.org/, http://software.jessies.org/.", "http://software.jessies.org/", "http://software.jessies.org/");
+        Assert.matches(HYPERLINK_PATTERN, "pre http://software.jessies.org/~user/ post", "http://software.jessies.org/~user/");
+        Assert.matches(HYPERLINK_PATTERN, "pre http://software.jessies.org/~user/page.html#target post", "http://software.jessies.org/~user/page.html#target");
     }
     
     /**
