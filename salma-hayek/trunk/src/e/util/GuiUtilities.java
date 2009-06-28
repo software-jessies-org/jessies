@@ -326,7 +326,7 @@ public class GuiUtilities {
             // http://java.sun.com/docs/books/tutorial/uiswing/lookandfeel/plaf.html
             String lafClassName = System.getProperty("swing.defaultlaf");
             if (lafClassName == null){
-            	lafClassName = UIManager.getSystemLookAndFeelClassName();
+                lafClassName = UIManager.getSystemLookAndFeelClassName();
             }
             
             // FIXME: when we move to 1.6, remove this completely. The GTK LAF is okay there.
@@ -366,6 +366,9 @@ public class GuiUtilities {
                 UIManager.put("Table.background", new Color(0xf5f2ed));
                 fixWmClass();
             }
+            
+            // Sneakily enable the HungAwtExit MBean for all our GUI applications.
+            e.debug.HungAwtExit.initMBean();
         } catch (Exception ex) {
             Log.warn("Problem setting up GUI defaults.", ex);
         }
