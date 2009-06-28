@@ -9,14 +9,20 @@ import java.awt.event.*;
 import java.util.regex.*;
 import javax.swing.*;
 import org.jessies.os.*;
+import org.jessies.test.*;
 
 // make && ./bin/build-ui 'cd ~/Projects/ctags/trunk;make clean;make --print-directory'
 // make && ./bin/build-ui .generated/classes/ e.tools.BuildUi 'cd ~/Projects/terminator;make clean;make --print-directory'
 
 public class BuildUi extends MainFrame {
+    // Matches addresses (such as "/some/path/to/filename.ext:line:(col:line:col)?: ").
+    private static final Pattern ADDRESS_PATTERN = Pattern.compile("^([-A-Za-z0-9_/]{4,}\\.[a-z0-9]+:\\d+:) ");
     
-    // Matches addresses (such as "filename.ext:line:(col:line:col)?: ").
-    private static final Pattern ADDRESS_PATTERN = Pattern.compile("^([-A-Za-z0-9_]{4,}\\.[a-z0-9]+:\\d+:) ");
+    @Test private static void testAddressPattern() {
+        Assert.matches(ADDRESS_PATTERN,"test.cpp:4: oops", "test.cpp:4:");
+        Assert.matches(ADDRESS_PATTERN,"/usr/include/stdio.h:123: oops", "/usr/include/stdio.h:123:");
+    }
+    
     // We avoid matching the " or ' before a filename.
     // We insist that an interesting extension has between 1 and 4 characters, and contains only alphabetic characters.
     // (There's an additional check later that the extension isn't known to be uninteresting, such as ".o" or ".class".)
