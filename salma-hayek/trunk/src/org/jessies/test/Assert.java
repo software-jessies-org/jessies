@@ -1,6 +1,7 @@
 package org.jessies.test;
 
-import java.util.List;
+import java.util.*;
+import java.util.regex.*;
 
 /**
  * Assertions for the simple Java unit testing framework.
@@ -37,6 +38,22 @@ public final class Assert {
         if (!lhs.contains(rhs)) {
             throw new RuntimeException(toString(lhs) + " does not contain " + toString(rhs));
         }
+    }
+    
+    /**
+     * Tests whether 'pattern' matches 'text' resulting in the given expected matches.
+     * Note that the expected matches are all capturing group 1.
+     * For example: Assert.matches(Pattern.compile("(a*)b*", "ab aab", "a", "aa")).
+     * If this doesn't suit your needs, consider adding an extra parameter like "$1" to describe the group(s) to be compared.
+     */
+    public static void matches(final Pattern pattern, final String text, final String... expectedMatches) {
+        final List<String> expected = Arrays.asList(expectedMatches);
+        final List<String> actual = new ArrayList<String>();
+        final Matcher matcher = pattern.matcher(text);
+        while (matcher.find()) {
+            actual.add(matcher.group(1));
+        }
+        Assert.equals(expected, actual);
     }
     
     // Outputs 'o' in the most useful form given the circumstances.
