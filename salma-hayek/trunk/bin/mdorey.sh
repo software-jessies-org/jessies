@@ -22,9 +22,13 @@
 # to try to get make to cope with file names containing spaces.
 # It can be done but it's not worth the effort.
 
-# The resulting cron job is actually longer than the non-comment part of this file:
-# 20 09 * * * cat /software.jessies.org/work/salma-hayek/bin/mdorey.sh | bash --login
+# exim configuration
+# the rewrite section is empty by default
+# add this:
+# *@+local_domains ${local_part}@bluearc.com EFfrstcb
 
-NIGHTLY_BUILD_SCRIPT=/software.jessies.org/work/salma-hayek/bin/nightly-build.rb
-NIGHTLY_BUILD_TREE=/software.jessies.org/nightlies/
+# 20 09 * * * cat ~/software.jessies.org/work/salma-hayek/bin/mdorey.sh | bash --login
+
+NIGHTLY_BUILD_SCRIPT=~/software.jessies.org/work/salma-hayek/bin/nightly-build.rb
+NIGHTLY_BUILD_TREE=~/software.jessies.org/nightlies/
 $NIGHTLY_BUILD_SCRIPT $NIGHTLY_BUILD_TREE clean native-dist
