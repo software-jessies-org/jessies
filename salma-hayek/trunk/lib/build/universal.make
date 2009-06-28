@@ -88,13 +88,13 @@ NATIVE_PATH_SEPARATOR.$(TARGET_OS) = :
 NATIVE_PATH_SEPARATOR.Cygwin = ";"
 NATIVE_PATH_SEPARATOR = $(NATIVE_PATH_SEPARATOR.$(TARGET_OS))
 
-convertToNativeFilenames.$(TARGET_OS) = $(1)
+convertToNativeFilename.$(TARGET_OS) = $(1)
 # javac is happy with forward slashes (as is the underlying Win32 API).
-convertToNativeFilenames.Cygwin = $(foreach file,$(1),'$(shell cygpath --mixed $(file))')
-convertToNativeFilenames = $(convertToNativeFilenames.$(TARGET_OS))
+convertToNativeFilename.Cygwin = $(shell cygpath --mixed $(1))
+convertToNativeFilenames = $(foreach file,$(1),'$(call convertToNativeFilename.$(TARGET_OS),$(file))')
 
 searchPath = $(shell which $(1) 2> /dev/null)
-makeNativePath = $(subst ' ','$(NATIVE_PATH_SEPARATOR)',$(foreach file,$(1),$(call convertToNativeFilenames,$(file))))
+makeNativePath = $(subst ' ','$(NATIVE_PATH_SEPARATOR)',$(call convertToNativeFilenames,$(1)))
 
 define SYMLINK_RULE
 	mkdir -p $(@D) && \
