@@ -166,7 +166,7 @@ public class BuildUi extends MainFrame {
     }
     
     public void startBuild() {
-        new Thread(new Runnable() {
+        ThreadUtilities.newSingleThreadExecutor("build runner").execute(new Runnable() {
             public void run() {
                 final ProcessUtilities.ProcessListener processListener = new ProcessListener();
                 final ProcessUtilities.LineListener stdoutListener = new LineListener();
@@ -182,7 +182,7 @@ public class BuildUi extends MainFrame {
                     }
                 });
             }
-        }).start();
+        });
     }
     
     public void stopBuild() {
