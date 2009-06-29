@@ -98,6 +98,7 @@ public class GnomeStockIcon {
             nameMap.put("Save As...", "gtk-save-as");
             nameMap.put("Select All", "gtk-select-all");
             nameMap.put("Show Info", "gtk-info");
+            nameMap.put("Stop", "gtk-stop");
         }
     }
     
