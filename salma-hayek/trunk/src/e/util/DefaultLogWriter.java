@@ -9,12 +9,12 @@ import java.io.PrintWriter;
  * 
  * @author mth
  */
-class DefaultLogSink implements LogSink {
+class DefaultLogWriter implements LogWriter {
 
     private final String applicationName;
     private PrintWriter out = new PrintWriter(System.err, true);
 
-    public DefaultLogSink(final String applicationName) {
+    public DefaultLogWriter(final String applicationName) {
         this.applicationName = applicationName;
         // We take care to initialize 'out' first so we can log if this goes wrong. 
         String logFilename = System.getProperty("e.util.Log.filename");
