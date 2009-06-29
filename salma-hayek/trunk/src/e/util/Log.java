@@ -29,16 +29,16 @@ public class Log {
     
     private static String applicationName = System.getProperty("e.util.Log.applicationName", "unknown");
     
-    private static LogSink out = new DefaultLogSink(applicationName);
+    private static LogWriter out = new DefaultLogWriter(applicationName);
     static {
-        final String sinkClassName = System.getProperty("e.util.Log.logSink");
+        final String logWriterClassName = System.getProperty("e.util.Log.logWriter");
         try {
-            if (sinkClassName != null) {
-                out = (LogSink) Class.forName(sinkClassName).newInstance();
+            if (logWriterClassName != null) {
+                out = (LogWriter) Class.forName(logWriterClassName).newInstance();
             }
         }
         catch (Exception ex) {
-            warn("Error configuring log sink \"" + sinkClassName + "\".", ex);
+            warn("Error configuring log writer \"" + logWriterClassName + "\".", ex);
         }
     }
     

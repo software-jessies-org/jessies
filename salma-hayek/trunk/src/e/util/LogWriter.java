@@ -5,11 +5,11 @@ package e.util;
  * 
  * @author mth
  */
-public interface LogSink {
+public interface LogWriter {
 
   /**
    * Logs a message from an application with optional exception.
    */
-  void log(String message, Throwable throwable);
+  public void log(String message, Throwable throwable);
   
 }
