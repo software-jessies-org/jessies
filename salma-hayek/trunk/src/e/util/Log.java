@@ -27,28 +27,18 @@ public class Log {
         }
     }
     
-    private static String applicationName;
-    static {
-        applicationName = System.getProperty("e.util.Log.applicationName");
-        if (applicationName == null) {
-            applicationName = "unknown";
-        }
-    }
+    private static String applicationName = System.getProperty("e.util.Log.applicationName", "unknown");
     
-    private static PrintWriter out = new PrintWriter(System.err, true);
+    private static LogSink out = new DefaultLogSink(applicationName);
     static {
-        String logFilename = System.getProperty("e.util.Log.filename");
+        final String sinkClassName = System.getProperty("e.util.Log.logSink");
         try {
-            if (logFilename != null) {
-                // Append to, rather than truncate, the log.
-                FileOutputStream fileOutputStream = new FileOutputStream(logFilename, true);
-                // Use the UTF-8 character encoding.
-                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, "utf-8");
-                // Auto-flush when println is called.
-                out = new PrintWriter(outputStreamWriter, true);
+            if (sinkClassName != null) {
+                out = (LogSink) Class.forName(sinkClassName).newInstance();
             }
-        } catch (Throwable th) {
-            Log.warn("Couldn't redirect logging to \"" + logFilename + "\"", th);
+        }
+        catch (Exception ex) {
+            warn("Error configuring log sink \"" + sinkClassName + "\".", ex);
         }
     }
     
@@ -102,11 +92,7 @@ public class Log {
     }
 
     public static void warn(String message, Throwable th) {
-        out.println(TimeUtilities.currentIsoString() + " " + applicationName + ": " + message);
-        if (th != null) {
-            out.println("Associated exception:");
-            th.printStackTrace(out);
-        }
+        out.log(message, th);
     }
     
     /** Protects against instantiation. */
