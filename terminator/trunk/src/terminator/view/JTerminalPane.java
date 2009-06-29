@@ -260,10 +260,6 @@ public class JTerminalPane extends JPanel {
 		return control;
 	}
 	
-	public LogWriter getLogWriter() {
-		return control.getLogWriter();
-	}
-	
 	public String getName() {
 		return name;
 	}
@@ -705,7 +701,7 @@ public class JTerminalPane extends JPanel {
 	
 	public void doCloseAction() {
 		destroyProcess();
-		getLogWriter().close();
+		control.getLogWriter().close();
 		host.closeTerminalPane(this);
 	}
 	

@@ -38,10 +38,11 @@ public class InfoDialog {
         final JCheckBox checkBox = new JCheckBox("Suspend Logging");
         checkBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                terminal.getLogWriter().suspend(suspendLogging.isSelected());
+                final LogWriter logWriter = terminal.getControl().getLogWriter();
+                logWriter.suspend(suspendLogging.isSelected());
                 // The LogWriter might not be able to comply, so ensure that
                 // the UI reflects the actual state.
-                checkBox.setSelected(terminal.getLogWriter().isSuspended());
+                checkBox.setSelected(logWriter.isSuspended());
             }
         });
         return checkBox;
@@ -66,7 +67,7 @@ public class InfoDialog {
             JButton showInFinderButton = new JButton(GuiUtilities.isMacOs() ? "Show in Finder" : "Show in Explorer");
             showInFinderButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    terminal.getLogWriter().flush();
+                    terminal.getControl().getLogWriter().flush();
                     GuiUtilities.selectFileInFileViewer(logFilename.getText());
                 }
             });
@@ -94,7 +95,7 @@ public class InfoDialog {
             processes.setText("");
         }
         
-        LogWriter logWriter = terminal.getLogWriter();
+        final LogWriter logWriter = terminal.getControl().getLogWriter();
         logFilename.setText(logWriter.getInfo());
         suspendLogging.setSelected(logWriter.isSuspended());
     }
