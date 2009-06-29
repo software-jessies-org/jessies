@@ -81,11 +81,7 @@ public class BuildUi extends MainFrame {
     
     private JButton makeStopButton() {
         final JButton stopButton = new JButton("Stop");
-        
-        // Make it a nice easy target.
-        final Dimension newSize = stopButton.getPreferredSize();
-        newSize.width *= 1.5;
-        stopButton.setPreferredSize(newSize);
+        GnomeStockIcon.configureButton(stopButton);
         
         stopButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -144,9 +140,15 @@ public class BuildUi extends MainFrame {
     }
     
     private JComponent makeTabbedPane() {
+        final JScrollPane scrollableErrors = makeScrollable(errors);
+        final JScrollPane scrollableTranscript = makeScrollable(transcript);
+        // Make the transcript automatically scroll as new output appears, on the assumption that the most recent output is the most interesting.
+        // Don't scroll the errors, on the assumption that you'll want to start at the beginning.
+        GuiUtilities.keepMaximumShowing(scrollableTranscript.getVerticalScrollBar());
+        
         final JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.add("Errors", makeScrollable(errors));
-        tabbedPane.add("Transcript", makeScrollable(transcript));
+        tabbedPane.add("Errors", scrollableErrors);
+        tabbedPane.add("Transcript", scrollableTranscript);
         return tabbedPane;
     }
     
@@ -154,14 +156,53 @@ public class BuildUi extends MainFrame {
         return new JScrollPane(c, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     }
     
-    private static PTextArea makeErrors() {
+    private PTextArea makeTextArea() {
+        final PTextArea textArea = new PTextArea();
+        // No margin, because all the text should be machine-generated.
+        textArea.showRightHandMarginAt(PTextArea.NO_MARGIN);
+        textArea.addStyleApplicator(new ErrorLinkStyler(textArea));
+        // Traditionally we were editable in imitation of acme.
+        // PTextArea currently decides whether you have to hold down control to follow a link based on whether the text area is editable.
+        // The easiest fix, which may or may not be sufficient, is to make errors windows non-editable.
+        textArea.setEditable(false);
+        textArea.setWrapStyleWord(true);
+        return textArea;
+    }
+    
+    private PTextArea makeErrors() {
         // FIXME: is a text area what we want here?
-        final PTextArea errors = new PTextArea();
+        final PTextArea errors = makeTextArea();
         return errors;
     }
     
-    private static PTextArea makeTranscript() {
-        final PTextArea transcript = new PTextArea();
+    private class ErrorLinkStyler extends RegularExpressionStyleApplicator {
+        public ErrorLinkStyler(PTextArea textArea) {
+            super(textArea, ADDRESS_PATTERN, PStyle.HYPERLINK);
+        }
+        
+        @Override protected void configureSegment(PTextSegment segment, Matcher matcher) {
+            segment.setLinkAction(new ErrorLinkActionListener(matcher.group(1)));
+        }
+    }
+    
+    private class ErrorLinkActionListener implements ActionListener {
+        private final String address;
+        
+        public ErrorLinkActionListener(String address) {
+            this.address = address;
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+            // FIXME: expose --editor as a command-line option.
+            // FIXME: use environment variables to supply BUI_FILENAME, BUI_LINE_NUMBER, and BUI_ADDRESS to support other editors.
+            // FIXME: don't use spawn because we should report failures.
+            final String[] command = ProcessUtilities.makeShellCommandArray("evergreen " + address);
+            ProcessUtilities.spawn(null, command);
+        }
+    }
+    
+    private PTextArea makeTranscript() {
+        final PTextArea transcript = makeTextArea();
         return transcript;
     }
     
@@ -174,11 +215,7 @@ public class BuildUi extends MainFrame {
                 final int status = ProcessUtilities.runCommand(null, ProcessUtilities.makeShellCommandArray(command), processListener, stdoutListener, stderrListener);
                 EventQueue.invokeLater(new Runnable() {
                     public void run() {
-                        runningProcess = null;
-                        currentActionLabel.setText("Finished."); // FIXME: cull something more useful from the transcript? at least include the exit status?
-                        currentActionLabel.setForeground(status == 0 ? new Color(0x008800) : Color.RED);
-                        progressBar.setIndeterminate(false); // FIXME: and setVisible(false)?
-                        stopButton.setEnabled(false);
+                        buildFinished(status);
                     }
                 });
             }
@@ -188,12 +225,34 @@ public class BuildUi extends MainFrame {
     public void stopBuild() {
         final int pid = ProcessUtilities.getProcessId(runningProcess);
         Posix.killpg(pid, Signal.SIGINT);
-        Posix.killpg(pid, Signal.SIGTERM);        
+        Posix.killpg(pid, Signal.SIGTERM);
+    }
+    
+    // Invoked on the EDT.
+    private void buildFinished(int exitStatus) {
+        // The user can't stop what's already finished.
+        runningProcess = null;
+        stopButton.setEnabled(false);
+        stopButton.setVisible(false);
+        // And we're not going to make any more progress.
+        progressBar.setVisible(false);
+        
+        final boolean success = (exitStatus == 0);
+        // FIXME: extract something more specific from the transcript?
+        currentActionLabel.setText(success ? "Built successfully." : "Build failed.");
+        currentActionLabel.setForeground(success ? new Color(0x008800) : Color.RED);
+        
+        // FIXME: option to exit on success.
     }
     
     private class ProcessListener implements ProcessUtilities.ProcessListener {
         public void processStarted(Process process) {
             runningProcess = process;
+            EventQueue.invokeLater(new Runnable() {
+                public void run() {
+                    currentActionLabel.setText("Child started...");
+                }
+            });
         }
         
         public void processExited(int status) {
@@ -218,8 +277,18 @@ public class BuildUi extends MainFrame {
                 isError = true; // FIXME: not exactly; it could be a warning.
             }
             
+            // FIXME: shouldn't have to-hard code support for arbitrary builds.
             if (line.startsWith("-- ")) {
                 newCurrentAction = line.substring(3);
+            }
+            
+            // FIXME: shouldn't have to-hard code support for arbitrary builds.
+            if (line.startsWith("____")) {
+                final Matcher detailedMatcher = Pattern.compile("^____\\(... ... .. ..:..:.. ... ....\\) \\[(\\d+)%\\] (.*)$").matcher(line);
+                if (detailedMatcher.matches()) {
+                    newPercentage = Integer.parseInt(detailedMatcher.group(1));
+                    newCurrentAction = detailedMatcher.group(2);
+                }
             }
             
             final String appendableLine = line + "\n";
@@ -243,6 +312,7 @@ public class BuildUi extends MainFrame {
         public void run() {
             if (newPercentage != -1) {
                 progressBar.setIndeterminate(false);
+                progressBar.setStringPainted(true);
                 progressBar.setValue(newPercentage);
             }
             if (newCurrentAction != null) {
@@ -256,7 +326,10 @@ public class BuildUi extends MainFrame {
     }
     
     public static void main(String[] args) {
-        // FIXME: other options?
+        // FIXME: options!
+        // FIXME: --editor COMMAND
+        // FIXME: --exit-on-success
+        // FIXME: --source-path DIRS
         if (args.length != 1) {
             System.err.println("usage: BuildUi <command>");
             System.exit(1);
