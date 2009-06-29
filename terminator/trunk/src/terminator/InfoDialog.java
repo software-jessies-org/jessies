@@ -38,11 +38,11 @@ public class InfoDialog {
         final JCheckBox checkBox = new JCheckBox("Suspend Logging");
         checkBox.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                final LogWriter logWriter = terminal.getControl().getLogWriter();
-                logWriter.suspend(suspendLogging.isSelected());
-                // The LogWriter might not be able to comply, so ensure that
+                final TerminalLogWriter terminalLogWriter = terminal.getControl().getTerminalLogWriter();
+                terminalLogWriter.suspend(suspendLogging.isSelected());
+                // The TerminalLogWriter might not be able to comply, so ensure that
                 // the UI reflects the actual state.
-                checkBox.setSelected(logWriter.isSuspended());
+                checkBox.setSelected(terminalLogWriter.isSuspended());
             }
         });
         return checkBox;
@@ -67,7 +67,7 @@ public class InfoDialog {
             JButton showInFinderButton = new JButton(GuiUtilities.isMacOs() ? "Show in Finder" : "Show in Explorer");
             showInFinderButton.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    terminal.getControl().getLogWriter().flush();
+                    terminal.getControl().getTerminalLogWriter().flush();
                     GuiUtilities.selectFileInFileViewer(logFilename.getText());
                 }
             });
@@ -95,8 +95,8 @@ public class InfoDialog {
             processes.setText("");
         }
         
-        final LogWriter logWriter = terminal.getControl().getLogWriter();
-        logFilename.setText(logWriter.getInfo());
-        suspendLogging.setSelected(logWriter.isSuspended());
+        final TerminalLogWriter terminalLogWriter = terminal.getControl().getTerminalLogWriter();
+        logFilename.setText(terminalLogWriter.getInfo());
+        suspendLogging.setSelected(terminalLogWriter.isSuspended());
     }
 }
