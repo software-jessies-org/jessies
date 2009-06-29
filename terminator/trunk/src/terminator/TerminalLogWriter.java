@@ -13,7 +13,7 @@ import javax.swing.Timer;
  * Logging can be temporarily suspended.
  * If the terminal logs directory does not exist or we can't open the log file for some other reason, logging is automatically suspended, and can't be un-suspended.
  */
-public class LogWriter {
+public class TerminalLogWriter {
 	// We can't use ':' to separate the hours, minutes, and seconds because it's not allowed on all file systems.
 	private static final DateFormat FILENAME_TIMESTAMP_FORMATTER = new SimpleDateFormat("yyyy-MM-dd'T'HHmmss.SSSZ");
 	
@@ -22,7 +22,7 @@ public class LogWriter {
 	private Writer suspendedWriter;
 	private Timer flushTimer;
 	
-	public LogWriter(List<String> command) {
+	public TerminalLogWriter(List<String> command) {
 		// Establish the invariant that writer != null.
 		// suspendedWriter is still null - when we're not suspended.
 		this.writer = NullWriter.INSTANCE;

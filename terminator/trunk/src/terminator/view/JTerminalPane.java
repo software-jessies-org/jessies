@@ -701,7 +701,7 @@ public class JTerminalPane extends JPanel {
 	
 	public void doCloseAction() {
 		destroyProcess();
-		control.getLogWriter().close();
+		control.getTerminalLogWriter().close();
 		host.closeTerminalPane(this);
 	}
 	
