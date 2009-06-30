@@ -414,12 +414,6 @@ public class FileUtilities {
     /**
      * Convert a filename to one that Java will be able to open.
      * You probably want to use fileFromString and get this for free.
-     * cygpath doesn't require the file to exist.
-     * It doesn't usually make absolute paths where the argument is specified relative to the current directory.
-     * It does make absolute paths where the argument refers to the parent directory.
-     * It does clean up unnecessary path components.
-     * It follows Cygwin symbolic links to return the target path.
-     * I suspect that it will cause problems for us if given non-Ascii input, and possibly even in Windows configurations where the first 128 code points aren't Ascii.
      */
     private static String cygpathIfNecessary(String filename) {
         if (OS.isWindows() == false) {
@@ -430,15 +424,44 @@ public class FileUtilities {
         if (filename.matches("^[A-Za-z]:\\\\.*")) {
             return filename;
         }
-        ArrayList<String> jvmForm = new ArrayList<String>();
+        return translateWithCygpath("--windows", filename);
+    }
+    
+    /**
+     * This method expands any "user-friendly" prefix and,
+     * on platforms other than Windows, returns immediately.
+     * On Windows, it converts the filename to a Unix format,
+     * performing the opposite translation to cygpathIfNecessary.
+     * On that platform, we fork shell commands, via the JRE, with native calls
+     * rather than going via a Cygwin shim like PtyProcess.
+     * This causes Cygwin to perform a globbing expansion on the command line,
+     * which ruins any attempt we might make to quote spaces or backslashes.
+     */
+    public static String translateFilenameForShellUse(String friendlyForm) {
+        String jvmForm = FileUtilities.fileFromString(friendlyForm).toString();
+        if (OS.isWindows() == false) {
+            return jvmForm;
+        }
+        return translateWithCygpath("--unix", jvmForm);
+    }
+    
+    /**
+     * cygpath doesn't require the file to exist.
+     * It doesn't usually make absolute paths where the argument is specified relative to the current directory.
+     * It does make absolute paths where the argument refers to the parent directory.
+     * It does clean up unnecessary path components.
+     * It follows Cygwin symbolic links to return the target path.
+     * I suspect that it will cause problems for us if given non-Ascii input, and possibly even in Windows configurations where the first 128 code points aren't Ascii.
+     * Should there ever be a useful Cygwin JVM, we will be back here.
+     */
+    private static String translateWithCygpath(String translationSwitch, String filename) {
+        ArrayList<String> translatedForm = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
-        // Should there ever be useful a Cygwin JVM, we may be back here.
-        // Should we need the opposite translation, there's --unix.
-        int status = ProcessUtilities.backQuote(null, new String[] { "cygpath", "--windows", filename }, jvmForm, errors);
-        if (status != 0 || jvmForm.size() != 1) {
+        int status = ProcessUtilities.backQuote(null, new String[] { "cygpath", translationSwitch, filename }, translatedForm, errors);
+        if (status != 0 || translatedForm.size() != 1) {
             return filename;
         }
-        return jvmForm.get(0);
+        return translatedForm.get(0);
     }
     
     private FileUtilities() { /* Not instantiable. */ }
