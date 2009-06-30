@@ -6,14 +6,19 @@ import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
+import org.jessies.cli.*;
 import org.jessies.os.*;
 import org.jessies.test.*;
 
 // make && ./bin/build-ui 'cd ~/Projects/ctags/trunk;make clean;make --print-directory'
 // make && ./bin/build-ui .generated/classes/ e.tools.BuildUi 'cd ~/Projects/terminator;make clean;make --print-directory'
 
+// FIXME: sometimes we don't exit. why not?
+// FIXME: we don't need a gigabyte heap.
+// FIXME: we should remember where we were last time we ran, and re-position ourselves there.
 public class BuildUi extends MainFrame {
     // Matches addresses (such as "/some/path/to/filename.ext:line:(col:line:col)?: ").
     private static final Pattern ADDRESS_PATTERN = Pattern.compile("^([-A-Za-z0-9_/]{4,}\\.[a-z0-9]+:\\d+:) ");
@@ -32,6 +37,19 @@ public class BuildUi extends MainFrame {
     // FIXME: duplicated from Evergreen.
     private static final Pattern MAKE_ENTERING_DIRECTORY_PATTERN = Pattern.compile("^make(?:\\[\\d+\\])?: Entering directory `(.*)'$");
     
+    // Our command-line options and their defaults.
+    private static class Options {
+        @Option(names = { "--exit-on-success" })
+        public boolean exitOnSuccess = true;
+        
+        @Option(names = { "--source-path" })
+        public String sourcePath = ".";
+        
+        @Option(names = { "--editor" })
+        public String editor = "evergreen";
+    }
+    
+    private final Options options;
     private final String command;
     
     private final ELabel commandLabel;
@@ -45,9 +63,10 @@ public class BuildUi extends MainFrame {
     
     private Process runningProcess;
     
-    public BuildUi(String command) {
+    public BuildUi(Options options, String command) {
         setTitle("BuildUi");
         
+        this.options = options;
         this.command = command;
         this.commandLabel = new ELabel();
         this.currentActionLabel = new ELabel("Starting up...");
@@ -193,10 +212,11 @@ public class BuildUi extends MainFrame {
         }
         
         public void actionPerformed(ActionEvent e) {
-            // FIXME: expose --editor as a command-line option.
+            // FIXME: use options.sourcePath to work out the appropriate absolute path.
+            
             // FIXME: use environment variables to supply BUI_FILENAME, BUI_LINE_NUMBER, and BUI_ADDRESS to support other editors.
             // FIXME: don't use spawn because we should report failures.
-            final String[] command = ProcessUtilities.makeShellCommandArray("evergreen " + address);
+            final String[] command = ProcessUtilities.makeShellCommandArray("'" + options.editor + "' '" + address + "'");
             ProcessUtilities.spawn(null, command);
         }
     }
@@ -242,7 +262,10 @@ public class BuildUi extends MainFrame {
         currentActionLabel.setText(success ? "Built successfully." : "Build failed.");
         currentActionLabel.setForeground(success ? new Color(0x008800) : Color.RED);
         
-        // FIXME: option to exit on success.
+        if (options.exitOnSuccess) {
+            // FIXME: something less brutal?
+            System.exit(0);
+        }
     }
     
     private class ProcessListener implements ProcessUtilities.ProcessListener {
@@ -277,12 +300,12 @@ public class BuildUi extends MainFrame {
                 isError = true; // FIXME: not exactly; it could be a warning.
             }
             
-            // FIXME: shouldn't have to-hard code support for arbitrary builds.
+            // FIXME: shouldn't have to hard-code support for arbitrary builds.
             if (line.startsWith("-- ")) {
                 newCurrentAction = line.substring(3);
             }
             
-            // FIXME: shouldn't have to-hard code support for arbitrary builds.
+            // FIXME: shouldn't have to hard-code support for arbitrary builds.
             if (line.startsWith("____")) {
                 final Matcher detailedMatcher = Pattern.compile("^____\\(... ... .. ..:..:.. ... ....\\) \\[(\\d+)%\\] (.*)$").matcher(line);
                 if (detailedMatcher.matches()) {
@@ -326,20 +349,19 @@ public class BuildUi extends MainFrame {
     }
     
     public static void main(String[] args) {
-        // FIXME: options!
-        // FIXME: --editor COMMAND
-        // FIXME: --exit-on-success
-        // FIXME: --source-path DIRS
-        if (args.length != 1) {
+        // FIXME: start a GUI anyway and report any problems that way?
+        final Options options = new Options();
+        final List<String> rest = new OptionParser(options).parse(args);
+        if (rest.size() != 1) {
             System.err.println("usage: BuildUi <command>");
             System.exit(1);
         }
-        final String command = args[0];
+        final String command = rest.get(0);
         
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 GuiUtilities.initLookAndFeel();
-                BuildUi ui = new BuildUi(command);
+                final BuildUi ui = new BuildUi(options, command);
                 ui.setVisible(true);
                 ui.startBuild();
             }
