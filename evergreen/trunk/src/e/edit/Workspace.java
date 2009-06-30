@@ -440,12 +440,12 @@ public class Workspace extends JPanel {
     
     public ShellCommand makeShellCommand(ETextWindow textWindow, String directory, String command, ToolInputDisposition inputDisposition, ToolOutputDisposition outputDisposition) {
         final Map<String, String> environment = new TreeMap<String, String>();
-        environment.put("EVERGREEN_CURRENT_DIRECTORY", canonicalizePath(directory));
+        environment.put("EVERGREEN_CURRENT_DIRECTORY", FileUtilities.translateFilenameForShellUse(directory));
         environment.put("EVERGREEN_LAUNCHER", Evergreen.getResourceFilename("bin", "evergreen"));
-        environment.put("EVERGREEN_WORKSPACE_ROOT", canonicalizePath(getRootDirectory()));
+        environment.put("EVERGREEN_WORKSPACE_ROOT", FileUtilities.translateFilenameForShellUse(getRootDirectory()));
         PTextArea textArea = null;
         if (textWindow != null) {
-            environment.put("EVERGREEN_CURRENT_FILENAME", canonicalizePath(textWindow.getFilename()));
+            environment.put("EVERGREEN_CURRENT_FILENAME", FileUtilities.translateFilenameForShellUse(textWindow.getFilename()));
             
             // Humans number lines from 1, text components from 0.
             // FIXME: we should pass full selection information.
@@ -461,9 +461,5 @@ public class Workspace extends JPanel {
         
         final EErrorsWindow errorsWindow = createErrorsWindow("Command Output"); // FIXME: be more specific.
         return new ShellCommand(textArea, errorsWindow, directory, command, environment, inputDisposition, outputDisposition);
-    }
-    
-    private static String canonicalizePath(String path) {
-        return FileUtilities.fileFromString(path).toString();
     }
 }
