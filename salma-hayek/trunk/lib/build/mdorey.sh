@@ -27,7 +27,7 @@
 # add this:
 # *@+local_domains ${local_part}@bluearc.com EFfrstcb
 
-# 20 09 * * * cat ~/software.jessies.org/work/salma-hayek/bin/mdorey.sh | bash --login
+# 20 09 * * * cat ~/software.jessies.org/work/salma-hayek/lib/build/mdorey.sh | bash --login
 
 NIGHTLY_BUILD_SCRIPT=~/software.jessies.org/work/salma-hayek/bin/nightly-build.rb
 NIGHTLY_BUILD_TREE=~/software.jessies.org/nightlies/
