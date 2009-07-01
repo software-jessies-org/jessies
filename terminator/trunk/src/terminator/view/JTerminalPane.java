@@ -329,6 +329,10 @@ public class JTerminalPane extends JPanel {
 				event.consume();
 				return;
 			}
+			// Leave the event for TerminatorMenuBar if it has appropriate modifiers.
+			if (TerminatorMenuBar.isKeyboardEquivalent(event)) {
+				return;
+			}
 			String sequence = getEscapeSequenceForKeyCode(event);
 			if (sequence != null) {
 				if (sequence.length() == 1) {
@@ -517,6 +521,7 @@ public class JTerminalPane extends JPanel {
 			}
 		}
 		
+		// gnome-terminal offers these shifted shortcuts, but nothing for scrolling by a single line.
 		private boolean doKeyboardScroll(KeyEvent e) {
 			final int keyCode = e.getKeyCode();
 			if (e.getModifiersEx() == InputEvent.SHIFT_DOWN_MASK) {
@@ -545,6 +550,7 @@ public class JTerminalPane extends JPanel {
 			final int keyCode = e.getKeyCode();
 			if (e.isControlDown() && keyCode == KeyEvent.VK_TAB) {
 				// Emulates Firefox's control-tab/control-shift-tab cycle-tab behavior.
+				// This is Terminator's native keystroke in the case where we're using Ctrl+Shift as our default modifier for shortcuts.
 				host.cycleTab(e.isShiftDown() ? -1 : 1);
 				return true;
 			} else if (e.isControlDown() && e.isShiftDown() == false && (keyCode == KeyEvent.VK_PAGE_UP || keyCode == KeyEvent.VK_PAGE_DOWN)) {
@@ -554,10 +560,15 @@ public class JTerminalPane extends JPanel {
 				return true;
 			} else if (e.isControlDown() && e.isShiftDown() && (keyCode == KeyEvent.VK_PAGE_UP || keyCode == KeyEvent.VK_PAGE_DOWN)) {
 				// Emulates gnome-terminal's control-shift page up/page down move-tab behavior.
+				// When this clashes with Terminator's native keystroke for scrolling, defer to that.
+				if (TerminatorMenuBar.isKeyboardEquivalent(e)) {
+					return false;
+				}
 				host.moveCurrentTab(keyCode == KeyEvent.VK_PAGE_UP ? -1 : 1);
 				return true;
 			} else if (e.isControlDown() && e.isShiftDown() && (keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_RIGHT)) {
 				// Emulates konsole's control-shift left/right move-tab behavior.
+				// This is Terminator's native keystroke in the case where we're using Ctrl+Shift as our default modifier for shortcuts.
 				host.moveCurrentTab(keyCode == KeyEvent.VK_LEFT ? -1 : 1);
 				return true;
 			} else if (TerminatorMenuBar.isKeyboardEquivalent(e)) {
@@ -569,13 +580,10 @@ public class JTerminalPane extends JPanel {
 					host.setSelectedTabIndex(newIndex);
 					return true;
 				}
-				if (keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_RIGHT) {
-					if (e.isShiftDown()) {
-						host.moveCurrentTab(keyCode == KeyEvent.VK_LEFT ? -1 : 1);
-					} else {
-						// gnome-terminal behaves a little differently - it disables the left action on the first tab and the right action on the last tab.
-						host.cycleTab(keyCode == KeyEvent.VK_LEFT ? -1 : 1);
-					}
+				// The shift-down case is handled elsewhere as a default Terminator keystroke.
+				if ((keyCode == KeyEvent.VK_LEFT || keyCode == KeyEvent.VK_RIGHT) && e.isShiftDown() == false) {
+					// gnome-terminal behaves a little differently - it disables the left action on the first tab and the right action on the last tab.
+					host.cycleTab(keyCode == KeyEvent.VK_LEFT ? -1 : 1);
 					return true;
 				}
 			}
