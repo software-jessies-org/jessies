@@ -56,10 +56,16 @@ gcc-g++,make,mingw-runtime,subversion
 aspell-en,ctags
 </pre>
 
-<p>To install all the packages recommended on this page, then:
+<p>Other programs useful in developing these projects have included:
 
 <pre>
-...\setup.exe -q -P inetutils,ncurses,openssh,perl,python,ruby,vim,gcc-g++,make,mingw-runtime,subversion,aspell-en,ctags,rxvt
+cron,exim,patch
+</pre>
+
+<p>To install all the packages recommended on this page and others that have been found useful when working on these projects, then:
+
+<pre>
+...\setup.exe -q -P inetutils,ncurses,openssh,perl,python,ruby,vim,gcc-g++,make,mingw-runtime,subversion,aspell-en,ctags,rxvt,cron,exim,patch
 </pre>
 
 <p>Should you ever have to do battle with Cygwin-1.5's package browser, click the "View" button until the label next to it says "Full". This flattens out the list of packages and makes it easier to peruse.
@@ -71,7 +77,8 @@ A substring match puts the package onto the shortlist, which is then much more m
 
 <h2>Configuration</h2>
 
-<p>Double-click on the Cygwin icon on your desktop. You'll get a message like this:
+<p>Double-click on the Cygwin icon on your desktop.
+With Cygwin-1.5, you'll get a message like this:
 <pre>
 Your group is currently "mkgroup".  This indicates that
 the /etc/group (and possibly /etc/passwd) files should be rebuilt.
@@ -80,7 +87,9 @@ mkpasswd -l [-d] > /etc/passwd
 mkgroup  -l [-d] > /etc/group
 Note that the -d switch is necessary for domain users.
 </pre>
-<p>If you don't know otherwise then you should follow the suggestion.  After doing that, double-click on the Cygwin icon <i>again</i> to set up your home directory.  If you don't then, for example, Terminator will fail to find your home directory and refuse to start.
+<p>If you don't know otherwise then you should follow the suggestion, including the note about -d where relevant.  After doing that, double-click on the Cygwin icon <i>again</i> to set up your home directory.  If you don't then, for example, Terminator will fail to find your home directory and refuse to start.
+
+<p>Even on Cygwin-1.7, you will want to follow the above instructions if, for example, ssh is to think of your home directory as something other than /tmp.
 
 <h3>A better command prompt</h3>
 <p>The Cygwin icon on your desktop starts Microsoft's command prompt window, albeit with bash(1) inside. You can do better than that, though. There's a port of rxvt(1) that doesn't require X11, which you can install with the Cygwin <tt>setup.exe</tt>, or you can install <a href="http://software.jessies.org/terminator/">Terminator</a>.
@@ -94,14 +103,35 @@ Note that the -d switch is necessary for domain users.
 
 <h3>Home directory</h3>
 
-<p>If you have a CIFS share on your real Unix box (via Samba, say), you should map that as a network drive (U:, say). You can then set the Win32 environment variable HOME to "U:\" and Cygwin will do the right thing, including running your existing login scripts. (You may want to have installed Perl and Ruby first, and you'll want to follow the usual rules when messing around with login scripts. In particular, keep a working window open at all times!)
+<p>If you have a CIFS share on your real Unix box (via Samba, say), it is tempting to map that as a network drive (U:, say). You can then set the Win32 environment variable HOME to "U:\" and Cygwin will do the right thing, including running your existing login scripts. (You may want to have installed Perl and Ruby first, and you'll want to follow the usual rules when messing around with login scripts. In particular, keep a working window open at all times!)
 
 <p>You can set Win32 environment variables from the control panel. Double-click "System", click the "Advanced" tab, and click the "Environment Variables..." button. Click the upper "New..." button to create a new user variable.
 
 <p>While you're there, add a variable called LANG, set to en_US.UTF-8.
 
+<p>Cygwin's interoperability with Samba has sometimes been problematic.
+Using a local directory as your home also tends to be faster.
+One way of doing this is to set HOME, instead, to C:\Documents and Settings\martind.
+The previously suggested mkpasswd incantation will have set your home directory in /etc/passwd to /home/martind,
+so mkdir /home/martind within Cygwin and add an entry to Cygwin's /etc/fstab:
+
+<pre>
+echo 'C:/Documents\040and\040Settings/martind /home/martind ntfs binary 0 0' >> /etc/fstab
+</pre>
+
+<p>After editing /etc/fstab, quit all of your Cygwin processes to activate the changes.
+By doing this immediately, rather than using the mount command, you will be ensured that everything will work after a reboot.
+
+<p>In the suggestion above, when Cygwin creates a Cygwin equivalent for the Windows environment variable HOME, it translates the Windows path into the longest Cygwin mount that matches, hence /home/martind.
+Unlike the Windows original, this doesn't contain spaces.
+Unix directory names rarely contain spaces and makefiles, in particular, usually don't cope.
+The mount won't circumvent the issue where the makefiles invoke native Windows tools, like the Java compiler or the tools used to build Windows installers.
+
+<p>A local home directory whose name includes no space will thus be the least problematic, if also the least convenient, choice.
+Whatever you choose to set HOME to, the entry in /etc/passwd should match.
+
 <h3>Default permissions</h3>
-<p>As mentioned in <a href="http://cygwin.com/ml/cygwin/2006-01/msg00257.html">http://cygwin.com/ml/cygwin/2006-01/msg00257.html</a>, the default permissions for a Cygwin installation are rwxrwxrwx. Even if you don't care about the security implications, Ruby does. You might get sick of seeing Ruby make complaints like:
+<p>As mentioned in <a href="http://cygwin.com/ml/cygwin/2006-01/msg00257.html">http://cygwin.com/ml/cygwin/2006-01/msg00257.html</a>, the default permissions for a Cygwin installation are, or at least used to be, rwxrwxrwx. Even if you don't care about the security implications, Ruby does. You might get sick of seeing Ruby make complaints like:
 <pre>
 warning: Insecure world writable dir /usr/local/bin, mode 040777
 </pre>
