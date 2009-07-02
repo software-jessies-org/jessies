@@ -6,6 +6,7 @@ import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.*;
 import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
@@ -28,12 +29,6 @@ public class BuildUi extends MainFrame {
         Assert.matches(ADDRESS_PATTERN,"/usr/include/stdio.h:123: oops", "/usr/include/stdio.h:123:");
     }
     
-    // We avoid matching the " or ' before a filename.
-    // We insist that an interesting extension has between 1 and 4 characters, and contains only alphabetic characters.
-    // (There's an additional check later that the extension isn't known to be uninteresting, such as ".o" or ".class".)
-    // FIXME: we don't yet have such a check.
-    // FIXME: duplicated from Evergreen.
-    //private static final Pattern ADDRESS_PATTERN = Pattern.compile("(?:^| |\"|')([^ :\"']+(?:Makefile|\\w+\\.[A-Za-z]{1,4}\\b)([\\d:]+|\\([\\d,]+\\))?)");
     // FIXME: duplicated from Evergreen.
     private static final Pattern MAKE_ENTERING_DIRECTORY_PATTERN = Pattern.compile("^make(?:\\[\\d+\\])?: Entering directory `(.*)'$");
     
@@ -212,12 +207,62 @@ public class BuildUi extends MainFrame {
         }
         
         public void actionPerformed(ActionEvent e) {
-            // FIXME: use options.sourcePath to work out the appropriate absolute path.
+            final AddressSplitter splitAddress = new AddressSplitter(address);
+            
+            String filename = splitAddress.filename;
+            if (!filename.startsWith("/") && !filename.startsWith("~")) {
+                // Try to work out where a relative path is supposed to point.
+                final String[] path = options.sourcePath.split(";");
+                for (String directory : path) {
+                    final File file = FileUtilities.fileFromParentAndString(directory, filename);
+                    if (file.exists()) {
+                        filename = file.toString();
+                        break;
+                    }
+                }
+            }
+            
+            final File file = FileUtilities.fileFromString(filename);
+            if (!file.exists()) {
+                SimpleDialog.showAlert(BuildUi.this, "No such file.", "Can't find \"" + filename + "\".");
+                return;
+            }
             
             // FIXME: use environment variables to supply BUI_FILENAME, BUI_LINE_NUMBER, and BUI_ADDRESS to support other editors.
             // FIXME: don't use spawn because we should report failures.
             final String[] command = ProcessUtilities.makeShellCommandArray("'" + options.editor + "' '" + address + "'");
             ProcessUtilities.spawn(null, command);
+        }
+    }
+    
+    private static class AddressSplitter {
+        public final String filename;
+        public final String lineNumber;
+        
+        public AddressSplitter(String address) {
+            // The link was probably a combination of filename and address within the file.
+            // Break that into the two components.
+            String name = address;
+            String tail = "";
+            final int colonIndex = name.indexOf(':');
+            if (colonIndex != -1) {
+                // A traditional Unix error such as "src/Trousers.cpp:109:26: parse error".
+                name = name.substring(0, colonIndex);
+                tail = address.substring(colonIndex + 1);
+            } else if (name.endsWith(")")) {
+                // Maybe a Microsoft-style error such as "src/Trousers.cs(109,26): error CS0103: The name `ferret' does not exist in the context of `Trousers'"?
+                final int openParenthesisIndex = name.indexOf('(');
+                if (openParenthesisIndex != -1) {
+                    name = name.substring(0, openParenthesisIndex);
+                    tail = address.substring(openParenthesisIndex + 1, address.length() - 1).replace(',', ':');
+                }
+            }
+            
+            // We only want the line number, so lose any more detailed context.
+            tail = tail.replaceAll(":.*", "");
+            
+            this.filename = name;
+            this.lineNumber = tail;
         }
     }
     
@@ -307,9 +352,11 @@ public class BuildUi extends MainFrame {
             
             // FIXME: shouldn't have to hard-code support for arbitrary builds.
             if (line.startsWith("____")) {
-                final Matcher detailedMatcher = Pattern.compile("^____\\(... ... .. ..:..:.. ... ....\\) \\[(\\d+)%\\] (.*)$").matcher(line);
+                final Matcher detailedMatcher = Pattern.compile("^____(?:\\(... ... .. ..:..:.. ... ....\\) )?(?:\\[(\\d+)%\\] )?(.*)$").matcher(line);
                 if (detailedMatcher.matches()) {
-                    newPercentage = Integer.parseInt(detailedMatcher.group(1));
+                    if (detailedMatcher.group(1) != null) {
+                        newPercentage = Integer.parseInt(detailedMatcher.group(1));
+                    }
                     newCurrentAction = detailedMatcher.group(2);
                 }
             }
