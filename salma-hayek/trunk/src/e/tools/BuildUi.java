@@ -314,7 +314,7 @@ public class BuildUi extends MainFrame {
         currentActionLabel.setText(success ? "Built successfully." : "Build failed.");
         currentActionLabel.setForeground(success ? new Color(0x008800) : Color.RED);
         
-        if (options.exitOnSuccess) {
+        if (success && options.exitOnSuccess) {
             // FIXME: something less brutal?
             System.exit(0);
         }
