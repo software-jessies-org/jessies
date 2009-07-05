@@ -25,12 +25,18 @@ public class BuildUi extends MainFrame {
     private static final Pattern ADDRESS_PATTERN = Pattern.compile("^([-A-Za-z0-9_/]{4,}\\.[a-z0-9]+:\\d+:) ");
     
     @Test private static void testAddressPattern() {
-        Assert.matches(ADDRESS_PATTERN,"test.cpp:4: oops", "test.cpp:4:");
-        Assert.matches(ADDRESS_PATTERN,"/usr/include/stdio.h:123: oops", "/usr/include/stdio.h:123:");
+        Assert.matches(ADDRESS_PATTERN, "test.cpp:4: oops", "test.cpp:4:");
+        Assert.matches(ADDRESS_PATTERN, "/usr/include/stdio.h:123: oops", "/usr/include/stdio.h:123:");
     }
     
     // FIXME: duplicated from Evergreen.
+    // FIXME: gcc has started using UTF-8 quotes; will make?
     private static final Pattern MAKE_ENTERING_DIRECTORY_PATTERN = Pattern.compile("^make(?:\\[\\d+\\])?: Entering directory `(.*)'$");
+    
+    @Test private static void testMakeEnteringDirectoryPattern() {
+        Assert.matches(MAKE_ENTERING_DIRECTORY_PATTERN, "make: Entering directory `/home/elliotth/Projects/terminator'", "/home/elliotth/Projects/terminator");
+        Assert.matches(MAKE_ENTERING_DIRECTORY_PATTERN, "make[1]: Entering directory `/home/elliotth/Projects/terminator'", "/home/elliotth/Projects/terminator");
+    }
     
     // Our command-line options and their defaults.
     private static class Options {
@@ -180,6 +186,7 @@ public class BuildUi extends MainFrame {
         // The easiest fix, which may or may not be sufficient, is to make errors windows non-editable.
         textArea.setEditable(false);
         textArea.setWrapStyleWord(true);
+        // FIXME: turn the spelling checker off; it's way too distracting in build transcripts.
         return textArea;
     }
     
