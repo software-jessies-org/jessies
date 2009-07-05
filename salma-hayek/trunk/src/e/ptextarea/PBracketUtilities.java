@@ -11,11 +11,13 @@ import java.util.*;
  * if (hello > (int))
  * if ((int) x > 2)
  * if ( (int) x > 2)
+ * f()
+ * x.cpp: In function ‘int main()’:
  */
 public class PBracketUtilities {
-    private static final String BRACKETS = "(<[{}]>)";
+    private static final String BRACKETS = "(<[{‘’}]>)";
     
-    private static final String PARTNERS = ")>]}{[<(";
+    private static final String PARTNERS = ")>]}’‘{[<(";
     
     public static boolean isBracket(char ch) {
         return BRACKETS.indexOf(ch) != -1;
@@ -33,7 +35,7 @@ public class PBracketUtilities {
         return PARTNERS.charAt(BRACKETS.indexOf(bracket));
     }
     
-    public static boolean isAllowedCharInBracket(char character, char bracket) {
+    private static boolean isAllowedCharInBracket(char character, char bracket) {
         switch (bracket) {
         case '<':
         case '>':
@@ -47,11 +49,13 @@ public class PBracketUtilities {
         }
     }
     
-    public static boolean isNestableBracketInBracket(char innerBracket, char outerBracket) {
+    private static boolean isNestableBracketInBracket(char innerBracket, char outerBracket) {
         if ("[]{}()".indexOf(outerBracket) != -1) {
             return ("[]{}()".indexOf(innerBracket) != -1);
         } else if ("<>".indexOf(outerBracket) != -1) {
             return ("<>".indexOf(innerBracket) != -1);
+        } else if ("‘’".indexOf(outerBracket) != -1) {
+            return isBracket(innerBracket);
         } else {
             throw new IllegalArgumentException("Character " + outerBracket + " is not a bracket.");
         }
