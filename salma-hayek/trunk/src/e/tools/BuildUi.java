@@ -38,6 +38,10 @@ public class BuildUi extends MainFrame {
         Assert.matches(MAKE_ENTERING_DIRECTORY_PATTERN, "make[1]: Entering directory `/home/elliotth/Projects/terminator'", "/home/elliotth/Projects/terminator");
     }
     
+    // When we see an address, we start copying lines to cope with javac's multi-line output.
+    // When we see this pattern, we know javac's finished.
+    private static final Pattern END_OF_JAVAC_OUTPUT_PATTERN = Pattern.compile("^\\d+ errors?");
+    
     // Our command-line options and their defaults.
     private static class Options {
         @Option(names = { "--exit-on-success" })
@@ -334,8 +338,39 @@ public class BuildUi extends MainFrame {
             // We don't care. We're blocked waiting for this notification elsewhere anyway.
         }
     }
+    /*
+    @Test private static void testLineListener() {
+        FIXME: examples to test.
     
+        // Single error, relevant line, no extra detail.
+        "make[1]: Entering directory `/tmp'",
+        "javac source.java",
+        "source.java:1: some error",
+        "    x = something problematic;"
+        "                 ^",
+        "1 error",
+        "make[1]: *** [/tmp/blah] Error 1",
+        "make[1]: Leaving directory `/tmp'",
+        "make: *** [recurse] Error 2",
+    
+        // Single error, relevant line, some extra detail.
+        "make[1]: Entering directory `/tmp'",
+        "src/terminator/terminal/PtyProcess.java:29: method read in class org.jessies.os.Posix cannot be applied to given types",
+        "        while ((n = Posix.read(fd, bytes, arrayOffset, byteCount, 0)) < 0) {",
+        "                         ^",
+        "  required: int,byte[],int,int",
+        "  found: int,byte[],int,int,int",
+        "1 error",
+        "make[1]: Leaving directory `/tmp'",
+        
+        // Multiple errors.
+    
+        // C++ errors.
+    }
+    */
     private class LineListener implements ProcessUtilities.LineListener {
+        private boolean copyingMultiLineError = false;
+        
         public void processLine(String line) {
             int newPercentage = -1;
             String newCurrentAction = null;
@@ -344,21 +379,32 @@ public class BuildUi extends MainFrame {
             final Matcher makeMatcher = MAKE_ENTERING_DIRECTORY_PATTERN.matcher(line);
             if (makeMatcher.matches()) {
                 newCurrentAction = makeMatcher.group(1);
+                copyingMultiLineError = false;
             }
             
             final Matcher addressMatcher = ADDRESS_PATTERN.matcher(line);
             if (addressMatcher.find()) {
                 // FIXME: we probably want a different kind of object to represent errors, and to collect up all the output for a given error first.
                 isError = true; // FIXME: not exactly; it could be a warning.
+                // FIXME: we don't have to do this by default. we could recognize (probable) javac output from the .java filename in the match.
+                copyingMultiLineError = true;
+            }
+            
+            // FIXME: option to ignore javac "context" output (line and "^") but keep extra detail (lines matching "^  \S+: ").
+            final Matcher endOfJavacOutputMatcher = END_OF_JAVAC_OUTPUT_PATTERN.matcher(line);
+            if (endOfJavacOutputMatcher.find()) {
+                copyingMultiLineError = false;
             }
             
             // FIXME: shouldn't have to hard-code support for arbitrary builds.
             if (line.startsWith("-- ")) {
                 newCurrentAction = line.substring(3);
+                copyingMultiLineError = false;
             }
             
             // FIXME: shouldn't have to hard-code support for arbitrary builds.
             if (line.startsWith("____")) {
+                copyingMultiLineError = false;
                 final Matcher detailedMatcher = Pattern.compile("^____(?:\\(... ... .. ..:..:.. ... ....\\) )?(?:\\[(\\d+)%\\] )?(.*)$").matcher(line);
                 if (detailedMatcher.matches()) {
                     if (detailedMatcher.group(1) != null) {
@@ -369,7 +415,7 @@ public class BuildUi extends MainFrame {
             }
             
             final String appendableLine = line + "\n";
-            EventQueue.invokeLater(new UiUpdater(appendableLine, newPercentage, newCurrentAction, isError));
+            EventQueue.invokeLater(new UiUpdater(appendableLine, newPercentage, newCurrentAction, isError || copyingMultiLineError));
         }
     }
     
