@@ -453,7 +453,7 @@ public class Workspace extends JPanel {
             final int currentLineNumber = 1 + textArea.getLineOfOffset(textArea.getSelectionStart());
             environment.put("EVERGREEN_CURRENT_LINE_NUMBER", Integer.toString(currentLineNumber));
             
-            environment.put("EVERGREEN_CURRENT_WORD", ETextAction.getWordAtCaret(textArea));
+            environment.put("EVERGREEN_CURRENT_WORD", ETextAction.getWordAtCaret(textWindow));
             if (textArea.getSelectionEnd() - textArea.getSelectionStart() < 1024) {
                 environment.put("EVERGREEN_CURRENT_SELECTION", textArea.getSelectedText());
             }

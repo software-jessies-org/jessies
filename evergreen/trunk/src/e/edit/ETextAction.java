@@ -66,10 +66,11 @@ public abstract class ETextAction extends AbstractAction {
      * Returns the empty string if no text area has the focus.
      */
     public static String getSearchTerm() {
-        PTextArea textArea = ETextAction.getFocusedTextArea();
-        if (textArea == null) {
+        ETextWindow textWindow = ETextAction.getFocusedTextWindow();
+        if (textWindow == null) {
             return "";
         }
+        PTextArea textArea = textWindow.getTextArea();
         
         // We use the selection, if there is one.
         String selection = textArea.getSelectedText();
@@ -78,20 +79,21 @@ public abstract class ETextAction extends AbstractAction {
         }
         
         // Otherwise, we use the word at the caret.
-        return getWordAtCaret(textArea);
+        return getWordAtCaret(textWindow);
     }
     
-    public static String getWordAtCaret(PTextArea textArea) {
+    public static String getWordAtCaret(ETextWindow textWindow) {
+        PTextArea textArea = textWindow.getTextArea();
         CharSequence chars = textArea.getTextBuffer();
-        String stopChars = chooseStopChars();
+        String stopChars = chooseStopChars(textWindow);
         int caretPosition = textArea.getSelectionStart();
         int start = PWordUtilities.getWordStart(chars, caretPosition, stopChars);
         int end = PWordUtilities.getWordEnd(chars, caretPosition, stopChars);
         return chars.subSequence(start, end).toString();
     }
     
-    private static String chooseStopChars() {
-        FileType fileType = ETextAction.getFocusedTextWindow().getFileType();
+    private static String chooseStopChars(ETextWindow textWindow) {
+        FileType fileType = textWindow.getFileType();
         String stopChars = PWordUtilities.DEFAULT_STOP_CHARS;
         if (fileType == FileType.C_PLUS_PLUS) {
             // "::" is useful in C++, so remove it from the stop list.
