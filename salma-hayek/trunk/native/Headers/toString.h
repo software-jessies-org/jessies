@@ -9,10 +9,10 @@
 template <typename T>
 inline std::string toString(const T& value) {
   std::stringstream interpreter;
-  std::string result;
-  if (!(interpreter << value) || !(interpreter >> result) || !(interpreter >> std::ws).eof()) {
+  if (!(interpreter << value)) {
     throw std::runtime_error("bad lexical cast");
   }
+  std::string result = interpreter.str();
   return result;
 }
 
