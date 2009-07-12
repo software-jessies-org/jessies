@@ -100,30 +100,18 @@ public class Terminator {
 	}
 	
 	// Returns whether we started the UI.
-	public boolean parseCommandLine(final String[] argumentArray, PrintWriter out) {
-		// Ignore "-xrm <resource-string>" argument pairs.
-		this.arguments = new ArrayList<String>();
-		for (int i = 0; i < argumentArray.length; ++i) {
-			if (argumentArray[i].equals("-xrm")) {
-				// FIXME: we want the ability to override preferences on a per-terminal (or just per-window?) basis. GNOME Terminal works around this by letting each terminal choose a "profile", rather than offering the ability to override arbitrary preferences.
-				//String resourceString = arguments[++i];
-				//processResourceString(resourceString);
-			} else {
-				arguments.add(argumentArray[i]);
-			}
-		}
-		
+	public boolean parseCommandLine(final List<String> arguments, PrintWriter out) {
+		this.arguments = arguments;
 		if (arguments.contains("-h") || arguments.contains("-help") || arguments.contains("--help")) {
 			showUsage(out);
-		} else {
-			initUi();
-			return true;
+			return false;
 		}
-		return false;
+		initUi();
+		return true;
 	}
 
-	private void parseOriginalCommandLine(final String[] argumentArray, PrintWriter out) {
-		if (parseCommandLine(argumentArray, out)) {
+	private void parseOriginalCommandLine(final List<String> arguments, PrintWriter out) {
+		if (parseCommandLine(arguments, out)) {
 			startTerminatorServer();
 		}
 	}
@@ -189,7 +177,13 @@ public class Terminator {
 				continue;
 			}
 			if (word.equals("--working-directory")) {
-				workingDirectory = arguments.get(++i);
+				String previousWorkingDirectory = workingDirectory;
+				String workingDirectoryArgument = arguments.get(++i);
+				if (FileUtilities.fileFromString(workingDirectoryArgument).isAbsolute() == false && previousWorkingDirectory != null) {
+					workingDirectory = new File(previousWorkingDirectory, workingDirectoryArgument).getPath();
+				} else {
+					workingDirectory = workingDirectoryArgument;
+				}
 				continue;
 			}
 			if (word.equals("-e")) {
@@ -223,7 +217,7 @@ public class Terminator {
 		}
 	}
 	
-	public static void main(final String[] arguments) {
+	public static void main(final String[] argumentArray) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -231,7 +225,7 @@ public class Terminator {
 					Terminator.getSharedInstance().optionsDidChange();
 					
 					PrintWriter outWriter = new PrintWriter(System.out);
-					Terminator.getSharedInstance().parseOriginalCommandLine(arguments, outWriter);
+					Terminator.getSharedInstance().parseOriginalCommandLine(Arrays.asList(argumentArray), outWriter);
 					outWriter.flush();
 				} catch (Throwable th) {
 					Log.warn("Couldn't start Terminator.", th);

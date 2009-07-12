@@ -4,6 +4,7 @@ class Terminator
     def initialize()
         require "fileutils.rb"
         require "pathname.rb"
+        require "uri"
         
         # Cope with symbolic links to this script.
         @terminator_home = Pathname.new(__FILE__).realpath().dirname().dirname()
@@ -132,16 +133,15 @@ class Terminator
         if FileUtils.uptodate?(serverPortPathname, [__FILE__]) == false
             return
         end
-        # We only support the simple "new shell" case.
-        # The motivation for using InAppServer here was performance.
-        # It should also mean that my "runtitan" commands always block, like an xterm would, rather than sometimes exiting immediately.
-        # But we could implement that differently, as in edit-and-block, albeit with the added complexity of multiple tabs.
+        # The existing application's current directory might not be the same.
         workingDirectory = Dir.getwd()
-        if ARGV.length() == 2 && ARGV[0] == "--working-directory"
-            workingDirectory = ARGV[1]
-        elsif ARGV.empty?() == false
-            return
-        end
+        arguments = [ "parseCommandLine", "--working-directory", workingDirectory ]
+        arguments.concat(ARGV)
+        encodedArguments = arguments.map() {
+            |argument|
+            URI.encode(argument)
+        }
+        encodedArgumentString = encodedArguments.join(" ")
         # See if there's already a Terminator running that can open us a new window.
         # This lets us emulate the Mac OS behavior when clicking on the Dock icon on Linux (from gnome-panel or whatever).
         # In particular, using this trick we can open a new window quicker than xterm(1), from the user's point of view.
@@ -151,7 +151,7 @@ class Terminator
         # Terminator's InAppServer only listens on the loopback address.
         # If the host running Terminator isn't the same as localhost, then we are unlikely to be able to make a connection and should fall back to the unoptimized code path.
         client.overrideHost("localhost")
-        if client.trySendCommand("newShell #{workingDirectory}") == false
+        if client.trySendCommand(encodedArgumentString) == false
             return
         end
         
@@ -161,6 +161,9 @@ class Terminator
         if desktop_startup_id != nil
             system("#{@salma_hayek}/.generated/#{target_directory()}/bin/gnome-startup", "stop", desktop_startup_id)
         end
+        # We don't block until the windows are closed or the application quits.
+        # This is different to xterm and to our behavior if we don't use the socket.
+        # We could implement this differently, as in edit-and-block, albeit with the added complexity of multiple tabs.
         exit(0)
     end
     
