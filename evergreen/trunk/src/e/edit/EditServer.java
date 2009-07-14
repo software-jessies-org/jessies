@@ -81,7 +81,7 @@ public final class EditServer {
             try {
                 EventQueue.invokeAndWait(this);
             } catch (Exception ex) {
-                out.println(ex.getMessage());
+                Log.warn("an unexpected checked exception was thrown", ex);
             }
             return window;
         }
@@ -96,7 +96,7 @@ public final class EditServer {
                 }
             } catch (Exception ex) {
                 out.println(ex.getMessage());
-                ex.printStackTrace(out);
+                Log.warn("failed to open " + filename, ex);
             }
         }
     }
