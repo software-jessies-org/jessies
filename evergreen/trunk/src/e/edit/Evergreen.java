@@ -280,7 +280,7 @@ public class Evergreen {
         
         // Refuse to open directories.
         if (FileUtilities.fileFromString(filename).isDirectory()) {
-            throw new RuntimeException("It's not possible to edit directories, which is what \"" + filename + "\" is.");
+            throw new RuntimeException("\"" + filename + "\" is a directory and so cannot be edited with Evergreen.");
         }
         
         // Limit ourselves (rather arbitrarily) to files under half a gigabyte. That's quite a strain on us, at present.
