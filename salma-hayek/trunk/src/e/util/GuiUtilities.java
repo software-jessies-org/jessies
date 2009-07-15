@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
 import java.lang.reflect.*;
+import java.util.concurrent.CountDownLatch;
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.event.*;
@@ -545,5 +546,22 @@ public class GuiUtilities {
      */
     public static final void stopMaximumShowing(final JScrollBar scrollBar, ChangeListener changeListener) {
         scrollBar.getModel().removeChangeListener(changeListener);
+    }
+    
+    public static final void waitForWindowToDisappear(final Component window) {
+        final CountDownLatch done = new CountDownLatch(1);
+        // FIXME: is this really the easiest way to watch for the component being removed from the hierarchy?
+        window.addHierarchyListener(new HierarchyListener() {
+            public void hierarchyChanged(HierarchyEvent e) {
+                if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0 && window.isShowing() == false) {
+                    done.countDown();
+                }
+            }
+        });
+        try {
+            done.await();
+        } catch (InterruptedException ex) {
+            Log.warn("InterruptedException while waiting for window to be closed", ex);
+        }
     }
 }
