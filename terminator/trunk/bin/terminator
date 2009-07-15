@@ -161,9 +161,7 @@ class Terminator
         if desktop_startup_id != nil
             system("#{@salma_hayek}/.generated/#{target_directory()}/bin/gnome-startup", "stop", desktop_startup_id)
         end
-        # We don't block until the windows are closed or the application quits.
-        # This is different to xterm and to our behavior if we don't use the socket.
-        # We could implement this differently, as in edit-and-block, albeit with the added complexity of multiple tabs.
+        # parseCommandLine now blocks until the requested window is closed.
         exit(0)
     end
     

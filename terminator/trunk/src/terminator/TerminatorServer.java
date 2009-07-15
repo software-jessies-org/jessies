@@ -21,6 +21,17 @@ public class TerminatorServer {
         }
         // Discard this method's name.
         arguments.remove(0);
-        Terminator.getSharedInstance().parseCommandLine(arguments, out);
+        // We only have one pipe.
+        PrintWriter err = out;
+        TerminatorOpener opener = new TerminatorOpener(arguments, err);
+        if (opener.showUsageIfRequested(out)) {
+            return;
+        }
+        TerminatorFrame window = opener.openFromBackgroundThread();
+        if (window == null) {
+            // Any syntax error will have been reported.
+            return;
+        }
+        GuiUtilities.waitForWindowToDisappear(window);
     }
 }
