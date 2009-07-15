@@ -4,7 +4,6 @@ import e.util.*;
 import java.awt.EventQueue;
 import java.awt.event.*;
 import java.io.*;
-import java.util.concurrent.CountDownLatch;
 import java.util.regex.*;
 
 public final class EditServer {
@@ -69,12 +68,12 @@ public final class EditServer {
     
     private class Opener implements Runnable {
         private String filename;
-        private PrintWriter out;
+        private PrintWriter err;
         private EWindow window;
         
-        public Opener(final String filename, final PrintWriter out) {
+        public Opener(final String filename, final PrintWriter err) {
             this.filename = filename;
-            this.out = out;
+            this.err = err;
         }
         
         public EWindow open() {
@@ -95,31 +94,21 @@ public final class EditServer {
                     editor.getFrame().toFront();
                 }
             } catch (Exception ex) {
-                out.println(ex.getMessage());
+                err.println(ex.getMessage());
                 Log.warn("failed to open " + filename, ex);
             }
         }
     }
     
     private void handleOpen(final String filename, final boolean shouldBlock, final PrintWriter out) {
-        Opener opener = new Opener(filename, out);
+        // We only have one pipe.
+        PrintWriter err = out;
+        Opener opener = new Opener(filename, err);
         final EWindow window = opener.open();
-        if (shouldBlock) {
-            out.println("Waiting for \"" + filename + "\" to be closed...");
-            final CountDownLatch done = new CountDownLatch(1);
-            // FIXME: is this really the easiest way to watch for the component being removed from the hierarchy?
-            window.addHierarchyListener(new HierarchyListener() {
-                public void hierarchyChanged(HierarchyEvent e) {
-                    if ((e.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0 && window.isShowing() == false) {
-                        done.countDown();
-                    }
-                }
-            });
-            try {
-                done.await();
-            } catch (Exception ex) {
-                out.println(ex.getMessage());
-            }
+        if (shouldBlock == false) {
+            return;
         }
+        out.println("Waiting for \"" + filename + "\" to be closed...");
+        GuiUtilities.waitForWindowToDisappear(window);
     }
 }
