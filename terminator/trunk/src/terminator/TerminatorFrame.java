@@ -96,7 +96,6 @@ public class TerminatorFrame extends JFrame implements TerminalPaneHost {
 		if (GuiUtilities.isMacOs()) {
 			WindowMenu.getSharedInstance().addWindow(this);
 		}
-		GuiUtilities.finishGnomeStartup();
 	}
 	
 	private void initTerminals() {

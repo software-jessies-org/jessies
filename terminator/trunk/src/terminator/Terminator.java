@@ -17,7 +17,6 @@ public class Terminator {
 	private TerminatorPreferences preferences;
 	private Color boldForegroundColor;
 	
-	private List<String> arguments;
 	private Frames frames = new Frames();
 	
 	public static Terminator getSharedInstance() {
@@ -99,21 +98,35 @@ public class Terminator {
 		new InAppServer("Terminator", System.getProperty("org.jessies.terminator.serverPortFileName"), loopbackAddress, TerminatorServer.class, new TerminatorServer());
 	}
 	
-	// Returns whether we started the UI.
-	public boolean parseCommandLine(final List<String> arguments, PrintWriter out) {
-		this.arguments = arguments;
-		if (arguments.contains("-h") || arguments.contains("-help") || arguments.contains("--help")) {
-			showUsage(out);
-			return false;
-		}
-		initUi();
-		return true;
-	}
-
-	private void parseOriginalCommandLine(final List<String> arguments, PrintWriter out) {
-		if (parseCommandLine(arguments, out)) {
+	/**
+	 * Returns whether we did whatever was requested.
+	 */
+	private boolean parseOriginalCommandLine(final List<String> arguments) {
+		PrintWriter out = new PrintWriter(System.out);
+		PrintWriter err = new PrintWriter(System.err);
+		try {
+			TerminatorOpener opener = new TerminatorOpener(arguments, err);
+			if (opener.showUsageIfRequested(out)) {
+				// Exit with success and without starting the UI or the TerminatorServer.
+				return true;
+			}
+			// We're already on the EDT.
+			TerminatorFrame window = opener.createUi();
+			if (window == null) {
+				// Any syntax error will have been reported but we should still exit with failure,
+				// but only after our "finally" clause.
+				return false;
+			}
 			startTerminatorServer();
+			// We have no need to wait for the window to be closed.
+		} finally {
+			out.flush();
+			err.flush();
+			// In the TerminatorServer case, by contrast, the Ruby has to handle this.
+			// The existing Terminator won't have the right DESKTOP_STARTUP_ID.
+			GuiUtilities.finishGnomeStartup();
 		}
+		return true;
 	}
 	
 	public Frames getFrames() {
@@ -122,17 +135,6 @@ public class Terminator {
 	
 	public void openFrame(JTerminalPane terminalPane) {
 		new TerminatorFrame(Collections.singletonList(terminalPane));
-	}
-	
-	/**
-	 * Sets up the user interface on the AWT event thread.
-	 */
-	private void initUi() {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				new TerminatorFrame(getInitialTerminals());
-			}
-		});
 	}
 	
 	/**
@@ -166,57 +168,6 @@ public class Terminator {
 		}
 	}
 	
-	private List<JTerminalPane> getInitialTerminals() {
-		ArrayList<JTerminalPane> result = new ArrayList<JTerminalPane>();
-		String name = null;
-		String workingDirectory = null;
-		for (int i = 0; i < arguments.size(); ++i) {
-			String word = arguments.get(i);
-			if (word.equals("-n") || word.equals("-T")) {
-				name = arguments.get(++i);
-				continue;
-			}
-			if (word.equals("--working-directory")) {
-				String previousWorkingDirectory = workingDirectory;
-				String workingDirectoryArgument = arguments.get(++i);
-				if (FileUtilities.fileFromString(workingDirectoryArgument).isAbsolute() == false && previousWorkingDirectory != null) {
-					workingDirectory = new File(previousWorkingDirectory, workingDirectoryArgument).getPath();
-				} else {
-					workingDirectory = workingDirectoryArgument;
-				}
-				continue;
-			}
-			if (word.equals("-e")) {
-				List<String> argV = arguments.subList(++i, arguments.size());
-				if (argV.isEmpty()) {
-					showUsage(System.err);
-					System.exit(1);
-				}
-				result.add(JTerminalPane.newCommandWithArgV(name, workingDirectory, argV));
-				break;
-			}
-			
-			// We can't hope to imitate the shell's parsing of a string, so pass it unmolested to the shell.
-			String command = word;
-			result.add(JTerminalPane.newCommandWithName(command, name, workingDirectory));
-			name = null;
-		}
-		
-		if (result.isEmpty()) {
-			result.add(JTerminalPane.newShellWithName(name, workingDirectory));
-		}
-		return result;
-	}
-	
-	private static void showUsage(Appendable out) {
-		try {
-			GuiUtilities.finishGnomeStartup();
-			out.append("Usage: terminator [--help] [[-n <name>] [--working-directory <directory>] [<command>]]...\n");
-		} catch (IOException ex) {
-			// Who cares?
-		}
-	}
-	
 	public static void main(final String[] argumentArray) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -224,9 +175,9 @@ public class Terminator {
 					GuiUtilities.initLookAndFeel();
 					Terminator.getSharedInstance().optionsDidChange();
 					
-					PrintWriter outWriter = new PrintWriter(System.out);
-					Terminator.getSharedInstance().parseOriginalCommandLine(Arrays.asList(argumentArray), outWriter);
-					outWriter.flush();
+					if (Terminator.getSharedInstance().parseOriginalCommandLine(Arrays.asList(argumentArray)) == false) {
+						System.exit(1);
+					}
 				} catch (Throwable th) {
 					Log.warn("Couldn't start Terminator.", th);
 					System.exit(1);
