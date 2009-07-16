@@ -1,4 +1,8 @@
 #!/usr/bin/ruby -w
+
+# This is now performed by cron as software@jessies.org:
+# @hourly /home/software/checked-out/salma-hayek/lib/build/publish-changelog-and-source-dist.rb
+
 require "pathname"
 salma_hayek = Pathname.new(__FILE__).realpath().dirname().dirname().dirname()
 failed = false
