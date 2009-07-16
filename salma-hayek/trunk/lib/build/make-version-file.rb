@@ -23,24 +23,32 @@ end
 
 def getSubversionVersion(directory)
   command = "svnversion #{directory}"
-  # svnversion is insanely slow on Cygwin using a samba share.
-  if `uname` =~ /CYGWIN/ && directory.match(/^\/cygdrive\/([a-z])\/(.*)/)
-    drive = $1.upcase()
-    pathWithinMappedDrive = $2
-    user = `whoami`.chomp()
-    # "net use" tells us what machine to ssh to. martind saw one line:
-    # OK           F:        \\duezer\martind          Microsoft Windows Network
-    # elliotth saw two lines:
-    # OK           U:        \\bertha.us.dev.bluearc.com\elliotth
-    #                                                  Microsoft Windows Network
-    if `net use`.match(/^OK\s+#{drive}:\s+\\\\(\S+)\\#{user}\b/)
-      fileHost = $1
-      # We assume that the drive is mapped to the user's home directory.
-      command = "ssh #{fileHost} svnversion /home/#{user}/#{pathWithinMappedDrive}"
-      $stderr.puts(command) # In case ssh(1) prompts for a password.
-    end
+  output = `#{command}`.chomp()
+  if $?.success?()
+    return output
   end
-  return `#{command}`.chomp()
+  require "pathname"
+  absoluteDirectory = Pathname.new(directory).realpath()
+  # Skip header:
+  # Filesystem           1K-blocks      Used Available Use% Mounted on
+  dfOutput = `df #{absoluteDirectory} | tail -n +2`
+  # df sometimes outputs one line per mount:
+  # /dev/sda7            448043100 383662960  41620860  91% /u219
+  # But sometimes two:
+  # whitewater.us.dev.bluearc.com:/u219/martind
+  #                      448043104 383662944  41620864  91% /home/martind
+  if dfOutput.match(/^(\S+):(\S+)\s+\d+\s+\d+\s+\d+\s+\d+%\s+(\S+)$/) == nil
+    $stderr.puts("Failed to parse NFS server out of df output")
+    return ""
+  end
+  fileHost = $1
+  export = $2
+  mountedOn = $3
+  remoteDirectory = absoluteDirectory.sub(mountedOn, export)
+  command = "ssh #{fileHost} svnversion #{remoteDirectory}"
+  $stderr.puts("Trying #{command}...") # In case ssh(1) prompts for a password.
+  output = `#{command}`.chomp()
+  return output
 end
 
 def extractSubversionVersionNumber(versionString)
