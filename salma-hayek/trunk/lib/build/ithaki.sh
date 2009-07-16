@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# This is now performed by an @hourly cron job as software@jessies.org.
-# ssh software@jessies.org /home/software/checked-out/salma-hayek/lib/build/publish-changelog-and-source-dist.rb
-
 # BlueArc's local copy of the archive:
 DEB_DIRECTORY=/u/u154/software.jessies.org/
 # deb http://deb/software.jessies.org/ ./
