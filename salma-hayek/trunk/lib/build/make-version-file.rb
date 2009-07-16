@@ -38,8 +38,7 @@ def getSubversionVersion(directory)
   # whitewater.us.dev.bluearc.com:/u219/martind
   #                      448043104 383662944  41620864  91% /home/martind
   if dfOutput.match(/^(\S+):(\S+)\s+\d+\s+\d+\s+\d+\s+\d+%\s+(\S+)$/) == nil
-    $stderr.puts("Failed to parse NFS server out of df output")
-    return ""
+    raise Exception.new("Failed to parse NFS server out of df output:\n#{dfOutput}")
   end
   fileHost = $1
   export = $2
@@ -57,10 +56,7 @@ def extractSubversionVersionNumber(versionString)
   if versionString.match(/^(?:\d+:)?(\d+)/)
     return $1.to_i()
   end
-  # In a directory not under Subversion control, svnversion(1) says "exported".
-  # This happens if you're using Bazaar, say, or nothing, or if you're building from a source tarball.
-  # Returning 0 as the version number lets us build without warnings.
-  return 0
+  raise Exception.new("Failed to parse version out of svnversion output:\n#{versionString}")
 end
 
 # --------------------------------------------------------------------------------------------------------
@@ -72,6 +68,7 @@ def getWorkingCopyVersion(directory)
     return extractSubversionVersionNumber(getSubversionVersion(directory))
   else
     # An end-user building from source, maybe?
+    # Returning 0 as the version number lets us build without warnings.
     return 0
   end
 end
