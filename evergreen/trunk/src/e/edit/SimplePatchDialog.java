@@ -165,8 +165,8 @@ public class SimplePatchDialog {
             System.err.println("usage: SimplePatchDialog FILE1 FILE2");
             System.exit(1);
         }
-        final String file1 = args[0];
-        final String file2 = args[1];
+        final File file1 = FileUtilities.fileFromString(args[0]);
+        final File file2 = FileUtilities.fileFromString(args[1]);
         GuiUtilities.initLookAndFeel();
         final Font font = new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 12);
         final String title = "Patch between '" + file1 + "' and '" + file2 + "'";
