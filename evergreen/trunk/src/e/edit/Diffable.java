@@ -44,7 +44,7 @@ public class Diffable {
      */
     public File file() {
         if (file == null) {
-            final String PREFIX = getClass().toString() + "-";
+            final String PREFIX = getClass().getName() + "-";
             file = FileUtilities.fileFromString(FileUtilities.createTemporaryFile(PREFIX, "file containing " + label(), content));
             isTemporaryFile = true;
         }
