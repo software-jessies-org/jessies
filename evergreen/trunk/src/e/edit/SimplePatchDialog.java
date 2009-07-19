@@ -25,6 +25,8 @@ public class SimplePatchDialog {
     /** Highlight color for the @@ lines. */
     private static final Color VERY_LIGHT_GRAY = Color.decode("#eeeeee");
     
+    private static final boolean useInternalDiff = false;
+    
     private SimplePatchDialog() {
     }
     
@@ -33,8 +35,12 @@ public class SimplePatchDialog {
     }
     
     private static List<String> runDiff(Diffable from, Diffable to) {
-        final String[] command = new String[] { "diff", "-u", "-b", "-B", "-L", from.label(), from.filename(), "-L", to.label(), to.filename() };
-        //final String[] command = new String[] { Evergreen.getResourceFilename("lib", "scripts", "ediff.py"), from.label(), from.filename(), to.label(), to.filename() };
+        String[] command;
+        if (useInternalDiff) {
+            command = new String[] { Evergreen.getResourceFilename("lib", "scripts", "ediff.py"), from.label(), from.filename(), to.label(), to.filename() };
+        } else {
+            command = new String[] { "diff", "-u", "-b", "-B", "-L", from.label(), from.filename(), "-L", to.label(), to.filename() };
+        }
         final ArrayList<String> lines = new ArrayList<String>();
         final ArrayList<String> errors = new ArrayList<String>();
         final int status = ProcessUtilities.backQuote(null, command, lines, errors);
@@ -56,7 +62,37 @@ public class SimplePatchDialog {
         from.dispose();
         to.dispose();
         
-        return lines;
+        return useInternalDiff ? makeContextDiff(lines) : lines;
+    }
+    
+    private static List<String> makeContextDiff(List<String> rawDiff) {
+        final int CONTEXT_LINES = 3;
+        
+        final List<String> result = new ArrayList<String>();
+        
+        int hunkCredit = 0;
+        
+        for (int i = 0; i < rawDiff.size(); ++i) {
+            final String line = rawDiff.get(i);
+            if (line.startsWith("+++") || line.startsWith("---") || line.startsWith("?")) {
+                result.add(line);
+            } else if (line.startsWith("+") || line.startsWith("-")) {
+                if (hunkCredit == 0) {
+                    // Output a hunk header.
+                    result.add(String.format("@@ -%d,%d +%d,%d @@", i, i, i, i)); // FIXME
+                    // Output the "before" lines (those that exist, anyway).
+                    for (int contextLine = Math.max(i - CONTEXT_LINES, 0); contextLine < i; ++contextLine) {
+                        result.add(rawDiff.get(contextLine));
+                    }
+                }
+                result.add(line);
+                hunkCredit = CONTEXT_LINES;
+            } else if (hunkCredit > 0) {
+                result.add(line);
+                --hunkCredit;
+            }
+        }
+        return result;
     }
     
     private static JComponent makePatchView(Font font, Diffable from, Diffable to) {
