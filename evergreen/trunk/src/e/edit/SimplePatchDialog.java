@@ -25,7 +25,7 @@ public class SimplePatchDialog {
     /** Highlight color for the @@ lines. */
     private static final Color VERY_LIGHT_GRAY = Color.decode("#eeeeee");
     
-    private static final boolean useInternalDiff = false;
+    private static final boolean useInternalDiff = true;
     
     private SimplePatchDialog() {
     }
@@ -71,15 +71,19 @@ public class SimplePatchDialog {
         final List<String> result = new ArrayList<String>();
         
         int hunkCredit = 0;
+        int minusLineNumber = 1;
+        int plusLineNumber = 1;
         
         for (int i = 0; i < rawDiff.size(); ++i) {
             final String line = rawDiff.get(i);
             if (line.startsWith("+++") || line.startsWith("---") || line.startsWith("?")) {
                 result.add(line);
+                // These aren't lines from either file, so we don't touch minusLineNumber or plusLineNumber.
             } else if (line.startsWith("+") || line.startsWith("-")) {
                 if (hunkCredit == 0) {
                     // Output a hunk header.
-                    result.add(String.format("@@ -%d,%d +%d,%d @@", i, i, i, i)); // FIXME
+                    // FIXME: the numbers after commas are the number of lines from the relevant file in the current hunk; to get them right, we'd have to determine the hunk before we output any of it.
+                    result.add(String.format("@@ -%d,%d +%d,%d @@", minusLineNumber - CONTEXT_LINES, 0, plusLineNumber - CONTEXT_LINES, 0));
                     // Output the "before" lines (those that exist, anyway).
                     for (int contextLine = Math.max(i - CONTEXT_LINES, 0); contextLine < i; ++contextLine) {
                         result.add(rawDiff.get(contextLine));
@@ -87,9 +91,18 @@ public class SimplePatchDialog {
                 }
                 result.add(line);
                 hunkCredit = CONTEXT_LINES;
-            } else if (hunkCredit > 0) {
-                result.add(line);
-                --hunkCredit;
+                if (line.charAt(0) == '+') {
+                    ++plusLineNumber;
+                } else {
+                    ++minusLineNumber;
+                }
+            } else {
+                if (hunkCredit > 0) {
+                    result.add(line);
+                    --hunkCredit;
+                }
+                ++minusLineNumber;
+                ++plusLineNumber;
             }
         }
         return result;
