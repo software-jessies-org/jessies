@@ -5,4 +5,4 @@ require "pathname.rb"
 salma_hayek = Pathname.new(__FILE__).realpath().dirname().dirname()
 
 require "#{salma_hayek}/bin/invoke-java.rb"
-Java.runCommandLineTool("org/jessies/test/TestRunner")
+Java.runCommandLineTool("org/jessies/tools/TestRunner")
