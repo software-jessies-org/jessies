@@ -1,4 +1,4 @@
-package org.jessies.test;
+package org.jessies.tools;
 
 import e.util.*;
 import java.io.*;
@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import org.jessies.cli.*;
 import org.jessies.os.*;
+import org.jessies.test.*;
 
 /**
  * Runs tests for the simple Java unit testing framework.
