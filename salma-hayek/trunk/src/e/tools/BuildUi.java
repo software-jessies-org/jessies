@@ -17,10 +17,9 @@ import org.jessies.test.*;
 // make && ./bin/build-ui 'cd ~/Projects/ctags/trunk;make clean;make --print-directory'
 // make && ./bin/build-ui .generated/classes/ e.tools.BuildUi 'cd ~/Projects/terminator;make clean;make --print-directory'
 
-// FIXME: sometimes we don't exit. why not?
 // FIXME: we don't need a gigabyte heap.
 // FIXME: we should remember where we were last time we ran, and re-position ourselves there.
-public class BuildUi extends MainFrame {
+public class BuildUi extends JFrame {
     // Matches addresses (such as "/some/path/to/filename.ext:line:(col:line:col)?: ").
     private static final Pattern ADDRESS_PATTERN = Pattern.compile("^([-A-Za-z0-9_/]{4,}\\.[a-z0-9]+:\\d+:) ");
     
@@ -82,6 +81,13 @@ public class BuildUi extends MainFrame {
         
         setSize(new Dimension(800, 300));
         setContentPane(makeUi());
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        
+        JFrameUtilities.constrainToScreen(this);
+        JFrameUtilities.setFrameIcon(this);
+        
+        GuiUtilities.finishGnomeStartup();
     }
     
     private JComponent makeUi() {
