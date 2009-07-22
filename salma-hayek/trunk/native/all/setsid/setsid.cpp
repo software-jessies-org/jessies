@@ -12,6 +12,7 @@ static void ensureCallerIsProcessGroupLeaderAndHasNoControllingTerminal() {
     // We may be hiding a different implementation of setsid, so have the grace to fail with an informative error message.
     // FIXME: This case always happens on Windows.
     // How can we divest ourselves of the controlling terminal on Cygwin, even if it means using non-portable code?
+    // Cygwin doesn't have TIOCNOTTY.
     std::cerr << "The software.jessies.org implementation of setsid does not work for process group leaders." << std::endl;
     std::cerr << "We are a process group leader, so that Evergreen's kill with a negative pid will work." << std::endl;
     std::cerr << "But we still have a controlling terminal, so ssh may try to ask for a password." << std::endl;
