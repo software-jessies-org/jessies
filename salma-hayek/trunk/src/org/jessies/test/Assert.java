@@ -40,6 +40,12 @@ public final class Assert {
         }
     }
     
+    public static void startsWith(String s, String prefix) {
+        if (!s.startsWith(prefix)) {
+            throw new RuntimeException(toString(s) + " does not start with " + toString(prefix));
+        }
+    }
+    
     /**
      * Tests whether 'pattern' matches 'text' resulting in the given expected matches.
      * Note that the expected matches are all capturing group 1.
