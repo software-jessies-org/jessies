@@ -30,7 +30,7 @@ public class EvergreenPreferences extends Preferences {
         addPreference(HIDE_MOUSE_WHEN_TYPING, Boolean.TRUE, "Hide mouse when typing");
         addPreference(SHOW_LINE_NUMBERS, Boolean.FALSE, "Show line numbers");
         addSeparator();
-        addPreference(UNINTERESTING_EXTENSIONS, ".a;.apk;.ap_;.aux;.bak;.bin;.class;.d;.dex;.elf;.exe;.gif;.icns;.jar;.jpeg;.jpg;.lib;.log;.map;.o;.obj;.orig;.pdf;.png;.ps;.pyc;.pyo;.rej;.so;.swp;.texshop;.tiff;.toc", "Don't index");
+        addPreference(UNINTERESTING_EXTENSIONS, ".a;.apk;.ap_;.aux;.bak;.bin;.class;.d;.dex;.elf;.eps;.exe;.gif;.hprof;.icns;.jar;.jpeg;.jpg;.lib;.log;.map;.o;.obj;.orig;.pdf;.png;.ps;.pyc;.pyo;.rej;.so;.swp;.texshop;.tiff;.toc", "Don't index");
         
         // FIXME: Evergreen and PTextArea need more work before we can change colors at run-time.
         //addSeparator();
