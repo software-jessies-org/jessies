@@ -62,10 +62,10 @@ public class SimplePatchDialog {
         from.dispose();
         to.dispose();
         
-        return useInternalDiff ? makeContextDiff(lines) : lines;
+        return useInternalDiff ? makeUnifiedDiff(lines) : lines;
     }
     
-    private static List<String> makeContextDiff(List<String> rawDiff) {
+    private static List<String> makeUnifiedDiff(List<String> rawDiff) {
         final int CONTEXT_LINES = 3;
         
         final List<String> result = new ArrayList<String>();
