@@ -237,13 +237,27 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
         int start = fromIndex;
         int rememberedCase = UNKNOWN_CASE;
         while (start < toIndex) {
-            // Skip un-checkable junk.
-            while (start < toIndex && Character.isLetter(buffer.charAt(start)) == false) {
+            // Skip uncheckable junk.
+            while (start < toIndex && Character.isLetterOrDigit(buffer.charAt(start)) == false) {
               start++;
             }
             
-            // Extract a word.
+            // Skip numbers, including hexadecimal numbers (which we assume start with the decimal digit '0').
+            // None of these are (or contain) words to be checked: 1234, 0x1234, 0xdeadbeef, 0x1234fffe.
             char currentChar;
+            if (start < toIndex && Character.isDigit(currentChar = buffer.charAt(start))) {
+                String allowedDigits = "0123456789";
+                ++start;
+                if (currentChar == '0' && start < toIndex && buffer.charAt(start) == 'x') {
+                    allowedDigits = "0123456789abcdefABCDEF";
+                    ++start;
+                }
+                while (start < toIndex && allowedDigits.indexOf(buffer.charAt(start)) != -1) {
+                    ++start;
+                }
+            }
+            
+            // Extract a word.
             int finish = start;
             while (finish < toIndex && isWordCharacter(currentChar = buffer.charAt(finish))) {
                 int previousCase = rememberedCase;
