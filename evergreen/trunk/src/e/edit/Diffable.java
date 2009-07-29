@@ -71,7 +71,14 @@ public class Diffable {
      */
     public String content() {
         if (content == null) {
-            content = StringUtilities.readFile(file);
+            try {
+                content = StringUtilities.readFile(file);
+            } catch (RuntimeException ex) {
+                Log.warn("Could not read " + file, ex);
+                // If the file has been deleted, then it has effectively empty content.
+                // ex.getCause() might not be a FileNotFoundException.
+                content = "";
+            }
         }
         return content;
     }
