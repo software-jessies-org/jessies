@@ -39,7 +39,7 @@ public class SimplePatchDialog {
         if (useInternalDiff) {
             command = new String[] { Evergreen.getResourceFilename("lib", "scripts", "ediff.py"), from.label(), from.filename(), to.label(), to.filename() };
         } else {
-            command = new String[] { "diff", "-u", "-b", "-B", "-L", from.label(), from.filename(), "-L", to.label(), to.filename() };
+            command = new String[] { "diff", "-N", "-u", "-b", "-B", "-L", from.label(), from.filename(), "-L", to.label(), to.filename() };
         }
         final ArrayList<String> lines = new ArrayList<String>();
         final ArrayList<String> errors = new ArrayList<String>();
