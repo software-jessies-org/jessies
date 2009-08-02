@@ -66,6 +66,7 @@ public class TerminalModel {
 			if (thisStartLineIndex <= highestStartLineIndex) {
 				throw new RuntimeException("the lineStartIndex must increase monotonically as the line number increases");
 			}
+			highestStartLineIndex = thisStartLineIndex;
 		}
 	}
 	
