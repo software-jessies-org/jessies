@@ -306,14 +306,6 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         }
     }
     
-    private HashSet<String> getSpellingExceptionsForLanguage(FileType language) {
-        HashSet<String> exceptions = SPELLING_EXCEPTIONS_MAP.get(language);
-        if (exceptions == null) {
-            exceptions = initSpellingExceptionsFor(language);
-        }
-        return exceptions;
-    }
-    
     private HashSet<String> initSpellingExceptionsFor(FileType language) {
         HashSet<String> result = new HashSet<String>();
         
@@ -329,7 +321,6 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         // And there may be a file of extra spelling exceptions for this language.
         readSpellingExceptionsFile(Evergreen.getResourceFilename("lib", "data", "spelling-exceptions-" + language.getName()), result);
         
-        SPELLING_EXCEPTIONS_MAP.put(language, result);
         return result;
     }
     
@@ -349,7 +340,20 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
      * Attaches an appropriate set of spelling exceptions to our document.
      */
     private void initSpellingExceptionsForDocument() {
-        textArea.putClientProperty(PTextAreaSpellingChecker.SPELLING_EXCEPTIONS_PROPERTY, getSpellingExceptionsForLanguage(getFileType()));
+        final FileType language = getFileType();
+        
+        HashSet<String> exceptions;
+        synchronized (SPELLING_EXCEPTIONS_MAP) {
+            exceptions = SPELLING_EXCEPTIONS_MAP.get(language);
+        }
+        if (exceptions == null) {
+            exceptions = initSpellingExceptionsFor(language);
+            synchronized (SPELLING_EXCEPTIONS_MAP) {
+                SPELLING_EXCEPTIONS_MAP.put(language, exceptions);
+            }
+        }
+        
+        textArea.putClientProperty(PTextAreaSpellingChecker.SPELLING_EXCEPTIONS_PROPERTY, exceptions);
     }
     
     public void updateWatermarkAndTitleBar() {
