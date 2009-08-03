@@ -10,6 +10,10 @@ import java.util.regex.*;
 import org.jdesktop.swingworker.SwingWorker;
 
 public class WorkspaceFileList {
+    // A thread pool for updating the file lists.
+    // One thread per workspace can cause a lot of load during startup, when all workspaces need updating at once.
+    private static final ExecutorService fileListUpdateExecutorService = ThreadUtilities.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), "File List Updater");
+    
     private final Workspace workspace;
     private final ArrayList<Listener> listeners = new ArrayList<Listener>();
     
@@ -17,7 +21,6 @@ public class WorkspaceFileList {
     private ArrayList<String> fileList;
     
     private FileAlterationMonitor fileAlterationMonitor;
-    private ExecutorService fileListUpdateExecutorService;
     
     public WorkspaceFileList(Workspace workspace) {
         this.workspace = workspace;
@@ -106,11 +109,8 @@ public class WorkspaceFileList {
             fileAlterationMonitor = null;
         }
         
-        // We have one thread to check for last-modified time changes...
-        this.fileAlterationMonitor = new FileAlterationMonitor(rootDirectory);
-        // And another thread to update our list of files...
-        this.fileListUpdateExecutorService = ThreadUtilities.newSingleThreadExecutor("File List Updater for " + rootDirectory);
-        
+        // Start a new thread to check for last-modified time changes...
+        fileAlterationMonitor = new FileAlterationMonitor(rootDirectory);
         fileAlterationMonitor.addListener(new FileAlterationMonitor.Listener() {
             public void fileTouched(String pathname) {
                 updateFileList();
