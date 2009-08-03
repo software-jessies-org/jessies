@@ -63,7 +63,7 @@ public class FilePropertiesAction extends ETextAction {
                 String newIndentationString = StringUtilities.unescapeJava(indentStringField.getText());
                 buffer.putProperty(PTextBuffer.INDENTATION_PROPERTY, newIndentationString);
                 String newFileTypeName = (String) fileTypeCombo.getSelectedItem();
-                window.reconfigureForFileType(FileType.fromName(newFileTypeName));
+                window.configureForFileType(FileType.fromName(newFileTypeName));
                 return Boolean.TRUE;
             }
         });
