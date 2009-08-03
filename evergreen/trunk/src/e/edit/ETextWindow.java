@@ -323,18 +323,26 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         // The various researchers might have more for this file type.
         Advisor.addWordsTo(language, result);
         
+        // There may be general-purpose spelling exceptions.
+        readSpellingExceptionsFile(Evergreen.getResourceFilename("lib", "data", "spelling-exceptions"), result);
+        
         // And there may be a file of extra spelling exceptions for this language.
-        final String exceptionsFileName = Evergreen.getResourceFilename("lib", "data", "spelling-exceptions-" + language.getName());
-        if (FileUtilities.exists(exceptionsFileName)) {
-            for (String exception : StringUtilities.readLinesFromFile(exceptionsFileName)) {
-                if (exception.startsWith("#")) {
-                    continue; // Ignore comments.
-                }
-                result.add(exception);
-            }
-        }
+        readSpellingExceptionsFile(Evergreen.getResourceFilename("lib", "data", "spelling-exceptions-" + language.getName()), result);
+        
         SPELLING_EXCEPTIONS_MAP.put(language, result);
         return result;
+    }
+    
+    private void readSpellingExceptionsFile(String filename, HashSet<String> result) {
+        if (!FileUtilities.exists(filename)) {
+            return;
+        }
+        for (String exception : StringUtilities.readLinesFromFile(filename)) {
+            if (exception.startsWith("#")) {
+                continue; // Ignore comments.
+            }
+            result.add(exception);
+        }
     }
     
     /**
