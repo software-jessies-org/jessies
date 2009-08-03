@@ -395,7 +395,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
             lastModifiedTime = file.lastModified();
             textArea.getTextBuffer().readFromFile(file);
             
-            reconfigureForGuessedFileType();
+            configureForGuessedFileType();
             updateWatermarkAndTitleBar();
             highlightMergeConflicts();
             textArea.getTextBuffer().getUndoBuffer().resetUndoBuffer();
@@ -408,14 +408,21 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         }
     }
     
-    private void reconfigureForGuessedFileType() {
-        reconfigureForFileType(FileType.guessFileType(filename, textArea.getTextBuffer()));
+    private void configureForGuessedFileType() {
+        configureForFileType(FileType.guessFileType(filename, textArea.getTextBuffer()));
     }
     
-    public void reconfigureForFileType(FileType newFileType) {
-        if (newFileType == getFileType()) {
+    private int configureCount = 0;
+    
+    public void configureForFileType(FileType newFileType) {
+        // We don't want to waste time if we're already correctly configured.
+        // The first time a plain-text file is configured, the text area's file type and the new file type are equal (because plain text is the default).
+        // We make sure we still do the right thing for plain text files by keeping count.
+        if (configureCount > 0 && newFileType == getFileType()) {
             return;
         }
+        ++configureCount;
+        
         newFileType.configureTextArea(textArea);
         
         BugDatabaseHighlighter.highlightBugs(textArea);
@@ -726,7 +733,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
             editor.showStatus("Saved " + filename);
             backupFile.delete();
             this.lastModifiedTime = file.lastModified();
-            reconfigureForGuessedFileType();
+            configureForGuessedFileType();
             updateWatermarkAndTitleBar();
             tagsUpdater.updateTags();
             SaveMonitor.getInstance().fireSaveListeners();
