@@ -92,6 +92,8 @@ IO.popen("-") {
   |buildOutputIo|
   if buildOutputIo == nil
     $stderr.reopen($stdout)
+    # When you can't see the question, you can't give a sane answer.
+    $stdin.close()
     exec(*ARGV)
   end
   filterBuildOutput(buildOutputIo)

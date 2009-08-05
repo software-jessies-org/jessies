@@ -102,12 +102,18 @@ define SYMLINK_RULE
 	ln -s $< $@
 endef
 
+define MOVE_GENERATED_TARGET_INTO_PLACE
+	chmod a-w $@.tmp && \
+	$(RM) $@ && \
+	mv $@.tmp $@
+endef
+
 # Use cp for the benefit of Windows native compilers which don't
 # understand "symlinks".
 define COPY_RULE
 	mkdir -p $(@D) && \
-	$(RM) $@ && \
-	cp $< $@.tmp && chmod a-w $@.tmp && mv $@.tmp $@
+	cp $< $@.tmp && \
+	$(MOVE_GENERATED_TARGET_INTO_PLACE)
 endef
 
 # ----------------------------------------------------------------------------
@@ -720,15 +726,13 @@ native-clean:
 	$(RM) -r .generated/native
 
 ChangeLog.html: ChangeLog
-	$(RM) $@ && \
 	ruby $(BUILD_SCRIPT_PATH)/svn-log-to-html.rb < $< > $@.tmp && \
-	mv $@.tmp $@
+	$(MOVE_GENERATED_TARGET_INTO_PLACE)
 
 .PHONY: ChangeLog
 ChangeLog:
-	$(RM) $@ && \
 	$(GENERATE_CHANGE_LOG.$(REVISION_CONTROL_SYSTEM)) > $@.tmp && \
-	mv $@.tmp $@
+	$(MOVE_GENERATED_TARGET_INTO_PLACE)
 
 # This is only designed to be run on jessies.org itself.
 # It's run by a custom post-commit hook to generate a new source download for each revision.
@@ -759,7 +763,7 @@ publish-changelog: ChangeLog.html
 .generated/build-revision.txt:
 	mkdir -p $(@D) && \
 	$(MAKE_VERSION_FILE_COMMAND) > $@.tmp && \
-	mv $@.tmp $@
+	$(MOVE_GENERATED_TARGET_INTO_PLACE)
 
 # Old versions of SunOS tic don't support the -o argument but do support redirecting
 # the output to $TERMINFO.
@@ -776,7 +780,7 @@ publish-changelog: ChangeLog.html
 .generated/$(TARGET_DIRECTORY)/bin/mingwm10.dll: /bin/mingwm10.dll
 	mkdir -p $(@D) && \
 	cp $< $@.tmp && \
-	mv $@.tmp $@
+	$(MOVE_GENERATED_TARGET_INTO_PLACE)
 
 # ----------------------------------------------------------------------------
 # How to build a .app directory and package it into an installer file.
@@ -836,13 +840,13 @@ $(INSTALLER.gz): $(MACHINE_PROJECT_NAME).app
 %/component-definitions.wxi: $(MAKEFILE_LIST) $(FILE_LIST_TO_WXI) $(MACHINE_PROJECT_NAME).app
 	mkdir -p $(@D) && \
 	( cd $(PACKAGING_DIRECTORY) && find . -type f -print ) | cut -c3- | $(FILE_LIST_TO_WXI) > $@.tmp && \
-	mv $@.tmp $@
+	$(MOVE_GENERATED_TARGET_INTO_PLACE)
 
 # This silliness is probably sufficient (as well as sadly necessary).
 %/component-references.wxi: %/component-definitions.wxi $(MAKEFILE_LIST)
 	mkdir -p $(@D) && \
 	ruby -w -ne '$$_.match(/Include/) && puts($$_); $$_.match(/<Component (Id='\''component\d+'\'')/) && puts("<ComponentRef #{$$1} />")' < $< > $@.tmp && \
-	mv $@.tmp $@
+	$(MOVE_GENERATED_TARGET_INTO_PLACE)
 
 %.wixobj: %.wxs $(patsubst %,$(WIX_COMPILATION_DIRECTORY)/component-%.wxi,references definitions)
 	@echo "-- Compiling $(notdir $<)..."
@@ -886,7 +890,7 @@ echo.%:
 .generated/local-variables.make: $(SALMA_HAYEK)/lib/build/per-directory.make $(SALMA_HAYEK)/lib/build/universal.make
 	mkdir -p $(@D) && \
 	ruby -w -ne '($$_.match(/^ *(\S+)\s*[:+]?=/) || $$_.match(/^\s*define\s*(\S+)/)) && puts("LOCAL_VARIABLES += #{$$1}")' $< | sort -u > $@.tmp && \
-	mv $@.tmp $@
+	$(MOVE_GENERATED_TARGET_INTO_PLACE)
 
 # Several of the rules include $(MAKEFILE_LIST) in their prerequisites.
 # All of the .o files, for example, depend on the makefiles.
