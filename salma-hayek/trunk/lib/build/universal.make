@@ -940,7 +940,7 @@ $(addprefix symlink-latest.,$(PUBLISHABLE_INSTALLERS)): symlink-latest.%: %
 	@echo "-- Symlinking the latest $(LATEST_INSTALLER_LINK)..."
 	ssh $(DIST_SSH_USER_AND_HOST) $(RM) $(DIST_DIRECTORY)/$(LATEST_INSTALLER_LINK) '&&' \
 	ln -s $(<F) $(DIST_DIRECTORY)/$(LATEST_INSTALLER_LINK) '&&' \
-	ls -t $(DIST_DIRECTORY)/$(call makeInstallerName$(suffix $<),'*') '|' tail +8 '|' xargs $(RM)
+	ls -t $(DIST_DIRECTORY)/$(call makeInstallerName$(suffix $<),'*') '|' tail -n +8 '|' xargs $(RM)
 
 .PHONY: install
 install: $(addprefix run-installer,$(suffix $(PUBLISHABLE_INSTALLERS)))
