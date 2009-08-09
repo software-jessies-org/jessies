@@ -1,8 +1,13 @@
 # General computing/technical vocabulary.
+arity
 backquote
 backquoted
 backquotes
 backquoting
+backtrace
+backtraces
+basename
+basenames
 bytecode
 bytecodes
 clickable
@@ -17,12 +22,14 @@ functor
 functors
 indenter
 indenters
+init
 makefile
 makefiles
 mutex
 mutexes
 pathname
 pathnames
+popup
 prepend
 prepended
 prepending
@@ -31,9 +38,12 @@ reformatter
 reformatters
 regex
 regexes
+runtime
 screenshot
 screenshots
 solaris
+stacktrace
+stacktraces
 startup
 stderr
 stdin
@@ -44,6 +54,7 @@ subclasses
 subclassing
 substring
 substrings
+unary
 validator
 validators
 whitespace
