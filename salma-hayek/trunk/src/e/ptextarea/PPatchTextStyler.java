@@ -12,8 +12,7 @@ public class PPatchTextStyler extends PAbstractTextStyler {
         super(textArea);
     }
     
-    @Override
-    public List<PLineSegment> getTextSegments(int line) {
+    @Override public List<PLineSegment> getTextSegments(int line) {
         int start = textArea.getLineStartOffset(line);
         int end = textArea.getLineEndOffsetBeforeTerminator(line);
         List<PLineSegment> result = new ArrayList<PLineSegment>();
@@ -33,8 +32,8 @@ public class PPatchTextStyler extends PAbstractTextStyler {
         return result;
     }
     
-    public void addKeywordsTo(Collection<String> collection) {
-        // We have no language, so we have no keywords.
+    public String[] getKeywords() {
+        return new String[0]; // Any keywords need to come from the language of the file we're a patch to.
     }
     
     public static class PatchHighlight extends PColoredHighlight {

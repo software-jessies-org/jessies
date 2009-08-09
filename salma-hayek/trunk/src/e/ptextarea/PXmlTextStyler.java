@@ -10,8 +10,7 @@ public class PXmlTextStyler extends PAbstractLanguageStyler {
         super(textArea);
     }
     
-    @Override
-    public void initStyleApplicators() {
+    @Override public void initStyleApplicators() {
         super.initStyleApplicators();
         
         // We add the tag-recognizing applicator first so that the standard hyperlink applicator doesn't interfere with it.
@@ -30,26 +29,23 @@ public class PXmlTextStyler extends PAbstractLanguageStyler {
         textArea.addStyleApplicator(new RegularExpressionStyleApplicator(textArea, "(&(?!" + entityTail + ")\\S*)", PStyle.ERROR));
     }
     
-    @Override
-    protected boolean supportMultiLineComments() {
+    @Override protected boolean supportMultiLineComments() {
         return true;
     }
     
-    @Override
-    protected String multiLineCommentStart() {
+    @Override protected String multiLineCommentStart() {
         return "<!--";
     }
     
-    @Override
-    protected String multiLineCommentEnd() {
+    @Override protected String multiLineCommentEnd() {
         return "-->";
     }
     
-    @Override
-    protected boolean isQuote(char ch) {
+    @Override protected boolean isQuote(char ch) {
         return false;
     }
     
-    public void addKeywordsTo(Collection<String> collection) {
+    public String[] getKeywords() {
+        return new String[0];
     }
 }

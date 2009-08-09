@@ -8,66 +8,6 @@ import java.util.*;
  * @author Phil Norman
  */
 public class PJavaTextStyler extends PAbstractLanguageStyler {
-    private static final String[] KEYWORDS = new String[] {
-        // JLS3, section 3.9: "Keywords"
-        "abstract",
-        "assert",
-        "boolean",
-        "break",
-        "byte",
-        "case",
-        "catch",
-        "char",
-        "class",
-        "const",
-        "continue",
-        "default",
-        "do",
-        "double",
-        "else",
-        "enum",
-        "extends",
-        "final",
-        "finally",
-        "float",
-        "for",
-        "if",
-        "goto",
-        "implements",
-        "import",
-        "instanceof",
-        "int",
-        "interface",
-        "long",
-        "native",
-        "new",
-        "package",
-        "private",
-        "protected",
-        "public",
-        "return",
-        "short",
-        "static",
-        "strictfp",
-        "super",
-        "switch",
-        "synchronized",
-        "this",
-        "throw",
-        "throws",
-        "transient",
-        "try",
-        "void",
-        "volatile",
-        "while",
-        
-        // JLS3, section 3.10.3: "Boolean Literals"
-        "true", "false",
-        
-        // JLS3, section 3.10.7: "The Null Literal"
-        "null",
-    };
-    
     public PJavaTextStyler(PTextArea textArea) {
         super(textArea);
     }
@@ -76,8 +16,7 @@ public class PJavaTextStyler extends PAbstractLanguageStyler {
      * Overrides the default string segment addition, performing validation on the
      * string format and introducing error segment types where appropriate.
      */
-    @Override
-    public void addStringSegment(PAbstractLanguageStyler.TextSegmentListBuilder builder, String line, int start, int end) {
+    @Override public void addStringSegment(PAbstractLanguageStyler.TextSegmentListBuilder builder, String line, int start, int end) {
         if (line.charAt(start) == '\'') {
             addSegments(builder, line, start, end, 1);
         } else {
@@ -190,17 +129,73 @@ public class PJavaTextStyler extends PAbstractLanguageStyler {
         return ((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F'));
     }
     
-    @Override
-    protected boolean isStartOfCommentToEndOfLine(String line, int atIndex) {
+    @Override protected boolean isStartOfCommentToEndOfLine(String line, int atIndex) {
         return line.startsWith("//", atIndex);
     }
     
-    @Override
-    protected boolean supportMultiLineComments() {
+    @Override protected boolean supportMultiLineComments() {
         return true;
     }
     
-    public void addKeywordsTo(Collection<String> collection) {
-        collection.addAll(Arrays.asList(KEYWORDS));
+    public String[] getKeywords() {
+        return new String[] {
+            // JLS3, section 3.9: "Keywords"
+            "abstract",
+            "assert",
+            "boolean",
+            "break",
+            "byte",
+            "case",
+            "catch",
+            "char",
+            "class",
+            "const",
+            "continue",
+            "default",
+            "do",
+            "double",
+            "else",
+            "enum",
+            "extends",
+            "final",
+            "finally",
+            "float",
+            "for",
+            "if",
+            "goto",
+            "implements",
+            "import",
+            "instanceof",
+            "int",
+            "interface",
+            "long",
+            "native",
+            "new",
+            "package",
+            "private",
+            "protected",
+            "public",
+            "return",
+            "short",
+            "static",
+            "strictfp",
+            "super",
+            "switch",
+            "synchronized",
+            "this",
+            "throw",
+            "throws",
+            "transient",
+            "try",
+            "void",
+            "volatile",
+            "while",
+            
+            // JLS3, section 3.10.3: "Boolean Literals"
+            "true", "false",
+            
+            // JLS3, section 3.10.7: "The Null Literal"
+            "null",
+        };
     }
 }

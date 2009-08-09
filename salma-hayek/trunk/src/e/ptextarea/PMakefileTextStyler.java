@@ -62,24 +62,20 @@ public class PMakefileTextStyler extends PAbstractLanguageStyler {
         super(textArea);
     }
     
-    @Override
-    protected boolean isStartOfCommentToEndOfLine(String line, int atIndex) {
+    @Override protected boolean isStartOfCommentToEndOfLine(String line, int atIndex) {
         return isShellComment(line, atIndex);
     }
     
-    @Override
-    protected boolean supportMultiLineComments() {
+    @Override protected boolean supportMultiLineComments() {
         return false;
     }
     
-    @Override
-    protected boolean isQuote(char ch) {
+    @Override protected boolean isQuote(char ch) {
         // FIXME: strictly, you can use ' instead of " after ifeq or ifneq, and it might be better to treat ' as a quote in rules' commands, but naively accepting ' leads to false matches with $(warning) text.
         return (ch == '\"');
     }
     
-    @Override
-    public void initStyleApplicators() {
+    @Override public void initStyleApplicators() {
         // Make functions are -- except in special cases like when they're arguments to "call" -- always preceded by "$(" or "${".
         // I didn't realize until testing this (and I've checked the source to see I'm not imagining things) that you can't have whitespace between the "$(" and the keyword.
         textArea.addStyleApplicator(new KeywordStyleApplicator(textArea, new HashSet<String>(Arrays.asList(FUNCTIONS)), "\\b(?<=\\$[({])([a-z_-]+)\\b"));
@@ -91,8 +87,10 @@ public class PMakefileTextStyler extends PAbstractLanguageStyler {
         textArea.addStyleApplicator(new RegularExpressionStyleApplicator(textArea, "^(\\.(PHONY|SUFFIXES|DEFAULT|PRECIOUS|INTERMEDIATE|SECONDARY|SECONDEXPANSION|DELETE_ON_ERROR|IGNORE|LOW_RESOLUTION_TIME|SILENT|EXPORT_ALL_VARIABLES|NOTPARALLEL))", PStyle.KEYWORD));
     }
     
-    public void addKeywordsTo(Collection<String> collection) {
-        collection.addAll(Arrays.asList(DIRECTIVES));
-        collection.addAll(Arrays.asList(FUNCTIONS));
+    public String[] getKeywords() {
+        ArrayList<String> result = new ArrayList<String>();
+        result.addAll(Arrays.asList(DIRECTIVES));
+        result.addAll(Arrays.asList(FUNCTIONS));
+        return result.toArray(new String[result.size()]);
     }
 }

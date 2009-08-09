@@ -24,9 +24,11 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
     
     public PAbstractLanguageStyler(PTextArea textArea) {
         super(textArea);
-        initCommentCache();
-        initTextListener();
-        textArea.setTextStyler(this);
+        if (textArea != null) {
+            initCommentCache();
+            initTextListener();
+            textArea.setTextStyler(this);
+        }
     }
     
     /**
@@ -90,7 +92,7 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
         } else {
             keywords = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
         }
-        addKeywordsTo(keywords);
+        keywords.addAll(Arrays.asList(getKeywords()));
         if (keywords.size() > 0) {
             textArea.addStyleApplicator(new KeywordStyleApplicator(textArea, keywords, getKeywordRegularExpression()));
         }

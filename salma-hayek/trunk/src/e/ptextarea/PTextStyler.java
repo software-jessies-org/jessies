@@ -17,9 +17,8 @@ public interface PTextStyler {
     public List<PLineSegment> getTextSegments(int lineIndex);
     
     /**
-     * Adds this language's keywords to the given collection. This lets
-     * something like a spelling checker automatically share the knowledge of
-     * the keywords.
+     * Returns the language's keywords.
+     * This lets something like a spelling checker automatically share the knowledge of the keywords.
      */
-    public void addKeywordsTo(Collection<String> collection);
+    public String[] getKeywords();
 }
