@@ -393,7 +393,9 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     
     private boolean showPatchAndAskForConfirmation(String verb, String question, boolean fromDiskToMemory) {
         final Diffable disk = new Diffable("disk at " + FileUtilities.getLastModifiedTime(file), file);
+        disk.setFileType(textArea.getFileType());
         final Diffable memory = new Diffable("memory", textArea.getTextBuffer().toString());
+        memory.setFileType(textArea.getFileType());
         
         final Diffable from = fromDiskToMemory ? disk : memory;
         final Diffable to = fromDiskToMemory ? memory : disk;

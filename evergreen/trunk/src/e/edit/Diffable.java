@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.ptextarea.FileType;
 import e.util.*;
 import java.io.*;
 
@@ -13,6 +14,8 @@ public class Diffable {
     private boolean isTemporaryFile;
     
     private String content;
+    
+    private FileType fileType;
     
     // If anyone actually had both the content and a file containing it, it would be more efficient for them to use this.
     private Diffable(String label, File file, String content) {
@@ -56,6 +59,19 @@ public class Diffable {
      */
     public String filename() {
         return file().toString();
+    }
+    
+    /**
+     * Returns the FileType of the original file, or null if unknown.
+     * That is, a patch between two Java files would return JAVA rather than PATCH.
+     */
+    public FileType fileType() {
+        return fileType;
+    }
+    
+    public Diffable setFileType(FileType newFileType) {
+        this.fileType = newFileType;
+        return this;
     }
     
     /**
