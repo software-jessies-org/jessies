@@ -402,6 +402,7 @@ class Java
       add_pathname_property("org.jessies.frameIcon", @frame_icon)
     end
     add_pathname_property("org.jessies.projectRoot", @project_root)
+    add_pathname_property("org.jessies.supportRoot", @salma_hayek)
     
     # Work around Sun bug 6274341.
     add_property("java.awt.Window.locationByPlatform", "true")
