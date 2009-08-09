@@ -16,7 +16,6 @@ public class JavaResearcher implements WorkspaceResearcher {
     private static final String COMMA = ",&nbsp;";
     
     private static final Set<String> uniqueIdentifiers = new TreeSet<String>();
-    private static final Set<String> uniqueWords = new TreeSet<String>();
     
     private static String[] javaDocSummary = new String[0];
     
@@ -61,8 +60,10 @@ public class JavaResearcher implements WorkspaceResearcher {
             }
         }
         
-        Log.warn("Extracting unique words from JavaDoc summary...");
+        // Prime the spelling checker with all the unique words we found.
+        final Set<String> uniqueWords = new TreeSet<String>();
         Advisor.extractUniqueWords(uniqueIdentifiers, uniqueWords);
+        SpellingChecker.getSharedSpellingCheckerInstance().addSpellingExceptionsFor(FileType.JAVA, uniqueWords);
         
         final long t1 = System.nanoTime();
         Log.warn("Read summarized JavaDoc for " + classCount + " classes (" + javaDocSummary.length + " lines, " + uniqueIdentifiers.size() + " unique identifiers, " + uniqueWords.size() + " unique words) in " + TimeUtilities.nsToString(t1 - t0) + ".");
@@ -469,13 +470,5 @@ public class JavaResearcher implements WorkspaceResearcher {
     /** We don't implement any non-standard URI schemes. */
     public boolean handleLink(String link) {
         return false;
-    }
-    
-    /**
-     * Adds all the unique words from the identifiers in the JDK to the given set.
-     * This might be useful for spelling checking or word completion purposes.
-     */
-    public void addWordsTo(Set<String> words) {
-        words.addAll(uniqueWords);
     }
 }

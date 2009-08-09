@@ -6,8 +6,6 @@ import e.ptextarea.*;
 import e.util.*;
 
 public class RubyDocumentationResearcher implements WorkspaceResearcher {
-    private static final Set<String> uniqueWords = new TreeSet<String>();
-    
     public RubyDocumentationResearcher() {
         final long t0 = System.nanoTime();
         
@@ -24,7 +22,10 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
             uniqueIdentifiers.add(line);
         }
         
+        // Prime the spelling checker with all the unique words we found.
+        final Set<String> uniqueWords = new TreeSet<String>();
         Advisor.extractUniqueWords(uniqueIdentifiers, uniqueWords);
+        SpellingChecker.getSharedSpellingCheckerInstance().addSpellingExceptionsFor(FileType.RUBY, uniqueWords);
         
         final long t1 = System.nanoTime();
         Log.warn("Learned " + uniqueWords.size() + " Ruby words in " + TimeUtilities.nsToString(t1 - t0) + ".");
@@ -117,10 +118,5 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
             return true;
         }
         return false;
-    }
-    
-    /** Adds all the words we found by reflection. */
-    public void addWordsTo(Set<String> words) {
-        words.addAll(uniqueWords);
     }
 }

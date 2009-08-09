@@ -13,8 +13,6 @@ public class ManPageResearcher implements WorkspaceResearcher {
     // A set of unique man page names, so we can quickly determine whether we have a suitable page.
     // This also lets us avoid accidentally returning man pages we're trying to ignore.
     private static final Set<String> uniqueManPageNames = new TreeSet<String>();
-    // A set of unique words, for the spelling checker.
-    private static final Set<String> uniqueWords = new TreeSet<String>();
     
     private static final ManPageResearcher INSTANCE = new ManPageResearcher();
     
@@ -54,7 +52,10 @@ public class ManPageResearcher implements WorkspaceResearcher {
             }
         }
         
+        // Prime the spelling checker with all the unique words we found.
+        final Set<String> uniqueWords = new TreeSet<String>();
         Advisor.extractUniqueWords(uniqueManPageNames, uniqueWords);
+        SpellingChecker.getSharedSpellingCheckerInstance().addSpellingExceptionsFor(FileType.C_PLUS_PLUS, uniqueWords);
         
         final long t1 = System.nanoTime();
         Log.warn("Learned of " + pageCount + " man pages in " + TimeUtilities.nsToString(t1 - t0) + ".");
@@ -215,12 +216,5 @@ public class ManPageResearcher implements WorkspaceResearcher {
             }
         }
         return null;
-    }
-    
-    /**
-     * Adds all the words used in identifiers that have man pages, for C++.
-     */
-    public void addWordsTo(Set<String> words) {
-        words.addAll(uniqueWords);
     }
 }

@@ -26,9 +26,4 @@ public interface WorkspaceResearcher {
      * This method is not invoked from the event dispatch thread.
      */
     public boolean handleLink(String link);
-    
-    /**
-     * Adds spelling exceptions to 'words'.
-     */
-    public void addWordsTo(Set<String> words);
 }

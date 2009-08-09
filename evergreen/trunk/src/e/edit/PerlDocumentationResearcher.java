@@ -41,8 +41,4 @@ public class PerlDocumentationResearcher implements WorkspaceResearcher {
         }
         return false;
     }
-    
-    /** Does nothing. */
-    public void addWordsTo(Set<String> words) {
-    }
 }
