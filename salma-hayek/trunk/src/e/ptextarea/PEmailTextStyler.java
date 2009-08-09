@@ -56,5 +56,7 @@ public class PEmailTextStyler extends PAbstractTextStyler {
         return result;
     }
     
-    public void addKeywordsTo(Collection<String> collection) { }
+    public String[] getKeywords() {
+        return new String[0];
+    }
 }

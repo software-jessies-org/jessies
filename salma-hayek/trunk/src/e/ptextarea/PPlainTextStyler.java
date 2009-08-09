@@ -11,16 +11,15 @@ public class PPlainTextStyler extends PAbstractTextStyler {
         super(textArea);
     }
     
-    @Override
-    public List<PLineSegment> getTextSegments(int line) {
+    @Override public List<PLineSegment> getTextSegments(int line) {
         int start = textArea.getLineStartOffset(line);
         int end = textArea.getLineEndOffsetBeforeTerminator(line);
         List<PLineSegment> result = new ArrayList<PLineSegment>();
         result.add(new PTextSegment(textArea, start, end, PStyle.NORMAL));
         return result;
     }
-
-    public void addKeywordsTo(Collection<String> collection) {
-        // We have no language, so we have no keywords.
+    
+    public String[] getKeywords() {
+        return new String[0]; // This isn't a known language, so we have no keywords.
     }
 }

@@ -1,5 +1,6 @@
 package e.ptextarea;
 
+import e.util.*;
 import java.util.*;
 import java.util.regex.*;
 
@@ -144,6 +145,16 @@ public class FileType {
         }
         
         textArea.repaint();
+    }
+    
+    public String[] getKeywords() {
+        try {
+            final PTextStyler styler = stylerClass.getConstructor(PTextArea.class).newInstance((PTextArea) null);
+            return styler.getKeywords();
+        } catch (Exception ex) {
+            Log.warn("FileType.getKeywords failed (for file type " + getName() + ")", ex);
+            return new String[0];
+        }
     }
     
     public String getName() {
