@@ -12,7 +12,6 @@ public class StlDocumentationResearcher implements WorkspaceResearcher {
     private static final String STL_DOCUMENTATION_ROOT = "/usr/share/doc/stl-manual/html/";
     
     private static final Map<String, String> docs = new HashMap<String, String>();
-    private static final Set<String> uniqueWords = new TreeSet<String>();
     
     public StlDocumentationResearcher() {
         final long t0 = System.nanoTime();
@@ -40,8 +39,6 @@ public class StlDocumentationResearcher implements WorkspaceResearcher {
                 uniqueIdentifiers.add(term);
             }
         }
-        
-        Advisor.extractUniqueWords(uniqueIdentifiers, uniqueWords);
         
         final long t1 = System.nanoTime();
         Log.warn("Learned of " + docs.size() + " STL terms in " + TimeUtilities.nsToString(t1 - t0) + ".");
@@ -89,12 +86,5 @@ public class StlDocumentationResearcher implements WorkspaceResearcher {
             }
         }
         return false;
-    }
-    
-    /**
-     * Adds all the words we found in the STL documentation, for C++.
-     */
-    public void addWordsTo(Set<String> words) {
-        words.addAll(uniqueWords);
     }
 }

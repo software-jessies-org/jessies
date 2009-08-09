@@ -18,8 +18,6 @@ import javax.swing.Timer;
  * A text-editing component.
  */
 public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTextListener {
-    private static final HashMap<FileType, HashSet<String>> SPELLING_EXCEPTIONS_MAP = new HashMap<FileType, HashSet<String>>();
-    
     // Used to update the watermark without creating and destroying an excessive number of threads.
     private static final ExecutorService WATERMARK_UPDATE_EXECUTOR = ThreadUtilities.newSingleThreadExecutor("Watermark Updater");
     
@@ -306,60 +304,6 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         }
     }
     
-    private HashSet<String> initSpellingExceptionsFor(FileType language) {
-        HashSet<String> result = new HashSet<String>();
-        
-        // The text styler knows all the language's keywords.
-        textArea.getTextStyler().addKeywordsTo(result);
-        
-        // The various researchers might have more for this file type.
-        Advisor.addWordsTo(language, result);
-        
-        // There may be general-purpose spelling exceptions.
-        readSpellingExceptionsFile(getSpellingExceptionsFilename("spelling-exceptions"), result);
-        
-        // And there may be a file of extra spelling exceptions for this language.
-        readSpellingExceptionsFile(getSpellingExceptionsFilename("spelling-exceptions-" + language.getName()), result);
-        
-        return result;
-    }
-    
-    private String getSpellingExceptionsFilename(String name) {
-        return System.getProperty("org.jessies.supportRoot") + File.separator + "lib" + File.separator + "data" + File.separator + name;
-    }
-    
-    private void readSpellingExceptionsFile(String filename, HashSet<String> result) {
-        if (!FileUtilities.exists(filename)) {
-            return;
-        }
-        for (String exception : StringUtilities.readLinesFromFile(filename)) {
-            if (exception.startsWith("#")) {
-                continue; // Ignore comments.
-            }
-            result.add(exception);
-        }
-    }
-    
-    /**
-     * Attaches an appropriate set of spelling exceptions to our document.
-     */
-    private void initSpellingExceptionsForDocument() {
-        final FileType language = getFileType();
-        
-        HashSet<String> exceptions;
-        synchronized (SPELLING_EXCEPTIONS_MAP) {
-            exceptions = SPELLING_EXCEPTIONS_MAP.get(language);
-        }
-        if (exceptions == null) {
-            exceptions = initSpellingExceptionsFor(language);
-            synchronized (SPELLING_EXCEPTIONS_MAP) {
-                SPELLING_EXCEPTIONS_MAP.put(language, exceptions);
-            }
-        }
-        
-        textArea.putClientProperty(PTextAreaSpellingChecker.SPELLING_EXCEPTIONS_PROPERTY, exceptions);
-    }
-    
     public void updateWatermarkAndTitleBar() {
         WATERMARK_UPDATE_EXECUTOR.execute(new Runnable() {
             
@@ -430,7 +374,6 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         newFileType.configureTextArea(textArea);
         
         BugDatabaseHighlighter.highlightBugs(textArea);
-        initSpellingExceptionsForDocument();
         
         // Ensure we re-do the tags now we've changed our mind about what kind of tags we're looking for.
         tagsUpdater.updateTags();

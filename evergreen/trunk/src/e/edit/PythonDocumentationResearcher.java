@@ -51,8 +51,4 @@ public class PythonDocumentationResearcher implements WorkspaceResearcher {
         }
         return false;
     }
-    
-    /** Does nothing. */
-    public void addWordsTo(Set<String> words) {
-    }
 }

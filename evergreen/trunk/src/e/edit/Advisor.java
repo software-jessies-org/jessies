@@ -112,17 +112,6 @@ public class Advisor extends JPanel {
         }
     }
     
-    /**
-     * Invokes addWordsTo with 'words' on every known researcher whose isSuitable returns true for 'fileType'.
-     */
-    public static void addWordsTo(FileType fileType, Set<String> words) {
-        for (WorkspaceResearcher researcher : getResearchers()) {
-            if (researcher.isSuitable(fileType)) {
-                researcher.addWordsTo(words);
-            }
-        }
-    }
-    
     private synchronized JFrame getFrame() {
         if (frame == null) {
             final String frameTitle = "Evergreen Documentation Browser";
