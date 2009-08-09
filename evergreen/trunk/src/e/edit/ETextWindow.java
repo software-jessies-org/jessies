@@ -316,12 +316,16 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         Advisor.addWordsTo(language, result);
         
         // There may be general-purpose spelling exceptions.
-        readSpellingExceptionsFile(Evergreen.getResourceFilename("lib", "data", "spelling-exceptions"), result);
+        readSpellingExceptionsFile(getSpellingExceptionsFilename("spelling-exceptions"), result);
         
         // And there may be a file of extra spelling exceptions for this language.
-        readSpellingExceptionsFile(Evergreen.getResourceFilename("lib", "data", "spelling-exceptions-" + language.getName()), result);
+        readSpellingExceptionsFile(getSpellingExceptionsFilename("spelling-exceptions-" + language.getName()), result);
         
         return result;
+    }
+    
+    private String getSpellingExceptionsFilename(String name) {
+        return System.getProperty("org.jessies.supportRoot") + File.separator + "lib" + File.separator + "data" + File.separator + name;
     }
     
     private void readSpellingExceptionsFile(String filename, HashSet<String> result) {
