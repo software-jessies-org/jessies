@@ -114,11 +114,15 @@ public class SimplePatchDialog {
         textArea.setFont(font);
         
         // Try to configure the text area appropriately for the specific content.
-        final String probableFilename = from.filename().indexOf(File.separatorChar) != -1 ? from.filename() : to.filename();
-        final String probableContent = from.content().length() > to.content().length() ? from.content() : to.content();
-        FileType.guessFileType(probableFilename, probableContent).configureTextArea(textArea);
+        FileType fileType = (from.fileType() != null) ? from.fileType() : to.fileType();
+        if (fileType == null) {
+            final String probableFilename = from.filename().indexOf(File.separatorChar) != -1 ? from.filename() : to.filename();
+            final String probableContent = from.content().length() > to.content().length() ? from.content() : to.content();
+            fileType = FileType.guessFileType(probableFilename, probableContent);
+        }
+        fileType.configureTextArea(textArea);
+        
         // FIXME: BugDatabaseHighlighter?
-        // FIXME: spelling exceptions?
         
         final List<HighlightInfo> highlights = new ArrayList<HighlightInfo>();
         Color color = null;

@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.ptextarea.FileType;
 import e.util.*;
 import java.awt.*;
 import java.awt.datatransfer.*;
@@ -34,12 +35,16 @@ public class CompareSelectionAndClipboardAction extends ETextAction {
         
         String selection = window.getTextArea().getSelectedText();
         String clipboard = getClipboardText();
+        FileType fileType = window.getTextArea().getFileType();
         
         // Avoid diff(1) warnings about "No newline at end of file".
         selection += "\n";
         clipboard += "\n";
         
-        SimplePatchDialog.showPatchBetween("Selection/Clipboard Comparison", new Diffable("selection", selection), new Diffable("clipboard", clipboard));
+        Diffable selectionDiffable = new Diffable("selection", selection).setFileType(fileType);
+        Diffable clipboardDiffable = new Diffable("clipboard", clipboard).setFileType(fileType);
+        
+        SimplePatchDialog.showPatchBetween("Selection/Clipboard Comparison", selectionDiffable, clipboardDiffable);
     }
     
     private String getClipboardText() {
