@@ -10,7 +10,6 @@ import e.util.*;
 
 public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider {
     private static final String HIGHLIGHTER_NAME = "PTextAreaSpellingChecker";
-    public static final String SPELLING_EXCEPTIONS_PROPERTY = "org.jessies.e.ptextarea.SpellingExceptionsHashSetProperty";
     
     private PTextArea component;
     
@@ -65,7 +64,7 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
         }
         
         actions.add(null);
-        actions.add(new AcceptSpellingAction(misspelling));
+        actions.add(new AcceptSpellingAction(misspelling, component.getFileType()));
     }
     
     public static class NoSuggestionsAction extends AbstractAction {
@@ -80,14 +79,16 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
     
     public static class AcceptSpellingAction extends AbstractAction {
         private final String word;
+        private final FileType fileType;
         
-        public AcceptSpellingAction(final String word) {
+        public AcceptSpellingAction(final String word, final FileType fileType) {
             super("Accept '" + word + "'");
             this.word = word;
+            this.fileType = fileType;
         }
         
         public void actionPerformed(ActionEvent e) {
-            SpellingChecker.getSharedSpellingCheckerInstance().acceptSpelling(word);
+            SpellingChecker.getSharedSpellingCheckerInstance().acceptSpelling(word, fileType);
             for (PTextAreaSpellingChecker spellingChecker : InstanceTracker.getInstancesOfClass(PTextAreaSpellingChecker.class)) {
                 spellingChecker.checkSpelling();
             }
@@ -308,7 +309,7 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
             
             //System.err.println(">>" + word + " " + wordLength);
             checkCount++;
-            if (isException(word) == false && spellingChecker.isMisspelledWord(word)) {
+            if (spellingChecker.isMisspelledWord(word, component.getFileType())) {
                 misspellingCount++;
                 //System.err.println("Misspelled word \"" + word + "\"");
                 component.addHighlight(new UnderlineHighlight(component, start, finish));
@@ -316,19 +317,6 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
             
             start = finish;
         }
-    }
-    
-    /**
-     * Tests whether the text component we're checking declares the given word
-     * as a spelling exception in its language.
-     */
-    private boolean isException(String word) {
-        HashSet<?> exceptions = (HashSet<?>) component.getClientProperty(SPELLING_EXCEPTIONS_PROPERTY);
-        if (exceptions == null) {
-            return false;
-        }
-        String lowerCaseWord = word.toLowerCase();
-        return exceptions.contains(word) || exceptions.contains(lowerCaseWord);
     }
     
     /**

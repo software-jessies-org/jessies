@@ -1,5 +1,6 @@
 package e.util;
 
+import e.ptextarea.FileType;
 import java.io.*;
 import java.util.*;
 import java.util.regex.*;
@@ -89,7 +90,7 @@ public class SpellingChecker {
      * We only ask ispell about any given word at most once: the
      * word cache is used to save on expensive inter-process communication.
      */
-    public synchronized boolean isMisspelledWord(String word) {
+    public synchronized boolean isMisspelledWord(String word, FileType fileType) {
         if (ispell == null) {
             debug("ispell == null");
             return false;
@@ -97,18 +98,97 @@ public class SpellingChecker {
         
         word = word.toLowerCase();
         
-        // Check the word cache first.
+        // Check the exceptions lists first...
+        if (isException(word, fileType)) {
+            return false;
+        }
+        
+        // ...then the word cache...
         Boolean cachedResult = wordCache.get(word);
         if (cachedResult != null) {
             return cachedResult;
         }
-        // Give in and ask the spelling checker.
+        
+        // ...and only then give in and ask the spelling checker.
         // We copy the word into a new string to avoid accidental retention
         // of character arrays representing documents in their entirety.
         boolean misspelled = isMisspelledWordAccordingToIspell(word, null);
         wordCache.put(new String(word), Boolean.valueOf(misspelled));
         return misspelled;
     }
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    private static final HashMap<FileType, HashSet<String>> SPELLING_EXCEPTIONS_MAP = new HashMap<FileType, HashSet<String>>();
+    
+    /**
+     * Tests whether the text component we're checking declares the given word
+     * as a spelling exception in its language.
+     */
+    private boolean isException(String word, FileType fileType) {
+        final HashSet<String> exceptions = getExceptionsFor(fileType);
+        if (exceptions == null) {
+            return false;
+        }
+        synchronized (exceptions) {
+            return exceptions.contains(word);
+        }
+    }
+    
+    private HashSet<String> getExceptionsFor(FileType fileType) {
+        HashSet<String> exceptions;
+        synchronized (SPELLING_EXCEPTIONS_MAP) {
+            exceptions = SPELLING_EXCEPTIONS_MAP.get(fileType);
+        }
+        if (exceptions == null) {
+            exceptions = initSpellingExceptionsFor(fileType);
+            synchronized (SPELLING_EXCEPTIONS_MAP) {
+                SPELLING_EXCEPTIONS_MAP.put(fileType, exceptions);
+            }
+        }
+        return exceptions;
+    }
+    
+    // Used by Evergreen's Advisors to supply extra exceptions they've gleaned at runtime.
+    public void addSpellingExceptionsFor(FileType fileType, Set<String> extraExceptions) {
+        final HashSet<String> exceptions = getExceptionsFor(fileType);
+        synchronized (exceptions) {
+            exceptions.addAll(extraExceptions);
+        }
+    }
+    
+    private HashSet<String> initSpellingExceptionsFor(FileType fileType) {
+        HashSet<String> result = new HashSet<String>();
+        
+        // None of the language's keywords should be considered misspelled.
+        result.addAll(Arrays.asList(fileType.getKeywords()));
+        
+        // There may be general-purpose spelling exceptions.
+        readSpellingExceptionsFile(getSpellingExceptionsFilename("spelling-exceptions"), result);
+        
+        // And there may be a file of extra spelling exceptions for this language.
+        readSpellingExceptionsFile(getSpellingExceptionsFilename("spelling-exceptions-" + fileType.getName()), result);
+        
+        return result;
+    }
+    
+    private String getSpellingExceptionsFilename(String name) {
+        return System.getProperty("org.jessies.supportRoot") + File.separator + "lib" + File.separator + "data" + File.separator + name;
+    }
+    
+    private void readSpellingExceptionsFile(String filename, HashSet<String> result) {
+        if (!FileUtilities.exists(filename)) {
+            return;
+        }
+        for (String exception : StringUtilities.readLinesFromFile(filename)) {
+            if (exception.startsWith("#")) {
+                continue; // Ignore comments.
+            }
+            result.add(exception);
+        }
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     public synchronized String[] getSuggestionsFor(String misspelledWord) {
         ArrayList<String> suggestions = new ArrayList<String>();
@@ -123,8 +203,8 @@ public class SpellingChecker {
      * Moves the word from the known bad set to the known good set,
      * and inserts it into the user's personal ispell dictionary.
      */
-    public synchronized void acceptSpelling(String word) {
-        if (isMisspelledWord(word) == false) {
+    public synchronized void acceptSpelling(String word, FileType fileType) {
+        if (isMisspelledWord(word, fileType) == false) {
             return;
         }
         
