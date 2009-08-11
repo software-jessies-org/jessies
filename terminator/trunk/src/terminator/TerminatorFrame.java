@@ -111,7 +111,9 @@ public class TerminatorFrame extends JFrame implements TerminalPaneHost {
 	
 	private void updateTabbedPane() {
 		if (terminals.size() == 1 && !Terminator.getPreferences().getBoolean(TerminatorPreferences.ALWAYS_SHOW_TABS)) {
-			switchToSinglePane();
+			if (tabbedPane != null) {
+				switchToSinglePane();
+			}
 		} else {
 			switchToTabbedPane();
 		}
@@ -164,6 +166,8 @@ public class TerminatorFrame extends JFrame implements TerminalPaneHost {
 	 * Switches to a simple UI where we can have only one terminal.
 	 */
 	private void switchToSinglePane() {
+		// It's only safe to call this if tabbedPane != null *or* we're setting up the window contents for the first time.
+		
 		updateBackground();
 		
 		JTerminalPane soleSurvivor = terminals.get(0);
