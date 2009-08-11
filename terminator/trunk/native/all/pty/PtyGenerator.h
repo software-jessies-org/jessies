@@ -77,7 +77,7 @@ public:
             try {
                 runChild(term, executable, argv, workingDirectory, *this);  // Should never return.
             } catch (const std::exception& ex) {
-                // reportFatalErrorUsingGui would have a better chance of being seen.
+                // reportFatalErrorViaGui would have a better chance of being seen.
                 fprintf(stderr, "%s\n", ex.what());
             }
             exit(1); // We're only exit()ing the child, not the VM.
