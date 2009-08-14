@@ -79,13 +79,6 @@ MAKEFILE_DIRECTORY = $(call dirWithoutSlash,$(SIMPLE_MAKEFILE))
 ABSOLUTE_MAKEFILE_DIRECTORY = $(patsubst ../%,$(dir $(CURDIR))%,$(MAKEFILE_DIRECTORY))
 SALMA_HAYEK = $(call dirWithoutSlash,$(call dirWithoutSlash,$(ABSOLUTE_MAKEFILE_DIRECTORY)))
 
-# Begin 2007-11-11 hack to cope with salma-hayek/simple.make.
-ifeq "$(notdir $(ABSOLUTE_MAKEFILE_DIRECTORY))" "salma-hayek"
-SALMA_HAYEK = $(ABSOLUTE_MAKEFILE_DIRECTORY)
-$(warning please update $(firstword $(MAKEFILE_LIST)) to include ../salma-hayek/lib/build/simple.make instead of ../salma-hayek/simple.make)
-endif
-# End 2007-11-11 hack.
-
 # make does special things when running commands including the magic string $(MAKE),
 # including clearing -n from $(MAKEFLAGS), so we snarf it here.
 DRY_RUNNING := $(findstring n,$(MAKEFLAGS))
