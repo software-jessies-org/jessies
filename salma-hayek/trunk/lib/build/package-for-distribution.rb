@@ -383,9 +383,17 @@ if target_os() == "Linux"
         # We could also get per-project build dependencies here.
         build_depends_filename = "#{salma_hayek}/lib/build/DEBIAN-control-Build-Depends.txt"
         build_depends = IO.readlines(build_depends_filename).join(", ").gsub("\n", "")
+        # Build-Depends is supposed to be in the source stanza of the source package's control file.
+        # We don't have a source package.
+        # On Lenny, dpkg-deb throws off warnings when Build-Depends is present in a binary package's control file.
+        # dpkg-deb: warning: '.generated/native/amd64_Linux/terminator/DEBIAN/control' contains user-defined field 'Build-Depends'
+        # dpkg-deb: ignoring 1 warnings about the control file(s)
+        # As noted elsewhere in this file, we should probably be using dpkg-gencontrol,
+        # giving it the control file for a source package.
+        # Build-Depends-Indep would probably then be more correct (and needed to side-step another warning).
+        #control.puts("Build-Depends: #{build_depends}")
         
         control.puts("Depends: #{depends}")
-        control.puts("Build-Depends: #{build_depends}")
         # Although Replaces would remove the need for user intervention, it would be anti-social
         # both to the conflicting package and to anyone using the Scheme interpreter or pane-oriented terminal.
         control.puts("Conflicts: #{machine_project_name}")
