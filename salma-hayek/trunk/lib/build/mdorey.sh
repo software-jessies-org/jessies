@@ -13,7 +13,12 @@
 # So then I did cron-config and followed all the suggestions, one of which led me to believe I'd be able to access
 # files over the network.
 # Cron wanted me to install exim and run exim-config.
-# The prompts there all looked reassuring but left me reading /var/spool/mail/martind with less(1).
+
+# exim configuration
+# the rewrite section is empty by default
+# add this:
+# *@+local_domains ${local_part}@bluearc.com EFfrstcb
+
 # Anyway, I could indeed access network files but it was insanely slow to do an svn update.
 # I realized that I really didn't want the Windows machine connecting over Samba and doing make clean while
 # the Debian build was happening.
@@ -21,11 +26,6 @@
 # Then I couldn't build them because "Documents and Settings" contains a space and it's basically a big waste of time
 # to try to get make to cope with file names containing spaces.
 # It can be done but it's not worth the effort.
-
-# exim configuration
-# the rewrite section is empty by default
-# add this:
-# *@+local_domains ${local_part}@bluearc.com EFfrstcb
 
 # 20 09 * * * cat ~/software.jessies.org/work/salma-hayek/lib/build/mdorey.sh | bash --login
 
