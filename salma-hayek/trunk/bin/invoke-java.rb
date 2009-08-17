@@ -385,8 +385,6 @@ class Java
     add_property("e.util.Log.applicationName", @dock_name)
 
     args << "-Xmx#{@heap_size}"
-    # Spams stdout with the port, breaking javahpp.
-    #args << "-agentlib:jdwp=server=y,transport=dt_socket,suspend=n,address=#{10000 + Process.pid()}"
 
     if target_os() == "Darwin"
       args << "-Xdock:name=#{@dock_name}"
@@ -466,7 +464,6 @@ end
 
 if __FILE__ == $0
   # Just an example.
-  klass = ARGV.shift()
-  invoker = Java.new(klass, klass)
+  invoker = Java.new("Launcher", "e/util/Launcher")
   invoker.invoke()
 end
