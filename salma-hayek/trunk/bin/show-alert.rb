@@ -116,7 +116,7 @@ else
                 # Our Windows desktop shortcuts get started from Cygwin's /bin directory.
                 # We want to behave as if started from the invoking user's home directory.
                 if ENV["RUBY_LAUNCHER_INVOKING"]
-                    ENV["RUBY_LAUNCHER_INVOKING"] = nil
+                    ENV.delete("RUBY_LAUNCHER_INVOKING")
                     run_in_home_directory(block)
                 else
                     block.call()

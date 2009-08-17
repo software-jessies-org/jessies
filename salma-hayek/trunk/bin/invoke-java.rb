@@ -367,7 +367,7 @@ class Java
     # We test for the empty string because GDK doesn't unset the variable, it sets it to the empty string, presumably for portability reasons.
     desktop_startup_id = ENV["DESKTOP_STARTUP_ID"]
     if desktop_startup_id != nil && desktop_startup_id.length() > 0
-      ENV["DESKTOP_STARTUP_ID"] = nil
+      ENV.delete("DESKTOP_STARTUP_ID")
       add_property("gnome.DESKTOP_STARTUP_ID", desktop_startup_id)
     end
 
@@ -385,6 +385,8 @@ class Java
     add_property("e.util.Log.applicationName", @dock_name)
 
     args << "-Xmx#{@heap_size}"
+    # Spams stdout with the port, breaking javahpp.
+    #args << "-agentlib:jdwp=server=y,transport=dt_socket,suspend=n,address=#{10000 + Process.pid()}"
 
     if target_os() == "Darwin"
       args << "-Xdock:name=#{@dock_name}"
@@ -464,6 +466,7 @@ end
 
 if __FILE__ == $0
   # Just an example.
-  invoker = Java.new("Launcher", "e/util/Launcher")
+  klass = ARGV.shift()
+  invoker = Java.new(klass, klass)
   invoker.invoke()
 end
