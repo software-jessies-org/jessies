@@ -308,6 +308,10 @@ RFEs
   "minicom" (http://alioth.debian.org/projects/minicom/). elliotth has used
   both and hated minicom's 1980s hierarchical menu interface, but liked socat's
   simplicity.
+  
+  sudo screen /dev/ttyS0 might work too.  car likes screen's ubiquity.
+  For mad, it's like emacs - one of those programs where all you want to know
+  about it is how to quit.
 
 * Write a front-end for lrzsz(1) (http://www.ohse.de/uwe/software/lrzsz.html)
   which turns its frame-by-frame progress reports into something as concise and
