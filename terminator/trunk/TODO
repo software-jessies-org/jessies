@@ -300,28 +300,6 @@ RFEs
   If we can support both sets, then we can advertise xterm's and deprecate rxvt's.
   TERM=xterm less ~/.profile and see that the window doesn't clear for an example.
 
-* Try socat(1) (http://www.dest-unreach.org/socat/) and write up the experience
-  for the benefit of the users who've wanted to use Terminator with directly
-  attached serial devices. (The ability to stick GNU readline between you and
-  the serial port sounds pretty nice, if you think how awful most serial
-  devices' consoles are.) Many people on the net (and our own Ed) recommend
-  "minicom" (http://alioth.debian.org/projects/minicom/). elliotth has used
-  both and hated minicom's 1980s hierarchical menu interface, but liked socat's
-  simplicity.
-  
-  sudo screen /dev/ttyS0 might work too.  car likes screen's ubiquity.
-  For mad, it's like emacs - one of those programs where all you want to know
-  about it is how to quit.
-
-* Write a front-end for lrzsz(1) (http://www.ohse.de/uwe/software/lrzsz.html)
-  which turns its frame-by-frame progress reports into something as concise and
-  useful as HyperTerminal's.
-  Our bring-up guys want to know if new hardware is dropping packets, how long
-  the transfer's going to take and whether the transfer rate is what it should
-  be.
-  Graphing transfers and errors against time should give them more useful
-  information than they get from HyperTerminal (without drowning them).
-
 * Simon Pamies [s.pamies@banality.de] isn't the only user to have suggested
   some way of saving a file which can be loaded to start a new Terminator window
   with several New Command Tabs, each with its own bgcolor and name.
