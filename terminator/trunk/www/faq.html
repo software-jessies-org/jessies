@@ -263,11 +263,15 @@ If you're an old-school Unix minimalist type, this is probably what you're looki
 
 <p>Many people on the net recommend "minicom" (<a href="http://alioth.debian.org/projects/minicom/">http://alioth.debian.org/projects/minicom/</a>).
 If you want a hierarchical text-based menu interface, like DOS programs of the 1980s, this is the one for you.
-This might be a better choice 
+This might be a better initial choice if you're unfamiliar with serial ports or otherwise need to experiment to find the right settings.
   
 <p>We're told that screen(1) (<a href="http://www.gnu.org/software/screen/">http://www.gnu.org/software/screen/</a>) works too: try <tt>sudo screen /dev/ttyS0</aa>.
 If you already use screen(1), this may be just what you're looking for.
 If you don't, you might find the learning curve very steep (because screen has a lot of functionality).
+
+<p>Serial concentrators turn serial connections into telnet ones, rendering the issue moot.
+I've had bad experiences with old models being both slow and dropping characters from one port when another port is under load.
+"Digi PortServer 16", though, I can recommend as being worth the several hundred dollar price tag.
 
 <p>If you're actually looking for XMODEM, YMODEM, ZMODEM file transfer, lrzsz(1) (<a href="http://www.ohse.de/uwe/software/lrzsz.html">http://www.ohse.de/uwe/software/lrzsz.html</a>) is excellent.
 Its UI could be improved; it would be nice if the frame-by-frame progress reports were as concise and useful as HyperTerminal's.
