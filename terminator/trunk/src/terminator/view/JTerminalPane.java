@@ -458,8 +458,10 @@ public class JTerminalPane extends JPanel {
 			if (Terminator.getPreferences().getBoolean(TerminatorPreferences.USE_ALT_AS_META) && e.isAltDown()) {
 				return Ascii.ESC + String.valueOf(e.getKeyChar());
 			}
-			if (e.isControlDown() && ch == '\t') {
-				// doKeyboardTabAction already handled this.
+			if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_TAB) {
+				// doKeyboardTabAction already handled this by cycling tabs.
+				// We don't want to insert a tab too in this case.
+				// We have to test the key code rather than the key char because of Ctrl-I.
 				return null;
 			}
 			// This modifier test lets Ctrl-H and Ctrl-J generate ^H and ^J instead of
