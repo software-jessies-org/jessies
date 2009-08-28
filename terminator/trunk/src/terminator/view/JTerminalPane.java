@@ -338,7 +338,8 @@ public class JTerminalPane extends JPanel {
 				if (sequence.length() == 1) {
 					char ch = sequence.charAt(0);
 					// We don't get a KEY_TYPED event for the escape key or keypad enter on Mac OS, where we have to handle it in keyPressed.
-					if (ch != Ascii.ESC && ch != Ascii.CR) {
+					// We can't tell the difference between control-tab and control-i in keyTyped, so we have to handle that here too.
+					if (ch != Ascii.ESC && ch != Ascii.CR && ch != Ascii.HT) {
 						Log.warn("The constraint about not handling keys that generate KEY_TYPED events in keyPressed was probably violated when handling " + event);
 					}
 				}
@@ -350,8 +351,20 @@ public class JTerminalPane extends JPanel {
 		}
 
 		private String getEscapeSequenceForKeyCode(KeyEvent event) {
-			int keyCode = event.getKeyCode();
-			// If this event will be followed by a KEY_TYPED event (that is, has a corresponding Unicode character), you must NOT handle it here.
+			final char keyChar = event.getKeyChar();
+			final int keyCode = event.getKeyCode();
+			// If this event will be followed by a KEY_TYPED event (that is, has a corresponding Unicode character), you must NOT handle it here; see keyTyped.
+			if (keyChar == '\t') {
+				// Here's our first awkward case: tab.
+				// In keyTyped, we can't tell the difference between control-tab and control-i.
+				// We have to handle both here.
+				if (event.isControlDown() && keyCode == KeyEvent.VK_TAB) {
+					// Control-tab: no corresponding text.
+					return null;
+				}
+				// Plain old tab, or control-i: insert a tab.
+				return "\t";
+			}
 			switch (keyCode) {
 				case KeyEvent.VK_ESCAPE:
 					// Annoyingly, while Linux sends a KEY_TYPED event for the escape key, Mac OS doesn't.
@@ -458,10 +471,8 @@ public class JTerminalPane extends JPanel {
 			if (Terminator.getPreferences().getBoolean(TerminatorPreferences.USE_ALT_AS_META) && e.isAltDown()) {
 				return Ascii.ESC + String.valueOf(e.getKeyChar());
 			}
-			if (e.isControlDown() && e.getKeyCode() == KeyEvent.VK_TAB) {
-				// doKeyboardTabAction already handled this by cycling tabs.
-				// We don't want to insert a tab too in this case.
-				// We have to test the key code rather than the key char because of Ctrl-I.
+			if (ch == '\t') {
+				// We handled tab in keyPressed because only there can we distinguish control-i and control-tab.
 				return null;
 			}
 			// This modifier test lets Ctrl-H and Ctrl-J generate ^H and ^J instead of
