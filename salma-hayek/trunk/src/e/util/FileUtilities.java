@@ -295,21 +295,6 @@ public class FileUtilities {
     }
     
     /**
-     * Returns a temporary file whose name begins with 'prefix'.
-     * The file will be deleted on exit.
-     * On error, a RuntimeException is thrown which will refer to the file using 'humanReadableName'.
-     */
-    public static File createTemporaryFile(String prefix, String humanReadableName) {
-        try {
-            File file = File.createTempFile(prefix, null);
-            file.deleteOnExit();
-            return file;
-        } catch (IOException ex) {
-            throw new RuntimeException("Couldn't create " + humanReadableName + ": " + ex.getMessage());
-        }
-    }
-    
-    /**
      * Creates a temporary file containing 'content' where the temporary file's name begins with 'prefix'.
      * The file will be deleted on exit.
      * Returns the name of the temporary file.
@@ -317,7 +302,13 @@ public class FileUtilities {
      */
     public static String createTemporaryFile(String prefix, String humanReadableName, String content) {
         try {
-            File file = createTemporaryFile(prefix, humanReadableName);
+            File file;
+            try {
+                file = File.createTempFile(prefix, null);
+                file.deleteOnExit();
+            } catch (IOException ex) {
+                throw new RuntimeException("Couldn't create " + humanReadableName + ": " + ex.getMessage());
+            }
             PrintWriter out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
             out.print(content);
             out.close();
@@ -325,6 +316,31 @@ public class FileUtilities {
         } catch (IOException ex) {
             throw new RuntimeException("Couldn't write " + humanReadableName + ": " + ex.getMessage());
         }
+    }
+    
+    /**
+     * Creates a temporary file containing 'content' where the temporary file's name begins with 'prefix' and has the given 'extension'.
+     * If 'content' is null, the file will be left empty. The empty string would have the same result, but cost slightly more.
+     * The file will be deleted when the VM exits.
+     * Returns the temporary file. Use toString on the result if you just want the path as a String.
+     * On error, a RuntimeException is thrown which will refer to the file using 'humanReadableName'.
+     */
+    public static File createTemporaryFile(String prefix, String extension, String humanReadableName, CharSequence content) {
+        File file;
+        try {
+            // FIXME: remove the other two variants of this method.
+            file = File.createTempFile(prefix, extension);
+            file.deleteOnExit();
+        } catch (IOException ex) {
+            throw new RuntimeException("Couldn't create " + humanReadableName + ": " + ex.getMessage());
+        }
+        if (content != null) {
+            String failure = StringUtilities.writeFile(file, content);
+            if (failure != null) {
+                throw new RuntimeException("Couldn't write " + humanReadableName + ": " + failure);
+            }
+        }
+        return file;
     }
     
     public static String getLastModifiedTime(File file) {

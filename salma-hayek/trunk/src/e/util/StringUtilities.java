@@ -83,14 +83,14 @@ public class StringUtilities {
     }
     
     @Test private static void testWriteFile_CharSequence() {
-        final File tmpFile = FileUtilities.createTemporaryFile("test", "test file");
+        final File tmpFile = FileUtilities.createTemporaryFile("test", ".tmp", "test file", null);
         final String expectedString = "hello\nworld";
         Assert.equals(writeFile(tmpFile, expectedString), null);
         Assert.equals(join(readLinesFromFile(tmpFile), "\n"), expectedString);
     }
     
     @Test private static void testWriteFile_List() {
-        final File tmpFile = FileUtilities.createTemporaryFile("test", "test file");
+        final File tmpFile = FileUtilities.createTemporaryFile("test", ".tmp", "test file", null);
         final List<String> expectedLines = Arrays.asList("hello", "world");
         Assert.equals(writeFile(tmpFile, expectedLines), null);
         final List<String> actualLines = Arrays.asList(readLinesFromFile(tmpFile));
