@@ -324,6 +324,8 @@ universal_binary_flags = -mmacosx-version-min=10.4 -isysroot /Developer/SDKs/Mac
 C_AND_CXX_FLAGS.Darwin += $(universal_binary_flags)
 LDFLAGS.Darwin += $(universal_binary_flags)
 LDFLAGS.Darwin += -lobjc
+# Mac OS 10.6 won't link PowerPC C++ without this.
+LDFLAGS.Darwin += -lstdc++
 LDFLAGS.Darwin += -framework Cocoa
 
 # ----------------------------------------------------------------------------
@@ -336,6 +338,11 @@ NATIVE_OS_DIRECTORIES.Cygwin += Mingw
 COMPILING_MINGW = $(filter $(CURDIR)/.generated/native/Mingw/%,$<)
 C_AND_CXX_FLAGS.Cygwin += $(if $(COMPILING_MINGW),-mno-cygwin)
 
+# Facilitate overriding for CXX that's conditional on a per-target, per-directory basis.
+DEFAULT_CXX := $(CXX)
+CXX.$(TARGET_OS) = $(DEFAULT_CXX)
+CXX = $(CXX.$(TARGET_OS))
+
 # Cygwin 1.7 has a g++-4 which can be installed as the default compiler.
 # Its compiler driver has no -mno-cygwin option.
 # The replacement is going to involve invoking a mingw cross-compiler.
@@ -343,8 +350,11 @@ C_AND_CXX_FLAGS.Cygwin += $(if $(COMPILING_MINGW),-mno-cygwin)
 # that the g++-4 driver knows how to invoke.
 # It doesn't know how to invoke the old one because it's in a non-standard place.
 # This is one of the things they want to address with the removal of -mno-cygwin.
-DEFAULT_CXX := $(CXX)
-CXX = $(if $(COMPILING_MINGW),g++-3,$(DEFAULT_CXX))
+CXX.Cygwin = $(if $(COMPILING_MINGW),g++-3,$(DEFAULT_CXX))
+
+# Mac OS 10.6 ships with gcc 4.2.1 as the default but, until we want to drop 10.4, we need headers like /Developer/SDKs/MacOSX10.4u.sdk/usr/include/c++/4.0.0/sstream
+# The compiler really is one sub-minor version ahead of the directory.
+CXX.Darwin = $(DEFAULT_CXX) -V4.0.1
 
 HAVE_MINGW_SOURCE := $(wildcard $(CURDIR)/native/Mingw)
 CRT_SHARED_LIBRARIES.Cygwin += $(if $(HAVE_MINGW_SOURCE),.generated/$(TARGET_DIRECTORY)/bin/mingwm10.dll)
