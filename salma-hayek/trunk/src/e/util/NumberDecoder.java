@@ -103,18 +103,40 @@ public class NumberDecoder {
         String signPrefix = number < 0 ? "-" : "";
         String digits = Long.toString(Math.abs(number), radix);
         // Make it easier to read large numbers.
+        // FIXME: it might be nice to be able to see the boundary between the top and bottom 32 bits in binary and hex.
         if (radix == 2) {
-            // FIXME: it would be convenient if binary numbers were always a multiple of 4 digits long (i.e. no partial bytes).
-            // FIXME: it would be nice to be able to see the boundary between the top and bottom 32 bits in binary.
+            digits = padTo32Or64(digits, 32, 64);
             digits = insertCharEveryNDigits(digits, ' ', 4);
         } else  if (radix == 10) {
             // FIXME: exact powers of two would usefully be given as "2048 (2Ki)", maybe (utility increasing with magnitude, probably).
             digits = insertCharEveryNDigits(digits, ',', 3);
         } else  if (radix == 16) {
-            // FIXME: it would be convenient if hex numbers were always a multiple of 2 digits long (i.e. no partial bytes).
+            digits = padTo32Or64(digits, 8, 16);
+            if (digits.length() % 2 != 0) {
+                digits = zeroPad(digits, 1);
+            }
             digits = insertCharEveryNDigits(digits, ' ', 4);
         }
         return radixToName(radix) + " " + signPrefix + radixToPrefix(radix) + digits;
+    }
+    
+    // Pad out to be a 32-bit or 64-bit number.
+    private static String padTo32Or64(String digits, int charCount32, int charCount64) {
+        if (digits.length() < charCount32) {
+            digits = zeroPad(digits, charCount32 - digits.length());
+        } else if (digits.length() < charCount64) {
+            digits = zeroPad(digits, charCount64 - digits.length());
+        }
+        return digits;
+    }
+    
+    // Return 's' prefixed with 'count' zeros.
+    private static String zeroPad(String s, int count) {
+        StringBuilder result = new StringBuilder(s);
+        for (int i = 0; i < count; ++i) {
+            result.insert(0, '0');
+        }
+        return result.toString();
     }
     
     private static String insertCharEveryNDigits(String s, char ch, int n) {
