@@ -23,6 +23,8 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
     static {
         // Try to run the site-local script.
         // This is too expensive and unpredictable to do every time we configure a PTextArea, especially because we'll probably be on the EDT.
+        // Really?  Well, if you say so, but it's lame to have to restart Evergreen to benefit from a script change.
+        // I can imagine wanting to produce different results in different Evergreen workspaces.
         // The script's output format is "^<pattern-to-match>\t<link-template>$" where the pattern's groups are as described in highlightBugs.
         // For example, this uses only Bash, keeps the two parts distinct, and avoids escaping issues:
         //
