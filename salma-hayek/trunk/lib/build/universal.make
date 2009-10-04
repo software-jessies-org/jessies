@@ -816,7 +816,7 @@ $(MACHINE_PROJECT_NAME).app: $(BUILD_TARGETS) .generated/build-revision.txt
 # on Linux), we could dispense with the top-level "terminator" directory and
 # just zip Terminator.app, which would leave users with a double-clickable app
 # in their downloads window (rather than a directory containing a
-$ double-clickable app).
+# double-clickable app).
 $(INSTALLER.zip): $(MACHINE_PROJECT_NAME).app
 	@echo "-- Creating Mac OS .zip file..."
 	mkdir -p $(@D) && \
