@@ -139,6 +139,29 @@ public class Palettes {
         palettes.put("XTerm", XTERM_COLORS);
     }
     
+    // Above the 16 system colors (which come from one of the arrays above), there are 240 more colors.
+    // The magic numbers below are to exactly match xterm's colors.
+    private static final Color[] cache = new Color[240];
+    static {
+        // First is a 6x6x6 color cube.
+        for (int r = 0; r < 6; ++r) {
+            for (int g = 0; g < 6; ++g) {
+                for (int b = 0; b < 6; ++b) {
+                    int index = 36*r + 6*g + b;
+                    cache[index] =
+                        new Color(r > 0 ? (40*r + 55) : 0,
+                                  g > 0 ? (40*g + 55) : 0,
+                                  b > 0 ? (40*b + 55) : 0);
+                }
+            }
+        }
+        // Then a grayscale ramp intentionally leaving out black and white.
+        for (int i = 0; i < 24; ++i) {
+            int gray = 10*i + 8;
+            cache[6*6*6 + i] = new Color(gray, gray, gray);
+        }
+    }
+    
     public static String toString(Color[] colors) {
         for (Map.Entry<String, Color[]> palette : palettes.entrySet()) {
             if (palette.getValue() == colors) {
@@ -163,14 +186,17 @@ public class Palettes {
     }
     
     /**
-     * Returns the color corresponding to 'index' (0-7), in its normal or bright variant.
+     * Returns the color corresponding to 'index' (0-255).
+     * 
+     * These come from the current palette:
+     *     0-  7 normal
+     *     8- 15 bright
+     * And these come from a fixed table:
+     *    16-231 6x6x6 color cube
+     *   232-255 grayscale ramp
      */
-    public static Color getColor(int index, boolean bright) {
-        if (!bright) {
-            return currentPalette()[index];
-        } else {
-            return currentPalette()[index + 8];
-        }
+    public static Color getColor(int index) {
+        return (index < 16) ? currentPalette()[index] : cache[index - 16];
     }
     
     /**

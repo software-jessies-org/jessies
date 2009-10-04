@@ -30,7 +30,7 @@ public class TextLine {
 	// The styles to be applied to the characters on this line.
 	// styles == null => all characters use the default style.
 	// Otherwise, styles.length == text.length(), and the style information for text.charAt(i) is styles[i].
-	private short[] styles;
+	private Style[] styles;
 	
 	public TextLine() {
 		clear();
@@ -44,8 +44,8 @@ public class TextLine {
 		this.lineStartIndex = lineStartIndex;
 	}
 	
-	public short getStyleAt(int index) {
-		return (styles == null) ? StyledText.getDefaultStyle() : styles[index];
+	public Style getStyleAt(int index) {
+		return (styles == null) ? Style.getDefaultStyle() : styles[index];
 	}
 	
 	public List<StyledText> getStyledTextSegments(int widthHintInChars) {
@@ -56,14 +56,14 @@ public class TextLine {
 		String string = getString();
 		ArrayList<StyledText> result = new ArrayList<StyledText>();
 		int startIndex = 0;
-		short startStyle = getStyleAt(0);
+		Style startStyle = getStyleAt(0);
 		boolean haveReasonToChop = (styles != null || string.length() > widthHintInChars);
 		if (haveReasonToChop) {
 			// If the line is very long, it helps the rendering code's manual clipping if we split it into more segments than necessary.
 			// Note: mod of a non-constant is too expensive, so we pay for a single decrement instead.
 			int charsLeftBeforeSplit = widthHintInChars;
 			for (int i = 1; i < textLength; ++i) {
-				if ((styles != null && styles[i] != startStyle) || (--charsLeftBeforeSplit == 0)) {
+				if ((styles != null && !styles[i].equals(startStyle)) || (--charsLeftBeforeSplit == 0)) {
 					result.add(new StyledText(string.substring(startIndex, i), startStyle));
 					startIndex = i;
 					if (styles != null) {
@@ -156,7 +156,7 @@ public class TextLine {
 		removeStyleData(startIndex, endIndex);
 	}
 	
-	public void insertTabAt(int offset, int tabLength, short style) {
+	public void insertTabAt(int offset, int tabLength, Style style) {
 		insertTextAt(offset, getTabString(tabLength), style);
 	}
 	
@@ -168,14 +168,14 @@ public class TextLine {
 	}
 	
 	/** Inserts text at the given position, moving anything already there further to the right. */
-	public void insertTextAt(int offset, String newText, short style) {
+	public void insertTextAt(int offset, String newText, Style style) {
 		ensureOffsetIsOK(offset);
 		text = text.substring(0, offset) + newText + text.substring(offset);
 		insertStyleData(offset, newText.length(), style);
 	}
 	
 	/** Writes text at the given position, overwriting anything underneath. */
-	public void writeTextAt(int offset, String newText, short style) {
+	public void writeTextAt(int offset, String newText, Style style) {
 		ensureOffsetIsOK(offset);
 		if (offset + newText.length() < text.length()) {
 			text = text.substring(0, offset) + newText + text.substring(offset + newText.length());
@@ -199,33 +199,33 @@ public class TextLine {
 		Arrays.fill(pad, ' ');
 		int oldTextLength = text.length();
 		text += new String(pad);
-		insertStyleData(oldTextLength, count, StyledText.getDefaultStyle());
+		insertStyleData(oldTextLength, count, Style.getDefaultStyle());
 	}
 	
-	private void overwriteStyleData(int offset, int count, short value) {
-		if (styles == null && value == StyledText.getDefaultStyle()) {
+	private void overwriteStyleData(int offset, int count, Style value) {
+		if (styles == null && value.equals(Style.getDefaultStyle())) {
 			return;
 		}
-		short[] oldStyleData = maybeResizeStyleData();
+		Style[] oldStyleData = maybeResizeStyleData();
 		if (oldStyleData != null) {
 			System.arraycopy(oldStyleData, 0, styles, 0, oldStyleData.length);
 		} else {
-			Arrays.fill(styles, 0, offset, StyledText.getDefaultStyle());
+			Arrays.fill(styles, 0, offset, Style.getDefaultStyle());
 		}
 		Arrays.fill(styles, offset, offset + count, value);
 	}
 	
-	private void insertStyleData(int offset, int count, short value) {
-		if (styles == null && value == StyledText.getDefaultStyle()) {
+	private void insertStyleData(int offset, int count, Style value) {
+		if (styles == null && value.equals(Style.getDefaultStyle())) {
 			return;
 		}
-		short[] oldStyleData = maybeResizeStyleData();
+		Style[] oldStyleData = maybeResizeStyleData();
 		if (oldStyleData != null) {
 			System.arraycopy(oldStyleData, 0, styles, 0, offset);
 			Arrays.fill(styles, offset, offset + count, value);
 			System.arraycopy(oldStyleData, offset, styles, offset + count, oldStyleData.length - offset);
 		} else {
-			Arrays.fill(styles, 0, styles.length, StyledText.getDefaultStyle());
+			Arrays.fill(styles, 0, styles.length, Style.getDefaultStyle());
 			Arrays.fill(styles, offset, offset + count, value);
 		}
 	}
@@ -234,7 +234,7 @@ public class TextLine {
 		if (styles == null) {
 			return;
 		}
-		short[] oldStyleData = maybeResizeStyleData();
+		Style[] oldStyleData = maybeResizeStyleData();
 		System.arraycopy(oldStyleData, 0, styles, 0, startIndex);
 		System.arraycopy(oldStyleData, endIndex, styles, startIndex, oldStyleData.length - endIndex);
 	}
@@ -243,10 +243,10 @@ public class TextLine {
 	 * Ensures that the "styles" array is the right size for the current "text".
 	 * You should only call this if you know that the line requires non-default styling.
 	 */
-	private short[] maybeResizeStyleData() {
-		short[] oldStyleData = styles;
+	private Style[] maybeResizeStyleData() {
+		Style[] oldStyleData = styles;
 		if (styles == null || styles.length != text.length()) {
-			styles = new short[text.length()];
+			styles = new Style[text.length()];
 		}
 		return oldStyleData;
 	}
