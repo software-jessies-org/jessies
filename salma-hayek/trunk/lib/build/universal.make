@@ -534,9 +534,9 @@ INSTALLER_EXTENSIONS += gz
 # The contents of a .msi are not so easily extracted.
 INSTALLER_EXTENSIONS.Cygwin += gz
 
-makeInstallerName.dmg = $(MACHINE_PROJECT_NAME)-$(1).dmg
-INSTALLER_EXTENSIONS += dmg
-INSTALLER_EXTENSIONS.Darwin += dmg
+makeInstallerName.zip = $(MACHINE_PROJECT_NAME)-$(1).zip
+INSTALLER_EXTENSIONS += zip
+INSTALLER_EXTENSIONS.Darwin += zip
 
 # Create different .pkg filenames for different target architectures so they can coexist.
 makeInstallerName.pkg = SJO$(MACHINE_PROJECT_NAME)_$(1)_$(TARGET_ARCHITECTURE).pkg
@@ -611,7 +611,7 @@ DIST_SUBDIRECTORY_FOR_$(notdir $(INSTALLER.gz)) = $(DIST_SUBDIRECTORY.$(PRIMARY_
 # Debian's mirrors are in a top-level directory called debian.
 # I thought there might be some tool dependency on that.
 DIST_SUBDIRECTORY.deb = debian
-DIST_SUBDIRECTORY.dmg = mac
+DIST_SUBDIRECTORY.zip = mac
 DIST_SUBDIRECTORY.msi = windows
 DIST_SUBDIRECTORY.pkg = sunos
 DIST_SUBDIRECTORY.rpm = redhat
@@ -806,13 +806,23 @@ installer-file-list:
 $(MACHINE_PROJECT_NAME).app: $(BUILD_TARGETS) .generated/build-revision.txt
 	$(BUILD_SCRIPT_PATH)/package-for-distribution.rb $(HUMAN_PROJECT_NAME) $(MACHINE_PROJECT_NAME) $(SALMA_HAYEK)
 
-# For a comparison of the major choices available at the time, see:
-# http://elliotth.blogspot.com/2007/05/choosing-best-disk-image-format-on-mac.html
-$(INSTALLER.dmg): $(MACHINE_PROJECT_NAME).app
-	@echo "-- Creating Mac OS .dmg disk image..."
+# We no longer use .dmg because (a) there have been bugs in 10.5 and 10.6 that
+# cause false "the disk image you are opening may be damaged" warnings and (b)
+# the whole mounting a virtual disk image thing is just weird and annoying.
+# Zip file support isn't buggy, most people from most backgrounds are familiar
+# with zip files, and Safari will extract zip files automatically and dispose
+# of the useless .zip husk automatically.
+# FIXME: if we made it possible to read the license from the app (as you can
+# on Linux), we could dispense with the top-level "terminator" directory and
+# just zip Terminator.app, which would leave users with a double-clickable app
+# in their downloads window (rather than a directory containing a
+$ double-clickable app).
+$(INSTALLER.zip): $(MACHINE_PROJECT_NAME).app
+	@echo "-- Creating Mac OS .zip file..."
 	mkdir -p $(@D) && \
 	$(RM) $@ && \
-	hdiutil create -fs HFSX -format UDZO -volname $(HUMAN_PROJECT_NAME) -srcfolder $(PACKAGING_DIRECTORY) $@
+	cd $(dir $(PACKAGING_DIRECTORY)) && \
+	zip -r -9 -y $@ $(notdir $(PACKAGING_DIRECTORY))
 
 $(INSTALLER.pkg): $(MACHINE_PROJECT_NAME).app
 	@echo "-- Creating package stream..."
@@ -977,10 +987,10 @@ run-installer.deb:
 .PHONY: run-installer.rpm
 run-installer.rpm:;
 
-.PHONY: run-installer.dmg
-run-installer.dmg:
+.PHONY: run-installer.zip
+run-installer.zip:
 	@echo "-- Running Mac OS installer..."
-	open -a DiskImageMounter $(INSTALLER.dmg)
+	open $(INSTALLER.zip)
 
 .PHONY: run-installer.msi
 run-installer.msi:
