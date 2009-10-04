@@ -90,7 +90,7 @@ public class Highlight {
 			// style to be propagated to the RHS.  Also, if the highlight starts after the end
 			// of the visible text, we need to do the same.
 			if ((result.size() == 0) || highlightStartsAtEndOfLine(unlit, unlitStart)) {
-				StyledText empty = new StyledText("", StyledText.getDefaultStyle());
+				StyledText empty = new StyledText("", Style.getDefaultStyle());
 				result.add(new StyledText("", style.appliedTo(empty.getStyle())));
 			}
 			result.get(result.size() - 1).setContinueToEnd(true);

@@ -209,7 +209,7 @@ public class TerminalControl {
 		designateCharacterSet(2, 'B');
 		designateCharacterSet(3, 'B');
 		if (model != null) {
-			model.setStyle(StyledText.getDefaultStyle());
+			model.setStyle(Style.getDefaultStyle());
 		}
 	}
 	

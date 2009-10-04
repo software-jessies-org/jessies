@@ -1,6 +1,9 @@
 package terminator.terminal.escape;
 
 import e.util.*;
+import java.awt.*;
+import java.util.*;
+import terminator.*;
 import terminator.model.*;
 import terminator.terminal.*;
 
@@ -283,23 +286,29 @@ public class CSIEscapeAction implements TerminalAction {
 		}
 	}
 	
+	// Returns the next chunk from 'chunks' as an int.
+	// If the next chunk is empty, returns 0.
+	// If there are no more chunks, returns 0.
+	private int nextInt(Iterator<String> chunks) {
+		final String chunk = chunks.hasNext() ? chunks.next() : "";
+		return (chunk.length() == 0) ? 0 : Integer.parseInt(chunk);
+	}
+	
 	public boolean processFontEscape(TerminalModel model, String sequence) {
-		int oldStyle = model.getStyle();
-		int foreground = StyledText.getForeground(oldStyle);
-		int background = StyledText.getBackground(oldStyle);
-		boolean isBold = StyledText.isBold(oldStyle);
-		boolean isReverseVideo = StyledText.isReverseVideo(oldStyle);
-		boolean isUnderlined = StyledText.isUnderlined(oldStyle);
-		boolean hasForeground = StyledText.hasForeground(oldStyle);
-		boolean hasBackground = StyledText.hasBackground(oldStyle);
-		String[] chunks = sequence.split(";");
-		for (String chunk : chunks) {
-			int value = (chunk.length() == 0) ? 0 : Integer.parseInt(chunk);
-			switch (value) {
+		Style oldStyle = model.getStyle();
+		Color foreground = oldStyle.getForeground();
+		Color background = oldStyle.getBackground();
+		boolean isBold = oldStyle.isBold();
+		boolean isReverseVideo = oldStyle.isReverseVideo();
+		boolean isUnderlined = oldStyle.isUnderlined();
+		Iterator<String> chunks = Arrays.asList(sequence.split(";")).iterator();
+		while (chunks.hasNext()) {
+			final int attribute = nextInt(chunks);
+			switch (attribute) {
 			case 0:
 				// Clear all attributes.
-				hasForeground = false;
-				hasBackground = false;
+				foreground = null;
+				background = null;
 				isBold = false;
 				isReverseVideo = false;
 				isUnderlined = false;
@@ -350,13 +359,39 @@ public class CSIEscapeAction implements TerminalAction {
 			case 35:
 			case 36:
 			case 37:
-				// Set foreground color.
-				foreground = value - 30;
-				hasForeground = true;
+				// Set foreground color to one of the original eight colors.
+				foreground = Palettes.getColor(attribute - 30);
+				break;
+			case 38:
+				// Set foreground color (256-color or 24-bit).
+			case 48:
+				// Set background color (256-color or 24-bit).
+				Color newColor = null;
+				final int colorMode = nextInt(chunks);
+				switch (colorMode) {
+				case 5:
+					// 256 color mode, as in xterm.
+					newColor = Palettes.getColor(nextInt(chunks));
+					break;
+				case 2:
+					// 24 bit color mode, a konsole extension.
+					final int red = nextInt(chunks);
+					final int green = nextInt(chunks);
+					final int blue = nextInt(chunks);
+					newColor = new Color(red, green, blue);
+					break;
+				default:
+					Log.warn("Unknown color mode " + colorMode + " for attribute " + attribute + " in [" + StringUtilities.escapeForJava(sequence));
+				}
+				if (attribute == 38) {
+					foreground = newColor;
+				} else {
+					background = newColor;
+				}
 				break;
 			case 39:
 				// Use default foreground color.
-				hasForeground = false;
+				foreground = null;
 				break;
 			case 40:
 			case 41:
@@ -366,20 +401,41 @@ public class CSIEscapeAction implements TerminalAction {
 			case 45:
 			case 46:
 			case 47:
-				// Set background color.
-				background = value - 40;
-				hasBackground = true;
+				// Set background color to one of the original eight colors.
+				background = Palettes.getColor(attribute - 40);
 				break;
 			case 49:
 				// Use default background color.
-				hasBackground = false;
+				background = null;
+				break;
+			case 90:
+			case 91:
+			case 92:
+			case 93:
+			case 94:
+			case 95:
+			case 96:
+			case 97:
+				// Set foreground color to one of the eight bright colors.
+				foreground = Palettes.getColor(attribute - 82);
+				break;
+			case 100:
+			case 101:
+			case 102:
+			case 103:
+			case 104:
+			case 105:
+			case 106:
+			case 107:
+				// Set background color to one of the eight bright colors.
+				background = Palettes.getColor(attribute - 92);
 				break;
 			default:
-				Log.warn("Unknown attribute " + value + " in [" + StringUtilities.escapeForJava(sequence));
+				Log.warn("Unknown attribute " + attribute + " in [" + StringUtilities.escapeForJava(sequence));
 				break;
 			}
 		}
-		model.setStyle(StyledText.getStyle(foreground, hasForeground, background, hasBackground, isBold, isUnderlined, isReverseVideo));
+		model.setStyle(Style.makeStyle(foreground, background, isBold, isUnderlined, isReverseVideo));
 		return true;
 	}
 }

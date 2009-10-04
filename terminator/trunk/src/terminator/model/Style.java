@@ -1,6 +1,7 @@
 package terminator.model;
 
 import java.awt.*;
+import terminator.*;
 
 /**
  * Phil talks about this class as being immutable, yet it's not final.
@@ -31,6 +32,8 @@ import java.awt.*;
  * absolutely disallowed because there's no particular reason it should be.
  */
 public class Style {
+	private static final Style DEFAULT_STYLE = makeStyle(null, null, false, false, false);
+	
 	// If any of these is null, it should be ignored.  We use Boolean references because they
 	// can be used to represent 3 states - null, TRUE and FALSE.
 	private Color foreground;
@@ -72,7 +75,7 @@ public class Style {
 	}
 	
 	public Color getForeground() {
-		return foreground;
+		return hasForeground() ? foreground : Terminator.getPreferences().getColor(TerminatorPreferences.FOREGROUND_COLOR);
 	}
 	
 	public boolean hasBackground() {
@@ -80,7 +83,7 @@ public class Style {
 	}
 	
 	public Color getBackground() {
-		return background;
+		return hasBackground() ? background : Terminator.getPreferences().getColor(TerminatorPreferences.BACKGROUND_COLOR);
 	}
 	
 	public boolean hasBold() {
@@ -101,5 +104,13 @@ public class Style {
 	
 	public boolean isReverseVideo() {
 		return isReverseVideo;
+	}
+	
+	public static Style getDefaultStyle() {
+		return DEFAULT_STYLE;
+	}
+	
+	public static Style makeStyle(Color foreground, Color background, boolean isBold, boolean isUnderlined, boolean isReverseVideo) {
+		return new Style(foreground, background, isBold, isUnderlined, isReverseVideo);
 	}
 }

@@ -70,14 +70,14 @@ terminator|Terminator no line wrap,
     tbc=\E[3g,
     vpa=\E[%i%p1%dd,
     sgr0=\E[m,
-# We offer 8 colors, in any foreground/background combination.
-    colors#8,
-    pairs#64,
+# We actually offer 24-bit color like konsole, but this is what xterm-256color says.
+    colors#256,
+    pairs#32767,
 # Return to the original pair of colors.
     op=\E[39;49m,
 # Set ANSI background and foreground colors.
-    setab=\E[%p1%{40}%+%dm,
-    setaf=\E[%p1%{30}%+%dm,
+    setab=\E[48;5;%p1%dm,
+    setaf=\E[38;5;%p1%dm,
 #
 # Use the title bar as a status line. Because we don't set $WINDOWID, you'll
 # have to "set title" in your .vimrc to get vim(1) to behave as it does with

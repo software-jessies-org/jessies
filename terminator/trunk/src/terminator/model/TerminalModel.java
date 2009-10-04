@@ -12,7 +12,7 @@ public class TerminalModel {
 	private int width;
 	private int height;
 	private ArrayList<TextLine> textLines = new ArrayList<TextLine>();
-	private short currentStyle = StyledText.getDefaultStyle();
+	private Style currentStyle = Style.getDefaultStyle();
 	private int firstScrollLineIndex;
 	private int lastScrollLineIndex;
 	private Location cursorPosition;
@@ -26,7 +26,7 @@ public class TerminalModel {
 	
 	// Fields used for saving and restoring state.
 	private Location savedPosition;
-	private short savedStyle;
+	private Style savedStyle;
 	
 	// Fields used for saving and restoring the 'real' screen while the alternate buffer is in use.
 	private TextLine[] savedScreen;
@@ -306,11 +306,11 @@ public class TerminalModel {
 		view.setCursorPosition(cursorPosition);
 	}
 	
-	public void setStyle(short style) {
+	public void setStyle(Style style) {
 		this.currentStyle = style;
 	}
 	
-	public short getStyle() {
+	public Style getStyle() {
 		return currentStyle;
 	}
 	
