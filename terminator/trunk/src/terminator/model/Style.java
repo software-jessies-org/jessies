@@ -33,13 +33,16 @@ import terminator.*;
  */
 public class Style {
 	private static final Style DEFAULT_STYLE = makeStyle(null, null, false, false, false);
-	
-	// If any of these is null, it should be ignored.  We use Boolean references because they
-	// can be used to represent 3 states - null, TRUE and FALSE.
+
+	// This style's foreground/background color, or null to indicate this style doesn't affect the foreground/background color.
+    // Note that the use of Colors means text styled while a given palette is in use for the lower 16 colors will always use those colors even if the user later switches to a different palette.
 	private Color foreground;
 	private Color background;
+
+    // We use Boolean references because they can be used to represent 3 states - null ("leave as-is"), TRUE ("turn on"), and FALSE ("turn off").
 	private Boolean isBold;
 	private Boolean isUnderlined;
+    // TODO: why doesn't reverse video need three states?
 	private boolean isReverseVideo;
 	
 	public Style(Color foreground, Color background, Boolean isBold, Boolean isUnderlined, boolean isReverseVideo) {
