@@ -11,35 +11,45 @@ import java.util.regex.*;
 public class SpellingChecker {
     private static final SpellingChecker instance = new SpellingChecker();
     private static final boolean DEBUGGING = false;
-    
+
     private static final Stopwatch stopwatch = Stopwatch.get("SpellingChecker");
-    
+
     private static WordCache wordCache = new WordCache();
-    
+
     /**
      * Caches whether or not the last MAX_ENTRIES words were spelled correctly or incorrectly.
      */
     private static class WordCache extends LinkedHashMap<String, Boolean> {
         private static final int MAX_ENTRIES = 4096;
-        
+
         public WordCache() {
             super(MAX_ENTRIES);
         }
-        
+
         @Override protected boolean removeEldestEntry(Map.Entry<String, Boolean> eldest) {
             return size() > MAX_ENTRIES;
         }
     }
-    
+
     private Process ispell;
     private PrintWriter out;
     private BufferedReader in;
-    
+    private String userSpellingExceptionsFile;
+
     /** Returns the single instance of SpellingChecker. */
     public static synchronized SpellingChecker getSharedSpellingCheckerInstance() {
         return instance;
     }
-    
+
+    /**
+     * Sets the name of the file from which we can read the spelling exceptions specified
+     * per user.  Any words which are later accepted by the user will be appended to
+     * this file, one word per line.
+     */
+    public void setUserSpellingExceptionsFile(String userSpellingExceptionsFile) {
+        this.userSpellingExceptionsFile = userSpellingExceptionsFile;
+    }
+
     /** Establishes the connection to ispell, if possible. */
     private SpellingChecker() {
         // On Mac OS, we want to use the system's spelling checker, so try our NSSpell utility (which gives Apple's code an ispell-like interface) first.
@@ -58,14 +68,14 @@ public class SpellingChecker {
         }
         Log.warn("SpellingChecker: failed to find any back end. Please install aspell(1) or ispell(1).");
     }
-    
+
     /** Attempts to connect to the given command-line spelling checker, which must be compatible with ispell's -a mode. */
     private boolean connectTo(String[] execArguments) {
         try {
             ispell = Runtime.getRuntime().exec(execArguments);
             in = new BufferedReader(new InputStreamReader(ispell.getInputStream()));
             out = new PrintWriter(ispell.getOutputStream());
-            
+
             String greeting = in.readLine();
             if (greeting != null && greeting.startsWith("@(#) International Ispell ")) {
                 Log.warn("SpellingChecker: connected to " + execArguments[0] + " okay: " + greeting + ".");
@@ -83,7 +93,7 @@ public class SpellingChecker {
             return false;
         }
     }
-    
+
     /**
      * Tests whether the given word is misspelled.
      * If ispell is unavailable, no words are considered misspelled.
@@ -95,20 +105,20 @@ public class SpellingChecker {
             debug("ispell == null");
             return false;
         }
-        
+
         word = word.toLowerCase();
-        
+
         // Check the exceptions lists first...
         if (isException(word, fileType)) {
             return false;
         }
-        
+
         // ...then the word cache...
         Boolean cachedResult = wordCache.get(word);
         if (cachedResult != null) {
             return cachedResult;
         }
-        
+
         // ...and only then give in and ask the spelling checker.
         // We copy the word into a new string to avoid accidental retention
         // of character arrays representing documents in their entirety.
@@ -116,16 +126,21 @@ public class SpellingChecker {
         wordCache.put(new String(word), Boolean.valueOf(misspelled));
         return misspelled;
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
-    private static final HashMap<FileType, HashSet<String>> SPELLING_EXCEPTIONS_MAP = new HashMap<FileType, HashSet<String>>();
-    
+
+    private final HashMap<FileType, HashSet<String>> spellingExceptionsPerType = new HashMap<FileType, HashSet<String>>();
+    private HashSet<String> sharedSpellingExceptions;
+
     /**
      * Tests whether the text component we're checking declares the given word
-     * as a spelling exception in its language.
+     * as a spelling exception in its language, or if the word is declared as an exception
+     * in one of the non-filetype-specific files.
      */
     private boolean isException(String word, FileType fileType) {
+        if (getSharedExceptions().contains(word)) {
+            return true;
+        }
         final HashSet<String> exceptions = getExceptionsFor(fileType);
         if (exceptions == null) {
             return false;
@@ -134,21 +149,45 @@ public class SpellingChecker {
             return exceptions.contains(word);
         }
     }
-    
+
+    private void addSharedSpellingException(String word) {
+        sharedSpellingExceptions.add(word);
+        if (userSpellingExceptionsFile != null) {
+            try {
+                PrintWriter writer = new PrintWriter(new FileWriter(userSpellingExceptionsFile, true));
+                writer.println(word);
+                writer.close();
+            } catch (IOException ex) {
+                Log.warn("Failed to write " + word + " to user spelling exceptions file " + userSpellingExceptionsFile, ex);
+            }
+        }
+    }
+
+    private HashSet<String> getSharedExceptions() {
+        if (sharedSpellingExceptions == null) {
+            sharedSpellingExceptions = new HashSet<String>();
+            readSpellingExceptionsFile(getSpellingExceptionsFilename("spelling-exceptions"), sharedSpellingExceptions);
+            if (userSpellingExceptionsFile != null) {
+                readSpellingExceptionsFile(userSpellingExceptionsFile, sharedSpellingExceptions);
+            }
+        }
+        return sharedSpellingExceptions;
+    }
+
     private HashSet<String> getExceptionsFor(FileType fileType) {
         HashSet<String> exceptions;
-        synchronized (SPELLING_EXCEPTIONS_MAP) {
-            exceptions = SPELLING_EXCEPTIONS_MAP.get(fileType);
+        synchronized (spellingExceptionsPerType) {
+            exceptions = spellingExceptionsPerType.get(fileType);
         }
         if (exceptions == null) {
             exceptions = initSpellingExceptionsFor(fileType);
-            synchronized (SPELLING_EXCEPTIONS_MAP) {
-                SPELLING_EXCEPTIONS_MAP.put(fileType, exceptions);
+            synchronized (spellingExceptionsPerType) {
+                spellingExceptionsPerType.put(fileType, exceptions);
             }
         }
         return exceptions;
     }
-    
+
     // Used by Evergreen's Advisors to supply extra exceptions they've gleaned at runtime.
     public void addSpellingExceptionsFor(FileType fileType, Set<String> extraExceptions) {
         final HashSet<String> exceptions = getExceptionsFor(fileType);
@@ -156,26 +195,26 @@ public class SpellingChecker {
             exceptions.addAll(extraExceptions);
         }
     }
-    
+
     private HashSet<String> initSpellingExceptionsFor(FileType fileType) {
         HashSet<String> result = new HashSet<String>();
-        
+
         // None of the language's keywords should be considered misspelled.
         result.addAll(Arrays.asList(fileType.getKeywords()));
-        
+
         // There may be general-purpose spelling exceptions.
         readSpellingExceptionsFile(getSpellingExceptionsFilename("spelling-exceptions"), result);
-        
+
         // And there may be a file of extra spelling exceptions for this language.
         readSpellingExceptionsFile(getSpellingExceptionsFilename("spelling-exceptions-" + fileType.getName()), result);
-        
+
         return result;
     }
-    
+
     private String getSpellingExceptionsFilename(String name) {
         return System.getProperty("org.jessies.supportRoot") + File.separator + "lib" + File.separator + "data" + File.separator + name;
     }
-    
+
     private void readSpellingExceptionsFile(String filename, HashSet<String> result) {
         if (!FileUtilities.exists(filename)) {
             return;
@@ -187,9 +226,9 @@ public class SpellingChecker {
             result.add(exception);
         }
     }
-    
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+
     public synchronized String[] getSuggestionsFor(String misspelledWord) {
         ArrayList<String> suggestions = new ArrayList<String>();
         boolean isMisspelled = isMisspelledWordAccordingToIspell(misspelledWord, suggestions);
@@ -198,25 +237,23 @@ public class SpellingChecker {
         }
         return suggestions.toArray(new String[suggestions.size()]);
     }
-    
+
     /**
      * Moves the word from the known bad set to the known good set,
      * and inserts it into the user's personal ispell dictionary.
      */
     public synchronized void acceptSpelling(String word, FileType fileType) {
+        word = word.toLowerCase();
         if (isMisspelledWord(word, fileType) == false) {
             return;
         }
-        
+
         // The word cache only contains lowercase words.
-        wordCache.remove(word.toLowerCase());
-        
-        // Send the word to ispell to insert into the personal dictionary.
-        // FIXME: we pass it through with its original case, but if it's not all lowercase, ispell(1) takes that to mean that it should only accept that capitalization. This may not be the right choice.
-        out.println("*" + word);
-        out.flush();
+        wordCache.remove(word);
+
+        addSharedSpellingException(word);
     }
-    
+
     private boolean isMisspelledWordAccordingToIspell(String word, Collection<String> returnSuggestions) {
         Stopwatch.Timer timer = stopwatch.start();
         try {
@@ -225,7 +262,7 @@ public class SpellingChecker {
             debug(request);
             out.println(request);
             out.flush();
-            
+
             // ispell's response will be one of:
             // 1. a blank line (meaning "correctly spelled"),
             // 2. lines beginning with [&?#] containing suggested corrections, followed by a blank line.
@@ -234,35 +271,35 @@ public class SpellingChecker {
                 Log.warn("SpellingChecker: lost connection to back end.");
                 return false;
             }
-            
+
             // A blank line means "correctly spelled".
             if (response.length() == 0) {
                 debug("\"" + word + "\" response length == 0");
                 return false;
             }
-            
+
             // &: near-miss
             // ?: guess
             // #: no suggestions
             boolean misspelled = true;
             while (response != null && response.length() > 0 && "&?#+-".indexOf(response.charAt(0)) != -1) {
                 debug(" " + response);
-                
+
                 if (response.charAt(0) == '&' && isCorrectIgnoringCase(word, response)) {
                     misspelled = false;
                 }
-                
+
                 if (returnSuggestions != null) {
                     fillCollectionWithSuggestions(response, returnSuggestions);
                 }
-                
+
                 response = in.readLine();
             }
-            
+
             if (response != null && response.length() != 0) {
                 Log.warn("SpellingChecker: garbled response: \"" + response + "\"");
             }
-            
+
             return misspelled;
         } catch (IOException ex) {
             // What do we know, other than we failed to get an answer?
@@ -273,7 +310,7 @@ public class SpellingChecker {
             timer.stop();
         }
     }
-    
+
     /**
      * Tests whether a spelling would be correct if we didn't care about case.
      * In code, case is often dependent on naming conventions rather than
@@ -283,7 +320,7 @@ public class SpellingChecker {
     private boolean isCorrectIgnoringCase(String word, String response) {
         /*
          * From the ispell(1) man page:
-         * 
+         *
          * If the word is not in the dictionary, but there are near  misses,  then
          * the  line  contains  an '&', a space, the misspelled word, a space, the
          * number of near misses, the number of characters between  the  beginning
@@ -308,23 +345,23 @@ public class SpellingChecker {
         }
         return false;
     }
-    
+
     private String[] extractSuggestions(String response) {
         // Does this response actually have any suggestions?
         if ("&?".indexOf(response.charAt(0)) == -1) {
             return new String[0];
         }
-        
+
         return response.replaceFirst("^[&\\?] .* \\d+ \\d+: ", "").split(", ");
     }
-    
+
     private void fillCollectionWithSuggestions(String response, Collection<String> returnSuggestions) {
         String[] suggestions = extractSuggestions(response);
         for (String suggestion : suggestions) {
             returnSuggestions.add(suggestion);
         }
     }
-    
+
     private void debug(String message) {
         if (DEBUGGING) {
             Log.warn("SpellingChecker: " + message);
