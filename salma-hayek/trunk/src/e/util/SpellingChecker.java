@@ -119,24 +119,44 @@ public class SpellingChecker {
     
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
-    private static final HashMap<FileType, HashSet<String>> SPELLING_EXCEPTIONS_MAP = new HashMap<FileType, HashSet<String>>();
+    private static final HashMap<FileType, InheritingSet> SPELLING_EXCEPTIONS_MAP = new HashMap<FileType, InheritingSet>();
+    
+    // A set of strings whose 'contains' method delegates to its parent on failure.
+    // This allows each FileType-specific set to delegate to a FileType-independent general purpose set.
+    static class InheritingSet {
+        private final HashSet<String> set = new HashSet<String>();
+        private final InheritingSet parent;
+        
+        InheritingSet(InheritingSet parent) {
+            this.parent = parent;
+        }
+        
+        public synchronized void add(String word) {
+            set.add(word);
+        }
+        
+        public synchronized void addAll(Collection<String> words) {
+            set.addAll(words);
+        }
+        
+        public synchronized boolean contains(String word) {
+            return set.contains(word) || (parent != null && parent.contains(word));
+        }
+    }
+    
+    // The current top of the delegation chain is this set of FileType-independent exceptions.
+    private static final InheritingSet GENERAL_PURPOSE_EXCEPTIONS = getGeneralPurposeExceptions();
     
     /**
      * Tests whether the text component we're checking declares the given word
      * as a spelling exception in its language.
      */
     private boolean isException(String word, FileType fileType) {
-        final HashSet<String> exceptions = getExceptionsFor(fileType);
-        if (exceptions == null) {
-            return false;
-        }
-        synchronized (exceptions) {
-            return exceptions.contains(word);
-        }
+        return getExceptionsFor(fileType).contains(word);
     }
     
-    private HashSet<String> getExceptionsFor(FileType fileType) {
-        HashSet<String> exceptions;
+    private InheritingSet getExceptionsFor(FileType fileType) {
+        InheritingSet exceptions;
         synchronized (SPELLING_EXCEPTIONS_MAP) {
             exceptions = SPELLING_EXCEPTIONS_MAP.get(fileType);
         }
@@ -151,20 +171,14 @@ public class SpellingChecker {
     
     // Used by Evergreen's Advisors to supply extra exceptions they've gleaned at runtime.
     public void addSpellingExceptionsFor(FileType fileType, Set<String> extraExceptions) {
-        final HashSet<String> exceptions = getExceptionsFor(fileType);
-        synchronized (exceptions) {
-            exceptions.addAll(extraExceptions);
-        }
+        getExceptionsFor(fileType).addAll(extraExceptions);
     }
     
-    private HashSet<String> initSpellingExceptionsFor(FileType fileType) {
-        HashSet<String> result = new HashSet<String>();
+    private static InheritingSet initSpellingExceptionsFor(FileType fileType) {
+        InheritingSet result = new InheritingSet(GENERAL_PURPOSE_EXCEPTIONS);
         
         // None of the language's keywords should be considered misspelled.
         result.addAll(Arrays.asList(fileType.getKeywords()));
-        
-        // There may be general-purpose spelling exceptions.
-        readSpellingExceptionsFile(getSpellingExceptionsFilename("spelling-exceptions"), result);
         
         // And there may be a file of extra spelling exceptions for this language.
         readSpellingExceptionsFile(getSpellingExceptionsFilename("spelling-exceptions-" + fileType.getName()), result);
@@ -172,11 +186,17 @@ public class SpellingChecker {
         return result;
     }
     
-    private String getSpellingExceptionsFilename(String name) {
+    private static InheritingSet getGeneralPurposeExceptions() {
+        InheritingSet result = new InheritingSet(null);
+        readSpellingExceptionsFile(getSpellingExceptionsFilename("spelling-exceptions"), result);
+        return result;
+    }
+    
+    private static String getSpellingExceptionsFilename(String name) {
         return System.getProperty("org.jessies.supportRoot") + File.separator + "lib" + File.separator + "data" + File.separator + name;
     }
     
-    private void readSpellingExceptionsFile(String filename, HashSet<String> result) {
+    private static void readSpellingExceptionsFile(String filename, InheritingSet result) {
         if (!FileUtilities.exists(filename)) {
             return;
         }
