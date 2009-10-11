@@ -147,6 +147,11 @@ public class SpellingChecker {
     // The current top of the delegation chain is this set of FileType-independent exceptions.
     private static final InheritingSet GENERAL_PURPOSE_EXCEPTIONS = getGeneralPurposeExceptions();
     
+    // The next level of the delegation chain is the set of exceptions the user has explicitly accepted.
+    // Remember that this field must remain after the GENERAL_PURPOSE_EXCEPTIONS field to ensure
+    // that this one is initialized later.
+    private static final InheritingSet USER_DEFINED_EXCEPTIONS = getUserDefinedExceptions(GENERAL_PURPOSE_EXCEPTIONS);
+    
     /**
      * Tests whether the text component we're checking declares the given word
      * as a spelling exception in its language.
@@ -175,7 +180,7 @@ public class SpellingChecker {
     }
     
     private static InheritingSet initSpellingExceptionsFor(FileType fileType) {
-        InheritingSet result = new InheritingSet(GENERAL_PURPOSE_EXCEPTIONS);
+        InheritingSet result = new InheritingSet(USER_DEFINED_EXCEPTIONS);
         
         // None of the language's keywords should be considered misspelled.
         result.addAll(Arrays.asList(fileType.getKeywords()));
@@ -190,6 +195,20 @@ public class SpellingChecker {
         InheritingSet result = new InheritingSet(null);
         readSpellingExceptionsFile(getSpellingExceptionsFilename("spelling-exceptions"), result);
         return result;
+    }
+    
+    private static InheritingSet getUserDefinedExceptions(InheritingSet parent) {
+        // The order in which the fields of the two inheriting sets are defined as important: our
+        // parent must be set up before we create this set which inherits from it.  The following
+        // assert is here to ensure this doesn't get broken without us noticing.
+        assert(parent != null);
+        InheritingSet result = new InheritingSet(parent);
+        readSpellingExceptionsFile(getUserDefinedExceptionsFilename(), result);
+        return result;
+    }
+    
+    private static String getUserDefinedExceptionsFilename() {
+        return FileUtilities.getUserHomeDirectory() + File.separator + ".org.jessies.spelling-exceptions";
     }
     
     private static String getSpellingExceptionsFilename(String name) {
@@ -229,12 +248,18 @@ public class SpellingChecker {
         }
         
         // The word cache only contains lowercase words.
-        wordCache.remove(word.toLowerCase());
+        final String lowerCaseWord = word.toLowerCase();
+        wordCache.remove(lowerCaseWord);
         
-        // Send the word to ispell to insert into the personal dictionary.
-        // FIXME: we pass it through with its original case, but if it's not all lowercase, ispell(1) takes that to mean that it should only accept that capitalization. This may not be the right choice.
-        out.println("*" + word);
-        out.flush();
+        // Add the word to the personal dictionary.
+        USER_DEFINED_EXCEPTIONS.add(lowerCaseWord);
+        try {
+            PrintWriter writer = new PrintWriter(new FileWriter(getUserDefinedExceptionsFilename(), true));
+            writer.println(lowerCaseWord);
+            writer.close();
+        } catch (IOException ex) {
+            Log.warn("SpellingChecker: failed to write new word " + lowerCaseWord + " to user dictionary " + getUserDefinedExceptionsFilename(), ex);
+        }
     }
     
     private boolean isMisspelledWordAccordingToIspell(String word, Collection<String> returnSuggestions) {
