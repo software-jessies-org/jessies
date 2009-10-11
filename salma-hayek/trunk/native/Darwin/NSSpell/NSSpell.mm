@@ -80,6 +80,9 @@ static void ispellLoop() {
         } else if (line[0] == '*') {
             std::string word(line.substr(1));
             // FIXME: insert word into dictionary.
+            // Note that this is not actually needed for salma-hayek's purposes
+            // anymore, since it now keeps its own record of those spellings
+            // the user has accepted.
         } else {
             abort();
         }
