@@ -453,13 +453,21 @@ public class Workspace extends JPanel {
             final int currentLineNumber = 1 + textArea.getLineOfOffset(textArea.getSelectionStart());
             environment.put("EVERGREEN_CURRENT_LINE_NUMBER", Integer.toString(currentLineNumber));
             
-            environment.put("EVERGREEN_CURRENT_WORD", ETextAction.getWordAtCaret(textWindow));
+            putIfPlainText(environment, "EVERGREEN_CURRENT_WORD", ETextAction.getWordAtCaret(textWindow));
             if (textArea.getSelectionEnd() - textArea.getSelectionStart() < 1024) {
-                environment.put("EVERGREEN_CURRENT_SELECTION", textArea.getSelectedText());
+                putIfPlainText(environment, "EVERGREEN_CURRENT_SELECTION", textArea.getSelectedText());
             }
         }
         
         final EErrorsWindow errorsWindow = createErrorsWindow("Command Output"); // FIXME: be more specific.
         return new ShellCommand(textArea, errorsWindow, directory, command, environment, inputDisposition, outputDisposition);
+    }
+    
+    // Environment variables are C strings, so we can't include NUL bytes.
+    public static void putIfPlainText(Map<String, String> environment, String name, String value) {
+        if (value.indexOf('\u0000') != -1) {
+            return;
+        }
+        environment.put(name, value);
     }
 }
