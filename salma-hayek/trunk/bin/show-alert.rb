@@ -94,9 +94,9 @@ else
                     raise()
                 end
                 messageLines = []
-                messageLines << "#{app_name} failed to change to your home directory."
+                messageLines << "#{@app_name} failed to change to your home directory."
                 messageLines << ""
-                messageLines << "Exception #{ex.class}: #{ex.message}"
+                messageLines << "Exception #{ex.class()}: #{ex.message()}"
                 messageLines << ""
                 messageLines << "Perhaps you need to double click on the Cygwin shortcut again?"
                 messageLines << "See http://software.jessies.org/salma-hayek/cygwin-setup.html"
