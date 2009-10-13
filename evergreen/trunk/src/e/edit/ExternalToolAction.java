@@ -75,7 +75,7 @@ public class ExternalToolAction extends ETextAction {
     private void runCommand(ShellCommand shellCommand) {
         try {
             shellCommand.runCommand();
-        } catch (IOException ex) {
+        } catch (Exception ex) {
             Evergreen.getInstance().showAlert("Couldn't start task", "There was a problem starting the command \"" + shellCommand.getCommand() + "\": " + ex.getMessage() + ".");
         }
     }
