@@ -130,6 +130,10 @@ class Terminator
         end
         # We should start a new Terminator if the client (this script) is newer than the server (the currently-running Terminator).
         # Checking just the modification time of just the script is only an approximation, but it's close enough for users who'll install all the files at once anyway.
+        # For users installing from .deb or .rpm, the time on the script is the time that the package was built, not the time of installation.
+        # This is unfortunate if you're trying out several packages that were all built before you started testing.
+        # Perhaps we should make the serverPortPathname dependent on the revision,
+        # but it would have to be dependent on the architecture too to have saved Ron.
         if FileUtils.uptodate?(serverPortPathname, [__FILE__]) == false
             return
         end
