@@ -210,7 +210,7 @@ public class TextLine {
 		if (oldStyleData != null) {
 			System.arraycopy(oldStyleData, 0, styles, 0, oldStyleData.length);
 		} else {
-			Arrays.fill(styles, 0, offset, Style.getDefaultStyle());
+			Arrays.fill(styles, 0, styles.length, Style.getDefaultStyle());
 		}
 		Arrays.fill(styles, offset, offset + count, value);
 	}
