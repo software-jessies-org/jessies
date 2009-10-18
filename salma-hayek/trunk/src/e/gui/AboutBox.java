@@ -78,11 +78,6 @@ public class AboutBox {
         return INSTANCE;
     }
     
-    public void setApplicationName(String applicationName) {
-        // Maintain binary compatibility by forwarding to the correct method.
-        Log.setApplicationName(applicationName);
-    }
-    
     public String getWebSiteAddress() {
         return webSiteAddress;
     }
