@@ -209,8 +209,6 @@ public class TextLine {
 		Style[] oldStyleData = maybeResizeStyleData();
 		if (oldStyleData != null) {
 			System.arraycopy(oldStyleData, 0, styles, 0, oldStyleData.length);
-		} else {
-			Arrays.fill(styles, 0, styles.length, Style.getDefaultStyle());
 		}
 		Arrays.fill(styles, offset, offset + count, value);
 	}
@@ -222,12 +220,9 @@ public class TextLine {
 		Style[] oldStyleData = maybeResizeStyleData();
 		if (oldStyleData != null) {
 			System.arraycopy(oldStyleData, 0, styles, 0, offset);
-			Arrays.fill(styles, offset, offset + count, value);
 			System.arraycopy(oldStyleData, offset, styles, offset + count, oldStyleData.length - offset);
-		} else {
-			Arrays.fill(styles, 0, styles.length, Style.getDefaultStyle());
-			Arrays.fill(styles, offset, offset + count, value);
 		}
+		Arrays.fill(styles, offset, offset + count, value);
 	}
 	
 	private void removeStyleData(int startIndex, int endIndex) {
@@ -235,6 +230,7 @@ public class TextLine {
 			return;
 		}
 		Style[] oldStyleData = maybeResizeStyleData();
+		// insert and overwrite can get here when oldStyleData is null, but remove can't.
 		System.arraycopy(oldStyleData, 0, styles, 0, startIndex);
 		System.arraycopy(oldStyleData, endIndex, styles, startIndex, oldStyleData.length - endIndex);
 	}
@@ -247,6 +243,7 @@ public class TextLine {
 		Style[] oldStyleData = styles;
 		if (styles == null || styles.length != text.length()) {
 			styles = new Style[text.length()];
+			Arrays.fill(styles, 0, styles.length, Style.getDefaultStyle());
 		}
 		return oldStyleData;
 	}
