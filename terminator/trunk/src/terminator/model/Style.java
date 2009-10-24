@@ -45,6 +45,40 @@ public class Style {
     // TODO: why doesn't reverse video need three states?
 	private boolean isReverseVideo;
 	
+	public String toString() {
+		return "Style[foreground=" + foreground + ", background=" + background + ", isBold=" + isBold + ", isUnderlined=" + isUnderlined + ", isReverseVideo=" + isReverseVideo + "]";
+	}
+	
+	@Override public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj instanceof Style == false) {
+			return false;
+		}
+		Style style = (Style) obj;
+		if (foreground == null ? style.foreground != null : foreground.equals(style.foreground) == false) {
+			return false;
+		}
+		if (background == null ? style.background != null : background.equals(style.background) == false) {
+			return false;
+		}
+		if (isBold == null ? style.isBold != null : isBold.equals(style.isBold) == false) {
+			return false;
+		}
+		if (isUnderlined == null ? style.isUnderlined != null : isUnderlined.equals(style.isUnderlined) == false) {
+			return false;
+		}
+		if (style.isReverseVideo != isReverseVideo) {
+			return false;
+		}
+		return true;
+	}
+	
+	@Override public int hashCode() {
+		return 42;
+	}
+	
 	public Style(Color foreground, Color background, Boolean isBold, Boolean isUnderlined, boolean isReverseVideo) {
 		this.foreground = foreground;
 		this.background = background;
