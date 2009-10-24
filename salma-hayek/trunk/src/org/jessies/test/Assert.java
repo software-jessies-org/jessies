@@ -7,9 +7,13 @@ import java.util.regex.*;
  * Assertions for the simple Java unit testing framework.
  */
 public final class Assert {
+    public static void failure(String message) {
+        failure(message);
+    }
+    
     public static void equals(List<?> lhs, List<?> rhs) {
         if (lhs.size() != rhs.size()) {
-            throw new RuntimeException("lhs.size() (" + lhs.size() + ") != rhs.size() (" + rhs.size() + ")");
+            failure("lhs.size() (" + lhs.size() + ") != rhs.size() (" + rhs.size() + ")");
         }
         for (int i = 0; i < lhs.size(); ++i) {
             Assert.equals(lhs.get(i), rhs.get(i));
@@ -20,29 +24,29 @@ public final class Assert {
         if (lhs == null && rhs == null) {
             // Okay, I guess.
         } else if (lhs == null && rhs != null) {
-            throw new RuntimeException(toString(lhs) + " != " + toString(rhs));
+            failure(toString(lhs) + " != " + toString(rhs));
         } else if (lhs != null && rhs == null) {
-            throw new RuntimeException(toString(lhs) + " != " + toString(rhs));
+            failure(toString(lhs) + " != " + toString(rhs));
         } else if (!lhs.equals(rhs)) {
-            throw new RuntimeException(toString(lhs) + " != " + toString(rhs));
+            failure(toString(lhs) + " != " + toString(rhs));
         }
     }
     
     public static void equals(double lhs, double rhs, double epsilon) {
         if (Math.abs(lhs - rhs) > epsilon) {
-            throw new RuntimeException(lhs + " != " + rhs + " (+/- " + epsilon + ")");
+            failure(lhs + " != " + rhs + " (+/- " + epsilon + ")");
         }
     }
     
     public static void contains(String lhs, String rhs) {
         if (!lhs.contains(rhs)) {
-            throw new RuntimeException(toString(lhs) + " does not contain " + toString(rhs));
+            failure(toString(lhs) + " does not contain " + toString(rhs));
         }
     }
     
     public static void startsWith(String s, String prefix) {
         if (!s.startsWith(prefix)) {
-            throw new RuntimeException(toString(s) + " does not start with " + toString(prefix));
+            failure(toString(s) + " does not start with " + toString(prefix));
         }
     }
     
