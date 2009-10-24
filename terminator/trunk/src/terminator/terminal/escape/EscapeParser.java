@@ -51,7 +51,7 @@ public class EscapeParser {
 		return (seqRecognizer == null) ? null : seqRecognizer.getTerminalAction(terminalControl, sequence);
 	}
 	
-	public String toString() {
+	@Override public String toString() {
 		return sequence;
 	}
 	

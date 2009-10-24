@@ -230,8 +230,7 @@ public class PtyProcess {
         }
     }
     
-    @Override
-    public String toString() {
+    @Override public String toString() {
         String result = "PtyProcess[pid=" + pid + ",fd=" + fd + ",pty=\"" + slavePtyName + "\"";
         if (didExitNormally) {
             result += ",didExitNormally,exitValue=" + exitValue;

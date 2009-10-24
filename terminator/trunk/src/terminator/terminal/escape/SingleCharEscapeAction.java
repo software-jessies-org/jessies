@@ -102,7 +102,7 @@ public class SingleCharEscapeAction implements TerminalAction {
 		}
 	}
 	
-	public String toString() {
+	@Override public String toString() {
 		return "SingleCharEscapeAction[" + getType() + "]";
 	}
 	

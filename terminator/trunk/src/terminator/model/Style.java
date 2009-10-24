@@ -45,7 +45,7 @@ public class Style {
     // TODO: why doesn't reverse video need three states?
 	private boolean isReverseVideo;
 	
-	public String toString() {
+	@Override public String toString() {
 		return "Style[foreground=" + foreground + ", background=" + background + ", isBold=" + isBold + ", isUnderlined=" + isUnderlined + ", isReverseVideo=" + isReverseVideo + "]";
 	}
 	
