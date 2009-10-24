@@ -56,7 +56,7 @@ public class XTermEscapeAction implements TerminalAction {
 		return sequence.substring(2);
 	}
 	
-	public String toString() {
+	@Override public String toString() {
 		if (isNewWindowTitle()) {
 			return "XTermEscapeAction[New window title:\"" + StringUtilities.escapeForJava(getNewWindowTitle()) + "\"]";
 		} else {

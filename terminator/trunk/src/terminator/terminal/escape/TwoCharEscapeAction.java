@@ -39,7 +39,7 @@ public class TwoCharEscapeAction implements TerminalAction {
 		return sequence.charAt(1);
 	}
 	
-	public String toString() {
+	@Override public String toString() {
 		final int characterSetIndex = getCharacterSetIndex();
 		if (characterSetIndex != -1) {
 			return "TwoCharEscapeAction[Set character set at index " + characterSetIndex + " to " + getCharacterSet() + "]";

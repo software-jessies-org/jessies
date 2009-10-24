@@ -59,7 +59,7 @@ public class CSIEscapeAction implements TerminalAction {
 		}
 	}
 	
-	public String toString() {
+	@Override public String toString() {
 		char lastChar = sequence.charAt(sequence.length() - 1);
 		return "CSIEscapeAction[" + getSequenceType(lastChar) + "]";
 	}

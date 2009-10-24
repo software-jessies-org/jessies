@@ -23,21 +23,23 @@ public final class Location implements Comparable<Location> {
 		return charOffset;
 	}
 	
-	public String toString() {
+	@Override public String toString() {
 		return "Location[line " + lineIndex + ", char " + charOffset + "]";
 	}
 	
-	public int hashCode() {  // Ought to use a prime, but I can't be bothered to work one out.
+	@Override public int hashCode() {  // Ought to use a prime, but I can't be bothered to work one out.
 		return (getLineIndex() * 163477) ^ getCharOffset();
 	}
 	
-	public boolean equals(Object obj) {
-		if (obj instanceof Location) {
-			Location other = (Location) obj;
-			return other.getLineIndex() == getLineIndex() && other.getCharOffset() == getCharOffset();
-		} else {
+	@Override public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj instanceof Location == false) {
 			return false;
 		}
+		Location other = (Location) obj;
+		return other.lineIndex == lineIndex && other.charOffset == charOffset;
 	}
 	
 	public boolean charOffsetInRange(int begin, int end) {

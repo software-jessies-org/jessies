@@ -49,7 +49,7 @@ public class Highlight {
 		return cursor;
 	}
 	
-	public String toString() {
+	@Override public String toString() {
 		return "Highlight[" + highlighter + " from " + start + " to " + end + "]";
 	}
 

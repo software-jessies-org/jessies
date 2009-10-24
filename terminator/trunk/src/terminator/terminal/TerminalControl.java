@@ -296,7 +296,7 @@ public class TerminalControl {
 				model.sizeChanged(sizeInChars);
 			}
 			
-			public String toString() {
+			@Override public String toString() {
 				return "TerminalAction[Size change to " + sizeInChars + "]";
 			}
 		};
@@ -419,7 +419,7 @@ public class TerminalControl {
 			model.processLine(line);
 		}
 		
-		public String toString() {
+		@Override public String toString() {
 			return "TerminalAction[Process line: " + line + "]";
 		}
 	}
@@ -459,7 +459,7 @@ public class TerminalControl {
 				model.processSpecialCharacter(ch);
 			}
 			
-			public String toString() {
+			@Override public String toString() {
 				return "TerminalAction[Special char " + getCharDesc(ch) + "]";
 			}
 			
