@@ -40,9 +40,10 @@ public class Style {
 	private Color background;
 
 	// We use Boolean references because they can be used to represent 3 states - null ("leave as-is"), TRUE ("turn on"), and FALSE ("turn off").
+	// This is a hack so that FindHighlighter can abuse a Style to cause matches to be highlighted with their existing bold/underlined state untouched.
 	private Boolean isBold;
 	private Boolean isUnderlined;
-	// TODO: why doesn't reverse video need three states?
+	// ... reverse video doesn't need three states because FindHighlighter has its own foreground and background colors, and actively wants to ignore any existing reverse video state.
 	private boolean isReverseVideo;
 	
 	@Override public String toString() {
