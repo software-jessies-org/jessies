@@ -8,7 +8,7 @@ import java.util.regex.*;
  */
 public final class Assert {
     public static void failure(String message) {
-        failure(message);
+        throw new RuntimeException(message);
     }
     
     public static void equals(List<?> lhs, List<?> rhs) {
