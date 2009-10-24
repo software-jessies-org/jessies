@@ -27,8 +27,11 @@ public final class Location implements Comparable<Location> {
 		return "Location[line " + lineIndex + ", char " + charOffset + "]";
 	}
 	
-	@Override public int hashCode() {  // Ought to use a prime, but I can't be bothered to work one out.
-		return (getLineIndex() * 163477) ^ getCharOffset();
+	@Override public int hashCode() {
+		int result = 17;
+		result = 31 * result + charOffset;
+		result = 31 * result + lineIndex;
+		return result;
 	}
 	
 	@Override public boolean equals(Object obj) {
