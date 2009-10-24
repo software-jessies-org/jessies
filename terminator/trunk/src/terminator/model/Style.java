@@ -35,14 +35,14 @@ public class Style {
 	private static final Style DEFAULT_STYLE = makeStyle(null, null, false, false, false);
 
 	// This style's foreground/background color, or null to indicate this style doesn't affect the foreground/background color.
-    // Note that the use of Colors means text styled while a given palette is in use for the lower 16 colors will always use those colors even if the user later switches to a different palette.
+	// Note that the use of Colors means text styled while a given palette is in use for the lower 16 colors will always use those colors even if the user later switches to a different palette.
 	private Color foreground;
 	private Color background;
 
-    // We use Boolean references because they can be used to represent 3 states - null ("leave as-is"), TRUE ("turn on"), and FALSE ("turn off").
+	// We use Boolean references because they can be used to represent 3 states - null ("leave as-is"), TRUE ("turn on"), and FALSE ("turn off").
 	private Boolean isBold;
 	private Boolean isUnderlined;
-    // TODO: why doesn't reverse video need three states?
+	// TODO: why doesn't reverse video need three states?
 	private boolean isReverseVideo;
 	
 	@Override public String toString() {
@@ -76,7 +76,13 @@ public class Style {
 	}
 	
 	@Override public int hashCode() {
-		return 42;
+		int result = 17;
+		result = 31 * result + (foreground != null ? foreground.hashCode() : 0);
+		result = 31 * result + (background != null ? background.hashCode() : 0);
+		result = 31 * result + (isBold != null ? isBold.hashCode() : 0);
+		result = 31 * result + (isUnderlined != null ? isUnderlined.hashCode() : 0);
+		result = 31 * result + (isReverseVideo ? 1 : 0);
+		return result;
 	}
 	
 	protected Style(Color foreground, Color background, Boolean isBold, Boolean isUnderlined, boolean isReverseVideo) {
