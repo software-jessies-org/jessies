@@ -16,7 +16,7 @@ public class FindHighlighter implements Highlighter {
 	private static final ExecutorService executorService = ThreadUtilities.newSingleThreadExecutor("Background Find");
 	
 	/** The highlighter pen style. */
-	private final Style style = new Style(Color.black, Color.yellow, null, null, false);
+	private final Style style = Style.makeStyle(Color.black, Color.yellow, null, null, false);
 
 	private Pattern pattern;
 	private String regularExpression = "";

@@ -79,7 +79,7 @@ public class Style {
 		return 42;
 	}
 	
-	public Style(Color foreground, Color background, Boolean isBold, Boolean isUnderlined, boolean isReverseVideo) {
+	protected Style(Color foreground, Color background, Boolean isBold, Boolean isUnderlined, boolean isReverseVideo) {
 		this.foreground = foreground;
 		this.background = background;
 		this.isBold = isBold;
@@ -147,7 +147,7 @@ public class Style {
 		return DEFAULT_STYLE;
 	}
 	
-	public static Style makeStyle(Color foreground, Color background, boolean isBold, boolean isUnderlined, boolean isReverseVideo) {
+	public static Style makeStyle(Color foreground, Color background, Boolean isBold, Boolean isUnderlined, boolean isReverseVideo) {
 		return new Style(foreground, background, isBold, isUnderlined, isReverseVideo);
 	}
 }
