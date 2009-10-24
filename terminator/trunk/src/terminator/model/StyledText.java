@@ -35,8 +35,4 @@ public class StyledText {
 	public Style getStyle() {
 		return style;
 	}
-	
-	public String getDescription() {
-		return "StyledText[foreground=" + style.getForeground() + ",background=" + style.getBackground() + ",bold=" + style.isBold() + ",underlined=" + style.isUnderlined() + ",reverse=" + style.isReverseVideo() + "]";
-	}
 }
