@@ -180,56 +180,57 @@ class Java
 
   def check_java_version()
     actual_java_version = get_java_version(@launcher)
-    if is_java_new_enough(actual_java_version) == false
-      # The "java" on the path was no good.
-      # Can we salvage the situation by finding a suitable JVM?
-      
-      if target_os() == "Darwin"
-        # At the moment on Mac OS, only Java 5 is suitable for running our applications.
-        globs = [ "/System/Library/Frameworks/JavaVM.framework/Versions/1.5/Home" ]
-      else
-        # This works for Linux distributions using Sun's RPM, and for Solaris.
-        globs = [  "/usr/java/jdk1.7.0*", "/usr/java/jre1.7.0*", "/usr/java/jdk1.6.0*", "/usr/java/jre1.6.0*", "/usr/java/jdk1.5.0*", "/usr/java/jre1.5.0*" ]
-      end
-      globs.each() {
-        |glob|
-        java_directories = Dir.glob(glob).sort().reverse()
-        java_directories.each() {
-          |java_directory|
-          bin_java = File.join(java_directory, "bin", "java")
-          if File.exist?(bin_java)
-            @launcher = bin_java
-            return
-          end
-        }
-      }
-
-      # This works for Linux distributions using the Debian package for Sun's JVM where the user hasn't run update-java-alternatives(1).
-      # (If they have configured Sun's JVM as their default, we won't have had to grovel about for a suitable JVM.)
-      sun_java = "/usr/lib/jvm/java-1.5.0-sun/bin/java"
-      if File.exist?(sun_java)
-        @launcher = sun_java
-        return
-      end
-      
-      # We didn't find a suitable JVM, so we'll just have to tell the user.
-      message_lines = []
-      launcher_path = `which #{@launcher}`.chomp()
-      # http://www.java.com/en/download/ looks like a better choice if we want to keep it simple.
-      # The suggestion below offers a variety of downloads of JDKs and Java EE stuff which would
-      # be bewildering to the uninitiated.
-      suggestion = "http://java.sun.com/javase/downloads/ may link to a suitable JRE, if you can't use one provided by your OS vendor"
-      if launcher_path != ""
-        message_lines << "Your #{launcher_path} claims to be #{actual_java_version}."
-        suggestion = "Please upgrade."
-      end
-      if File.exist?("/usr/bin/gnome-app-install")
-        suggestion = 'To install a suitable JRE, choose "Add/Remove..." from the GNOME "Applications" menu, show "All available applications", type "sun java" in the search field, and install "Sun Java 5.0 Runtime".'
-      end
-      message_lines << suggestion
-      show_alert("#{@dock_name} requires Java 5 or newer.", message_lines.join("\n\n"))
-      exit(1)
+    if is_java_new_enough(actual_java_version)
+      return
     end
+    # The "java" on the path was no good.
+    # Can we salvage the situation by finding a suitable JVM?
+    
+    if target_os() == "Darwin"
+      # At the moment on Mac OS, only Java 5 is suitable for running our applications.
+      globs = [ "/System/Library/Frameworks/JavaVM.framework/Versions/1.5/Home" ]
+    else
+      # This works for Linux distributions using Sun's RPM, and for Solaris.
+      globs = [  "/usr/java/jdk1.7.0*", "/usr/java/jre1.7.0*", "/usr/java/jdk1.6.0*", "/usr/java/jre1.6.0*", "/usr/java/jdk1.5.0*", "/usr/java/jre1.5.0*" ]
+    end
+    globs.each() {
+      |glob|
+      java_directories = Dir.glob(glob).sort().reverse()
+      java_directories.each() {
+        |java_directory|
+        bin_java = File.join(java_directory, "bin", "java")
+        if File.exist?(bin_java)
+          @launcher = bin_java
+          return
+        end
+      }
+    }
+    
+    # This works for Linux distributions using the Debian package for Sun's JVM where the user hasn't run update-java-alternatives(1).
+    # (If they have configured Sun's JVM as their default, we won't have had to grovel about for a suitable JVM.)
+    sun_java = "/usr/lib/jvm/java-1.5.0-sun/bin/java"
+    if File.exist?(sun_java)
+      @launcher = sun_java
+      return
+    end
+    
+    # We didn't find a suitable JVM, so we'll just have to tell the user.
+    message_lines = []
+    launcher_path = `which #{@launcher}`.chomp()
+    # http://www.java.com/en/download/ looks like a better choice if we want to keep it simple.
+    # The suggestion below offers a variety of downloads of JDKs and Java EE stuff which would
+    # be bewildering to the uninitiated.
+    suggestion = "http://java.sun.com/javase/downloads/ may link to a suitable JRE, if you can't use one provided by your OS vendor"
+    if launcher_path != ""
+      message_lines << "Your #{launcher_path} claims to be #{actual_java_version}."
+      suggestion = "Please upgrade."
+    end
+    if File.exist?("/usr/bin/gnome-app-install")
+      suggestion = 'To install a suitable JRE, choose "Add/Remove..." from the GNOME "Applications" menu, show "All available applications", type "sun java" in the search field, and install "Sun Java 5.0 Runtime".'
+    end
+    message_lines << suggestion
+    show_alert("#{@dock_name} requires Java 5 or newer.", message_lines.join("\n\n"))
+    exit(1)
   end
 
   def add_class_path_entries(new_entries)
