@@ -21,7 +21,7 @@
 <p>Cygwin is now installed.
 
 <p>In future, assuming you only want to update the packages already on your system, rather than adding new ones, you can simply start the installer and keep hitting "Next" without any other interaction. It remembers what you've already told it.
-Also, now setup.exe has been primed with your preferences, you can update and add to your installation using "unattended" mode with -q.
+Now setup.exe has been primed with your preferences, you can update your installation using "unattended" mode with -q.
 
 <p>You might want to make use of that right away to install extra packages.
 We suggest:
@@ -36,9 +36,9 @@ ruby       # run Perl, Python, or Ruby scripts
 vim        # edit stuff locally
 </pre>
 
-<p>Setup needs to be run from a cmd window, not from bash.
+<p>Cygwin 1.7's setup.exe introduces a -P switch which takes a list of extra packages.
+Setup needs to be run from a cmd window, not from bash.
 Drag the shortcut to setup.exe from your Desktop into the cmd window.
--P takes a list of extra packages.
 
 <pre>
 ...\setup.exe -q -P inetutils,ncurses,openssh,perl,python,ruby,vim
@@ -65,7 +65,7 @@ cron,exim,patch
 <p>To install all the packages recommended on this page and others that have been found useful when working on these projects, then:
 
 <pre>
-...\setup.exe -q -P inetutils,ncurses,openssh,perl,python,ruby,vim,gcc-g++,make,mingw-runtime,subversion,aspell-en,ctags,rxvt,cron,exim,patch
+...\setup.exe -q -P aspell-en,cron,ctags,exim,gcc-g++,inetutils,make,mingw-runtime,ncurses,openssh,patch,perl,python,ruby,rxvt,subversion,vim
 </pre>
 
 <p>Should you ever have to do battle with Cygwin-1.5's package browser, click the "View" button until the label next to it says "Full". This flattens out the list of packages and makes it easier to peruse.
