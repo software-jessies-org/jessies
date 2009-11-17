@@ -13,10 +13,11 @@
 # So then I did cron-config and followed all the suggestions, one of which led me to believe I'd be able to access
 # files over the network.
 # Cron wanted me to install exim and run exim-config.
+# On Cygwin 1.5, even if you choose to run cron as yourself, you need to grant yourself "Create a token object" privilege in Control Panel, Administrative Tools, Local Security Policy, Local Policies, User Rights Assignment.
 
-# exim configuration
+# exim-config
 # the rewrite section is empty by default
-# add this:
+# add this on a line on its own:
 # *@+local_domains ${local_part}@bluearc.com EFfrstcb
 
 # Anyway, I could indeed access network files but it was insanely slow to do an svn update.
@@ -24,8 +25,9 @@
 # the Debian build was happening.
 # So I cloned local salma-hayek and terminator repositories.
 # Then I couldn't build them because "Documents and Settings" contains a space and it's basically a big waste of time
-# to try to get make to cope with file names containing spaces.
+# to try to get make(1) to cope with file names containing spaces.
 # It can be done but it's not worth the effort.
+# Mounting C:\Documents and Settings\martind on /home/martind, however, works fine.
 
 # 20 09 * * * cat ~/software.jessies.org/work/salma-hayek/lib/build/mdorey.sh | bash --login
 
