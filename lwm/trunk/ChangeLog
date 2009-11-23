@@ -1,5 +1,15 @@
 Change Log for "lwm"
 
+2009-11-20	jfc	York
+	Improved performance by only checking for pending X events when the
+	socket it ready for reading.
+
+	Fixed applyGravity() bug that caused frameless windows to be
+	mis-positioned.
+
+	Applied a workaround in destroy() to avoid error reports when closing
+	windows.
+
 2005-01-28	jfc	York
 
 	Applied a patch from Chris Reece that ensures that the popup

@@ -81,6 +81,7 @@ extern int
 main(int argc, char *argv[]) {
 	XEvent ev;
 	struct sigaction sa;
+	int dpy_fd, max_fd;
 
 	argv0 = argv[0];
 
@@ -182,24 +183,25 @@ main(int argc, char *argv[]) {
 	/*
 	 * The main event loop.
 	 */
+	dpy_fd = ConnectionNumber(dpy);
+	max_fd = dpy_fd + 1;
+	if (ice_fd > dpy_fd) max_fd = ice_fd + 1;
 	for (;;) {
 		fd_set readfds;
-		struct timeval timeout;
 
 		FD_ZERO(&readfds);
+		FD_SET(dpy_fd, &readfds);
 		if (ice_fd > 0) FD_SET(ice_fd, &readfds);
-		timeout.tv_sec = 0;
-		timeout.tv_usec = 10;
-		switch (select(ice_fd + 1, &readfds, NULL, NULL, &timeout)) {
-		case 0:
-			while (XPending(dpy) > 0) {
+		if (select(max_fd, &readfds, NULL, NULL, NULL) > -1) {
+		    if (FD_ISSET(dpy_fd, &readfds)) {
+			    while (XPending(dpy)) {
 				XNextEvent(dpy, &ev);
 				dispatch(&ev);
-			}
-			break;
-		case 1:
-			session_process();
-			break;
+			    }
+		    }
+		    if (ice_fd > 0 && FD_ISSET(ice_fd, &readfds)) {
+			    session_process();
+		    }
 		}
 	}
 }
@@ -296,10 +298,10 @@ shell(ScreenInfo * screen, int button, int x, int y) {
 		close(ConnectionNumber(dpy));
 		if (screen && screen->display_spec != 0)
 			putenv(screen->display_spec);
-		execl(sh, sh, "-c", command, 0);
+		execl(sh, sh, "-c", command, NULL);
 		fprintf(stderr, "%s: can't exec \"%s -c %s\"\n", argv0, sh,
 			command);
-		execlp("xterm", "xterm", 0);
+		execlp("xterm", "xterm", NULL);
 		exit(EXIT_FAILURE);
 	case -1:	/* Error. */
 		fprintf(stderr, "%s: couldn't fork\n", argv0);
