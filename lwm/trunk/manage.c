@@ -325,6 +325,7 @@ manage(Client * c, int mapped)
 
 static void
 applyGravity(Client *c) {
+	if (c->framed == False) return; /* only required for framed windows*/
 	if (c->size.flags & PWinGravity) {
 		switch (c->size.win_gravity) {
 			case NorthEastGravity:

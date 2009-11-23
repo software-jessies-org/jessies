@@ -485,7 +485,9 @@ destroy(XEvent *ev) {
 	if (c == 0)
 		return;
 
+	ignore_badwindow = 1;
 	Client_Remove(c);
+	ignore_badwindow = 0;
 }
 
 static void
