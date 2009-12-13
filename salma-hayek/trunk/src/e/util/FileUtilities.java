@@ -343,6 +343,19 @@ public class FileUtilities {
         return file;
     }
     
+    // Many tools care about the extensions of their input files, so it's helpful if our temporary files preserve the extension.
+    // FIXME: support multiple extensions such as ".tar.gz", watching out for "/etc/udev/rules.d/blah.rules".
+    // FIXME: make this the default behavior of our temporary file creation methods?
+    public static String extensionOf(File file) {
+        final String path = file.toString();
+        return extensionOf(path);
+    }
+    
+    public static String extensionOf(String path) {
+        final int lastDot = path.lastIndexOf('.');
+        return (lastDot == -1) ? "" : path.substring(lastDot, path.length());
+    }
+    
     public static String getLastModifiedTime(File file) {
         return TimeUtilities.toIsoString(new Date(file.lastModified()));
     }
