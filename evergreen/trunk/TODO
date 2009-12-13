@@ -361,6 +361,12 @@ BUILDING
 
 SCM
 
++ some way to see just the "open for edit" files (in systems where you have to declare that), or the edited/new files (in systems where you don't).
+
++ update from repository. show what, if anything, came down. make it easy to open auto-merged files.
+
++ create new workspace by checking out from a repository. also option to create a new workspace from a new checkout of the repository backing an existing workspace.
+
 + add current file ("svn add"). Better left to another tool?
 
 + remove current file ("svn rm").
