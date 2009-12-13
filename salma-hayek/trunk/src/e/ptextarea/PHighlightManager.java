@@ -30,8 +30,8 @@ public class PHighlightManager {
      */
     public synchronized List<PHighlight> getHighlightsOverlapping(int beginOffset, int endOffset) {
         List<PHighlight> result = new ArrayList<PHighlight>();
-        for (String highlighter : highlighterSets.keySet()) {
-            result.addAll(getNamedHighlightsOverlapping(highlighter, beginOffset, endOffset));
+        for (HighlightSet set : highlighterSets.values()) {
+            result.addAll(set.getHighlightsOverlapping(beginOffset, endOffset));
         }
         return result;
     }
