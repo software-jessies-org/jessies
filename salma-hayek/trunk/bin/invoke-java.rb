@@ -15,7 +15,18 @@ def convert_to_jvm_compatible_pathname(pathname)
   # That was only believed to be an issue when run from a non-console Win32 application.
   # Now our shortcuts run Ruby via ruby-launcher, a Cygwin application.
   # That program ensures that stdout and stderr are open, which I now think is the active ingredient.
-  return `cygpath --windows '#{pathname}'`.chomp()
+  cygpathCommand = "cygpath --windows '#{pathname}'"
+  $stderr.puts("Running:")
+  $stderr.puts(cygpathCommand)
+  cygpathOutput = `#{cygpathCommand}`
+  $stderr.puts("Produced:")
+  $stderr.puts(cygpathOutput)
+  $stderr.puts("Status was:")
+  $stderr.puts($?.inspect())
+  if $?.success?() != true
+    throw "cygpath failed"
+  end
+  return cygpathOutput.chomp()
 end
 
 # Takes a list of POSIX pathnames and returns a string suitable for use
@@ -335,7 +346,12 @@ class Java
   def chooseSupportBinaryDirectory()
     # An i386 JVM on an amd64 kernel will run amd64 binaries.
     # But only the i386 binaries are likely to be installed (with dpkg --force-architecture).
-    return Dir.glob("#{@salma_hayek}/.generated/{#{target_directory()},*_#{target_os()}}/bin")[0]
+    pattern = "#{@salma_hayek}/.generated/{#{target_directory()},*_#{target_os()}}/bin"
+    plausibleSupportBinaryDirectories = Dir.glob(pattern)
+    if plausibleSupportBinaryDirectories.empty?()
+      throw "Failed to find any support binary directories with a glob for #{pattern}"
+    end
+    return plausibleSupportBinaryDirectories[0]
   end
   
   def findSupportBinary(binaryName)
