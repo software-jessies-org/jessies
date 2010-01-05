@@ -24,7 +24,7 @@ def convert_to_jvm_compatible_pathname(pathname)
   $stderr.puts("Status was:")
   $stderr.puts($?.inspect())
   if $?.success?() != true
-    throw "cygpath failed"
+    throw "#{cygpathCommand} failed"
   end
   return cygpathOutput.chomp()
 end
@@ -414,7 +414,9 @@ class Java
       ENV["CHERE_INVOKING"] = "1"
     end
     
-    add_pathname_property("org.jessies.aboutBoxIcon", @png_icon)
+    if @png_icon != ""
+      add_pathname_property("org.jessies.aboutBoxIcon", @png_icon)
+    end
     if @frame_icon != ""
       add_pathname_property("org.jessies.frameIcon", @frame_icon)
     end
