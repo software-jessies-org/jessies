@@ -27,6 +27,7 @@ functors
 indenter
 indenters
 init
+linefeeds
 makefile
 makefiles
 mutex
