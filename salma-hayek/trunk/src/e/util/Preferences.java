@@ -426,37 +426,59 @@ public abstract class Preferences {
     
     private class FontHelper implements PreferencesHelper {
         public String encode(String key) {
-            // Translate the Font into something Font.decode can parse.
-            Font font = getFont(key);
-            String style = "plain";
-            if (font.getStyle() == Font.BOLD) {
-                style = "bold";
-            } else if (font.getStyle() == Font.ITALIC) {
-                style = "italic";
-            } else if (font.getStyle() == (Font.BOLD | Font.ITALIC)) {
-                style = "bolditalic";
-            }
-            return (font.getFamily() + "-" + style + "-" + font.getSize());
+            // Translate the Font into something Font.decode can parse. Font.toString is not suitable.
+            final Font font = getFont(key);
+            final String styleString = fontStyleToString(font.getStyle()).toLowerCase().replaceAll(" ", "");
+            return (font.getFamily() + "-" + styleString + "-" + font.getSize());
         }
         
         public Object decode(String valueString) {
             return Font.decode(valueString);
         }
         
+        private int parseFontStyle(String style) {
+            if (style.equalsIgnoreCase("bold")) {
+                return Font.BOLD;
+            } else if (style.equalsIgnoreCase("italic")) {
+                return Font.ITALIC;
+            } else if (style.equalsIgnoreCase("bold italic")) {
+                return Font.BOLD | Font.ITALIC;
+            } else {
+                return Font.PLAIN;
+            }
+        }
+        
+        private String fontStyleToString(int style) {
+            if (style == Font.BOLD) {
+                return "Bold";
+            } else if (style == Font.ITALIC) {
+                return "Italic";
+            } else if (style == (Font.BOLD | Font.ITALIC)) {
+                return "Bold Italic";
+            } else {
+                return "Plain";
+            }
+        }
+        
         public void addRow(FormPanel formPanel, final String key, final String description) {
             final JComboBox fontNameComboBox = makeFontNameComboBox(key);
+            final JComboBox fontStyleComboBox = makeFontStyleComboBox(key);
             final JComboBox fontSizeComboBox = makeFontSizeComboBox(key);
             
             // updateComboBoxFont (below) sets the combo box font so that when you choose a font you can see a preview.
             // Ensure that when the font name or font size changes, we call updateComboBoxFont.
             ActionListener actionListener = new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    put(key, new Font(fontNameComboBox.getSelectedItem().toString(), Font.PLAIN, Integer.parseInt(fontSizeComboBox.getSelectedItem().toString())));
+                    final String fontName = fontNameComboBox.getSelectedItem().toString();
+                    final int fontStyle = parseFontStyle(fontStyleComboBox.getSelectedItem().toString());
+                    final int fontSize = Integer.parseInt(fontSizeComboBox.getSelectedItem().toString());
+                    put(key, new Font(fontName, fontStyle, fontSize));
                     updateComboBoxFont(key, fontNameComboBox);
                 }
             };
             updateComboBoxFont(key, fontNameComboBox);
             fontNameComboBox.addActionListener(actionListener);
+            fontStyleComboBox.addActionListener(actionListener);
             fontSizeComboBox.addActionListener(actionListener);
             
             // It's too expensive to show a preview of every possible font when the user pulls up the combo box's menu, sadly.
@@ -474,10 +496,12 @@ public abstract class Preferences {
                 }
             });
             
-            // Stick the two combo boxes (font name and font size) together.
-            JPanel fontChooser = new JPanel(new BorderLayout(2, 0));
-            fontChooser.add(fontNameComboBox, BorderLayout.CENTER);
-            fontChooser.add(fontSizeComboBox, BorderLayout.EAST);
+            // Stick the combo boxes (font name, style, and size) together.
+            JPanel fontChooser = new JPanel();
+            fontChooser.setLayout(new BoxLayout(fontChooser, BoxLayout.LINE_AXIS));
+            fontChooser.add(fontNameComboBox);
+            fontChooser.add(fontStyleComboBox);
+            fontChooser.add(fontSizeComboBox);
             formPanel.addRow(description + ":", fontChooser);
         }
         
@@ -492,6 +516,12 @@ public abstract class Preferences {
             }
             fontNameComboBox.setSelectedItem(getFont(key).getFamily());
             return fontNameComboBox;
+        }
+        
+        private JComboBox makeFontStyleComboBox(String key) {
+            JComboBox fontStyleComboBox = new JComboBox(new String[] { "Plain", "Bold", "Italic", "Bold Italic" });
+            fontStyleComboBox.setSelectedItem(fontStyleToString(getFont(key).getStyle()));
+            return fontStyleComboBox;
         }
         
         private JComboBox makeFontSizeComboBox(String key) {
