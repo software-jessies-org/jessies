@@ -1,7 +1,6 @@
 package terminator.view;
 
 import java.awt.*;
-import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.List;
@@ -195,7 +194,7 @@ public class JTerminalPane extends JPanel {
 			}
 			return colors;
 		}
-		public void paintComponent(Graphics oldGraphics) {
+		@Override public void paintComponent(Graphics oldGraphics) {
 			Graphics2D g = (Graphics2D) oldGraphics;
 			int x = 0;
 			for (Color color : getColors()) {
@@ -204,7 +203,7 @@ public class JTerminalPane extends JPanel {
 				++x;
 			}
 		}
-	};
+	}
 	
 	private void initSizeMonitoring() {
 		class SizeMonitor extends ComponentAdapter {
@@ -218,7 +217,7 @@ public class JTerminalPane extends JPanel {
 			public void componentResized(ComponentEvent event) {
 				updateTerminalSize();
 			}
-		};
+		}
 		scrollPane.getViewport().addComponentListener(new SizeMonitor());
 	}
 	
@@ -588,7 +587,7 @@ public class JTerminalPane extends JPanel {
 				// Emulates gnome-terminal's alt-<number> jump-to-tab behavior, or an analog of Terminal.app's command-<number> jump-to-window behavior.
 				// We rely on VK_0 being '0' et cetera, and use the key code rather than the key char so that both alt-<number> and control-shift-<number> can work.
 				final char ch = (char) e.getKeyCode();
-				final int newIndex = TerminatorTabbedPane.keyCharToTabIndex(ch);
+				final int newIndex = TabbedPane.keyCharToTabIndex(ch);
 				if (newIndex != -1) {
 					host.setSelectedTabIndex(newIndex);
 					return true;
@@ -661,7 +660,7 @@ public class JTerminalPane extends JPanel {
 	/**
 	 * Hands focus to our text pane.
 	 */
-	public void requestFocus() {
+	@Override public void requestFocus() {
 		view.requestFocus();
 	}
 	public void doCopyAction() {

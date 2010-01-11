@@ -7,7 +7,6 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
-import terminator.terminal.*;
 import terminator.view.*;
 
 public class TerminatorTabbedPane extends TabbedPane {

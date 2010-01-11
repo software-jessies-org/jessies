@@ -23,7 +23,7 @@ public class InfoDialog {
     private InfoDialog() {
         this.title = new JTextField();
         title.getDocument().addDocumentListener(new DocumentAdapter() {
-            public void documentChanged() {
+            @Override public void documentChanged() {
                 terminal.setName(title.getText());
             }
         });

@@ -46,11 +46,11 @@ public class TerminatorPreferences extends Preferences {
     private static final Color SELECTION_BLUE = new Color(0x1c2bff);
     private static final Color VERY_DARK_BLUE = new Color(0x000045);
     
-    protected String getPreferencesFilename() {
+    @Override protected String getPreferencesFilename() {
         return System.getProperty("org.jessies.terminator.optionsFile");
     }
     
-    protected void initPreferences() {
+    @Override protected void initPreferences() {
         setHelperForClass(Double.class, new AlphaHelper());
         setHelperForClass(Color[].class, new PaletteHelper());
         

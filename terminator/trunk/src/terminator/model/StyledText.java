@@ -1,8 +1,5 @@
 package terminator.model;
 
-import java.awt.*;
-import terminator.*;
-
 /**
  * Represents a run of text with one particular style applied.
  */

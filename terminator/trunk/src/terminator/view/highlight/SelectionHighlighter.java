@@ -258,7 +258,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 		Clipboard systemSelection = view.getToolkit().getSystemSelection();
 		if (systemSelection != null) {
 			systemSelection.setContents(new LazyStringSelection() {
-				public String reallyGetText() {
+				@Override public String reallyGetText() {
 					return getTabbedString();
 				}
 			}, this);

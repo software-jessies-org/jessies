@@ -4,7 +4,6 @@ import e.gui.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.lang.reflect.*;
 import javax.swing.*;
 import terminator.*;
 import terminator.view.highlight.*;
@@ -30,7 +29,7 @@ public class FindPanel extends JPanel implements FindStatusDisplay {
         });
         typingTimer.setRepeats(false);
         findField.getDocument().addDocumentListener(new DocumentAdapter() {
-            public void documentChanged() {
+            @Override public void documentChanged() {
                 typingTimer.restart();
             }
         });
