@@ -192,7 +192,7 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
             
             updateEnabledStates();
         }
-    };
+    }
     
     private class ForwardAction extends AbstractAction {
         private ForwardAction() {
@@ -218,7 +218,7 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
             
             updateEnabledStates();
         }
-    };
+    }
     
     private void updateEnabledStates() {
         BACK_ACTION.setEnabled(history.size() >= 2);
