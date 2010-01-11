@@ -1,7 +1,5 @@
 package e.ptextarea;
 
-import java.util.*;
-
 /**
  * A PJavaTextStyler knows how to apply syntax highlighting for Java code.
  * 

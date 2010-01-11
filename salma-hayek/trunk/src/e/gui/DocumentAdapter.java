@@ -1,7 +1,6 @@
 package e.gui;
 
 import javax.swing.event.*;
-import javax.swing.text.*;
 
 /**
  * Forwards all DocumentListener methods to a single method, for convenience.

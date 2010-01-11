@@ -1,7 +1,5 @@
 package e.ptextarea;
 
-import java.util.*;
-
 public class PPBasicTextStyler extends PAbstractLanguageStyler {
     public PPBasicTextStyler(PTextArea textArea) {
         super(textArea);

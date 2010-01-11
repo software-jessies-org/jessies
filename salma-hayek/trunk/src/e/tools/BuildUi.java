@@ -1,6 +1,5 @@
 package e.tools;
 
-import e.forms.*;
 import e.gui.*;
 import e.ptextarea.*;
 import e.util.*;

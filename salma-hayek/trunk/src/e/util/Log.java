@@ -1,6 +1,5 @@
 package e.util;
 
-import java.io.*;
 import java.util.regex.*;
 
 public class Log {

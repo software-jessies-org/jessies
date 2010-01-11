@@ -1,7 +1,5 @@
 package e.ptextarea;
 
-import java.awt.*;
-
 public class UnprintableCharacterTextSegment extends PTextSegment {
     public UnprintableCharacterTextSegment(PTextArea textArea, int start, int end, PStyle style) {
         super(textArea, start, end, style);

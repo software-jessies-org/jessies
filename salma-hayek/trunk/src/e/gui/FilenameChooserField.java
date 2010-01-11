@@ -1,6 +1,5 @@
 package e.gui;
 
-import e.forms.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;

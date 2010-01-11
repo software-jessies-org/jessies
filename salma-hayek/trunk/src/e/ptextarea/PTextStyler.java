@@ -1,6 +1,5 @@
 package e.ptextarea;
 
-import java.util.*;
 import java.util.List;
 
 /**
