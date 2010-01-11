@@ -1,7 +1,5 @@
 package e.ptextarea;
 
-import java.util.*;
-
 /**
  * Applies colors to XML/HTML derivatives' source.
  */

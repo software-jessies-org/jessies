@@ -2,7 +2,6 @@ package e.gui;
 
 import java.awt.*;
 import java.awt.geom.*;
-import javax.swing.*;
 
 public class CrossIcon extends DrawnIcon {
     private Color fillColor;

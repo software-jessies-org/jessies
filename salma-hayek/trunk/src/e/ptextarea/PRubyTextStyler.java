@@ -1,7 +1,5 @@
 package e.ptextarea;
 
-import java.util.*;
-
 public class PRubyTextStyler extends PAbstractLanguageStyler {
     public PRubyTextStyler(PTextArea textArea) {
         super(textArea);

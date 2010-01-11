@@ -1,7 +1,5 @@
 package e.ptextarea;
 
-import java.util.*;
-
 public class PPythonTextStyler extends PAbstractLanguageStyler {
     public PPythonTextStyler(PTextArea textArea) {
         super(textArea);

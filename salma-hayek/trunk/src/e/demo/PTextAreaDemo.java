@@ -5,7 +5,6 @@ import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
 import java.io.*;
-import java.util.*;
 import javax.swing.*;
 
 public class PTextAreaDemo {

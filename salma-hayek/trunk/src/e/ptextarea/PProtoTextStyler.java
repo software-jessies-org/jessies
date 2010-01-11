@@ -1,7 +1,5 @@
 package e.ptextarea;
 
-import java.util.*;
-
 /**
  * A text styler for Google protocol buffers (http://code.google.com/p/protobuf).
  */

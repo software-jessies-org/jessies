@@ -1,7 +1,5 @@
 package e.ptextarea;
 
-import java.util.*;
-
 /**
  * A PCPPTextStyler knows how to apply syntax highlighting for C++ code.
  * 
