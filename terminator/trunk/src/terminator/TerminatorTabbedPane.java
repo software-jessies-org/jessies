@@ -175,7 +175,7 @@ public class TerminatorTabbedPane extends TabbedPane {
             
             this.terminalPane = terminalPane;
             
-            this.label = new JLabel(terminalPane.getName());
+            this.label = new JLabel(terminalPane.getTerminalName());
             label.setOpaque(false);
             setOpaque(false);
             

@@ -259,7 +259,7 @@ public class JTerminalPane extends JPanel {
 		return control;
 	}
 	
-	public String getName() {
+	public String getTerminalName() {
 		return name;
 	}
 	
@@ -269,7 +269,7 @@ public class JTerminalPane extends JPanel {
 		return (wasCreatedAsNewShell == false) && (status != 0);
 	}
 	
-	public void setName(String name) {
+	public void setTerminalName(String name) {
 		this.name = name;
 		host.terminalNameChanged(this);
 	}
