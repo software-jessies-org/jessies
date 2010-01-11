@@ -478,10 +478,27 @@ JAVAC_FLAGS.javac += -target 1.5
 # Ensure we give a clear error if the user attempts to use anything older than Java 5.
 JAVAC_FLAGS.javac += -source 1.5
 
-# javac(1) warns if you build source containing characters unrepresentable
-# in your locale. Although we all use UTF-8 locales, we can't guarantee that
-# everyone else does, so let the compiler know that our source is in UTF-8.
-JAVAC_FLAGS += -encoding UTF-8
+# ----------------------------------------------------------------------------
+# Set ecj flags.
+# ----------------------------------------------------------------------------
+
+JAVAC_FLAGS.ecj += -d .generated/classes/
+JAVAC_FLAGS.ecj += -sourcepath src/
+JAVAC_FLAGS.ecj += -g
+JAVAC_FLAGS.ecj += -Xemacs
+JAVAC_FLAGS.ecj += -referenceInfo
+
+# Turn on warnings.
+JAVAC_FLAGS.ecj += -deprecation
+JAVAC_FLAGS.ecj += -warn:+allDeprecation,conditionAssign,dep-ann,enumSwitch,fallthrough,finalBound,noEffectAssign,null,nullDereference,over-ann,pkgDefaultMethod,raw,semicolon,unused,uselessTypeCheck,varargsCast
+JAVAC_FLAGS.ecj += -warn:-serial
+JAVAC_FLAGS.ecj += -proceedOnError
+
+# We should also ensure that we build class files that can be used on the current Java release, regardless of where we build.
+JAVAC_FLAGS.ecj += -target 1.5
+
+# Ensure we give a clear error if the user attempts to use anything older than Java 5.
+JAVAC_FLAGS.ecj += -source 1.5
 
 # ----------------------------------------------------------------------------
 # Set GCJ flags.
@@ -495,6 +512,13 @@ JAVAC_FLAGS.gcj += -encoding UTF-8
 JAVAC_FLAGS.gcj += -fjni
 JAVAC_FLAGS.gcj += --main=$(GCJ_MAIN_CLASS)
 JAVAC_FLAGS.gcj += -o $(MACHINE_PROJECT_NAME)
+
+# ----------------------------------------------------------------------------
+
+# javac(1) warns if you build source containing characters unrepresentable
+# in your locale. Although we all use UTF-8 locales, we can't guarantee that
+# everyone else does, so let the compiler know that our source is in UTF-8.
+JAVAC_FLAGS += -encoding UTF-8
 
 # Combine the compiler-specific flags with the portable flags.
 JAVAC_FLAGS += $(JAVAC_FLAGS.$(notdir $(JAVA_COMPILER)))
