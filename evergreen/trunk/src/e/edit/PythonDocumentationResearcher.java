@@ -2,7 +2,6 @@ package e.edit;
 
 import e.ptextarea.*;
 import e.util.*;
-import java.io.File;
 import java.util.*;
 
 /**

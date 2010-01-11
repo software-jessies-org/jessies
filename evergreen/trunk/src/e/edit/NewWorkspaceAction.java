@@ -2,7 +2,6 @@ package e.edit;
 
 import e.util.*;
 import java.awt.event.*;
-import java.io.*;
 import javax.swing.*;
 
 /**

@@ -2,7 +2,6 @@ package e.edit;
 
 import e.util.*;
 import java.awt.EventQueue;
-import java.awt.event.*;
 import java.io.*;
 import java.util.regex.*;
 

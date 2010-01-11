@@ -1,7 +1,6 @@
 package e.edit;
 
 import e.ptextarea.FileType;
-import java.util.Set;
 
 public interface WorkspaceResearcher {
     /**

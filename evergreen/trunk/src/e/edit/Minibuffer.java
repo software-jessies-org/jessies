@@ -5,7 +5,6 @@ import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.event.*;
 
 public class Minibuffer extends JPanel implements FocusListener {
     private final ELabel prompt = new ELabel();

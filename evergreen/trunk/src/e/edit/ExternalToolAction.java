@@ -1,8 +1,6 @@
 package e.edit;
 
-import e.forms.*;
 import java.awt.event.*;
-import java.io.*;
 import javax.swing.*;
 
 public class ExternalToolAction extends ETextAction {
