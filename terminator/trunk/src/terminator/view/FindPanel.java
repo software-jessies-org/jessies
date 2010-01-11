@@ -118,6 +118,10 @@ public class FindPanel extends JPanel implements FindStatusDisplay {
         if (selection.length() > 0) {
             findField.setText("(?-i)" + StringUtilities.regularExpressionFromLiteral(selection));
         }
+        // The existing status text might be out of date (because the terminal's contents have changed more recently).
+        // updateResults won't necessarily fix it: FindHighlighter.setPattern is a no-op if the regular expression hasn't changed.
+        // TODO: count extant highlights (here or in FindHighlighter.setPattern)?
+        findStatus.setText("");
         updateResults();
         findField.selectAll();
         setVisible(true);
