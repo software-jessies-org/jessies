@@ -607,6 +607,6 @@ public class TerminalModel {
 	
 	public void setWindowTitle(String newWindowTitle) {
 		JTerminalPane terminalPane = (JTerminalPane) SwingUtilities.getAncestorOfClass(JTerminalPane.class, view);
-		terminalPane.setName(newWindowTitle);
+		terminalPane.setTerminalName(newWindowTitle);
 	}
 }

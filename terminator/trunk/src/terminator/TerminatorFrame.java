@@ -43,7 +43,7 @@ public class TerminatorFrame extends JFrame implements TerminalPaneHost {
 				pane = (JTerminalPane) tabbedPane.getSelectedComponent();
 			}
 			if (pane != null) {
-				title.append(pane.getName());
+				title.append(pane.getTerminalName());
 			}
 		}
 		setTitle(title.toString());
@@ -341,7 +341,7 @@ public class TerminatorFrame extends JFrame implements TerminalPaneHost {
 	public void terminalNameChanged(JTerminalPane terminal) {
 		if (tabbedPane != null) {
 			int index = tabbedPane.indexOfComponent(terminal);
-			tabbedPane.setTitleAt(index, terminal.getName());
+			tabbedPane.setTitleAt(index, terminal.getTerminalName());
 		}
 		updateFrameTitle();
 	}
@@ -356,7 +356,7 @@ public class TerminatorFrame extends JFrame implements TerminalPaneHost {
 	
 	private void addPaneToUI(JTerminalPane newPane) {
 		switchToTabbedPane();
-		tabbedPane.addTab(newPane.getName(), newPane);
+		tabbedPane.addTab(newPane.getTerminalName(), newPane);
 	}
 	
 	public void moveCurrentTab(int direction) {

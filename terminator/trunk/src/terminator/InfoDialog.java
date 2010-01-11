@@ -24,7 +24,7 @@ public class InfoDialog {
         this.title = new JTextField();
         title.getDocument().addDocumentListener(new DocumentAdapter() {
             @Override public void documentChanged() {
-                terminal.setName(title.getText());
+                terminal.setTerminalName(title.getText());
             }
         });
         this.dimensions = new UneditableTextField();
@@ -81,7 +81,7 @@ public class InfoDialog {
     private void updateFieldValuesFor(JTerminalPane terminal) {
         this.terminal = terminal;
         
-        title.setText(terminal.getName());
+        title.setText(terminal.getTerminalName());
         
         Dimension size = terminal.getTerminalView().getVisibleSizeInCharacters();
         dimensions.setText(size.width + " x " + size.height);
