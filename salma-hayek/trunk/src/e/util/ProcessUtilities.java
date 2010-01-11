@@ -349,7 +349,7 @@ public class ProcessUtilities {
         int status = backQuote(null, new String[] { "lsof", "-a", "-p", Integer.toString(pid), "-d", "cwd", "-F0n" }, output, errors);
         if (status != 0) {
             return null;
-        };
+        }
         // p18316\0
         // n/private/var/tmp\0
         String cwdLine = output.get(1);
