@@ -61,7 +61,7 @@ public class Parameters {
     }
     
     private static class Loader {
-        private FileAlterationMonitor fileAlterationMonitor = new FileAlterationMonitor(MONITOR_NAME);;
+        private FileAlterationMonitor fileAlterationMonitor = new FileAlterationMonitor(MONITOR_NAME);
         private HashMap<String, String> map = new HashMap<String, String>();
         
         private void load(Iterable<File> files) {
