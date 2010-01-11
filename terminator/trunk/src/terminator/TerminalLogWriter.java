@@ -137,16 +137,16 @@ public class TerminalLogWriter {
 		private NullWriter() {
 		}
 		
-		public void close() {
+		@Override public void close() {
 		}
 		
-		public void flush() {
+		@Override public void flush() {
 		}
 		
-		public void write(int c) {
+		@Override public void write(int c) {
 		}
 		
-		public void write(char[] buffer, int offset, int byteCount) {
+		@Override public void write(char[] buffer, int offset, int byteCount) {
 		}
 	}
 }

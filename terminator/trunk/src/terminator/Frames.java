@@ -1,6 +1,7 @@
 package terminator;
 
 import e.util.*;
+import java.awt.*;
 import java.util.*;
 import javax.swing.*;
 
@@ -53,7 +54,7 @@ public class Frames implements Iterable<TerminatorFrame> {
     public void frameStateChanged() {
         if (GuiUtilities.isMacOs()) {
             for (TerminatorFrame frame : list) {
-                if (frame.isShowing() && (frame.getExtendedState() & TerminatorFrame.ICONIFIED) == 0) {
+                if (frame.isShowing() && (frame.getExtendedState() & Frame.ICONIFIED) == 0) {
                     getHiddenFrame().setVisible(false);
                     return;
                 }

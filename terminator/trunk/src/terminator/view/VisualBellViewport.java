@@ -59,7 +59,7 @@ public class VisualBellViewport extends JViewport {
             g.fillRect(0, 0, getWidth(), getHeight());
         } else {
             // On a remote X11 display (or really rubbish hardware) the compositing effect is prohibitively expensive, so we offer XOR instead.
-            Color background = preferences.getColor(TerminatorPreferences.BACKGROUND_COLOR);;
+            Color background = preferences.getColor(TerminatorPreferences.BACKGROUND_COLOR);
             final int R = blend(background.getRed(), foreground.getRed());
             final int G = blend(background.getGreen(), foreground.getGreen());
             final int B = blend(background.getBlue(), foreground.getBlue());

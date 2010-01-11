@@ -402,7 +402,7 @@ public class TerminatorMenuBar extends EMenuBar {
 			super("Detach Tab");
 		}
 		
-		public void performFrameAction(TerminatorFrame frame) {
+		@Override public void performFrameAction(TerminatorFrame frame) {
 			frame.detachCurrentTab();
 		}
 	}
@@ -489,7 +489,7 @@ public class TerminatorMenuBar extends EMenuBar {
 			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("G"));
 		}
 		
-		public void performOn(JTerminalPane terminalPane) {
+		@Override public void performOn(JTerminalPane terminalPane) {
 			terminalPane.getTerminalView().findNext(FindHighlighter.class);
 		}
 	}
@@ -500,7 +500,7 @@ public class TerminatorMenuBar extends EMenuBar {
 			putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("D"));
 		}
 		
-		public void performOn(JTerminalPane terminalPane) {
+		@Override public void performOn(JTerminalPane terminalPane) {
 			terminalPane.getTerminalView().findPrevious(FindHighlighter.class);
 		}
 	}

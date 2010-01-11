@@ -53,7 +53,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 		optionsDidChange();
 		addFocusListener(this);
 		addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent event) {
+			@Override public void mouseClicked(MouseEvent event) {
 				requestFocus();
 				if (SwingUtilities.isLeftMouseButton(event)) {
 					highlightClicked(event);
@@ -70,7 +70,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 		addMouseMotionListener(new MouseMotionAdapter() {
 			private Location lastLocation = new Location(-1, -1);
 
-			public void mouseMoved(MouseEvent event) {
+			@Override public void mouseMoved(MouseEvent event) {
 				Location location = viewToModel(event.getPoint());
 				if (location.equals(lastLocation)) {
 					return;
@@ -701,7 +701,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 		repaint(cursorRect);
 	}
 	
-	public void paintComponent(Graphics oldGraphics) {
+	@Override public void paintComponent(Graphics oldGraphics) {
 		Stopwatch.Timer timer = paintComponentStopwatch.start();
 		try {
 			Graphics2D g = (Graphics2D) oldGraphics;

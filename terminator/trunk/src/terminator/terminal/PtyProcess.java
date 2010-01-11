@@ -4,7 +4,6 @@ import e.util.*;
 import java.awt.Dimension;
 import java.io.*;
 import java.util.concurrent.*;
-import java.util.regex.*;
 import org.jessies.os.*;
 
 public class PtyProcess {
