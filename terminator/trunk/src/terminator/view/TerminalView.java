@@ -20,7 +20,6 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 	
 	private TerminalModel model;
 	private Location cursorPosition = new Location(0, 0);
-	private boolean hasFocus = false;
 	private boolean displayCursor = true;
 	private boolean blinkOn = true;
 	private CursorBlinker cursorBlinker;
@@ -775,7 +774,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 		g.setColor(getCursorColor());
 		Rectangle cursorRect = modelToView(cursorPosition);
 		final int bottomY = cursorRect.y + cursorRect.height - 1;
-		if (hasFocus) {
+		if (isFocusOwner()) {
 			TerminatorPreferences preferences = Terminator.getPreferences();
 			// The CursorBlinker may have left blinkOn in either state if the user changed the cursor blink preference.
 			// Ignore blinkOn if the cursor shouldn't be blinking right now.
@@ -855,23 +854,17 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 		}
 	}
 	
-	public boolean hasFocus() {
-		return hasFocus;
-	}
-	
 	//
 	// FocusListener interface.
 	//
 	
 	public void focusGained(FocusEvent event) {
-		hasFocus = true;
 		blinkOn = true;
 		cursorBlinker.start();
 		redrawCursorPosition();
 	}
 	
 	public void focusLost(FocusEvent event) {
-		hasFocus = false;
 		blinkOn = true;
 		cursorBlinker.stop();
 		redrawCursorPosition();
