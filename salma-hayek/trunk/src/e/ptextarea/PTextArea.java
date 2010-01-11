@@ -17,7 +17,6 @@ import e.util.*;
  */
 public class PTextArea extends JComponent implements PLineListener, Scrollable, ClipboardOwner {
     private static final int MIN_WIDTH = 50;
-    private static final int MAX_CACHED_CHAR = 128;
     
     public static final int NO_MARGIN = -1;
     
