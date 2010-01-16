@@ -1,5 +1,6 @@
 package terminator;
 
+import com.apple.eawt.*;
 import e.util.*;
 import java.awt.*;
 import java.util.*;
@@ -16,10 +17,15 @@ public class Frames implements Iterable<TerminatorFrame> {
     private ArrayList<TerminatorFrame> list = new ArrayList<TerminatorFrame>();
     private JFrame hiddenFrame; // Mac OS X only.
     
+    private static final Action[] DOCK_MENU_ACTIONS = new Action[] {
+        new TerminatorMenuBar.NewShellAction(),
+        new TerminatorMenuBar.NewCommandAction(),
+    };
+    
     public Frames() {
     }
     
-    private synchronized void initHiddenFrame() {
+    private synchronized void initHiddenFrameAndDockMenu() {
         if (hiddenFrame == null) {
             String name = "Mac OS Hidden Frame";
             hiddenFrame = new JFrame(name);
@@ -28,11 +34,27 @@ public class Frames implements Iterable<TerminatorFrame> {
             hiddenFrame.setUndecorated(true);
             // Move the window off-screen so that when we're forced to setVisible(true) it doesn't actually disturb the user.
             hiddenFrame.setLocation(new java.awt.Point(-100, -100));
+            
+            // The Dock menu needs a valid Component as a parent. The hidden frame
+            // does not become valid until it has been made visible.
+            hiddenFrame.setVisible(true);
+            PopupMenu dockMenu = new PopupMenu("Dock Menu");
+            addActions(dockMenu, DOCK_MENU_ACTIONS);
+            hiddenFrame.add(dockMenu);
+            Application.getApplication().setDockMenu(dockMenu);
+        }
+    }
+    
+    private void addActions(PopupMenu menu, Action[] actions) {
+        for (Action action : actions) {
+            MenuItem item = new MenuItem(action.getValue(Action.NAME).toString());
+            item.addActionListener(action);
+            menu.add(item);
         }
     }
     
     private JFrame getHiddenFrame() {
-        initHiddenFrame();
+        initHiddenFrameAndDockMenu();
         return hiddenFrame;
     }
     
