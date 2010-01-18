@@ -41,7 +41,12 @@ public class Frames implements Iterable<TerminatorFrame> {
             PopupMenu dockMenu = new PopupMenu("Dock Menu");
             addActions(dockMenu, DOCK_MENU_ACTIONS);
             hiddenFrame.add(dockMenu);
-            Application.getApplication().setDockMenu(dockMenu);
+            try {
+                java.lang.reflect.Method setDockMenuMethod = Application.class.getDeclaredMethod("setDockMenu");
+                setDockMenuMethod.invoke(Application.getApplication(), dockMenu);
+            } catch (Throwable th) {
+                Log.warn("failed to set dock menu", th);
+            }
         }
     }
     
