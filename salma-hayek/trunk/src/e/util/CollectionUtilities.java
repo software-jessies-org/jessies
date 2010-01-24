@@ -77,11 +77,14 @@ public final class CollectionUtilities {
      * 
      * @see Collections.reverseOrder
      */
+    @SuppressWarnings("unchecked")
     public static <T> Comparator<T> naturalOrder() {
-        return new NaturalComparator<T>();
+        return NATURAL_ORDER_COMPARATOR;
     }
     
-    private static final class NaturalComparator<T> implements Comparator<T> {
+    private static final Comparator NATURAL_ORDER_COMPARATOR = new NaturalOrderComparator();
+    
+    private static final class NaturalOrderComparator<T> implements Comparator<T> {
         public int compare(T lhs, T rhs) {
             @SuppressWarnings("unchecked") Comparable<T> comparableLhs = ((Comparable<T>) lhs);
             return comparableLhs.compareTo(rhs);
