@@ -16,6 +16,7 @@ import org.jdesktop.swingworker.SwingWorker;
 public class TagsUpdater {
     private static final ExecutorService executorService = ThreadUtilities.newSingleThreadExecutor("Tags Updater");
     private static final Stopwatch tagsUpdaterStopwatch = Stopwatch.get("TagsUpdater");
+    private static final Comparator<String> TAG_COMPARATOR = new SmartStringComparator();
     
     private final ETextWindow textWindow;
     
@@ -347,6 +348,8 @@ public class TagsUpdater {
     }
     
     private static class BranchNode extends DefaultMutableTreeNode {
+        private ArrayList<String> kidSortKeys = new ArrayList<String>();
+        
         public BranchNode(Object userObject) {
             super(userObject);
         }
@@ -360,15 +363,9 @@ public class TagsUpdater {
             }
         }
         
-        private ArrayList<String> kidSortKeys = new ArrayList<String>();
-        
         private int getInsertIndex(TagReader.Tag tag) {
-            // Confusing tag 1 of "badger1" with tag 11 of "badger" would be bad.
-            String insertString = tag.getSortIdentifier() + '\u0000' + kidSortKeys.size();
-            int index = Collections.binarySearch(kidSortKeys, insertString);
-            if (index < 0) {
-                index = -index - 1;
-            }
+            String insertString = tag.getSortIdentifier();
+            int index = CollectionUtilities.upperBound(kidSortKeys, insertString, TAG_COMPARATOR);
             // FIXME: This is O(n*n) but works OK with the worst real-world use case yet measured (stone1/.../soapC.cpp, with ~300 kloc).
             kidSortKeys.add(index, insertString);
             return index;
