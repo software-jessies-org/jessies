@@ -11,6 +11,18 @@ public final class Assert {
         throw new RuntimeException(message);
     }
     
+    public static void gt(int lhs, int rhs) {
+        if (lhs <= rhs) {
+            failure("lhs (" + lhs + ") <= rhs (" + rhs + ")");
+        }
+    }
+    
+    public static void lt(int lhs, int rhs) {
+        if (lhs >= rhs) {
+            failure("lhs (" + lhs + ") >= rhs (" + rhs + ")");
+        }
+    }
+    
     public static void equals(List<?> lhs, List<?> rhs) {
         if (lhs.size() != rhs.size()) {
             failure("lhs.size() (" + lhs.size() + ") != rhs.size() (" + rhs.size() + ")");
