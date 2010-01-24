@@ -5,6 +5,40 @@ import org.jessies.test.*;
 
 public final class CollectionUtilities {
     /**
+     * Returns the first position in 'list' where 'key' could be inserted without violating ordering according to 'comparator'.
+     * (Collections.binarySearch makes no guarantee about which index will be returned if the list contains multiple elements equal
+     * to the key.)
+     * 
+     * As with Collections.binarySearch, results are undefined if 'list' is not sorted into ascending order according to
+     * 'comparator'.
+     */
+    public static <T> int lowerBound(List<? extends T> list, T key, Comparator<? super T> comparator) {
+        int index = Collections.binarySearch(list, key, comparator);
+        if (index < 0) {
+            return -index - 1;
+        }
+        // FIXME: O(n) is distressing on a sorted list.
+        while (index > 0 && comparator.compare(list.get(index - 1), key) == 0) {
+            --index;
+        }
+        return index;
+    }
+    
+    @Test private static void testLowerBound() {
+        // http://www.sgi.com/tech/stl/upper_bound.html uses this as an example.
+        final List<Integer> ints = Arrays.asList(1, 2, 3, 3, 3, 5, 8);
+        Assert.equals(lowerBound(ints, 1, naturalOrder()), 0);
+        Assert.equals(lowerBound(ints, 2, naturalOrder()), 1);
+        Assert.equals(lowerBound(ints, 3, naturalOrder()), 2);
+        Assert.equals(lowerBound(ints, 4, naturalOrder()), 5);
+        Assert.equals(lowerBound(ints, 5, naturalOrder()), 5);
+        Assert.equals(lowerBound(ints, 6, naturalOrder()), 6);
+        Assert.equals(lowerBound(ints, 7, naturalOrder()), 6);
+        Assert.equals(lowerBound(ints, 8, naturalOrder()), 6);
+        Assert.equals(lowerBound(ints, 9, naturalOrder()), 7);
+    }
+    
+    /**
      * Returns the last position in 'list' where 'key' could be inserted without violating ordering according to 'comparator'.
      * (Collections.binarySearch makes no guarantee about which index will be returned if the list contains multiple elements equal
      * to the key.)

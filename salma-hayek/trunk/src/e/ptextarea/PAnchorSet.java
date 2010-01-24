@@ -61,17 +61,9 @@ class PAnchorSet implements PTextListener {
     
     // Returns the first position where an anchor for the textIndex could be inserted
     // without violating the ordering.
-    // This is what the STL calls "lower_bound".
     private int getFirstAnchorIndex(int textIndex) {
-//        checkLinearity();    // Comment this out to improve speed, but remove warnings when our state goes wrong.
-        int index = Collections.binarySearch(anchors, new UnownedAnchor(textIndex));
-        if (index < 0) {
-            index = -index - 1;
-        }
-        while (index > 0 && get(index - 1).getIndex() == textIndex) {
-            --index;
-        }
-        return index;
+        // checkLinearity();    // Comment this out to improve speed, but remove warnings when our state goes wrong.
+        return CollectionUtilities.lowerBound(anchors, new UnownedAnchor(textIndex), CollectionUtilities.naturalOrder());
     }
     
     private void checkLinearity() {
