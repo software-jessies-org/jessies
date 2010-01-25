@@ -365,6 +365,9 @@ public class TagsUpdater {
         
         private int getInsertIndex(TagReader.Tag tag) {
             String insertString = tag.getSortIdentifier();
+            // Behave more like Windows and less like GTK+, sorting Main between init_handlers and print,
+            // rather than on its own at the top, while consistently sorting transform_A before transform_a.
+            // upperBound will keep otherwise identical tags, like those for overloaded constructors, in their original order.
             int index = CollectionUtilities.upperBound(kidSortKeys, insertString, TAG_COMPARATOR);
             // FIXME: This is O(n*n) but works OK with the worst real-world use case yet measured (stone1/.../soapC.cpp, with ~300 kloc).
             kidSortKeys.add(index, insertString);
