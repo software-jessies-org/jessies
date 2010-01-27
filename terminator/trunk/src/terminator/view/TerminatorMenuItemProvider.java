@@ -61,7 +61,15 @@ public class TerminatorMenuItemProvider implements MenuItemProvider {
 		}
 		actions.add(null);
 		actions.add(EPopupMenu.makeInfoItem("Selection"));
-		actions.add(EPopupMenu.makeInfoItem("  characters: " + selectedText.length()));
+		if (selectedText.length() == 1) {
+			// It's a single character... describe it.
+			char ch = selectedText.charAt(0);
+			actions.add(EPopupMenu.makeInfoItem("  character '" + ch + "'"));
+			actions.add(EPopupMenu.makeInfoItem(String.format("  code point U+%04X", (int) ch)));
+			actions.add(EPopupMenu.makeInfoItem("  block " + Character.UnicodeBlock.of(ch)));
+		} else {
+			actions.add(EPopupMenu.makeInfoItem("  characters: " + selectedText.length()));
+		}
 		if (selectedLineCount != 0) {
 			actions.add(EPopupMenu.makeInfoItem("  lines: " + selectedLineCount));
 		}
