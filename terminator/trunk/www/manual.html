@@ -44,7 +44,17 @@
 
 <h2><a name="logging">Logging</a></h2>
 
-FIXME: What we log. When we log. Where we log. How to suspend logging (in the info dialog).
+Terminator logs all terminal output, including escape sequences.
+The log files are placed, by default, in ~/.terminator/logs/.
+Each terminal is logged to a separate file.
+The file names are constructed from the date, time and the program that was originally run in the terminal.
+Logging can be suspended temporarily with File, Show Info, Suspend Logging.
+Note, though, that terminal input is not logged, so passwords are not usually revealed.
+Logging can be disabled permanently, in such a way as to not generate warnings, by making the logging directory non-writable.
+But wait!
+In perhaps typical developer use, the author generates about 1 GiB of logs per year.
+A modern disk thus fails before the logs take up an appreciable portion.
+Being able to tell <em>exactly</em> what I typed yesterday seems well worth the space.
 
 <h2><a name="tabs">Tabs</a></h2>
 
