@@ -86,12 +86,53 @@ public class TerminatorMenuItemProvider implements MenuItemProvider {
 	}
 	
 	private void describeCharacter(Collection<Action> actions, int codePoint) {
-		actions.add(EPopupMenu.makeInfoItem(String.format("  character '%c'", codePoint)));
-		actions.add(EPopupMenu.makeInfoItem(String.format("  code point U+%04X", codePoint)));
+		actions.add(EPopupMenu.makeInfoItem(String.format("  character: '%c'", codePoint)));
+		actions.add(EPopupMenu.makeInfoItem(String.format("  code point: U+%04X", codePoint)));
 		Character.UnicodeBlock block = Character.UnicodeBlock.of(codePoint);
 		if (block != null) {
-			actions.add(EPopupMenu.makeInfoItem("  block " + block));
+			actions.add(EPopupMenu.makeInfoItem("  block: " + block));
 		}
+		String category = unicodeCategoryOf(codePoint);
+		if (category != null) {
+			actions.add(EPopupMenu.makeInfoItem("  category: " + category));
+		}
+	}
+	
+	private String unicodeCategoryOf(int codePoint) {
+		int type = Character.getType(codePoint);
+		switch (type) {
+		case Character.UNASSIGNED: return "unassigned (Cn)";
+		case Character.UPPERCASE_LETTER: return "uppercase letter (Lu)";
+		case Character.LOWERCASE_LETTER: return "lowercase letter (Ll)";
+		case Character.TITLECASE_LETTER: return "titlecase letter (Lt)";
+		case Character.MODIFIER_LETTER: return "modifier letter (Lm)";
+		case Character.OTHER_LETTER: return "other letter (Lo)";
+		case Character.NON_SPACING_MARK: return "non-spacing mark (Mn)";
+		case Character.ENCLOSING_MARK: return "enclosing mark (Me)";
+		case Character.COMBINING_SPACING_MARK: return "combining spacing mark (Mc)";
+		case Character.DECIMAL_DIGIT_NUMBER: return "decimal digit number (Nd)";
+		case Character.LETTER_NUMBER: return "letter number (Nl)";
+		case Character.OTHER_NUMBER: return "other number (No)";
+		case Character.SPACE_SEPARATOR: return "space separator (Zs)";
+		case Character.LINE_SEPARATOR: return "line separator (Zl)";
+		case Character.PARAGRAPH_SEPARATOR: return "paragraph separator (Zp)";
+		case Character.CONTROL: return "control (Cc)";
+		case Character.FORMAT: return "format (Cf)";
+		case Character.PRIVATE_USE: return "private use (Co)";
+		case Character.SURROGATE: return "surrogate (Cs)";
+		case Character.DASH_PUNCTUATION: return "dash punctuation (Pd)";
+		case Character.START_PUNCTUATION: return "start punctuation (Ps)";
+		case Character.END_PUNCTUATION: return "end punctuation (Pe)";
+		case Character.CONNECTOR_PUNCTUATION: return "connector punctuation (Pc)";
+		case Character.OTHER_PUNCTUATION: return "other punctuation (Po)";
+		case Character.MATH_SYMBOL: return "math symbol (Sm)";
+		case Character.CURRENCY_SYMBOL: return "currency symbol (Sc)";
+		case Character.MODIFIER_SYMBOL: return "modifier symbol (Sk)";
+		case Character.OTHER_SYMBOL: return "other symbol (So)";
+		case Character.INITIAL_QUOTE_PUNCTUATION: return "initial quote punctuation (Pi)";
+		case Character.FINAL_QUOTE_PUNCTUATION: return "final quote punctuation (Pf)";
+		}
+		return null;
 	}
 	
 	private String getSystemSelection() {
