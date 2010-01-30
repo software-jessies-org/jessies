@@ -470,6 +470,13 @@ class Java
       
       messageLines = []
       messageLines << "Java failed with " + $?.inspect()
+      if logging
+        messageLines << ""
+        # FIXME: The path used here will be in Cygwin format, which isn't the most widely understood on Windows.
+        messageLines << "Please send us the contents of the application log, from #{@log_filename}."
+      end
+      messageLines << ""
+      messageLines << "An idea of what you were doing when Java exited might be useful."
       messageLines << ""
       # The application log filename is perhaps of particular interest.
       messageLines << "Command line was:"
