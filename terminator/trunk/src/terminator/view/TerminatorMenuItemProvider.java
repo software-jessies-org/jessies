@@ -61,17 +61,36 @@ public class TerminatorMenuItemProvider implements MenuItemProvider {
 		}
 		actions.add(null);
 		actions.add(EPopupMenu.makeInfoItem("Selection"));
-		if (selectedText.length() == 1) {
-			// It's a single character... describe it.
-			char ch = selectedText.charAt(0);
-			actions.add(EPopupMenu.makeInfoItem("  character '" + ch + "'"));
-			actions.add(EPopupMenu.makeInfoItem(String.format("  code point U+%04X", (int) ch)));
-			actions.add(EPopupMenu.makeInfoItem("  block " + Character.UnicodeBlock.of(ch)));
+		int codePoint = toCodePoint(selectedText);
+		if (codePoint != -1) {
+			describeCharacter(actions, codePoint);
 		} else {
 			actions.add(EPopupMenu.makeInfoItem("  characters: " + selectedText.length()));
 		}
 		if (selectedLineCount != 0) {
 			actions.add(EPopupMenu.makeInfoItem("  lines: " + selectedLineCount));
+		}
+	}
+	
+	private int toCodePoint(String s) {
+		int result = -1;
+		if (s.length() == 1) {
+			result = s.codePointAt(0);
+		} else if (s.length() >= 6 && s.length() <= 8 && (s.startsWith("\\u") || s.startsWith("U+"))) {
+			try {
+				result = Integer.parseInt(s.substring(2), 16);
+			} catch (NumberFormatException ignored) {
+			}
+		}
+		return Character.isValidCodePoint(result) ? result : -1;
+	}
+	
+	private void describeCharacter(Collection<Action> actions, int codePoint) {
+		actions.add(EPopupMenu.makeInfoItem(String.format("  character '%c'", codePoint)));
+		actions.add(EPopupMenu.makeInfoItem(String.format("  code point U+%04X", codePoint)));
+		Character.UnicodeBlock block = Character.UnicodeBlock.of(codePoint);
+		if (block != null) {
+			actions.add(EPopupMenu.makeInfoItem("  block " + block));
 		}
 	}
 	
