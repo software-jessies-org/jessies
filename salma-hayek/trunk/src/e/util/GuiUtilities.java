@@ -210,9 +210,17 @@ public class GuiUtilities {
     private static String findMonospacedFontName() {
         // Although taking the best available from the ordered list "Monaco", "Lucida Sans Typewriter", "Lucida Console", "Monospaced" would cater for all cases, getAllFonts is expensive.
         if (GuiUtilities.isMacOs()) {
-            // "Monaco" is the traditional monospaced font on Mac OS.
+            // Starting with Mac OS 10.6 the preferred monospaced font is Menlo.
+            // If it is available, we are either on 10.6 or it has been installed
+            // on purpose.
+            String menlo = "Menlo";
+            if (isFontFamilyAvailable(menlo)) {
+                return menlo;
+            }
+            // "Monaco" is the traditional monospaced font on Mac OS up to and
+            // including Mac OS 10.5.
             // "Lucida Sans Typewriter" will be available too.
-            // Either will cover as much of Unicode as "Monospaced" would.
+            // Any of these will cover as much of Unicode as "Monospaced" would.
             // "Monospaced" would use "Courier New", which is unacceptable.
             return "Monaco";
         } else if (GuiUtilities.isWindows()) {
@@ -221,11 +229,8 @@ public class GuiUtilities {
             // It looks like Windows XP ships with "Lucida Console", a squat "funhouse mirror" variant: http://www.microsoft.com/typography/fonts/winxp.htm
             // FIXME: we should probably choose "Lucida Sans Typewriter" over "Lucida Console", but that over "Monospaced".
             String lucidaSansTypewriter = "Lucida Sans Typewriter";
-            Font[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
-            for (Font font : fonts) {
-                if (font.getFamily().equals(lucidaSansTypewriter)) {
-                    return lucidaSansTypewriter;
-                }
+            if (isFontFamilyAvailable(lucidaSansTypewriter)) {
+                return lucidaSansTypewriter;
             }
             // On Windows, "Monospaced" uses "Courier New" for the latin range, so it's a choice of last resort.
             // Far-east Asian users might disagree, but they seem to be a minority of our users.
@@ -236,6 +241,16 @@ public class GuiUtilities {
             // FIXME: the fix for Sun bug 6378099 in Java 7 (b33) breaks this by using "Courier New" for the latin range. Bug or feature?
             return "Monospaced";
         }
+    }
+    
+    private static boolean isFontFamilyAvailable(String fontFamily) {
+        Font[] fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAllFonts();
+        for (Font font : fonts) {
+            if (font.getFamily().equals(fontFamily)) {
+                return true;
+            }
+        }
+        return false;
     }
     
     /**
