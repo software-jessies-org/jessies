@@ -67,7 +67,7 @@ public class TerminatorPreferences extends Preferences {
         addPreference("Behavior", VISUAL_BELL, Boolean.TRUE, "Visual bell (as opposed to no bell)");
         addPreference("Behavior", USE_ALT_AS_META, Boolean.FALSE, "Use alt key as meta key (for Emacs)");
         
-        addPreference("Appearance", ANTI_ALIAS, Boolean.FALSE, "Anti-alias text");
+        addPreference("Appearance", ANTI_ALIAS, Boolean.TRUE, "Anti-alias text");
         addPreference("Appearance", BLINK_CURSOR, Boolean.TRUE, "Blink cursor");
         addPreference("Appearance", BLOCK_CURSOR, Boolean.FALSE, "Use block cursor");
         addPreference("Appearance", FANCY_BELL, Boolean.TRUE, "High-quality rendering of the visual bell");
@@ -75,11 +75,11 @@ public class TerminatorPreferences extends Preferences {
         addPreference("Appearance", FONT, new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 12), "Font");
         addPreference("Appearance", PALETTE, Palettes.fromString("ANSI"), "Palette");
         
-        // Defaults reminiscent of SGI's xwsh(1).
-        addPreference("Appearance", BACKGROUND_COLOR, VERY_DARK_BLUE, "Background");
-        addPreference("Appearance", CURSOR_COLOR, Color.GREEN, "Cursor");
-        addPreference("Appearance", FOREGROUND_COLOR, NEAR_WHITE, "Text foreground");
-        addPreference("Appearance", SELECTION_COLOR, SELECTION_BLUE, "Selection background");
+        // Defaults similar to most other modern terminals: black on white.
+        addPreference("Appearance", BACKGROUND_COLOR, Color.WHITE, "Background");
+        addPreference("Appearance", CURSOR_COLOR, Color.BLUE, "Cursor");
+        addPreference("Appearance", FOREGROUND_COLOR, NEAR_BLACK, "Text foreground");
+        addPreference("Appearance", SELECTION_COLOR, LIGHT_BLUE, "Selection background");
     }
     
     // Offer various preset color combinations.
