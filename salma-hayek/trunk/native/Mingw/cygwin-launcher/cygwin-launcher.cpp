@@ -100,10 +100,10 @@ void launchCygwin(char** argValues) {
     std::string ARGV0 = *argValues;
     ++ argValues;
     size_t lastBackslash = ARGV0.rfind('\\');
-    if (lastBackslash == std::string::npos) {
-        throw std::runtime_error(std::string("couldn't determine directory from which ") + ARGV0 + " was run");
+    std::string directoryPrefix;
+    if (lastBackslash != std::string::npos) {
+        directoryPrefix = ARGV0.substr(0, lastBackslash + 1);
     }
-    std::string directory = ARGV0.substr(0, lastBackslash);
     
     std::string cygwinBin = findCygwinBin();
     
@@ -122,7 +122,7 @@ void launchCygwin(char** argValues) {
     // Windows requires that we quote the arguments ourselves.
     typedef std::vector<std::string> Arguments;
     Arguments arguments;
-    std::string program = directory + "\\ruby-launcher.exe";
+    std::string program = directoryPrefix + "ruby-launcher.exe";
     // We mustn't quote the program argument but we must quote argv[0].
     arguments.push_back(quote(program));
     // Make sure we invoke the Cygwin rubyw, not any native version that might be ahead of it on the PATH.
