@@ -171,6 +171,10 @@ We don't know of a simple, complete way of persuading RedHat to always use one o
 infocmp -C >> ~/.termcap
 </pre>
 
+<p>Even with termcap set up, so that eg cursors work, we don't know how to make vim-minimal produce colors with TERM=terminator.
+We suggest that you install vim-enhanced, which colors out of the box, anyway and use that (via <tt>vim</tt> rather than <tt>vi</tt>) when you have a choice.
+If you know how to beat vim-minimal into coloring with TERM=terminator, then we'd love to know.
+
 <p>Finally, it seems necessary to add this line, or an equivalent, to your .bash_profile or equivalent:
 
 <pre>
