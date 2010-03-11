@@ -155,7 +155,7 @@ export TERM=$TERM
 <p>Cygwin-1.5's less(1) still uses a termcap-based ncurses library.
 If less(1)&nbsp;&ndash; and hence man(1)&nbsp;&ndash; say "WARNING: terminal is not fully functional" and upgrading to Cygwin-1.7 is not an option, then try:
 <pre>
-infocmp -C >> ~/.termcap
+infocmp -Cr >> ~/.termcap
 </pre>
 
 <p>infocmp is provided by Cygwin's ncurses package.
@@ -168,7 +168,7 @@ We don't know of a simple, complete way of persuading RedHat to always use one o
 
 <p>If you need to use applications, like vim-minimal, which are compiled with termcap, then first install Terminator on the RedHat box or otherwise install the Terminator terminfo there.  Then:
 <pre>
-infocmp -C >> ~/.termcap
+infocmp -Cr >> ~/.termcap
 </pre>
 
 <p>Even with termcap set up, so that eg cursors work, we don't know how to make vim-minimal produce colors with TERM=terminator.
