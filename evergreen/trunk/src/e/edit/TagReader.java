@@ -9,7 +9,7 @@ import java.util.regex.*;
 
 public class TagReader {
     private static final Pattern TAG_LINE_PATTERN = Pattern.compile("([^\t]+)\t(?:[^\t])+\t(\\d+);\"\t(\\w)(?:\t(.*))?");
-    private static final Pattern CLASS_PATTERN = Pattern.compile("(?:struct|class|enum|interface|namespace):([^\t]+).*");
+    private static final Pattern CLASS_PATTERN = Pattern.compile("(struct|class|enum|interface|namespace):([^\t]+).*");
     
     private TagListener listener;
     private FileType fileType;
@@ -167,12 +167,17 @@ public class TagReader {
         }
         
         final Matcher classMatcher = CLASS_PATTERN.matcher(context);
-        final String containingClass = (classMatcher.matches() ? classMatcher.group(1) : "");
+        String containingClassKind = "";
+        String containingClass = "";
+        if (classMatcher.matches()) {
+            containingClassKind = classMatcher.group(1);
+            containingClass = classMatcher.group(2);
+        }
         //Log.warn(context + " => " + containingClass);
         
         TagReader.Tag tag = null;
         if (fileType == FileType.JAVA) {
-            tag = new JavaTag(identifier, lineNumber, type, context, containingClass);
+            tag = new JavaTag(identifier, lineNumber, type, context, containingClass, containingClassKind);
         } else if (fileType == FileType.C_PLUS_PLUS) {
             tag = new CTag(identifier, lineNumber, type, context, containingClass);
         } else if (fileType == FileType.JAVA_SCRIPT) {
@@ -277,7 +282,7 @@ public class TagReader {
     }
     
     public static class JavaTag extends Tag {
-        public JavaTag(String identifier, int lineNumber, char tagType, String context, String containingClass) {
+        public JavaTag(String identifier, int lineNumber, char tagType, String context, String containingClass, String containingClassKind) {
             super(identifier, lineNumber, tagType, context, containingClass);
             typeSortOrder = new TagType[][] {
                 { TagType.PACKAGE },
@@ -288,8 +293,8 @@ public class TagReader {
                 { TagType.CLASS, TagType.ENUM, TagType.INTERFACE }
             };
             
-            // Mark interfaces as "abstract" so they're rendered differently.
-            if (type == TagType.INTERFACE) {
+            // Mark interfaces themselves -- and all their methods --  as "abstract" so they're rendered differently.
+            if (type == TagType.INTERFACE || containingClassKind.equals("interface")) {
                 this.isAbstract = true;
             }
             
