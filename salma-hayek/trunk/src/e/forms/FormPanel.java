@@ -26,6 +26,14 @@ public class FormPanel extends JPanel {
     }
     
     /**
+     * Adds a row consisting of just a component.
+     * This component will take up the entire row, including the space usually reserved for a label.
+     */
+    public void addWideRow(Component component) {
+        addRow(null, component);
+    }
+    
+    /**
      * Adds a row consisting of a label and a corresponding component.
      * If you want an empty label, use "". (This is the more common case.)
      * If you don't want even a space for a label, and want 'component' to take up the entire row, use null.
@@ -35,13 +43,15 @@ public class FormPanel extends JPanel {
         // Text components are automatically listened to for changes; see setTypingTimeoutAction.
         addTextComponentChildren(component);
         
+        int gridx = 0;
+        
         // Add the label, unless the caller doesn't want one.
         if (text != null) {
             JLabel label = new JLabel(text);
             label.setLabelFor(component);
             
             GridBagConstraints labelConstraints = new GridBagConstraints();
-            labelConstraints.gridx = 0;
+            labelConstraints.gridx = gridx++;
             labelConstraints.gridy = nextRow;
             labelConstraints.insets = new Insets(GuiUtilities.getComponentSpacing(), GuiUtilities.getComponentSpacing(), 0, 0);
             labelConstraints.anchor = (component instanceof JScrollPane) ? GridBagConstraints.NORTHEAST : GridBagConstraints.EAST;
@@ -51,7 +61,7 @@ public class FormPanel extends JPanel {
 
         // Add the component with its constraints
         GridBagConstraints componentConstraints = new GridBagConstraints();
-        componentConstraints.gridx = 1;
+        componentConstraints.gridx = gridx++;
         componentConstraints.gridy = nextRow;
         componentConstraints.gridwidth = GridBagConstraints.REMAINDER;
         componentConstraints.insets = new Insets(GuiUtilities.getComponentSpacing(), GuiUtilities.getComponentSpacing(), 0, GuiUtilities.getComponentSpacing());
