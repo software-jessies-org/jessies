@@ -83,9 +83,9 @@ public class PHighlightManager {
         
         private List<PHighlight> getHighlightsOverlapping(int beginOffset, int endOffset) {
             // The 'firstItem' is to be the lowest-indexed highlight wrapper which *overlaps* the range.
-            // We must check highlights which start before beginOffset to determine if they end past beginOffset.
+            // We must check highlights which start <= beginOffset to determine if they end > beginOffset.
             PHighlight firstItem = new ProbeHighlight(beginOffset);
-            SortedSet<PHighlight> highlightsBeforeStart = highlights.headSet(firstItem);
+            SortedSet<PHighlight> highlightsBeforeStart = highlights.headSet(firstItem, true);
             if (highlightsBeforeStart.size() > 0) {
                 PHighlight lastBefore = highlightsBeforeStart.last();
                 if (lastBefore.getEndIndex() > beginOffset) {
