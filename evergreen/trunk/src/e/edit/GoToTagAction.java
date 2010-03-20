@@ -74,7 +74,7 @@ public class GoToTagAction extends ETextAction {
             });
             
             FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "Tags Matching \"" + tagName + "\"");
-            form.getFormPanel().addRow("Tags:", new JScrollPane(list));
+            form.getFormPanel().addWideRow(new JScrollPane(list));
             form.showNonModal();
         }
     }
