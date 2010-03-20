@@ -206,9 +206,9 @@ public class SimplePatchDialog {
     private static FormBuilder makeDialog(Frame parent, Font font, String title, String question, Diffable from, Diffable to) {
         FormBuilder form = new FormBuilder(parent, title);
         if (question != null) {
-            form.getFormPanel().addRow("", new JLabel(question));
+            form.getFormPanel().addWideRow(new JLabel(question));
         }
-        form.getFormPanel().addRow("Patch:", makeScrollablePatchView(font, from, to));
+        form.getFormPanel().addWideRow(makeScrollablePatchView(font, from, to));
         return form;
     }
     

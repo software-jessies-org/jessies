@@ -55,7 +55,7 @@ public class ShowMisspellingsAction extends PTextAction {
         });
         
         FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "Misspellings");
-        form.getFormPanel().addRow("Misspellings:", new JScrollPane(list));
+        form.getFormPanel().addWideRow(new JScrollPane(list));
         form.showNonModal();
     }
 }
