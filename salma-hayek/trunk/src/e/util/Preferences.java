@@ -569,7 +569,7 @@ public abstract class Preferences {
                     final Frame parent = (Frame) SwingUtilities.getAncestorOfClass(Frame.class, formPanel);
                     final String title = description;
                     final FormBuilder form = new FormBuilder(parent, title);
-                    form.getFormPanel().addRow(null, colorChooser);
+                    form.getFormPanel().addWideRow(colorChooser);
                     if (form.show("OK") == false) {
                         // Reset the color if the user hit "Cancel".
                         setColor(originalColor);
