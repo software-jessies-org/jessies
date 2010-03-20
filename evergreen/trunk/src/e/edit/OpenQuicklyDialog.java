@@ -128,7 +128,6 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
     
     private void initForm() {
         this.form = new FormBuilder(Evergreen.getInstance().getFrame(), "Open Quickly");
-        form.setStatusBar(status);
         form.setTypingTimeoutActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 showMatches();
@@ -136,7 +135,8 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
         });
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Names Containing:", filenameField);
-        formPanel.addRow("Matches:", new JScrollPane(matchList));
+        formPanel.addWideRow(status);
+        formPanel.addWideRow(new JScrollPane(matchList));
         form.getFormDialog().setAcceptCallable(new java.util.concurrent.Callable<Boolean>() {
             public Boolean call() {
                 openSelectedFilesFromList();
