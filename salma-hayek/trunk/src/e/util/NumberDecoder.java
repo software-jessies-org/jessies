@@ -100,8 +100,23 @@ public class NumberDecoder {
     }
     
     private static String toString(int radix, long number) {
-        String signPrefix = number < 0 ? "-" : "";
-        String digits = Long.toString(Math.abs(number), radix);
+        // It makes sense to treat the "computer" bases specially, since we probably want to interpret them as unsigned.
+        String signPrefix = "";
+        String digits;
+        switch (radix) {
+        case 2:
+            digits = Long.toBinaryString(number);
+            break;
+        case 8:
+            digits = Long.toOctalString(number);
+            break;
+        case 16:
+            digits = Long.toHexString(number);
+            break;
+        default:
+            signPrefix = number < 0 ? "-" : "";
+            digits = Long.toString(Math.abs(number), radix);
+        }
         // Make it easier to read large numbers.
         // FIXME: it might be nice to be able to see the boundary between the top and bottom 32 bits in binary and hex.
         if (radix == 2) {
