@@ -285,7 +285,7 @@ public:
             os << std::endl;
             return true;
         }
-        if (version < "1.5") {
+        if (version < "1.6") {
             os << version;
             os << " is too old";
             os << std::endl;
@@ -400,7 +400,7 @@ public:
         std::ostringstream os;
         os << "Couldn't find ";
         os << sizeof(void*) * 8;
-        os << " bit jvm.dll - please install a 1.5 or newer JRE or JDK.";
+        os << " bit jvm.dll - please install a 1.6 or newer JRE or JDK.";
         os << std::endl;
         os << "Error messages were:";
         os << std::endl;

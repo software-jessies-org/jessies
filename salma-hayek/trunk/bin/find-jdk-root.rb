@@ -161,12 +161,7 @@ else
       # Unfortunately, they can point the /usr/bin/java link to the JRE (Versions/A/) rather than the JDK (Versions/CurrentJDK/).
       # So now we need a heuristic.
       if jdk_root.to_s().include?("/1.6")
-        # If the user's path has a 1.6 "java" highest, we use the latest Java 6.
-        # This will likely break when Java 6 becomes the default, if Apple continues to link to their JRE from /usr/bin/.
         jdk_root = "/System/Library/Frameworks/JavaVM.framework/Versions/1.6/Home/"
-      else
-        # Otherwise we use the latest Java 5.
-        jdk_root = "/System/Library/Frameworks/JavaVM.framework/Versions/1.5/Home/"
       end
     end
     

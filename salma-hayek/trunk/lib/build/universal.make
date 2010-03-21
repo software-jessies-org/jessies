@@ -473,10 +473,10 @@ JAVAC_FLAGS.javac += -deprecation
 JAVAC_FLAGS.javac += -Xlint:all -Xlint:-serial
 
 # We should also ensure that we build class files that can be used on the current Java release, regardless of where we build.
-JAVAC_FLAGS.javac += -target 1.5
+JAVAC_FLAGS.javac += -target 1.6
 
-# Ensure we give a clear error if the user attempts to use anything older than Java 5.
-JAVAC_FLAGS.javac += -source 1.5
+# Ensure we give a clear error if the user attempts to use anything older than Java 6.
+JAVAC_FLAGS.javac += -source 1.6
 
 # ----------------------------------------------------------------------------
 # Set ecj flags.
@@ -495,10 +495,10 @@ JAVAC_FLAGS.ecj += -warn:-serial
 JAVAC_FLAGS.ecj += -proceedOnError
 
 # We should also ensure that we build class files that can be used on the current Java release, regardless of where we build.
-JAVAC_FLAGS.ecj += -target 1.5
+JAVAC_FLAGS.ecj += -target 1.6
 
-# Ensure we give a clear error if the user attempts to use anything older than Java 5.
-JAVAC_FLAGS.ecj += -source 1.5
+# Ensure we give a clear error if the user attempts to use anything older than Java 6.
+JAVAC_FLAGS.ecj += -source 1.6
 
 # ----------------------------------------------------------------------------
 # Set GCJ flags.

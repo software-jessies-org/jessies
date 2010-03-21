@@ -198,11 +198,10 @@ class Java
     # Can we salvage the situation by finding a suitable JVM?
     
     if target_os() == "Darwin"
-      # At the moment on Mac OS, only Java 5 is suitable for running our applications.
-      globs = [ "/System/Library/Frameworks/JavaVM.framework/Versions/1.5/Home" ]
+      globs = [ "/System/Library/Frameworks/JavaVM.framework/Versions/1.6/Home" ]
     else
       # This works for Linux distributions using Sun's RPM, and for Solaris.
-      globs = [  "/usr/java/jdk1.7.0*", "/usr/java/jre1.7.0*", "/usr/java/jdk1.6.0*", "/usr/java/jre1.6.0*", "/usr/java/jdk1.5.0*", "/usr/java/jre1.5.0*" ]
+      globs = [  "/usr/java/jdk1.7.0*", "/usr/java/jre1.7.0*", "/usr/java/jdk1.6.0*", "/usr/java/jre1.6.0*" ]
     end
     globs.each() {
       |glob|
@@ -219,7 +218,7 @@ class Java
     
     # This works for Linux distributions using the Debian package for Sun's JVM where the user hasn't run update-java-alternatives(1).
     # (If they have configured Sun's JVM as their default, we won't have had to grovel about for a suitable JVM.)
-    sun_java = "/usr/lib/jvm/java-1.5.0-sun/bin/java"
+    sun_java = "/usr/lib/jvm/java-6-sun/bin/java"
     if File.exist?(sun_java)
       @launcher = sun_java
       return
@@ -237,10 +236,11 @@ class Java
       suggestion = "Please upgrade."
     end
     if File.exist?("/usr/bin/gnome-app-install")
-      suggestion = 'To install a suitable JRE, choose "Add/Remove..." from the GNOME "Applications" menu, show "All available applications", type "sun java" in the search field, and install "Sun Java 5.0 Runtime".'
+      # FIXME: it's now just "Ubuntu Software Center" on the main menu for Ubuntu users.
+      suggestion = 'To install a suitable JRE, choose "Add/Remove..." from the GNOME "Applications" menu, show "All available applications", type "sun java" in the search field, and install "Sun Java 6 Runtime".'
     end
     message_lines << suggestion
-    show_alert("#{@dock_name} requires Java 5 or newer.", message_lines.join("\n\n"))
+    show_alert("#{@dock_name} requires Java 6 or newer.", message_lines.join("\n\n"))
     exit(1)
   end
 
