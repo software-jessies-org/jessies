@@ -23,7 +23,7 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
             this.text = text;
         }
         
-        //@Override // FIXME: Java 5's javac(1) is broken.
+        @Override
         public void displayAdvice() {
             setTemporaryText(text);
         }
@@ -36,7 +36,7 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
             this.url = url;
         }
         
-        //@Override // FIXME: Java 5's javac(1) is broken.
+        @Override
         public void displayAdvice() {
             try {
                 textPane.setPage(url);

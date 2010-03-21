@@ -69,8 +69,9 @@ public class JavaDoc {
         // On some systems we may have the documentation installed in a well-known place.
         String[] wellKnownJavaDocDirectories = {
             // Mac OS X.
-            "/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Resources/Documentation/Reference/doc/api",
-            "/System/Library/Frameworks/JavaVM.framework/Versions/1.5.0/Resources/Documentation/Reference/appledoc/api",
+            // FIXME: untested search & replace from 1.5.0 --- are these right?
+            "/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Resources/Documentation/Reference/doc/api",
+            "/System/Library/Frameworks/JavaVM.framework/Versions/1.6.0/Resources/Documentation/Reference/appledoc/api",
             // Debian-based Linux.
             "/usr/share/doc/sun-java6-jdk/html/api",
             "/usr/share/doc/sun-java5-jdk/html/api",
