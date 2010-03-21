@@ -32,9 +32,7 @@ public class ShowHideTagsAction extends AbstractAction {
     }
     
     private ShowHideTagsAction() {
-        // FIXME: SELECTED_KEY only works on Java 6.
-        // Using the string's value means that we can compile on Java 5, but we don't select the check box on Java 5.
-        putValue("SwingSelectedKey", areTagsVisible());
+        putValue(SELECTED_KEY, areTagsVisible());
     }
     
     public void actionPerformed(ActionEvent e) {
