@@ -51,7 +51,7 @@ public abstract class PAnchor implements Comparable<PAnchor> {
         return false;
     }
     
-    //@Override // FIXME: Java 5's javac(1) is broken.
+    @Override
     public final int compareTo(PAnchor other) {
         return (index - other.index);
     }
