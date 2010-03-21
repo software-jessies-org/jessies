@@ -16,8 +16,8 @@ public class TerminatorTabbedPane extends TabbedPane {
      * Lets the user drag tabs to reorder them.
      * The tabs are reordered live, as the user drags.
      */
-    private static class TabDragger extends MouseAdapter implements MouseMotionListener {
-        //@Override // FIXME: Java 5's javac(1) is broken.
+    private static class TabDragger extends MouseAdapter {
+        @Override
         public void mouseDragged(MouseEvent e) {
             TerminatorTabbedPane tabbedPane = (TerminatorTabbedPane) e.getSource();
             tabbedPane.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -61,7 +61,7 @@ public class TerminatorTabbedPane extends TabbedPane {
             tabbedPane.setCursor(Cursor.getDefaultCursor());
         }
         
-        // FIXME: Java 5's MouseAdapter doesn't cover MouseMotionListener.
+        @Override
         public void mouseMoved(MouseEvent e) { }
     }
     
