@@ -231,7 +231,10 @@ copy_files_for_installation(salma_hayek, "#{resources_dir}/salma-hayek")
 
 # Windows users have java.exe on the path, but not jar.exe.
 require "#{salma_hayek}/bin/find-jdk-root.rb"
-jar = find_jdk_root() + "/bin/jar"
+jar = which("jar")
+if jar == nil
+    jar = find_jdk_root() + "/bin/jar"
+end
 
 # Use an absolute path so we can chdir first.
 jar_filename = Pathname.new("#{project_resource_directory}").realpath() + ".generated" + "classes.jar"

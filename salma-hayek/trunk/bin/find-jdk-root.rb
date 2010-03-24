@@ -154,14 +154,6 @@ else
     # Assume the directory above the bin/ directory is the "home" directory; the directory that contains bin/ and include/ and so on.
     jdk_root = jdk_bin.dirname()
     
-    if target_os() == "Darwin"
-      # On Mac OS, Apple use their own layout but provide a Home/ subdirectory
-      # that contains a JDK-like directory structure of links to the files in
-      # the Apple tree.
-      # Unfortunately, they can point the /usr/bin/java link to the JRE (Versions/A/) rather than the JDK (Versions/CurrentJDK/).
-      jdk_root = "/System/Library/Frameworks/JavaVM.framework/Versions/1.6/Home/"
-    end
-    
     # We must not return Pathname in some circumstances and String in others.
     return jdk_root.to_s()
   end

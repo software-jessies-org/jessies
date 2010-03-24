@@ -129,9 +129,14 @@ findMakeFriendlyEquivalentName = $(findMakeFriendlyEquivalentName.$(TARGET_OS))
 JDK_ROOT_SCRIPT = $(SCRIPT_PATH)/find-jdk-root.rb
 SCRIPTS_WHICH_AFFECT_COMPILER_FLAGS += $(JDK_ROOT_SCRIPT)
 JDK_ROOT := $(call findMakeFriendlyEquivalentName,$(shell ruby $(JDK_ROOT_SCRIPT)))
-ifeq "$(wildcard $(JDK_ROOT)/include/jni_md.h $(JDK_ROOT)/include/*/jni_md.h)" ""
-	JDK_ROOT := $(error $(JDK_ROOT) is not a sane location for JDK headers)
-endif
+
+JDK_INCLUDE_DIR.$(TARGET_OS) = include
+JDK_INCLUDE_DIR.Darwin = Headers
+JDK_INCLUDE = $(JDK_ROOT)/$(JDK_INCLUDE_DIR.$(TARGET_OS))
+
+JDK_BIN_DIR.$(TARGET_OS) = bin
+JDK_BIN_DIR.Darwin = Commands
+JDK_BIN = $(JDK_ROOT)/$(JDK_BIN_DIR.$(TARGET_OS))
 
 # ----------------------------------------------------------------------------
 # We use our own replacement for javah(1).
@@ -288,13 +293,13 @@ LD = $(CXX)
 # Note that our Solaris build assumes GCC rather than Sun's compiler.
 # GCC's -shared option, which we use on Linux, exists, but produces link
 # errors. -G, as used in Sun's tutorial examples with their own compiler works.
-EXTRA_INCLUDE_PATH.SunOS += $(JDK_ROOT)/include/solaris
+EXTRA_INCLUDE_PATH.SunOS += $(JDK_INCLUDE)/solaris
 SHARED_LIBRARY_LDFLAGS.SunOS += -G
 
-EXTRA_INCLUDE_PATH.Linux += $(JDK_ROOT)/include/linux
+EXTRA_INCLUDE_PATH.Linux += $(JDK_INCLUDE)/linux
 SHARED_LIBRARY_LDFLAGS.Linux += -shared
 
-EXTRA_INCLUDE_PATH.Cygwin += $(JDK_ROOT)/include/win32
+EXTRA_INCLUDE_PATH.Cygwin += $(JDK_INCLUDE)/win32
 SHARED_LIBRARY_LDFLAGS.Cygwin += -shared
 # Do we want stdcall aliases for even non-JNI shared libraries?
 SHARED_LIBRARY_LDFLAGS.Cygwin += -Wl,--add-stdcall-alias
@@ -302,13 +307,17 @@ SHARED_LIBRARY_LDFLAGS.Cygwin += -Wl,--enable-auto-image-base
 SHARED_LIBRARY_PREFIX.Cygwin =
 SHARED_LIBRARY_EXTENSION.Cygwin = dll
 
-EXTRA_INCLUDE_PATH += $(JDK_ROOT)/include
+EXTRA_INCLUDE_PATH += $(JDK_INCLUDE)
 EXTRA_INCLUDE_PATH += $(EXTRA_INCLUDE_PATH.$(TARGET_OS))
 
 EXTANT_INCLUDE_DIRECTORIES := $(wildcard $(EXTRA_INCLUDE_PATH))
 NON_EXISTENT_INCLUDE_DIRECTORIES = $(filter-out $(EXTANT_INCLUDE_DIRECTORIES),$(EXTRA_INCLUDE_PATH))
 ifneq "$(NON_EXISTENT_INCLUDE_DIRECTORIES)" ""
   $(warning Could not find $(NON_EXISTENT_INCLUDE_DIRECTORIES) - perhaps the first java on your PATH isn't in a JDK)
+endif
+
+ifeq "$(wildcard $(foreach include,$(EXTRA_INCLUDE_PATH),$(include)/jni_md.h))" ""
+	JDK_ROOT := $(error $(JDK_ROOT) is not a sane location for JDK headers)
 endif
 
 SHARED_LIBRARY_LDFLAGS = $(SHARED_LIBRARY_LDFLAGS.$(TARGET_OS))
@@ -439,7 +448,7 @@ makeGuid = $(shell $(BUILD_SCRIPT_PATH)/uuid.rb)
 # Choose a Java compiler.
 # ----------------------------------------------------------------------------
 
-JAVA_COMPILER ?= $(JDK_ROOT)/bin/javac
+JAVA_COMPILER ?= $(JDK_BIN)/javac
 ifeq "$(wildcard $(JAVA_COMPILER)$(EXE_SUFFIX))" ""
   JAVA_COMPILER := $(error Unable to find $(JAVA_COMPILER) --- do you only have a JRE installed or did you explicitly supply a non-absolute path?)
 endif
