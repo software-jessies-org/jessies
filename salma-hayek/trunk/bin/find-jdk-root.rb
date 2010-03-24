@@ -159,10 +159,7 @@ else
       # that contains a JDK-like directory structure of links to the files in
       # the Apple tree.
       # Unfortunately, they can point the /usr/bin/java link to the JRE (Versions/A/) rather than the JDK (Versions/CurrentJDK/).
-      # So now we need a heuristic.
-      if jdk_root.to_s().include?("/1.6")
-        jdk_root = "/System/Library/Frameworks/JavaVM.framework/Versions/1.6/Home/"
-      end
+      jdk_root = "/System/Library/Frameworks/JavaVM.framework/Versions/1.6/Home/"
     end
     
     # We must not return Pathname in some circumstances and String in others.
