@@ -65,7 +65,7 @@ ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
         $(warning Try our pre-built http://software.jessies.org/3rdParty/make-3.81-darwin-universal instead.)
     endif
     ifeq "$(TARGET_OS)" "Linux"
-        $(warning Debian testing/unstable has a new enough make if you do sudo apt-get install make.)
+        $(warning Debian Etch has a new enough make if you do sudo apt-get install make.)
         $(warning Ubuntu "Dapper Drake" has a new enough make.)
         $(warning Or try http://software.jessies.org/3rdParty/make-3.81-linux.)
     endif
