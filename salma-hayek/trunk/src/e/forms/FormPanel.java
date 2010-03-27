@@ -43,17 +43,23 @@ public class FormPanel extends JPanel {
         // Text components are automatically listened to for changes; see setTypingTimeoutAction.
         addTextComponentChildren(component);
         
-        int gridx = 0;
+        // We want space between components, but don't want to waste space above the first component.
+        // We assume that the enclosing dialog (or whatever) is going to have its own spacing.
+        int spaceAbove = (nextRow == 0) ? 0 : GuiUtilities.getComponentSpacing();
         
         // Add the label, unless the caller doesn't want one.
+        int gridx = 0;
         if (text != null) {
             JLabel label = new JLabel(text);
             label.setLabelFor(component);
             
+            // We also want padding to the right of labels, so there's space between the label and its component.
+            final Insets insets = new Insets(spaceAbove, 0, 0, GuiUtilities.getComponentSpacing());
+            
             GridBagConstraints labelConstraints = new GridBagConstraints();
             labelConstraints.gridx = gridx++;
             labelConstraints.gridy = nextRow;
-            labelConstraints.insets = new Insets(GuiUtilities.getComponentSpacing(), GuiUtilities.getComponentSpacing(), 0, 0);
+            labelConstraints.insets = insets;
             labelConstraints.anchor = (component instanceof JScrollPane) ? GridBagConstraints.NORTHEAST : GridBagConstraints.EAST;
             labelConstraints.fill = GridBagConstraints.NONE;
             add(label, labelConstraints);
@@ -64,7 +70,7 @@ public class FormPanel extends JPanel {
         componentConstraints.gridx = gridx++;
         componentConstraints.gridy = nextRow;
         componentConstraints.gridwidth = GridBagConstraints.REMAINDER;
-        componentConstraints.insets = new Insets(GuiUtilities.getComponentSpacing(), GuiUtilities.getComponentSpacing(), 0, GuiUtilities.getComponentSpacing());
+        componentConstraints.insets = new Insets(spaceAbove, 0, 0, 0);
         componentConstraints.weightx = 1.0;
         if (component instanceof JCheckBox) {
             // FIXME: we should have a better mechanism for component-specific spacing.
