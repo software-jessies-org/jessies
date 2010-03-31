@@ -160,8 +160,9 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 	}
 	
 	/**
-	 * Pastes the system selection on X11, the clipboard on Windows
-	 * and nothing on Mac OS X.
+	 * Pastes the system selection on X11.
+	 * Pastes the clipboard on Windows, like PuTTY.
+	 * Does nothing on Mac OS, whereas Terminal pastes the selection from the current terminal.
 	 */
 	public void middleButtonPaste() {
 		if (GuiUtilities.isWindows()) {
