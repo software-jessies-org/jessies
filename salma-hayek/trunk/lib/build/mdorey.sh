@@ -29,7 +29,12 @@
 # It can be done but it's not worth the effort.
 # Mounting C:\Documents and Settings\martind on /home/martind, however, works fine.
 
-# 20 09 * * * cat ~/software.jessies.org/work/salma-hayek/lib/build/mdorey.sh | bash --login
+# When switching to a different major version of Cygwin:
+# cygrunsrv --stop cygserver
+# cygrunsrv --remove cygserver
+# cygserver-config
+
+# 20 09 * * * echo ~/software.jessies.org/work/salma-hayek/lib/build/mdorey.sh | bash --login
 
 NIGHTLY_BUILD_SCRIPT=~/software.jessies.org/work/salma-hayek/bin/nightly-build.rb
 NIGHTLY_BUILD_TREE=~/software.jessies.org/nightlies/
