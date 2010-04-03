@@ -20,8 +20,9 @@ public class OpenQuicklyAction extends AbstractAction {
     
     public void actionPerformed(ActionEvent e) {
         final String filename = ETextAction.getSelectedText();
-        if (filename.startsWith("~") || filename.startsWith("/")) {
-            // If we have an absolute name, we can go straight there.
+        // If we have an absolute name, we can go straight there.
+        // Avoid selections with newlines in: any selection that starts with a comment would look like a filename!
+        if (filename.indexOf('\n') == -1 && (filename.startsWith("~") || filename.startsWith("/"))) {
             Evergreen.getInstance().openFile(filename);
             return;
         }
