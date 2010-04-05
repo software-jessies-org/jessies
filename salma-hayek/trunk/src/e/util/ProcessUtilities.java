@@ -190,7 +190,9 @@ public class ProcessUtilities {
             in = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
             String line;
             while ((line = in.readLine()) != null) {
-                listener.processLine(line);
+                if (listener != null) {
+                    listener.processLine(line);
+                }
             }
             in.close();
         } catch (Exception ex) {
@@ -207,6 +209,9 @@ public class ProcessUtilities {
     }
     
     private static void feedExceptionToLineListener(LineListener listener, Exception ex) {
+        if (listener == null) {
+            return;
+        }
         listener.processLine(ex.getMessage());
         String stackTrace = StringUtilities.stackTraceFromThrowable(ex);
         for (String line : stackTrace.split("\n")) {
