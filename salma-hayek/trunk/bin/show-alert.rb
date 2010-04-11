@@ -8,12 +8,30 @@ else
         salma_hayek = Pathname.new(__FILE__).realpath().dirname().dirname()
         
         require "#{salma_hayek}/bin/target-os.rb"
+        instructionLines = []
+        # Some alerts are self-explanatory.
+        if support_address != nil
+            # Some of our error messages end in a newline, some don't.
+            # No-one would notice these instructions without a blank line separating them from the morass of stack or arguments.
+            # Two blank lines would look amateur.
+            if message[-1] != "\n"
+                instructionLines << ""
+            end
+            instructionLines << ""
+            instructionLines << "Please mail this error message to #{support_address}.";
+            if target_os() == "Cygwin" || target_os() == "Windows"
+                instructionLines << "You can copy it to the clipboard with Ctrl-C.";
+                instructionLines << "Windows won't let you select the text but Ctrl-C works anyway.";
+            end
+        end
+        instructions = instructionLines.join("\n")
         if target_os() == "Darwin"
+            text = "#{message}#{instructions}"
             # FIXME: Mac OS 10.5 should give us RubyCocoa. Until then, we need a separate helper executable.
-            command = [ "#{salma_hayek}/.generated/#{target_directory()}/bin/NSRunAlertPanel", title, message ]
+            command = [ "#{salma_hayek}/.generated/#{target_directory()}/bin/NSRunAlertPanel", title, text ]
             system(*command)
         elsif target_os() == "Linux"
-            text = "#{title}\n\n#{message}"
+            text = "#{title}\n\n#{message}#{instructions}"
             reported_okay = false
             
             # FIXME: this assumes that a KDE user doesn't have the GNOME zenity(1) installed. Which is probably true.
@@ -42,16 +60,9 @@ else
                 $stderr.puts(text)
             end
         elsif target_os() == "Cygwin" || target_os() == "Windows"
-            platformMessageLines = []
-            platformMessageLines << message
-            # Some alerts are self-explanatory.
-            if support_address != nil
-                platformMessageLines << ""
-                platformMessageLines << "Please copy this message to the clipboard with Ctrl-C and mail it to #{support_address}.";
-                platformMessageLines << "(Windows won't let you select the text but Ctrl-C works anyway.)";
-            end
+            text = "#{message}#{instructions}"
             require "Win32API"
-            Win32API.new('user32', 'MessageBox', %w(p p p i), 'i').call(0, platformMessageLines.join("\n"), title, 0)
+            Win32API.new('user32', 'MessageBox', %w(p p p i), 'i').call(0, text, title, 0)
         end
     end
     
