@@ -113,6 +113,13 @@ public class EPopupMenu {
         
         private void handle(MouseEvent e) {
             if (componentWithMenu.isEnabled() && e.isConsumed() == false && e.isPopupTrigger()) {
+                if (e.getButton() == 0) {
+                    // Apparently, if you have a scroll wheel capable of horizontal scrolling,
+                    // Ubuntu and X11 conspire to send MouseEvents claiming that button 0 is
+                    // pressed, released, and clicked. Sun's isPopupTrigger test appears to be
+                    // broken in this case, so we need to filter it out ourselves.
+                    return;
+                }
                 requestFocusOnComponentWithMenu();
                 showPopupMenuLater(e);
             }
