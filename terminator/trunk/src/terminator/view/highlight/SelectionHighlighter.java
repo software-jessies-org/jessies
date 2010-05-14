@@ -205,7 +205,11 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
 			// Space marks the end of a word by any reasonable definition.
 			// Bracket characters usually mark the end of what you're interested in.
 			// Likewise quote characters.
-			return " <>(){}[]`'\"".indexOf(ch) == -1;
+			// Colon would break selection of URLs (Matt Hillsdon tried it, didn't like it).
+			// It's also useful to copy grep-style file:line "addresses" for eg Evergreen.
+			// mydarus wanted double-click to select "Slot" from:
+			// Equipment=1,Subrack=1,Slot=3,PlugInUnit=1,ExchangeTerminal=1,E1PhysPathTerm=pp1
+			return " <>(){}[]`'\",=".indexOf(ch) == -1;
 		}
 	}
 	
