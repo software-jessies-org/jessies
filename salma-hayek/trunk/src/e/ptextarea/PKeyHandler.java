@@ -181,7 +181,7 @@ public class PKeyHandler implements KeyListener {
                 // Notepad kills the remainder of the line to the right.
                 // Word 2003 sometimes also deletes a preceding space, but I've been unable to determine quite when.
                 // Wordpad doesn't do that, even with the same corpus.
-                if (event.isControlDown()) {
+                if (byWord) {
                     moveRight(true, true);
                 }
                 delete();
