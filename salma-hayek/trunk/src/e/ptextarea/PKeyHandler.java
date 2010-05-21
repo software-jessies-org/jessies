@@ -177,6 +177,13 @@ public class PKeyHandler implements KeyListener {
             if (event.isShiftDown()) {
                 textArea.cut();
             } else {
+                // With Ctrl, Word 2003 and Wordpad delete the remainder of the word to the right.
+                // Notepad kills the remainder of the line to the right.
+                // Word 2003 sometimes also deletes a preceding space, but I've been unable to determine quite when.
+                // Wordpad doesn't do that, even with the same corpus.
+                if (event.isControlDown()) {
+                    moveRight(true, true);
+                }
                 delete();
             }
         } else if (key == KeyEvent.VK_INSERT && event.isShiftDown()) {
