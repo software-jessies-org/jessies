@@ -119,7 +119,7 @@ public class TerminatorPreferences extends Preferences {
         // Make a representative image for the button.
         BufferedImage image = makeEmptyPresetButtonImage();
         Graphics2D g = image.createGraphics();
-        g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, getBoolean(TerminatorPreferences.ANTI_ALIAS) ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+        GuiUtilities.setTextAntiAliasing(g, Terminator.getPreferences().getBoolean(TerminatorPreferences.ANTI_ALIAS));
         g.setFont(getFont(TerminatorPreferences.FONT));
         g.setColor(background);
         g.fillRect(0, 0, image.getWidth(), image.getHeight());
