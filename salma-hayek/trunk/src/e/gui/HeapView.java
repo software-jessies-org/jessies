@@ -203,12 +203,6 @@ public class HeapView extends JComponent {
      */
     protected void paintComponent(Graphics oldGraphics) {
         Graphics2D g = (Graphics2D) oldGraphics;
-        // Get the desktop rendering hints so that if the user's chosen anti-aliased text, we give it to them.
-        Map<?, ?> map = (Map<?, ?>) (Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints"));
-        if (map != null) {
-            g.addRenderingHints(map);
-        }
-        
         int width = getWidth();
         int height = getHeight();
         if (width - BORDER_W > 0 && height - BORDER_H > 0) {
@@ -224,7 +218,7 @@ public class HeapView extends JComponent {
             g.translate(-1, -2);
         } else {
             stopTimerIfNecessary();
-            // To honor opaque contract, fill in the background
+            // To honor the setOpaque contract, fill in the background.
             g.setColor(getBackground());
             g.fillRect(0, 0, width, height);
         }
