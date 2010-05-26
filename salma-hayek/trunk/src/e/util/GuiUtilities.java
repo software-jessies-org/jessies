@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
 import java.lang.reflect.*;
+import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import javax.swing.*;
 import javax.swing.border.*;
@@ -435,6 +436,25 @@ public class GuiUtilities {
         } catch (Exception ex) {
             // No setWindowOpacity for you, then. Not unexpected.
             return null;
+        }
+    }
+    
+    public static void setTextAntiAliasing(Graphics2D g, boolean antiAlias) {
+        if (!antiAlias) {
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+            return;
+        }
+        // Get the desktop rendering hints so that if the user's chosen anti-aliased text, we give them what they've configured.
+        // This is necessary to get the user's exact configuration (such as which order the LCD pixels are in).
+        Map<?, ?> map = (Map<?, ?>) (Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints"));
+        if (map != null) {
+            g.addRenderingHints(map);
+        }
+        // If the user has no global anti-aliasing settings, go for the JVM's default anti-aliasing.
+        // Note that VALUE_ANTIALIAS_DEFAULT basically means "off".
+        Object hint = g.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+        if (hint == RenderingHints.VALUE_ANTIALIAS_OFF || hint == RenderingHints.VALUE_ANTIALIAS_DEFAULT) {
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         }
     }
     

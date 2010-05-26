@@ -1,5 +1,6 @@
 package e.ptextarea;
 
+import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
@@ -70,11 +71,7 @@ public class PLineNumberPanel extends JComponent {
             return;
         }
         
-        // Get the desktop rendering hints so that if the user's chosen anti-aliased text, we give it to them.
-        Map<?, ?> map = (Map<?, ?>) (Toolkit.getDefaultToolkit().getDesktopProperty("awt.font.desktophints"));
-        if (map != null) {
-            g.addRenderingHints(map);
-        }
+        GuiUtilities.setTextAntiAliasing(g, true);
         
         final FontMetrics fontMetrics = textArea.getFontMetrics(Font.PLAIN);
         final Insets insets = getInsets();
