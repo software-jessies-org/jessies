@@ -705,9 +705,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 		Stopwatch.Timer timer = paintComponentStopwatch.start();
 		try {
 			Graphics2D g = (Graphics2D) oldGraphics;
-			
-			Object antiAliasHint = g.getRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING);
-			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, Terminator.getPreferences().getBoolean(TerminatorPreferences.ANTI_ALIAS) ? RenderingHints.VALUE_TEXT_ANTIALIAS_ON : RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
+			GuiUtilities.setTextAntiAliasing(g, Terminator.getPreferences().getBoolean(TerminatorPreferences.ANTI_ALIAS));
 			
 			FontMetrics metrics = getFontMetrics(getFont());
 			Dimension charUnitSize = getCharUnitSize();
@@ -751,7 +749,6 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 					paintCursor(g, "", baseline);
 				}
 			}
-			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, antiAliasHint);
 		} finally {
 			timer.stop();
 		}
