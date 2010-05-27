@@ -168,6 +168,19 @@ private:
         // Assume input is UTF-8; this allows character-erase to be correctly performed in cooked mode.
         terminalAttributes.c_iflag |= IUTF8;
 #endif
+        
+        // The equivalent of stty erase ^? for the benefit of Cygwin-1.5, which defaults to ^H.
+        // Our belief is that every other platform we care about, including Cygwin-1.7, uses ^?.
+        // We used to send ^H on Windows.
+        // That worked OK with ssh in Cygwin-1.5 because ssh passes stty erase to the remote system.
+        // Only "OK" because it hid the Emacs help, which someone once complained about to the mailing list.
+        // It didn't work so well with Cygwin telnet, which neither translated ^H to ^?, nor passed stty erase.
+        // One reason I appear to have thought it necessary to send ^H is for the benefit of native Windows applications, writing:
+        // "Windows's ReadConsoleInput function always provides applications, like jdb, with ^H, so that's what they expect."
+        // However, ReadConsoleInput seems never to return when a Cygwin pty is providing the input, even in 1.5, so I now think that's irrelevant.
+        // Search the change log for "backspace" for more information.
+        terminalAttributes.c_cc[VERASE] = 127;
+        
         if (tcsetattr(childFd, TCSANOW, &terminalAttributes) != 0) {
             throw child_exception_via_pipe(childFd, "tcsetattr(" + toString(childFd) + ", TCSANOW, &terminalAttributes) with IXON cleared");
         }
