@@ -18,9 +18,7 @@ ENV["PATH"] = "/usr/local/bin:/usr/bin:/bin"
 
 # You *will* need to change these.
 
-mail_domain = "jessies.org" # Assumes all authors (and the to_address) share a domain.
-
-to_address = "software@#{mail_domain}"
+to_address = "software"
 reply_to_address = to_address # Use "nil" to reply to the author.
 
 # ------------------------------------------------------------------------
@@ -60,7 +58,7 @@ comment = info_lines
 # Remove the localized date that follows the ISO date.
 date = date.gsub(/ \(.*\)$/, "")
 
-from_address = "#{author}@#{mail_domain}"
+from_address = "#{author}"
 
 subject = "#{repository_name} revision #{rev}"
 
