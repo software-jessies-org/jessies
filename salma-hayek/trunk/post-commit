@@ -16,7 +16,7 @@ ENV["PATH"] = "/usr/local/bin:/usr/bin:/bin"
 
 # ------------------------------------------------------------------------
 
-# You *will* need to change these.
+# You *WILL* need to change these.
 
 to_address = "software"
 reply_to_address = to_address # Use "nil" to reply to the author.
