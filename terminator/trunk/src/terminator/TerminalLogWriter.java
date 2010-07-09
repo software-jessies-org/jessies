@@ -55,9 +55,11 @@ public class TerminalLogWriter {
 			return;
 		}
 		try {
+			// canWrite didn't work on a couple of versions of Windows with Java 6 after a Cygwin 1.7.5 chmod u-w ~/.terminator/logs.
+			// (canWrite also ignores the effective uid and doesn't work with ACLs on a file server over NFSv2.)
 			// Multiple Terminator processes may contend for the same log directory,
 			// so just creating a file called "sentinel" would be liable to occasional failure.
-			File sentinel = File.createTempFile("sentinel", null, logsDirectory);
+			File sentinel = File.createTempFile("sentinel", ".tmp", logsDirectory);
 			sentinel.delete();
 		} catch (IOException ex) {
 			// What other reason could there be?
