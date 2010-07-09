@@ -54,6 +54,16 @@ public class TerminalLogWriter {
 			this.info = "(\"" + logsDirectoryName + "\" does not exist)";
 			return;
 		}
+		try {
+			// Multiple Terminator processes may contend for the same log directory,
+			// so just creating a file called "sentinel" would be liable to occasional failure.
+			File sentinel = File.createTempFile("sentinel", null, logsDirectory);
+			sentinel.delete();
+		} catch (IOException ex) {
+			// What other reason could there be?
+			this.info = "(\"" + logsDirectoryName + "\" is not writable)";
+			return;
+		}
 		
 		// Try to create a log file.
 		// We'll keep truncating the name until we either succeed or there's no name left.
@@ -68,17 +78,7 @@ public class TerminalLogWriter {
 			} catch (IOException ex) {
 				if (truncationLength == 0) {
 					// That's it. We can't retry with a shorter filename.
-					if (logsDirectory.canWrite() == false) {
-						// access(2)'s deliberate ignoring of the effective uid means we can't really trust canWrite.
-						// Lack of support for ACLs in, say, NFSv2 can also cause canWrite to return erroneous results.
-						// (This is why we don't make the canWrite check up with the File.exists check.)
-						// We do, however, have undocumented support for disabling logging by making the logs directory "clearly" not writable.
-						this.info = "(\"" + logsDirectoryName + "\" is not writable)";
-						return;
-					} else {
-						// This, though, is probably a real problem that the user needs to be explicitly alerted to.
-						throw ex;
-					}
+					throw ex;
 				}
 			}
 		}
