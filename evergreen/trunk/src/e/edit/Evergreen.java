@@ -35,6 +35,7 @@ public class Evergreen {
     private class InitialState {
         private ArrayList<InitialWorkspace> initialWorkspaces = new ArrayList<InitialWorkspace>();
         private boolean showTagsPanel = true;
+        private boolean tagsPanelOnLeft = false;
         private int tagsPanelSplitPaneDividerLocation = -1;
         
         /**
@@ -615,6 +616,9 @@ public class Evergreen {
                 if (root.hasAttribute("splitPaneDividerLocation")) {
                     initialState.tagsPanelSplitPaneDividerLocation = Integer.parseInt(root.getAttribute("splitPaneDividerLocation"));
                 }
+                if (root.hasAttribute("tagsPanelOnLeft")) {
+                    initialState.tagsPanelOnLeft = Boolean.parseBoolean(root.getAttribute("tagsPanelOnLeft"));
+                }
             }
             
             for (Node xmlWorkspace = root.getFirstChild(); xmlWorkspace != null; xmlWorkspace = xmlWorkspace.getNextSibling()) {
@@ -660,6 +664,7 @@ public class Evergreen {
             root.setAttribute("height", Integer.toString((int) size.getHeight()));
             
             root.setAttribute("showTagsPanel", Boolean.toString(tagsPanel.isVisible()));
+            root.setAttribute("tagsPanelOnLeft", Boolean.toString(splitPane.getLeftComponent() == tagsPanel));
             root.setAttribute("splitPaneDividerLocation", Integer.toString(tagsPanel.isVisible() ? splitPane.getDividerLocation() : ShowHideTagsAction.oldDividerLocation));
             
             for (Workspace workspace : getWorkspaces()) {
@@ -819,9 +824,12 @@ public class Evergreen {
         initWindow();
         initTagsPanel();
         tabbedPane = new EvergreenTabbedPane();
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, tabbedPane, tagsPanel);
         initStatusArea();
         readSavedState();
+        
+        JComponent left = initialState.tagsPanelOnLeft ? tagsPanel : tabbedPane;
+        JComponent right = initialState.tagsPanelOnLeft ? tabbedPane : tagsPanel;
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, left, right);
         
         InetAddress wildcardAddress = null;
         new InAppServer("EditServer", getPreferenceFilename("evergreen-server-port"), wildcardAddress, EditServer.class, new EditServer(this));
