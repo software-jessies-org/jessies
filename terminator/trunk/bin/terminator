@@ -94,10 +94,6 @@ class Terminator
         invoker.add_property("e.gui.HelpMenu.supportAddress", @support_address)
         invoker.add_property("e.gui.HelpMenu.supportSite", "http://groups.google.com/group/terminator-users")
         
-        # Work around Sun bug 6961306, which has inconvenienced at least two of our Windows users.
-        # Correctness trumps what I presume is a performance optimization.
-        invoker.add_property("sun.java2d.d3d", "false")
-        
         invoker.launch()
     end
     
