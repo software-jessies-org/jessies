@@ -427,6 +427,9 @@ class Java
     add_property("java.awt.Window.locationByPlatform", "true")
     # Work around the Metal LAF's ugliness. Not needed in Java 6?
     add_property("swing.boldMetal", "false")
+    # Work around Sun bug 6961306, which has inconvenienced at least two of our Windows users.
+    # Correctness trumps what I presume is a performance optimization.
+    add_property("sun.java2d.d3d", "false")
     
     args.concat(@extra_java_arguments)
     args << @class_name
