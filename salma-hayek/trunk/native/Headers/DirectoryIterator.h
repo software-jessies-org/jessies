@@ -20,7 +20,7 @@ public:
   
   DirectoryEntry() {
   }
-  DirectoryEntry(const dirent* cStyleEntry)
+  explicit DirectoryEntry(const dirent* cStyleEntry)
   : name(cStyleEntry->d_name) {
   }
 };
@@ -37,7 +37,7 @@ private:
     errno = 0;
     const dirent* cStyleEntry = readdir(m_handle);
     if (cStyleEntry != 0) {
-      m_entry = cStyleEntry;
+      m_entry = DirectoryEntry(cStyleEntry);
       return;
     }
     m_eof = true;
@@ -46,8 +46,11 @@ private:
     }
   }
   
+  DirectoryIterator(DirectoryIterator&);
+  void operator=(DirectoryIterator&);
+  
 public:
-  DirectoryIterator(const std::string& directoryName)
+  explicit DirectoryIterator(const std::string& directoryName)
   : m_directoryName(directoryName)
   , m_handle(opendir(directoryName.c_str()))
   , m_eof(false)
