@@ -178,7 +178,7 @@ class Java
       java_version = "gij! run away!"
     end
     # If we appear to have found a JVM, extract just the version number.
-    # Otherwise, If we return exactly what the executable said, that might give the user some clue as to what went wrong.
+    # Otherwise return everything the executable said, to give the user some clue as to what went wrong.
     if java_version.match(/java version "(.*)"/) != nil
       java_version = $1
     end
