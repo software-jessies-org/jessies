@@ -51,7 +51,7 @@ public:
     std::string ARGV0;
     NativeArguments launcherArguments;
     std::string supportAddress;
-    std::string sharedLibraryFilename;
+    std::ostringstream progressOStream;
     
 private:
     std::string getUsage() const;
@@ -59,7 +59,7 @@ private:
         
 public:
     ErrorReporter()
-    : ARGV0("<unknown>"), sharedLibraryFilename("<not selected yet>") {
+    : ARGV0("<unknown>") {
     }
     
     void reportUsageError(const UsageError& ex) const {
@@ -203,7 +203,6 @@ SharedLibraryHandle openSharedLibrary(const std::string& sharedLibraryFilename) 
 #endif
         throw std::runtime_error(os.str());
     }
-    errorReporter.sharedLibraryFilename = sharedLibraryFilename;
     return sharedLibraryHandle;
 }
 
@@ -327,7 +326,7 @@ public:
         const std::string registryPrefix = "/proc/registry/" + toString(hive) + "/SOFTWARE/" + javaVendor + "/";
         const std::string jreRegistryPath = registryPrefix + jreName;
         const std::string jdkRegistryPath = registryPrefix + jdkName;
-        std::ostringstream os;
+        std::ostream& os = errorReporter.progressOStream;
         JvmRegistryKeys jvmRegistryKeys;
         findVersionsInRegistry(os, jvmRegistryKeys, jreRegistryPath, "");
         // My Sun JDK key says:
@@ -362,11 +361,12 @@ public:
             os << "]";
             os << std::endl;
         }
-        throw std::runtime_error(os.str());
+        std::ostringstream errorOStream;
+        errorOStream << "openJvmLibraryUsingSpecificRegistryHive(" << hive << ", " << javaVendor << ", " << jdkName << ", " << jreName << ") failed";
+        throw std::runtime_error(errorOStream.str());
     }
     
     SharedLibraryHandle openJvmLibraryUsingRegistry(const char* javaVendor, const char* jdkName, const char* jreName) const {
-        std::ostringstream os;
         typedef std::deque<HKEY> Hives;
         Hives hives;
         hives.push_back(HKEY_CURRENT_USER);
@@ -376,10 +376,13 @@ public:
             try {
                 return openJvmLibraryUsingSpecificRegistryHive(hive, javaVendor, jdkName, jreName);
             } catch (const std::exception& ex) {
+                std::ostream& os = errorReporter.progressOStream;
                 os << ex.what();
                 os << std::endl;
             }
         }
+        std::ostringstream os;
+        os << "openJvmLibraryUsingRegistry(" << javaVendor << ", " << jdkName << ", " << jreName << ") failed";
         throw std::runtime_error(os.str());
     }
         
@@ -397,10 +400,10 @@ public:
     // or else who knows what it's DLL entry point has done.
     // Until we've successfully opened it, though, we can keep trying alternatives.
     SharedLibraryHandle openWin32JvmLibrary() const {
-        std::ostringstream os;
-        os << "Couldn't find ";
+        std::ostream& os = errorReporter.progressOStream;
+        os << "Trying to find ";
         os << sizeof(void*) * 8;
-        os << " bit jvm.dll - please install a 1.6 or newer JRE or JDK.";
+        os << " bit jvm.dll - we need a 1.6 or newer JRE or JDK.";
         os << std::endl;
         os << "Error messages were:";
         os << std::endl;
@@ -416,7 +419,7 @@ public:
                 os << std::endl;
             }
         }
-        throw std::runtime_error(os.str());
+        throw std::runtime_error("openWin32JvmLibrary() failed");
     }
     
     SharedLibraryHandle openJvmLibrary() const {
@@ -735,7 +738,8 @@ void ErrorReporter::generateReport(const std::exception& ex, const std::string& 
     os << "Error: " << ex.what() << std::endl;
     os << std::endl;
     
-    os << "Selected JVM was: " << sharedLibraryFilename << std::endl;
+    os << "JVM selection:" << std::endl;
+    os << progressOStream.str();
     os << std::endl;
     
     os << usage;
