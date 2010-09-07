@@ -125,9 +125,6 @@ public class PtyProcess {
     public PtyProcess(String executable, String[] argv, String workingDirectory) throws Exception {
         ensureLibraryLoaded();
         startProcess(executable, argv, workingDirectory);
-        if (pid == -1) {
-            throw new IOException("Could not start process \"" + executable + "\".");
-        }
         inStream = new PtyInputStream();
         outStream = new PtyOutputStream();
     }
