@@ -72,7 +72,7 @@ public:
     pid_t forkAndExec(const std::string& term, const std::string& executable, char * const *argv, const std::string& workingDirectory) {
         pid_t pid = fork();
         if (pid < 0) {
-            return -1;
+            throw unix_exception("fork() failed");
         } else if (pid == 0) {
             try {
                 runChild(term, executable, argv, workingDirectory, *this);  // Should never return.
