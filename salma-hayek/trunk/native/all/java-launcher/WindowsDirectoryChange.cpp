@@ -12,7 +12,8 @@ std::string getCurrentWindowsDirectory() {
     currentDirectory.resize(MAX_PATH);
     DWORD rc = GetCurrentDirectory(currentDirectory.size(), &currentDirectory[0]);
     if (rc == 0) {
-        throw WindowsError("GetCurrentDirectory()");
+        DWORD lastError = GetLastError();
+        throw WindowsError("GetCurrentDirectory()", lastError);
     }
     if (rc > currentDirectory.size()) {
         throw std::runtime_error("GetCurrentDirectory() claimed to want a buffer of " + toString(rc) + " when MAX_PATH is only " + toString(MAX_PATH));
@@ -24,7 +25,8 @@ std::string getCurrentWindowsDirectory() {
 
 void setCurrentWindowsDirectory(const std::string& directory) {
     if (SetCurrentDirectory(directory.c_str()) == false) {
-        throw WindowsError("SetCurrentDirectory(\"" + directory + "\")");
+        DWORD lastError = GetLastError();
+        throw WindowsError("SetCurrentDirectory(\"" + directory + "\")", lastError);
     }
 }
 
