@@ -17,19 +17,8 @@ private:
     }
     
 public:
-    WindowsError(const std::string& description)
-    : std::runtime_error(makeErrorMessage(description, GetLastError())) {
-    }
     WindowsError(const std::string& description, DWORD errorCode)
     : std::runtime_error(makeErrorMessage(description, errorCode)) {
-    }
-};
-
-#else
-
-struct WindowsError : std::runtime_error {
-    WindowsError(const std::string& description)
-    : std::runtime_error(description) {
     }
 };
 
