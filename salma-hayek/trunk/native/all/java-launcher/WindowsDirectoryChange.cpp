@@ -1,5 +1,7 @@
 #include "WindowsDirectoryChange.h"
 
+#include "convertUtf16ToUtf8.h"
+#include "convertUtf8ToUtf16.h"
 #include "toString.h"
 #include "WindowsError.h"
 
@@ -8,25 +10,27 @@
 #include <windows.h>
 
 std::string getCurrentWindowsDirectory() {
-    std::string currentDirectory;
-    currentDirectory.resize(MAX_PATH);
-    DWORD rc = GetCurrentDirectory(currentDirectory.size(), &currentDirectory[0]);
+    std::basic_string<WCHAR> currentDirectoryInUtf16;
+    currentDirectoryInUtf16.resize(MAX_PATH);
+    DWORD rc = GetCurrentDirectoryW(currentDirectoryInUtf16.size(), &currentDirectoryInUtf16[0]);
     if (rc == 0) {
         DWORD lastError = GetLastError();
         throw WindowsError("GetCurrentDirectory()", lastError);
     }
-    if (rc > currentDirectory.size()) {
+    if (rc > currentDirectoryInUtf16.size()) {
         throw std::runtime_error("GetCurrentDirectory() claimed to want a buffer of " + toString(rc) + " when MAX_PATH is only " + toString(MAX_PATH));
     }
     // The returned size only includes the terminator if the buffer was too small.
-    currentDirectory.resize(rc);
-    return currentDirectory;
+    currentDirectoryInUtf16.resize(rc);
+    std::string currentDirectoryUtf8 = convertUtf16ToUtf8(currentDirectoryInUtf16);
+    return currentDirectoryUtf8;
 }
 
-void setCurrentWindowsDirectory(const std::string& directory) {
-    if (SetCurrentDirectory(directory.c_str()) == false) {
+void setCurrentWindowsDirectory(const std::string& directoryInUtf8) {
+    std::basic_string<WCHAR> directoryInUtf16 = convertUtf8ToUtf16(directoryInUtf8);
+    if (SetCurrentDirectoryW(directoryInUtf16.c_str()) == false) {
         DWORD lastError = GetLastError();
-        throw WindowsError("SetCurrentDirectory(\"" + directory + "\")", lastError);
+        throw WindowsError("SetCurrentDirectory(\"" + directoryInUtf8 + "\")", lastError);
     }
 }
 
@@ -45,6 +49,7 @@ WindowsDirectoryChange::WindowsDirectoryChange(const std::string& targetDirector
 : previousDirectory(getCurrentWindowsDirectory()) {
     setCurrentWindowsDirectory(targetDirectory);
 }
+
 WindowsDirectoryChange::~WindowsDirectoryChange() {
     setCurrentWindowsDirectory(previousDirectory);
 }
