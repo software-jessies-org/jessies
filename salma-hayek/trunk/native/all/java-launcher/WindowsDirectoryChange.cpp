@@ -27,10 +27,19 @@ std::string getCurrentWindowsDirectory() {
 }
 
 void setCurrentWindowsDirectory(const std::string& directoryInUtf8) {
-    std::basic_string<WCHAR> directoryInUtf16 = convertUtf8ToUtf16(directoryInUtf8);
+    // SetCurrentDirectory wants a trailing backslash.
+    // Usually, it will add that for you, but perhaps not when the directory name starts with \\?.
+    // At least, not on newer versions of Windows than XP.
+    std::ostringstream os;
+    os << directoryInUtf8;
+    if (directoryInUtf8.empty() || directoryInUtf8[directoryInUtf8.size() - 1] != '\\') {
+        os << '\\';
+    }
+    std::string canonicalizedDirectoryInUtf8 = os.str();
+    std::basic_string<WCHAR> directoryInUtf16 = convertUtf8ToUtf16(canonicalizedDirectoryInUtf8);
     if (SetCurrentDirectoryW(directoryInUtf16.c_str()) == false) {
         DWORD lastError = GetLastError();
-        throw WindowsError("SetCurrentDirectory(\"" + directoryInUtf8 + "\")", lastError);
+        throw WindowsError("SetCurrentDirectory(\"" + canonicalizedDirectoryInUtf8 + "\")", lastError);
     }
 }
 
