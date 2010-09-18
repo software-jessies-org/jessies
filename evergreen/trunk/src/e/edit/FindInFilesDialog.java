@@ -20,6 +20,15 @@ import org.jdesktop.swingworker.SwingWorker;
 public class FindInFilesDialog implements WorkspaceFileList.Listener {
     /** How our worker threads know whether they're still relevant. */
     private static final AtomicInteger currentSequenceNumber = new AtomicInteger(0);
+    private static boolean shouldStillWorkOn(int sequenceNumber) {
+        return currentSequenceNumber.get() == sequenceNumber;
+    }
+    private static void stopOutstandingWork() {
+        currentSequenceNumber.incrementAndGet();
+    }
+    private static int nextSequenceNumber() {
+        return currentSequenceNumber.incrementAndGet();
+    }
     
     /** We share these between all workspaces, to make it harder to accidentally launch a denial-of-service attack against ourselves. */
     private static final ExecutorService definitionFinderExecutor = ThreadUtilities.newFixedThreadPool(8, "Find Definitions");
@@ -167,7 +176,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         private long endTimeNs;
         
         public FileFinder() {
-            this.sequenceNumber = currentSequenceNumber.incrementAndGet();
+            this.sequenceNumber = nextSequenceNumber();
             
             this.matchRoot = new DefaultMutableTreeNode();
             this.regex = regexField.getText();
@@ -268,7 +277,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         
         @Override
         protected void process(List<DefaultMutableTreeNode> treeNodes) {
-            if (currentSequenceNumber.get() != sequenceNumber) {
+            if (!shouldStillWorkOn(sequenceNumber)) {
                 return;
             }
             
@@ -282,7 +291,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         
         @Override
         protected void done() {
-            if (currentSequenceNumber.get() != sequenceNumber) {
+            if (!shouldStillWorkOn(sequenceNumber)) {
                 return;
             }
             
@@ -316,7 +325,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
             }
             
             public void run() {
-                if (currentSequenceNumber.get() != sequenceNumber) {
+                if (!shouldStillWorkOn(sequenceNumber)) {
                     return;
                 }
                 try {
@@ -379,17 +388,22 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
     }
     
     public static class DefinitionFinder implements Runnable, TagReader.TagListener {
-        private File file;
-        private MatchingFile matchingFile;
-        private Pattern pattern;
+        private final File file;
+        private final MatchingFile matchingFile;
+        private final Pattern pattern;
+        private final int sequenceNumber;
         
         public DefinitionFinder(File file, Pattern pattern, MatchingFile matchingFile) {
             this.file = file;
             this.matchingFile = matchingFile;
             this.pattern = pattern;
+            this.sequenceNumber = currentSequenceNumber.get();
         }
         
         public void run() {
+            if (!shouldStillWorkOn(sequenceNumber)) {
+                return;
+            }
             // FIXME: obviously not all files are really UTF-8.
             new TagReader(file, null, "UTF-8", this);
         }
@@ -543,6 +557,17 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
             }
         });
         form.getFormDialog().setExtraButton(rescanButton);
+        form.getFormDialog().setCancelRunnable(new Runnable() {
+            public void run() {
+                stopOutstandingWork();
+            }
+        });
+        form.getFormDialog().setAcceptCallable(new java.util.concurrent.Callable<Boolean>() {
+            public Boolean call() {
+                stopOutstandingWork();
+                return true;
+            }
+        });
     }
     
     private void initSaveMonitor() {
