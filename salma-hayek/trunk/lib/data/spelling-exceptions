@@ -13,6 +13,7 @@ booleans
 bytecode
 bytecodes
 canonicalize
+canonicalized
 canonicalization
 clickable
 cygwin
@@ -24,6 +25,8 @@ destructors
 draggable
 filename
 filenames
+finalizer
+finalizers
 formatter
 formatters
 functor
@@ -48,6 +51,8 @@ prepend
 prepended
 prepending
 prepends
+profiler
+profilers
 primality
 programmatically
 reals
@@ -67,6 +72,8 @@ reimplements
 runtime
 screenshot
 screenshots
+seekable
+serializer
 solaris
 stacktrace
 stacktraces
@@ -78,11 +85,15 @@ subclass
 subclassed
 subclasses
 subclassing
+subsequence
+subsequences
 substring
 substrings
+superclass
 superset
 supersets
 unary
+unsynchronized
 validator
 validators
 whitespace
