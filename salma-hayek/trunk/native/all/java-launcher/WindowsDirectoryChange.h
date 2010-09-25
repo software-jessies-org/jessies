@@ -8,7 +8,7 @@ private:
     std::string previousDirectory;
     
 public:
-    WindowsDirectoryChange(const std::string& targetDirectory);
+    explicit WindowsDirectoryChange(const std::string& targetDirectory);
     ~WindowsDirectoryChange();
 };
 
