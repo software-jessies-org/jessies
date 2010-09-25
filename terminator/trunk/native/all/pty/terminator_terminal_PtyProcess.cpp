@@ -41,7 +41,7 @@ struct JavaStringArrayToStringArray : StringArray {
 
 struct Argv : std::vector<char*> {
     // Non-const because execvp is anti-social about const.
-    Argv(StringArray& arguments) {
+    explicit Argv(StringArray& arguments) {
         for (StringArray::iterator it = arguments.begin(); it != arguments.end(); ++it) {
             // We must point to the memory in arguments, not a local.
             std::string& argument = *it;
