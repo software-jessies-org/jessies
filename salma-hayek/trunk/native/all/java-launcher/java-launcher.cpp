@@ -35,7 +35,7 @@
 #include <vector>
 
 struct UsageError : std::runtime_error {
-    UsageError(const std::string& description)
+    explicit UsageError(const std::string& description)
     : std::runtime_error(description) {
     }
 };
@@ -438,7 +438,7 @@ public:
 #endif
     }
     
-    JvmLocation(bool isClient) {
+    explicit JvmLocation(bool isClient) {
         jvmDirectory = isClient ? "client" : "server";
     }
 };
@@ -474,7 +474,7 @@ private:
     NativeArguments mainArguments;
     
 public:
-    LauncherArgumentParser(const NativeArguments& launcherArguments) {
+    explicit LauncherArgumentParser(const NativeArguments& launcherArguments) {
         properties.parse(launcherArguments);
         // Try to set the mailing list address before reporting errors.
         errorReporter.supportAddress = properties["e.gui.HelpMenu.supportAddress"];
@@ -646,7 +646,7 @@ private:
     }
     
 public:
-    JavaInvocation(LauncherArgumentParser& launcherArguments0)
+    explicit JavaInvocation(LauncherArgumentParser& launcherArguments0)
     : launcherArguments(launcherArguments0)
     {
         typedef std::vector<JavaVMOption> JavaVMOptions; // Required to be contiguous.

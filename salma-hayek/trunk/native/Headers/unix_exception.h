@@ -11,7 +11,7 @@
 
 class unix_exception : public std::runtime_error {
 public:
-    unix_exception(const std::string& message)
+    explicit unix_exception(const std::string& message)
     : std::runtime_error(message + (errno ? ": (" + errnoToString(errno) + ")" : " (but errno is zero)"))
     , m_errno(errno)
     {

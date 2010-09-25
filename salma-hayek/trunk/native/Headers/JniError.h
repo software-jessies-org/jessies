@@ -10,7 +10,7 @@
  */
 class JniError {
 public:
-    JniError(int err) : m_err(err) {
+    explicit JniError(int err) : m_err(err) {
     }
     
     void dumpTo(std::ostream& os) const {
