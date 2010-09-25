@@ -89,7 +89,7 @@ public:
 private:
     class child_exception : public unix_exception {
     public:
-        child_exception(const std::string& message)
+        explicit child_exception(const std::string& message)
         : unix_exception("Error from child: " + message) {
         }
     };
