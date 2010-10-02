@@ -442,6 +442,7 @@ public class GuiUtilities {
     public static void setTextAntiAliasing(Graphics2D g, boolean antiAlias) {
         if (!antiAlias) {
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+            g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
             return;
         }
         // Get the desktop rendering hints so that if the user's chosen anti-aliased text, we give them what they've configured.
