@@ -129,9 +129,9 @@ JDK_ROOT_SCRIPT = $(SCRIPT_PATH)/find-jdk-root.rb
 SCRIPTS_WHICH_AFFECT_COMPILER_FLAGS += $(JDK_ROOT_SCRIPT)
 JDK_ROOT := $(call findMakeFriendlyEquivalentName,$(shell ruby $(JDK_ROOT_SCRIPT)))
 
-JDK_INCLUDE_DIR.$(TARGET_OS) = include
-JDK_INCLUDE_DIR.Darwin = Headers
-JDK_INCLUDE = $(JDK_ROOT)/$(JDK_INCLUDE_DIR.$(TARGET_OS))
+JDK_INCLUDE.$(TARGET_OS) = $(JDK_ROOT)/include
+JDK_INCLUDE.Darwin = /Developer/SDKs/MacOSX10.6.sdk/$(JDK_ROOT)/Headers
+JDK_INCLUDE = $(JDK_INCLUDE.$(TARGET_OS))
 
 JDK_BIN_DIR.$(TARGET_OS) = bin
 JDK_BIN_DIR.Darwin = Commands
