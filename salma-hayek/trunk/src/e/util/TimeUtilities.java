@@ -78,13 +78,13 @@ public class TimeUtilities {
      */
     public static String nsToString(long ns) {
         if (ns < 1000L) {
-            return Long.toString(ns) + " ns";
+            return Long.toString(ns) + "ns";
         } else if (ns < 1000000L) {
-            return Long.toString(ns/1000L) + " us";
+            return Long.toString(ns/1000L) + "us";
         } else if (ns < 1000000000L) {
-            return Long.toString(ns/1000000L) + " ms";
+            return Long.toString(ns/1000000L) + "ms";
         } else if (ns < 60000000000L) {
-            return String.format("%.2f s", nsToS(ns));
+            return String.format("%.2fs", nsToS(ns));
         } else {
             long duration = ns;
             long nanoseconds = duration % 1000;
