@@ -45,6 +45,9 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 	
 	public TerminalView() {
 		TerminatorPreferences preferences = Terminator.getPreferences();
+		// The background is no longer set in optionsDidChange
+		// The background must be set before the model is created, or Bad Things happen
+		setBackground(preferences.getColor("background"));
 		this.model = new TerminalModel(this, preferences.getInt(TerminatorPreferences.INITIAL_COLUMN_COUNT), preferences.getInt(TerminatorPreferences.INITIAL_ROW_COUNT));
 		ComponentUtilities.disableFocusTraversal(this);
 		setBorder(BorderFactory.createEmptyBorder(1, 4, 4, 4));
@@ -106,9 +109,6 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 			// If we want to handle key events when alt is down, we need to turn off input methods.
 			enableInputMethods(false);
 		}
-		
-		setBackground(preferences.getColor("background"));
-		setForeground(preferences.getColor("foreground"));
 		
 		setFont(preferences.getFont(TerminatorPreferences.FONT));
 		sizeChanged();
@@ -743,6 +743,12 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
 						drawCursor = false;
 					}
 					startOffset += chunkText.length();
+				}
+				Color lineBG = model.getTextLine(i).getBackground();
+				if (!getBackground().equals(lineBG)) {
+					// Fill the rest of the line with line's default background
+					g.setColor(lineBG);
+					g.fillRect(x, baseline - metrics.getMaxAscent() - metrics.getLeading(), maxX - x, metrics.getHeight());
 				}
 				if (drawCursor) {
 					// A cursor at the end of the line is in a position past the end of the text.
