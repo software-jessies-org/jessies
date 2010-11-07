@@ -6,6 +6,7 @@ import javax.swing.*;
 import e.util.*;
 import terminator.terminal.*;
 import terminator.view.*;
+import terminator.Terminator;
 
 public class TerminalModel {
 	private TerminalView view;
@@ -138,17 +139,21 @@ public class TerminalModel {
 		if (useAlternateBuffer == usingAlternateBuffer()) {
 			return;
 		}
+		// Since we don't save the alternate buffer, reset background to default before switching to it.
+		// When switching back, we don't want the background that was probably set while in the alternate buffer.
+		// FIXME: should we save the screen's old background along with savedScreen?
+		view.setBackground(Terminator.getPreferences().getColor("background"));
 		if (useAlternateBuffer) {
 			savedScreen = new TextLine[height];
 			for (int i = 0; i < height; i++) {
 				int lineIndex = getFirstDisplayLine() + i;
 				savedScreen[i] = getTextLine(lineIndex);
-				textLines.set(lineIndex, new TextLine());
+				textLines.set(lineIndex, new TextLine(view.getBackground()));
 			}
 		} else {
 			for (int i = 0; i < height; i++) {
 				int lineIndex = getFirstDisplayLine() + i;
-				textLines.set(lineIndex, i >= savedScreen.length ? new TextLine() : savedScreen[i]);
+				textLines.set(lineIndex, i >= savedScreen.length ? new TextLine(view.getBackground()) : savedScreen[i]);
 			}
 			for (int i = height; i < savedScreen.length; i++) {
 				textLines.add(savedScreen[i]);
@@ -323,7 +328,7 @@ public class TerminalModel {
 	}
 	
 	public void insertLine(int index) {
-		insertLine(index, new TextLine());
+		insertLine(index, new TextLine(view.getBackground()));
 	}
 	
 	public void insertLine(int index, TextLine lineToInsert) {
@@ -367,7 +372,7 @@ public class TerminalModel {
 	public TextLine getTextLine(int index) {
 		if (index >= textLines.size()) {
 			Log.warn("TextLine requested for index " + index + ", size of buffer is " + textLines.size() + ".", new Exception("stack trace"));
-			return new TextLine();
+			return new TextLine(view.getBackground());
 		}
 		return textLines.get(index);
 	}
@@ -385,7 +390,7 @@ public class TerminalModel {
 		} else if (this.height < height) {
 			for (int i = 0; i < (height - this.height); i++) {
 				if (usingAlternateBuffer() || getFirstDisplayLine() <= 0) {
-					textLines.add(new TextLine());
+					textLines.add(new TextLine(view.getBackground()));
 				}
 			}
 		}
@@ -393,7 +398,7 @@ public class TerminalModel {
 		firstScrollLineIndex = 0;
 		lastScrollLineIndex = height - 1;
 		while (getFirstDisplayLine() < 0) {
-			textLines.add(new TextLine());
+			textLines.add(new TextLine(view.getBackground()));
 		}
 		checkInvariant();
 	}
@@ -487,17 +492,25 @@ public class TerminalModel {
 	}
 	
 	public void killHorizontally(boolean fromStart, boolean toEnd) {
+		if (!fromStart && !toEnd) throw new IllegalArgumentException();
 		TextLine line = getTextLine(cursorPosition.getLineIndex());
 		int oldLineLength = line.length();
-		int start = fromStart ? 0 : cursorPosition.getCharOffset();
-		int end = toEnd ? oldLineLength : cursorPosition.getCharOffset();
-		line.killText(start, end);
+		if(!toEnd) {
+			// If clearing before current position, we have to leave spaces.
+			// The current position is included in the deletion, hence + 1.
+			line.writeTextAt(0, StringUtilities.nCopies(cursorPosition.getCharOffset() + 1, ' '), currentStyle);
+		} else {
+			line.setBackground(currentStyle.getBackground());
+			int start = fromStart ? 0 : cursorPosition.getCharOffset();
+			line.killText(start, oldLineLength);
+		}
 		lineIsDirty(cursorPosition.getLineIndex() + 1);  // cursorPosition.y's line still has a valid *start* index.
 		linesChangedFrom(cursorPosition.getLineIndex());
 	}
 	
 	/** Erases from either the top or the cursor, to either the bottom or the cursor. */
 	public void eraseInPage(boolean fromTop, boolean toBottom) {
+		if (!fromTop && !toBottom) throw new IllegalArgumentException();
 		// Should produce "hi\nwo":
 		// echo $'\n\n\nworld\x1b[A\rhi\x1b[B\x1b[J'
 		// Should produce "   ld":
@@ -507,18 +520,20 @@ public class TerminalModel {
 		int start = fromTop ? getFirstDisplayLine() : cursorPosition.getLineIndex();
 		int startClearing = fromTop ? start : start + 1;
 		int endClearing = toBottom ? getLineCount() : cursorPosition.getLineIndex();
+		Color currentBackground = currentStyle.getBackground();
 		for (int i = startClearing; i < endClearing; i++) {
-			getTextLine(i).clear();
+			TextLine cl = getTextLine(i);
+			cl.clear();
+			cl.setBackground(currentBackground);
 		}
 		TextLine line = getTextLine(cursorPosition.getLineIndex());
 		int oldLineLength = line.length();
-		if (fromTop) {
-			// The current position is always erased, hence the + 1.
-			// Is overwriting with spaces in the currentStyle correct?
-			line.writeTextAt(0, StringUtilities.nCopies(cursorPosition.getCharOffset() + 1, ' '), currentStyle);
-		}
 		if (toBottom) {
+			view.setBackground(currentBackground);
 			line.killText(cursorPosition.getCharOffset(), oldLineLength);
+		} else /* only fromTop = true */ {
+			// The current position is always erased, hence the + 1.
+			line.writeTextAt(0, StringUtilities.nCopies(cursorPosition.getCharOffset() + 1, ' '), currentStyle);
 		}
 		lineIsDirty(start + 1);
 		linesChangedFrom(start);
@@ -585,7 +600,7 @@ public class TerminalModel {
 	public void scrollDisplayUp() {
 		int addIndex = getFirstDisplayLine() + firstScrollLineIndex;
 		int removeIndex = getFirstDisplayLine() + lastScrollLineIndex + 1;
-		textLines.add(addIndex, new TextLine());
+		textLines.add(addIndex, new TextLine(view.getBackground()));
 		textLines.remove(removeIndex);
 		lineIsDirty(addIndex);
 		linesChangedFrom(addIndex);
@@ -597,7 +612,7 @@ public class TerminalModel {
 	public void deleteLine() {
 		int removeIndex = cursorPosition.getLineIndex();
 		int addIndex = getFirstDisplayLine() + lastScrollLineIndex + 1;
-		textLines.add(addIndex, new TextLine());
+		textLines.add(addIndex, new TextLine(view.getBackground()));
 		textLines.remove(removeIndex);
 		lineIsDirty(removeIndex);
 		linesChangedFrom(removeIndex);

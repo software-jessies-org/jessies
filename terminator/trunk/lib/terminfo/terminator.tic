@@ -18,6 +18,10 @@ terminator|Terminator no line wrap,
 # there's no cvvis capability here.
     civis=\E[?25l,
     cnorm=\E[?25h,
+# We support back color erase since 2010-11-07 (revision 1625).
+# Older versions of Terminator using this terminfo will behave oddly.
+# Newer versions of Terminator with an old terminfo will be fine.
+    bce,
 # Undocumented; possibly untested and incorrect...
     eo,
     km,
