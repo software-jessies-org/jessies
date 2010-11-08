@@ -13,114 +13,114 @@ import terminator.view.*;
  * Highlights the results of user-initiated finds.
  */
 public class FindHighlighter implements Highlighter {
-	private static final ExecutorService executorService = ThreadUtilities.newSingleThreadExecutor("Background Find");
-	
-	/** The highlighter pen style. */
-	private final Style style = Style.makeStyle(Color.black, Color.yellow, null, null, false);
+    private static final ExecutorService executorService = ThreadUtilities.newSingleThreadExecutor("Background Find");
+    
+    /** The highlighter pen style. */
+    private final Style style = Style.makeStyle(Color.black, Color.yellow, null, null, false);
 
-	private Pattern pattern;
-	private String regularExpression = "";
-	
-	public String getName() {
-		return "Find Highlighter";
-	}
-	
-	/**
-	 * Sets the current sought regular expression. Existing highlights will
-	 * be removed, matches in the current text will be found, and future
-	 * matches will be found as they appear.
-	 * 
-	 * 'newRegularExpression' can be "" to cancel match highlighting.
-	 * 
-	 * Status changes will be reported to 'findStatusDisplay' on the EDT.
-	 */
-	public void setPattern(final TerminalView view, String newRegularExpression, final FindStatusDisplay findStatusDisplay) {
-		// Don't waste time re-finding all the current matches.
-		if (newRegularExpression.equals(regularExpression)) {
-			return;
-		}
-		
-		// Cancel the current find.
-		forgetPattern(view);
-		findStatusDisplay.setStatus("", false);
-		
-		// Is that all we're here for?
-		if (newRegularExpression.length() == 0) {
-			return;
-		}
-		
-		// Check that we can actually compile the new regular expression.
-		try {
-			this.pattern = PatternUtilities.smartCaseCompile(newRegularExpression);
-			this.regularExpression = newRegularExpression;
-		} catch (PatternSyntaxException ex) {
-			findStatusDisplay.setStatus(ex.getDescription(), true);
-			return;
-		}
-		
-		executorService.execute(new SwingWorker<Object, Object>() {
-			private int matchCount;
-			
-			@Override
-			protected Object doInBackground() {
-				matchCount = addHighlightsInternal(view, 0);
-				return null;
-			}
-			
-			@Override
-			protected void done() {
-				findStatusDisplay.setStatus(StringUtilities.pluralize(matchCount, "match", "matches"), false);
-			}
-		});
-	}
-	
-	public void forgetPattern(TerminalView view) {
-		view.removeHighlightsFrom(this, 0);
-		this.pattern = null;
-		this.regularExpression = "";
-	}
-	
-	/** Request to add highlights to all lines of the view from the index given onwards. */
-	public void addHighlights(TerminalView view, int firstLineIndex) {
-		addHighlightsInternal(view, firstLineIndex);
-	}
+    private Pattern pattern;
+    private String regularExpression = "";
+    
+    public String getName() {
+        return "Find Highlighter";
+    }
+    
+    /**
+     * Sets the current sought regular expression. Existing highlights will
+     * be removed, matches in the current text will be found, and future
+     * matches will be found as they appear.
+     * 
+     * 'newRegularExpression' can be "" to cancel match highlighting.
+     * 
+     * Status changes will be reported to 'findStatusDisplay' on the EDT.
+     */
+    public void setPattern(final TerminalView view, String newRegularExpression, final FindStatusDisplay findStatusDisplay) {
+        // Don't waste time re-finding all the current matches.
+        if (newRegularExpression.equals(regularExpression)) {
+            return;
+        }
+        
+        // Cancel the current find.
+        forgetPattern(view);
+        findStatusDisplay.setStatus("", false);
+        
+        // Is that all we're here for?
+        if (newRegularExpression.length() == 0) {
+            return;
+        }
+        
+        // Check that we can actually compile the new regular expression.
+        try {
+            this.pattern = PatternUtilities.smartCaseCompile(newRegularExpression);
+            this.regularExpression = newRegularExpression;
+        } catch (PatternSyntaxException ex) {
+            findStatusDisplay.setStatus(ex.getDescription(), true);
+            return;
+        }
+        
+        executorService.execute(new SwingWorker<Object, Object>() {
+            private int matchCount;
+            
+            @Override
+            protected Object doInBackground() {
+                matchCount = addHighlightsInternal(view, 0);
+                return null;
+            }
+            
+            @Override
+            protected void done() {
+                findStatusDisplay.setStatus(StringUtilities.pluralize(matchCount, "match", "matches"), false);
+            }
+        });
+    }
+    
+    public void forgetPattern(TerminalView view) {
+        view.removeHighlightsFrom(this, 0);
+        this.pattern = null;
+        this.regularExpression = "";
+    }
+    
+    /** Request to add highlights to all lines of the view from the index given onwards. */
+    public void addHighlights(TerminalView view, int firstLineIndex) {
+        addHighlightsInternal(view, firstLineIndex);
+    }
 
-	/**
-	 * Returns the number of highlights added.
-	 */
-	private int addHighlightsInternal(TerminalView view, int firstLineIndex) {
-		if (pattern == null) {
-			return 0;
-		}
-		view.getBirdView().setValueIsAdjusting(true);
-		try {
-			TerminalModel model = view.getModel();
-			int count = 0;
-			for (int i = firstLineIndex; i < model.getLineCount(); i++) {
-				String line = model.getTextLine(i).getString();
-				count += addHighlightsOnLine(view, i, line);
-			}
-			return count;
-		} finally {
-			view.getBirdView().setValueIsAdjusting(false);
-		}
-	}
-	
-	private int addHighlightsOnLine(TerminalView view, int lineIndex, String text) {
-		int count = 0;
-		Matcher matcher = pattern.matcher(text);
-		while (matcher.find()) {
-			Location start = new Location(lineIndex, matcher.start());
-			Location end = new Location(lineIndex, matcher.end());
-			Highlight highlight = new Highlight(this, start, end, style);
-			view.addHighlight(highlight);
-			++count;
-		}
-		return count;
-	}
+    /**
+     * Returns the number of highlights added.
+     */
+    private int addHighlightsInternal(TerminalView view, int firstLineIndex) {
+        if (pattern == null) {
+            return 0;
+        }
+        view.getBirdView().setValueIsAdjusting(true);
+        try {
+            TerminalModel model = view.getModel();
+            int count = 0;
+            for (int i = firstLineIndex; i < model.getLineCount(); i++) {
+                String line = model.getTextLine(i).getString();
+                count += addHighlightsOnLine(view, i, line);
+            }
+            return count;
+        } finally {
+            view.getBirdView().setValueIsAdjusting(false);
+        }
+    }
+    
+    private int addHighlightsOnLine(TerminalView view, int lineIndex, String text) {
+        int count = 0;
+        Matcher matcher = pattern.matcher(text);
+        while (matcher.find()) {
+            Location start = new Location(lineIndex, matcher.start());
+            Location end = new Location(lineIndex, matcher.end());
+            Highlight highlight = new Highlight(this, start, end, style);
+            view.addHighlight(highlight);
+            ++count;
+        }
+        return count;
+    }
 
-	/** Request to do something when the user clicks on a Highlight generated by this Highlighter. */
-	public void highlightClicked(TerminalView view, Highlight highlight, MouseEvent event) {
-		return;
-	}
+    /** Request to do something when the user clicks on a Highlight generated by this Highlighter. */
+    public void highlightClicked(TerminalView view, Highlight highlight, MouseEvent event) {
+        return;
+    }
 }
