@@ -105,11 +105,6 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
     
     public void optionsDidChange() {
         TerminatorPreferences preferences = Terminator.getPreferences();
-        if (preferences.getBoolean(TerminatorPreferences.USE_ALT_AS_META)) {
-            // If we want to handle key events when alt is down, we need to turn off input methods.
-            enableInputMethods(false);
-        }
-        
         setFont(preferences.getFont(TerminatorPreferences.FONT));
         sizeChanged();
     }
