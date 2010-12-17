@@ -18,13 +18,13 @@ def convert_to_jvm_compatible_pathname(pathname)
   cygpathCommand = "cygpath --windows '#{pathname}'"
   $stderr.puts("Running:")
   $stderr.puts(cygpathCommand)
-  cygpathOutput = `#{cygpathCommand}`
+  cygpathOutput = `#{cygpathCommand} 2>&1`
   $stderr.puts("Produced:")
   $stderr.puts(cygpathOutput)
   $stderr.puts("Status was:")
   $stderr.puts($?.inspect())
   if $?.success?() != true
-    throw "#{cygpathCommand} failed"
+    raise("#{cygpathCommand} failed with $?.inspect(), producing \"#{cygpathOutput}\"")
   end
   return cygpathOutput.chomp()
 end
@@ -349,7 +349,7 @@ class Java
     pattern = "#{@salma_hayek}/.generated/{#{target_directory()},*_#{target_os()}}/bin"
     plausibleSupportBinaryDirectories = Dir.glob(pattern)
     if plausibleSupportBinaryDirectories.empty?()
-      throw "Failed to find any support binary directories with a glob for #{pattern}"
+      raise("Failed to find any support binary directories with a glob for #{pattern}")
     end
     return plausibleSupportBinaryDirectories[0]
   end
