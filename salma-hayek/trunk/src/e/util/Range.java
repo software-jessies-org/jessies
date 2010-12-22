@@ -8,8 +8,8 @@ public final class Range {
      */
     public static final Range NULL_RANGE = new Range(-1, -1);
     
-    private int start;
-    private int end;
+    private final int start;
+    private final int end;
     
     public Range(int start, int end) {
         this.start = start;
