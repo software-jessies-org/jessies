@@ -110,7 +110,7 @@ public class FindPanel extends JPanel implements FindStatusDisplay {
     }
     
     private FindHighlighter getFindHighlighter() {
-        return terminalPane.getTerminalView().getHighlighterOfClass(FindHighlighter.class);
+        return terminalPane.getTerminalView().getFindHighlighter();
     }
     
     public void showFindPanel() {

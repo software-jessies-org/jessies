@@ -56,4 +56,12 @@ public final class Location implements Comparable<Location> {
             return getLineIndex() - other.getLineIndex();
         }
     }
+
+    public static Location min(Location one, Location two) {
+        return (one.compareTo(two) < 0) ? one : two;
+    }
+
+    public static Location max(Location one, Location two) {
+        return (one.compareTo(two) > 0) ? one : two;
+    }
 }

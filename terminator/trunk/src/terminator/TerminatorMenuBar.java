@@ -490,7 +490,7 @@ public class TerminatorMenuBar extends EMenuBar {
         }
         
         @Override public void performOn(JTerminalPane terminalPane) {
-            terminalPane.getTerminalView().findNext(FindHighlighter.class);
+            terminalPane.getTerminalView().findNext();
         }
     }
     
@@ -501,7 +501,7 @@ public class TerminatorMenuBar extends EMenuBar {
         }
         
         @Override public void performOn(JTerminalPane terminalPane) {
-            terminalPane.getTerminalView().findPrevious(FindHighlighter.class);
+            terminalPane.getTerminalView().findPrevious();
         }
     }
     
@@ -513,7 +513,7 @@ public class TerminatorMenuBar extends EMenuBar {
         @Override
         protected void performPaneAction(JTerminalPane terminalPane) {
             TerminalView view = terminalPane.getTerminalView();
-            view.getHighlighterOfClass(FindHighlighter.class).forgetPattern(view);
+            view.getFindHighlighter().forgetPattern(view);
         }
     }
     

@@ -23,25 +23,27 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
     private boolean displayCursor = true;
     private boolean blinkOn = true;
     private CursorBlinker cursorBlinker;
-    private HashMap<Class<? extends Highlighter>, Highlighter> highlighters = new HashMap<Class<? extends Highlighter>, Highlighter>();
+
     private SelectionHighlighter selectionHighlighter;
+    private FindHighlighter findHighlighter;
+    private UrlHighlighter urlHighlighter;
+
+    // TODO: show the current selection like Evergreen does, and maybe the range of visible lines too?
     private BirdView birdView;
     private FindBirdsEye birdsEye;
     
-    /**
-    * The highlights present in each line.  The highlights for a line are stored at the index in
-    * lineHighlights corresponding to the line index.  The object at that index is another ArrayList
-    * containing all Highlight objects which appear on that line.  Note that a highlight object which
-    * appears on several lines will appear several times within this structure (once within the
-    * ArrayList for each line upon which the highlight appears).  This ArrayList is not guaranteed to
-    * be the same size as the number of lines in the model, and likewise there is no guarantee that
-    * the reference at a certain index will be a real ArrayList - it could be null.  Use the already
-    * implemented methods for accessing this structure whenever possible in order to hide all the
-    * necessary checks.
-    */
-    private ArrayList<ArrayList<Highlight>> lineHighlights = new ArrayList<ArrayList<Highlight>>();
+    // Size may be smaller than model's lines. Elements may be null, but should not be empty.
+    // FIXME: this is a mistake:
+    // 1. Lines with matches/URLs are very rare, so we shouldn't waste space on lines with no matches.
+    // 2. We should use List<Range> rather than Range[].
+    // 3. Using null instead of an empty array or list is gross (but any fix for #1 probably fixes this).
+    private final ArrayList<Range[]> urlMatches = new ArrayList<Range[]>();
+    private final ArrayList<Range[]> findMatches = new ArrayList<Range[]>();
     
-    private List<Highlight> highlightsUnderMouse = Collections.emptyList();
+    // If non-null, the row of this is mouseLocation.getLineIndex()
+    private Range urlUnderMouse = null;
+    // Init line index to 0 so we never need to check if it's a valid line index, but don't have a valid char offset.
+    private Location mouseLocation = new Location(0, -1);
     
     public TerminalView() {
         TerminatorPreferences preferences = Terminator.getPreferences();
@@ -57,46 +59,42 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
         addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent event) {
                 requestFocus();
-                if (SwingUtilities.isLeftMouseButton(event)) {
-                    highlightClicked(event);
-                }
-            }
-
-            public void highlightClicked(MouseEvent event) {
-                List<Highlight> highlights = getHighlightsForLocation(viewToModel(event.getPoint()));
-                for (Highlight highlight : highlights) {
-                    highlight.getHighlighter().highlightClicked(TerminalView.this, highlight, event);
+                if (SwingUtilities.isLeftMouseButton(event) && urlUnderMouse != null && event.isControlDown()) {
+                    try {
+                        TextLine line = model.getTextLine(mouseLocation.getLineIndex());
+                        String url = line.getTabbedString(urlUnderMouse.getStart(), urlUnderMouse.getEnd());
+                        BrowserLauncher.openURL(url);
+                    } catch (Throwable th) {
+                        SimpleDialog.showDetails(TerminalView.this, "Problem opening URL", th);
+                    }
                 }
             }
         });
         addMouseMotionListener(new MouseMotionAdapter() {
-            private Location lastLocation = new Location(-1, -1);
-
             @Override public void mouseMoved(MouseEvent event) {
                 Location location = viewToModel(event.getPoint());
-                if (location.equals(lastLocation)) {
+                if (location.equals(mouseLocation)) {
                     return;
                 }
-                lastLocation = location;
-                List<Highlight> previousHighlights = highlightsUnderMouse;
-                highlightsUnderMouse = getHighlightsForLocation(viewToModel(event.getPoint()));
-                repaintHighlights(previousHighlights);
-                repaintHighlights(highlightsUnderMouse);
-                setCursor(getCursorForHighlightsUnderMouse());
-            }
-            
-            private Cursor getCursorForHighlightsUnderMouse() {
-                for (Highlight highlight : highlightsUnderMouse) {
-                    if (highlight.getCursor() != null) {
-                        return highlight.getCursor();
-                    }
+                // Lines to be repainted:
+                // The line the mouse left, if there was a URL
+                // The line the mouse entered, if there is a URL
+                if (urlUnderMouse != null) {
+                    repaintLine(mouseLocation.getLineIndex());
                 }
-                return Cursor.getDefaultCursor();
+                urlUnderMouse = getUrlForLocation(location);
+                mouseLocation = location;
+                if (urlUnderMouse != null) {
+                    repaintLine(mouseLocation.getLineIndex());
+                }
+                // There's a minor problem with setting the cursor in the mouse motion listener: It doesn't change the cursor if a URL is created or destroyed by additional output.
+                // Still, that's a small price to pay.
+                setCursor(urlUnderMouse != null ? Cursor.getPredefinedCursor(Cursor.HAND_CURSOR) : Cursor.getDefaultCursor() );
             }
         });
         addMouseWheelListener(HorizontalScrollWheelListener.INSTANCE);
-        addHighlighter(new FindHighlighter());
-        addHighlighter(new UrlHighlighter());
+        findHighlighter = new FindHighlighter();
+        urlHighlighter = new UrlHighlighter();
         becomeDropTarget();
         cursorBlinker = new CursorBlinker(this);
         selectionHighlighter = new SelectionHighlighter(this);
@@ -121,6 +119,14 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
         return selectionHighlighter;
     }
     
+    public UrlHighlighter getUrlHighlighter() {
+        return urlHighlighter;
+    }
+
+    public FindHighlighter getFindHighlighter() {
+        return findHighlighter;
+    }
+
     public void userIsTyping() {
         blinkOn = true;
         redrawCursorPosition();
@@ -381,6 +387,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
     }
     
     public Color getCursorColor() {
+        // Is this ever called when !blinkOn?
         return Terminator.getPreferences().getColor(blinkOn ? TerminatorPreferences.CURSOR_COLOR : TerminatorPreferences.BACKGROUND_COLOR);
     }
     
@@ -456,90 +463,68 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
         return new Dimension(width, height);
     }
     
-    // Highlighting support.
-    
-    /**
-     * Adds a highlighter. Highlighters are referred to by class, so it's
-     * a bad idea to have more than one of the same class.
-     */
-    public <T extends Highlighter> void addHighlighter(T highlighter) {
-        Class<? extends Highlighter> kind = highlighter.getClass();
-        if (highlighters.get(kind) != null) {
-            throw new IllegalArgumentException("duplicate " + kind);
+    public void setUrlMatches(int lineIndex, Range[] matches) {
+        resizeAndSet(urlMatches, lineIndex, matches);
+        if (lineIndex == mouseLocation.getLineIndex()) {
+            urlUnderMouse = getUrlForLocation(mouseLocation);
         }
-        highlighters.put(kind, highlighter);
     }
     
-    /**
-     * Returns the highlighter of the given class.
-     */
-    @SuppressWarnings("unchecked") // FIXME: can we give highlighters the correct type and avoid this?
-    public <T extends Highlighter> T getHighlighterOfClass(Class<T> kind) {
-        return (T) highlighters.get(kind);
+    public void setFindMatches(int lineIndex, Range[] matches) {
+        resizeAndSet(findMatches, lineIndex, matches);
+        birdView.addMatchingLine(lineIndex);
     }
     
-    public Collection<Highlighter> getHighlighters() {
-        return Collections.unmodifiableCollection(highlighters.values());
+    private static <T> void resizeAndSet(ArrayList<T> list, int index, T element) {
+        if (list.size() <= index) {
+            list.ensureCapacity(index);
+            for (int i = list.size(); i <= index; ++i) {
+                list.add(null);
+            }
+        }
+        list.set(index, element);
+    }
+    
+    public void removeFindMatches() {
+        findMatches.clear();
+        birdView.clearMatchingLines();
+        repaint();
     }
     
     private void redoHighlightsFrom(int firstLineIndex) {
         removeHighlightsFrom(firstLineIndex);
-        for (Highlighter highlighter : getHighlighters()) {
-            highlighter.addHighlights(this, firstLineIndex);
-        }
+        urlHighlighter.addHighlightsFrom(this, firstLineIndex);
+        findHighlighter.addHighlightsFrom(this, firstLineIndex);
     }
     
     public void removeHighlightsFrom(int firstLineIndex) {
         if (firstLineIndex == 0) {
-            lineHighlights.clear();
+            urlUnderMouse = null;
+            urlMatches.clear();
+            findMatches.clear();
             birdView.clearMatchingLines();
             repaint();
-        } else {
-            birdView.setValueIsAdjusting(true);
-            try {
-                // We use a backwards loop because going forwards results in N array copies if we're removing N lines.
-                for (int i = (lineHighlights.size() - 1); i >= firstLineIndex; --i) {
-                    lineHighlights.remove(i);
-                    birdView.removeMatchingLine(i);
-                }
-                repaintFromLine(firstLineIndex);
-            } finally {
-                birdView.setValueIsAdjusting(false);
-            }
+            return;
         }
-    }
-    
-    public void removeHighlightsFrom(Highlighter highlighter, int firstLineIndex) {
-        if (highlighter instanceof FindHighlighter) {
-            birdView.clearMatchingLines();
-        }
-        for (int i = firstLineIndex; i < lineHighlights.size(); i++) {
-            ArrayList<Highlight> list = lineHighlights.get(i);
-            if (list != null) {
-                Iterator<Highlight> it = list.iterator();
-                while (it.hasNext()) {
-                    Highlight highlight = it.next();
-                    if (highlight.getHighlighter() == highlighter) {
-                        it.remove();
-                        repaintHighlight(highlight);
-                    }
-                }
+        
+        birdView.setValueIsAdjusting(true);
+        try {
+            for (int i = urlMatches.size() - 1; i >= firstLineIndex; --i) {
+                urlMatches.remove(i);
             }
+            // We use a backwards loop because going forwards results in N array copies if we're removing N lines.
+            for (int i = findMatches.size() - 1; i >= firstLineIndex; --i) {
+                findMatches.remove(i);
+                birdView.removeMatchingLine(i);
+            }
+            repaintFromLine(firstLineIndex);
+        } finally {
+            birdView.setValueIsAdjusting(false);
         }
     }
     
     public BirdView getBirdView() {
         return birdView;
-    }
-    
-    public void addHighlight(Highlight highlight) {
-        if (highlight.getHighlighter() instanceof FindHighlighter) {
-            birdView.addMatchingLine(highlight.getStart().getLineIndex());
-        }
-        for (int i = highlight.getStart().getLineIndex(); i <= highlight.getEnd().getLineIndex(); i++) {
-            addHighlightAtLine(highlight, i);
-        }
-        repaintHighlight(highlight);
     }
     
     private void repaintFromLine(int firstLineToRepaint) {
@@ -548,47 +533,26 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
         repaint(0, top, size.width, size.height - top);
     }
     
-    private void repaintHighlights(final Collection<Highlight> highlights) {
-        for (Highlight highlight : highlights) {
-            repaintHighlight(highlight);
-        }
-    }
-    
-    private void repaintHighlight(Highlight highlight) {
-        Point redrawStart = modelToView(highlight.getStart()).getLocation();
-        Rectangle endRect = modelToView(highlight.getEnd());
-        Point redrawEnd = new Point(endRect.x + endRect.width, endRect.y + endRect.height);
-        if (highlight.getStart().getLineIndex() == highlight.getEnd().getLineIndex()) {
-            repaint(redrawStart.x, redrawStart.y, redrawEnd.x - redrawStart.x, redrawEnd.y - redrawStart.y);
-        } else {
-            repaint(0, redrawStart.y, getSize().width,redrawEnd.y - redrawStart.y);
-        }
-    }
-    
-    public void addHighlightAtLine(Highlight highlight, int lineIndex) {
-        if (lineIndex >= lineHighlights.size() || lineHighlights.get(lineIndex) == null) {
-            for (int i = lineHighlights.size(); i <= lineIndex; i++) {
-                lineHighlights.add(i, null);
-            }
-            lineHighlights.set(lineIndex, new ArrayList<Highlight>());
-        }
-        ArrayList<Highlight> highlightsForThisLine = lineHighlights.get(lineIndex);
-        if (highlightsForThisLine.contains(highlight) == false) {
-            highlightsForThisLine.add(highlight);
-        }
+    private void repaintLine(int index) {
+        FontMetrics metrics = getFontMetrics(getFont());
+        int h = getCharUnitSize().height;
+        int y = getInsets().top + index * h;
+        repaint(0, y, getSize().width, h);
     }
     
     /**
      * Searches from startLine to endLine inclusive, incrementing the
      * current line by 'direction', looking for a line with a find highlight.
-     * When one is found, the cursor is moved there.
+     * When one is found, we scroll there.
      */
-    private void findAgain(Class<? extends Highlighter> highlighterClass, int startLine, int endLine, int direction) {
+    private void findAgain(int startLine, int endLine, int direction) {
+        if (direction != 1 && direction != -1) {
+            throw new IllegalArgumentException("Invalid direction: " + direction);
+        }
         for (int i = startLine; i != endLine; i += direction) {
-            List<Highlight> highlights = getHighlightsForLine(i);
-            Highlight match = firstHighlightOfClass(highlights, highlighterClass);
-            if (match != null) {
-                scrollTo(i, match.getStart().getCharOffset(), match.getEnd().getCharOffset());
+            Range[] matches = matchesForLine(i);
+            if (matches != null) {
+                scrollTo(i, matches[0].getStart(), matches[0].getEnd());
                 birdsEye.setCurrentLineIndex(i);
                 // Highlight the new match in the bird view as well as in the text itself.
                 birdView.repaint();
@@ -597,30 +561,22 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
         }
     }
     
-    /**
-     * Tests whether any of the Highlight objects in the list is a FindHighlighter.
-     */
-    private static Highlight firstHighlightOfClass(List<Highlight> highlights, Class<? extends Highlighter> highlighterClass) {
-        for (Highlight highlight : highlights) {
-            if (highlight.getHighlighter().getClass() == highlighterClass) {
-                return highlight;
-            }
-        }
-        return null;
+    private Range[] matchesForLine(int i) {
+        return i >= findMatches.size() ? null : findMatches.get(i);
     }
     
     /**
      * Scrolls the display down to the next highlight of the given class not currently on the display.
      */
-    public void findNext(Class<? extends Highlighter> highlighterClass) {
-        findAgain(highlighterClass, getLastVisibleLine() + 1, getModel().getLineCount() + 1, 1);
+    public void findNext() {
+        findAgain(getLastVisibleLine() + 1, getModel().getLineCount() + 1, 1);
     }
     
     /**
      * Scrolls the display up to the next highlight of the given class not currently on the display.
      */
-    public void findPrevious(Class<? extends Highlighter> highlighterClass) {
-        findAgain(highlighterClass, getFirstVisibleLine() - 1, -1, -1);
+    public void findPrevious() {
+        findAgain(getFirstVisibleLine() - 1, -1, -1);
     }
     
     public JViewport getViewport() {
@@ -639,39 +595,25 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
         return (visibleBounds.y + visibleBounds.height) / lineHeight;
     }
 
-    public List<Highlight> getHighlightsForLocation(Location location) {
-        List<Highlight> highlights = getHighlightsForLine(location.getLineIndex());
-        ArrayList<Highlight> result = new ArrayList<Highlight>();
-        for (Highlight highlight : highlights) {
-            Location start = highlight.getStart();
-            Location end = highlight.getEnd();
-            boolean startOK = (location.getLineIndex() > start.getLineIndex()) ||
-                    (location.getCharOffset() >= start.getCharOffset());
-            boolean endOK = (location.getLineIndex() < end.getLineIndex()) ||
-                    (location.getCharOffset() < end.getCharOffset());
-            if (startOK && endOK) {
-                result.add(highlight);
+    private Range getUrlForLocation(Location location) {
+        int line = location.getLineIndex();
+        int offset = location.getCharOffset();
+        if (line >= urlMatches.size() || urlMatches.get(line) == null) {
+            return null;
+        }
+        for (Range r : urlMatches.get(line)) {
+            // Optimization: URLs are in order.
+            if (r.getStart() > offset) {
+                return null;
+            }
+            if (r.getStart() <= offset && offset < r.getEnd()) {
+                return r;
             }
         }
-        return Collections.unmodifiableList(result);
+        return null;
     }
     
-    public boolean isHighlightUnderMouse(Highlight highlight) {
-        return highlightsUnderMouse.contains(highlight);
-    }
-    
-    /** Returns a (possibly empty) list containing all highlights in the indexed line. */
-    private List<Highlight> getHighlightsForLine(int lineIndex) {
-        if (lineIndex >= lineHighlights.size() || lineHighlights.get(lineIndex) == null) {
-            return Collections.emptyList();
-        } else {
-            return Collections.unmodifiableList(lineHighlights.get(lineIndex));
-        }
-    }
-    
-    public String getTabbedString(Highlight highlight) {
-        Location start = highlight.getStart();
-        Location end = highlight.getEnd();
+    public String getTabbedString(Location start, Location end) {
         StringBuilder buf = new StringBuilder();
         for (int i = start.getLineIndex(); i <= end.getLineIndex(); i++) {
             // Necessary to cope with selections extending to the bottom of the buffer.
@@ -690,12 +632,22 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
     }
     
     // Redraw code.
-    
     private void redrawCursorPosition() {
         Rectangle cursorRect = modelToView(cursorPosition);
         repaint(cursorRect);
     }
     
+    // FIXME: why isn't the single caller of this just a nested Math.max(...Math.min()) ?
+    private static int getMinGT(int bound, int... args) {
+        int out = Integer.MAX_VALUE;
+        for (int v : args) {
+            if (v < out && v > bound) {
+                out = v;
+            }
+        }
+        return out;
+    }
+
     @Override public void paintComponent(Graphics oldGraphics) {
         Stopwatch.Timer timer = paintComponentStopwatch.start();
         try {
@@ -718,50 +670,72 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
             int firstTextLine = (rect.y - insets.top) / charUnitSize.height;
             int lastTextLine = (rect.y - insets.top + rect.height + charUnitSize.height - 1) / charUnitSize.height;
             lastTextLine = Math.min(lastTextLine, model.getLineCount() - 1);
-            int lineNotToDraw = model.usingAlternateBuffer() ? model.getFirstDisplayLine() - 1 : -1;
+            final Location selectionStart = selectionHighlighter.getStart();
+            final Location selectionEnd = selectionHighlighter.getEnd();
+            final boolean hasSelection = selectionStart != null;
+
             for (int i = firstTextLine; i <= lastTextLine; i++) {
-                if (i == lineNotToDraw) {
-                    continue;
-                }
                 boolean drawCursor = (shouldShowCursor() && i == cursorPosition.getLineIndex());
                 int x = insets.left;
                 int baseline = insets.top + charUnitSize.height * (i + 1) - metrics.getMaxDescent();
-                int startOffset = 0;
-                Iterator<StyledText> it = getLineStyledText(i, widthHintInChars).iterator();
-                while (it.hasNext() && x < maxX) {
-                    StyledText chunk = it.next();
-                    x += paintStyledText(g, metrics, chunk, x, baseline);
-                    String chunkText = chunk.getText();
-                    if (drawCursor && cursorPosition.charOffsetInRange(startOffset, startOffset + chunkText.length())) {
-                        final int charOffsetUnderCursor = cursorPosition.getCharOffset() - startOffset;
-                        paintCursor(g, chunkText.substring(charOffsetUnderCursor, charOffsetUnderCursor + 1), baseline);
+                TextLine textLine = model.getTextLine(i);
+                final int length = textLine.length();
+                int urlStart = length;
+                int urlEnd = length;
+                if (urlUnderMouse != null && i == mouseLocation.getLineIndex()) {
+                    urlStart = urlUnderMouse.getStart();
+                    urlEnd = urlUnderMouse.getEnd();
+                }
+                Range[] findResults = matchesForLine(i);
+                int findIndex = -1;
+                int findStart = 0, findEnd = -1;
+                for (int start = 0, end, done; start < length && x < maxX; start = done) {
+                    if (findResults != null && findEnd < start && ++findIndex < findResults.length) {
+                        findStart = findResults[findIndex].getStart();
+                        findEnd = findResults[findIndex].getEnd();
+                    }
+                    end = getMinGT(start, findStart, findEnd, urlStart, urlEnd, length);
+                    done = textLine.getRunLimit(start, end);
+                    String text = textLine.getSubstring(start, done);
+                    Style style = textLine.getStyleAt(start);
+                    boolean isUrl = urlStart <= start && start < urlEnd;
+                    boolean isFind = findStart <= start && start < findEnd;
+                    x += paintStyledText(g, metrics, text, style, x, baseline, isUrl, isFind);
+                    if (drawCursor && cursorPosition.charOffsetInRange(start, done)) {
+                        paintCursor(g, textLine.getSubstring(cursorPosition.getCharOffset(), cursorPosition.getCharOffset() + 1), baseline);
                         drawCursor = false;
                     }
-                    startOffset += chunkText.length();
                 }
-                Color lineBG = model.getTextLine(i).getBackground();
-                if (!getBackground().equals(lineBG)) {
+                Color lineBG = textLine.getBackground();
+                if (x < maxX && !getBackground().equals(lineBG)) {
                     // Fill the rest of the line with line's default background
                     g.setColor(lineBG);
-                    g.fillRect(x, baseline - metrics.getMaxAscent() - metrics.getLeading(), maxX - x, metrics.getHeight());
+                    g.fillRect(x, baseline - metrics.getMaxAscent() - metrics.getLeading(), maxX - x, charUnitSize.height);
                 }
                 if (drawCursor) {
                     // A cursor at the end of the line is in a position past the end of the text.
                     paintCursor(g, "", baseline);
                 }
+                if (hasSelection && selectionStart.getLineIndex() <= i && i <= selectionEnd.getLineIndex()) {
+                    int start = selectionStart.getLineIndex() == i ? selectionStart.getCharOffset() : 0;
+                    boolean toEnd = selectionEnd.getLineIndex() != i;
+                    int end = toEnd ? textLine.length() : selectionEnd.getCharOffset();
+
+                    // FIXME: this is likely to want some tuning; in particular, we might need to distinguish between light-on-dark and dark-on-light color schemes.
+                    Color selectionColor = Terminator.getPreferences().getColor(TerminatorPreferences.SELECTION_COLOR);
+                    g.setColor(new Color(selectionColor.getRed(), selectionColor.getGreen(), selectionColor.getBlue(), 128));
+
+                    x = insets.left + (start == 0 ? 0 : metrics.stringWidth(textLine.getSubstring(0, start)));
+                    int y = baseline - metrics.getMaxAscent() - metrics.getLeading();
+                    int w = toEnd ? maxX - x : metrics.stringWidth(textLine.getSubstring(start, end));
+                    int h = charUnitSize.height;
+
+                    g.fillRect(x, y, w, h);
+                }
             }
         } finally {
             timer.stop();
         }
-    }
-    
-    private List<StyledText> getLineStyledText(int line, int widthHintInChars) {
-        List<StyledText> result = model.getTextLine(line).getStyledTextSegments(widthHintInChars);
-        List<Highlight> highlights = getHighlightsForLine(line);
-        for (Highlight highlight : highlights) {
-            result = highlight.applyHighlight(result, new Location(line, 0));
-        }
-        return result;
     }
     
     /**
@@ -807,12 +781,11 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
     /**
      * Paints the text. Returns how many pixels wide the text was.
      */
-    private int paintStyledText(Graphics2D g, FontMetrics metrics, StyledText text, int x, int y) {
+    private int paintStyledText(Graphics2D g, FontMetrics metrics, String text, Style style, int x, int y, boolean url, boolean find) {
         Stopwatch.Timer timer = paintStyledTextStopwatch.start();
         try {
-            Style style = text.getStyle();
-            Color foreground = style.getForeground();
-            Color background = style.getBackground();
+            Color foreground = find ? Color.BLACK : style.getForeground();
+            Color background = find ? Color.YELLOW : style.getBackground();
             
             if (style.isReverseVideo()) {
                 Color oldForeground = foreground;
@@ -820,20 +793,18 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
                 background = oldForeground;
             }
             
-            int textWidth = metrics.stringWidth(text.getText());
+            int textWidth = metrics.stringWidth(text);
             if (background.equals(getBackground()) == false) {
                 g.setColor(background);
-                // Special continueToEnd flag used for drawing the backgrounds of Highlights which extend over the end of lines.
-                // Used for multi-line selection.
-                int backgroundWidth = text.continueToEnd() ? (getSize().width - x) : textWidth;
+                int backgroundWidth = textWidth;
                 g.fillRect(x, y - metrics.getMaxAscent() - metrics.getLeading(), backgroundWidth, metrics.getHeight());
             }
-            if (style.isUnderlined()) {
+            if (url || style.isUnderlined()) {
                 g.setColor(new Color(foreground.getRed(), foreground.getGreen(), foreground.getBlue(), 128));
                 g.drawLine(x, y + 1, x + textWidth, y + 1);
             }
             g.setColor(foreground);
-            g.drawString(text.getText(), x, y);
+            g.drawString(text, x, y);
             if (style.isBold()) {
                 // A font doesn't necessarily have a bold.
                 // Mac OS X's "Monaco" font is an example.
@@ -845,7 +816,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
                 // ProggySquare (http://www.proggyfonts.com/) is an example: the bold variant is significantly wider.
                 
                 // The old-fashioned "overstrike" method of faking bold doesn't look too bad, and it works in these awkward cases.
-                g.drawString(text.getText(), x + 1, y);
+                g.drawString(text, x + 1, y);
             }
             return textWidth;
         } finally {
