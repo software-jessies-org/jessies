@@ -6,6 +6,9 @@ import java.awt.Color;
 /**
  * Ties together the String containing the characters on a particular line, and the styles to be applied to each character.
  * TextLines are mutable, though it's not possible to change style information without rewriting the corresponding characters (because that's not how terminals work).
+ * Actually documentation says that the VT400 has some, but by default support is not compiled into xterm.
+ * #define OPT_DEC_RECTOPS 1
+ * enables CSI Pt;Pl;Pb;Pr;Ps $[rt] (as well as some other rectangle stuff).
  */
 public class TextLine {
     // The text we store internally contains information about tabs.
@@ -32,7 +35,7 @@ public class TextLine {
     
     // The styles to be applied to the characters on this line.
     // styles == null => all characters use the default style.
-    // Otherwise, styles.length == text.length(), and the style information for text.charAt(i) is styles[i].
+    // Otherwise, styles.length == text.length(), and the style information for text.charAt(i) is styles[i] (never null).
     private Style[] styles;
     
     public TextLine(Color bg) {
@@ -60,35 +63,32 @@ public class TextLine {
         return (styles == null) ? Style.getDefaultStyle() : styles[index];
     }
     
-    public List<StyledText> getStyledTextSegments(int widthHintInChars) {
-        final int textLength = text.length();
-        if (textLength == 0) {
-            return Collections.emptyList();
+    /**
+     * Return the first index with a different starting style, given that external style changes at end.
+     * ('end' is where the next/current find/url highlight starts or ends, or the end of the text.)
+     * Instead of iterating over getStyledTextSegments(), use code like:
+     * 
+     * for (int start = 0, end = length(); start < end; start = done) {
+     *     int done = getRunLimit(start, end);
+     *     Style style = getStyleAt(start);
+     *     somehowDrawText(getSubstring(start, done), style);
+     * }
+     */
+    public int getRunLimit(int start, int end) {
+        if (start < 0 || start >= end || end > length()) {
+            throw new AssertionError("start=" + start + " end=" + end + " length()=" + length());
         }
-        String string = getString();
-        ArrayList<StyledText> result = new ArrayList<StyledText>();
-        int startIndex = 0;
-        Style startStyle = getStyleAt(0);
-        boolean haveReasonToChop = (styles != null || string.length() > widthHintInChars);
-        if (haveReasonToChop) {
-            // If the line is very long, it helps the rendering code's manual clipping if we split it into more segments than necessary.
-            // Note: mod of a non-constant is too expensive, so we pay for a single decrement instead.
-            int charsLeftBeforeSplit = widthHintInChars;
-            for (int i = 1; i < textLength; ++i) {
-                if ((styles != null && !styles[i].equals(startStyle)) || (--charsLeftBeforeSplit == 0)) {
-                    result.add(new StyledText(string.substring(startIndex, i), startStyle));
-                    startIndex = i;
-                    if (styles != null) {
-                        startStyle = styles[i];
-                    }
-                    if (charsLeftBeforeSplit == 0) {
-                        charsLeftBeforeSplit = widthHintInChars;
-                    }
-                }
+        // If we have no styling, only caller can affect styling of a run.
+        if (styles == null) {
+            return end;
+        }
+        Style toMatch = styles[start];
+        for (int i = start + 1; i < end; i++) {
+            if (!toMatch.equals(styles[i])) {
+                return i;
             }
         }
-        result.add(new StyledText(string.substring(startIndex, textLength), startStyle));
-        return result;
+        return end;
     }
     
     /**
@@ -100,6 +100,10 @@ public class TextLine {
         return text.replace(TAB_START, ' ').replace(TAB_CONTINUE, ' ');
     }
     
+    public String getSubstring(int beginIndex, int endIndex) {
+        return getString().substring(beginIndex, endIndex);
+    }
+
     /** Returns the text, with all the tabs put back in for use with clipboard stuff. */
     public String getTabbedString(int start, int end) {
         StringBuilder buf = new StringBuilder();

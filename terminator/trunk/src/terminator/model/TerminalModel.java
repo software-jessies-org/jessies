@@ -492,10 +492,12 @@ public class TerminalModel {
     }
     
     public void killHorizontally(boolean fromStart, boolean toEnd) {
-        if (!fromStart && !toEnd) throw new IllegalArgumentException();
+        if (!fromStart && !toEnd) {
+            throw new IllegalArgumentException("fromStart=" + fromStart + " toEnd=" + toEnd);
+        }
         TextLine line = getTextLine(cursorPosition.getLineIndex());
         int oldLineLength = line.length();
-        if(!toEnd) {
+        if (!toEnd) {
             // If clearing before current position, we have to leave spaces.
             // The current position is included in the deletion, hence + 1.
             line.writeTextAt(0, StringUtilities.nCopies(cursorPosition.getCharOffset() + 1, ' '), currentStyle);
@@ -510,7 +512,9 @@ public class TerminalModel {
     
     /** Erases from either the top or the cursor, to either the bottom or the cursor. */
     public void eraseInPage(boolean fromTop, boolean toBottom) {
-        if (!fromTop && !toBottom) throw new IllegalArgumentException();
+        if (!fromTop && !toBottom) {
+            throw new IllegalArgumentException("fromTop=" + fromTop + " toBottom=" + toBottom);
+        }
         // Should produce "hi\nwo":
         // echo $'\n\n\nworld\x1b[A\rhi\x1b[B\x1b[J'
         // Should produce "   ld":

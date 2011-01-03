@@ -15,97 +15,69 @@ import terminator.view.*;
  * double-click to highlight a word (the exact definition of which is biased
  * towards shell-like applications), triple-click for line selection, and
  * shift-click to extend a selection.
+ * FIXME: a shift-click after a double- or triple-click line/word selection should not cause us to change the original anchor.
  */
-public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseListener, MouseMotionListener {
-    /**
-     * Subverts the immutability of Style so we can track focus changes
-     * and effectively update the selection highlight's background color
-     * in response.
-     */
-    private class SelectionStyle extends Style implements FocusListener {
-        private final Color unfocusedSelectionColor = new Color(0.5f, 0.5f, 0.5f);
-        private boolean focused = true;
+public class SelectionHighlighter implements ClipboardOwner, MouseListener, MouseMotionListener {
         
-        private SelectionStyle() {
-            super(null, null, null, null, false);
-        }
-        
-        @Override
-        public Color getBackground() {
-            return (focused ? Terminator.getPreferences().getColor(TerminatorPreferences.SELECTION_COLOR) : unfocusedSelectionColor);
-        }
-        
-        @Override
-        public Color getForeground() {
-            return Terminator.getPreferences().getColor(TerminatorPreferences.FOREGROUND_COLOR);
-        }
-        
-        @Override
-        public boolean hasBackground() {
-            return true;
-        }
-        
-        @Override
-        public boolean hasForeground() {
-            return true;
-        }
-        
-        public void focusGained(FocusEvent e) {
-            focused = true;
-            view.repaint();
-        }
-        
-        public void focusLost(FocusEvent e) {
-            focused = false;
-            view.repaint();
-        }
-    }
-    
-    private SelectionStyle style = new SelectionStyle();
-    
     private TerminalView view;
-    private Highlight highlight;
+    // Both null or both non-null.
+    private Location highlightStart, highlightEnd;
+    // Internally used while dragging. May be null or non-null independently of highlightStart/highlightEnd.
     private Location startLocation;
     private DragHandler dragHandler;
     
     /** Creates a SelectionHighlighter for selecting text in the given view, and adds us as mouse listeners to that view. */
     public SelectionHighlighter(TerminalView view) {
         this.view = view;
-        view.addFocusListener(style);
         view.addMouseListener(this);
         view.addMouseMotionListener(this);
-        view.addHighlighter(this);
         view.setAutoscrolls(true);
     }
     
+    public boolean hasSelection() {
+        return highlightStart != null;
+    }
+
+    public Location getStart() {
+        return highlightStart;
+    }
+
+    public Location getEnd() {
+        return highlightEnd;
+    }
+
     public void textChanged(Location start, Location end) {
-        if (highlight != null) {
-            if ((highlight.getStart().compareTo(end) < 0) && (highlight.getEnd().compareTo(start) > 0)) {
-                view.removeHighlightsFrom(this, 0);
-                highlight = null;
+        if (hasSelection()) {
+            if (highlightEnd.compareTo(start) > 0 && highlightStart.compareTo(end) < 0) {
+                highlightStart = null;
+                highlightEnd = null;
+                view.repaint();
             }
         }
     }
     
     public void mousePressed(MouseEvent e) {
-        if (e.isConsumed() || SwingUtilities.isLeftMouseButton(e) == false || e.isPopupTrigger()) {
+        if (e.isConsumed() || !SwingUtilities.isLeftMouseButton(e) || e.isPopupTrigger()) {
             return;
         }
         
         // Shift-click should move one end of the selection.
         if (e.isShiftDown() && startLocation != null) {
             Location newEndLocation = view.viewToModel(e.getPoint());
-            dragHandler = new SingleClickDragHandler();
-            // The following line does nothing, but we should call makeInitialSelection to
-            // protect against future changes in implementation.
-            dragHandler.makeInitialSelection(startLocation);
+            // My intent was that the dragHandler would remain, but apparently dragHandler is always null.
+            if (dragHandler == null) {
+                dragHandler = new SingleClickDragHandler();
+                // The following line does nothing, but we should call makeInitialSelection to
+                // protect against future changes in implementation.
+                dragHandler.makeInitialSelection(startLocation);
+            }
             dragHandler.mouseDragged(newEndLocation);
             return;
         }
         
         Location loc = view.viewToModel(e.getPoint());
-        view.removeHighlightsFrom(this, 0);
-        highlight = null;
+        highlightStart = null;
+        highlightEnd = null;
         startLocation = loc;
         
         if (loc.getLineIndex() >= view.getModel().getLineCount()) {
@@ -113,6 +85,8 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
         }
         dragHandler = getDragHandlerForClick(e);
         dragHandler.makeInitialSelection(loc);
+
+        view.repaint();
     }
     
     public void mouseClicked(MouseEvent event) {
@@ -158,7 +132,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
         public void makeInitialSelection(Location pressedLocation) { }
         
         public void mouseDragged(Location newLocation) {
-            setHighlight(min(startLocation, newLocation), max(startLocation, newLocation));
+            setHighlight(Location.min(startLocation, newLocation), Location.max(startLocation, newLocation));
         }
     }
     
@@ -168,8 +142,8 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
         }
         
         public void mouseDragged(Location newLocation) {
-            Location start = min(startLocation, newLocation);
-            Location end = max(startLocation, newLocation);
+            Location start = Location.min(startLocation, newLocation);
+            Location end = Location.max(startLocation, newLocation);
             setHighlight(getWordStart(start), getWordEnd(end));
         }
         
@@ -219,8 +193,8 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
         }
         
         public void mouseDragged(Location newLocation) {
-            Location start = min(startLocation, newLocation);
-            Location end = max(startLocation, newLocation);
+            Location start = Location.min(startLocation, newLocation);
+            Location end = Location.max(startLocation, newLocation);
             selectLines(start, end);
         }
         
@@ -232,9 +206,11 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
     }
     
     private void clearSelection() {
-        view.removeHighlightsFrom(this, 0);
         startLocation = null;
-        highlight = null;
+        highlightStart = null;
+        highlightEnd = null;
+
+        view.repaint();
     }
     
     public void selectAll() {
@@ -255,7 +231,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
      * Does nothing on other platforms.
      */
     public void updateSystemSelection() {
-        if (highlight == null) {
+        if (!hasSelection()) {
             // Almost all X11 applications leave the selection alone in this case.
             return;
         }
@@ -281,7 +257,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
     }
     
     private void copyToClipboard(Clipboard clipboard) {
-        if (highlight == null) {
+        if (!hasSelection()) {
             return;
         }
         String newContents = getTabbedString();
@@ -294,7 +270,7 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
     }
     
     public String getTabbedString() {
-        return (highlight != null) ? view.getTabbedString(highlight) : "";
+        return hasSelection() ? view.getTabbedString(highlightStart, highlightEnd) : "";
     }
     
     /**
@@ -307,7 +283,6 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
     }
     
     private void setHighlight(Location start, Location end) {
-        view.removeHighlightsFrom(this, 0);
         TextLine startLine = view.getModel().getTextLine(start.getLineIndex());
         start = new Location(start.getLineIndex(), startLine.getEffectiveCharStartOffset(start.getCharOffset()));
         // Cope with selections off the bottom of the screen.
@@ -316,29 +291,16 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
             end = new Location(end.getLineIndex(), endLine.getEffectiveCharEndOffset(end.getCharOffset()));
         }
         if (start.equals(end)) {
-            highlight = null;
+            highlightStart = null;
+            highlightEnd = null;
         } else {
-            highlight = new Highlight(this, start, end, style);
-            view.addHighlight(highlight);
+            highlightStart = start;
+            highlightEnd = end;
             selectionChanged();
         }
+        view.repaint();
     }
 
-    // Highlighter methods.
-    
-    public String getName() {
-        return "Selection Highlighter";
-    }
-    
-    /** Request to add highlights to all lines of the view from the index given onwards. */
-    public void addHighlights(TerminalView view, int firstLineIndex) {
-        if (highlight != null && isValidLocation(view, highlight.getStart()) && isValidLocation(view, highlight.getEnd())) {
-            view.addHighlight(highlight);
-        } else {
-            highlight = null;
-        }
-    }
-    
     private boolean isValidLocation(TerminalView view, Location location) {
         TerminalModel model = view.getModel();
         if (location.getLineIndex() >= model.getLineCount()) {
@@ -352,16 +314,4 @@ public class SelectionHighlighter implements Highlighter, ClipboardOwner, MouseL
         return true;
     }
 
-    /** Request to do something when the user clicks on a Highlight generated by this Highlighter. */
-    public void highlightClicked(TerminalView view, Highlight highlight, MouseEvent event) { }
-    
-    // These two should be in java.lang.Math, but they're not.
-    
-    public Location min(Location one, Location two) {
-        return (one.compareTo(two) < 0) ? one : two;
-    }
-    
-    public Location max(Location one, Location two) {
-        return (one.compareTo(two) > 0) ? one : two;
-    }
 }
