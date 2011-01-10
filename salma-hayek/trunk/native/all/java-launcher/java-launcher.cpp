@@ -11,6 +11,7 @@
 #include "DirectoryIterator.h"
 #include "HKEY.h"
 #include "JniError.h"
+#include "JniString.h"
 #include "join.h"
 #include "reportFatalErrorViaGui.h"
 #include "synchronizeWindowsEnvironment.h"
@@ -604,7 +605,8 @@ private:
         jclass javaClass = env->FindClass(canonicalName.c_str());
         if (javaClass == 0) {
             std::ostringstream os;
-            os << "FindClass(\"" << canonicalName << "\") failed.";
+            reportAnyJavaException(os);
+            os << "FindClass(\"" << canonicalName << "\") failed (FindClass loads and initializes the class as well as finding it).";
             throw std::runtime_error(os.str());
         }
         return javaClass;
@@ -683,11 +685,38 @@ public:
         }
     }
     
+    void reportAnyJavaException(std::ostream& os) {
+        jthrowable javaException = env->ExceptionOccurred();
+        if (javaException == 0) {
+            return;
+        }
+        // Report it via stderr first, in case we fail later and overwrite the pending exception.
+        env->ExceptionDescribe();
+        os << "A Java exception occurred.";
+        os << std::endl;
+        jclass stringUtilitiesClass = env->FindClass("e/util/StringUtilities");
+        if (stringUtilitiesClass == 0) {
+            os << "FindClass(\"e/util/StringUtilities\") failed.";
+            os << std::endl;
+            os << "Run with salma-hayek/.generated/classes/ on the classpath for GUI reporting of Java exceptions.";
+            os << std::endl;
+            return;
+        }
+        jmethodID stackTraceFromThrowable = env->GetStaticMethodID(stringUtilitiesClass, "stackTraceFromThrowable", "(Ljava/lang/Throwable;)Ljava/lang/String;");
+        if (stackTraceFromThrowable == 0) {
+            os << "GetStaticMethodID(e.util.StringUtilities.class(), \"stackTraceFromThrowable\") failed.";
+            os << std::endl;
+            return;
+        }
+        jstring report = static_cast<jstring>(env->CallStaticObjectMethod(stringUtilitiesClass, stackTraceFromThrowable, javaException));
+        os << JniString(env, report);
+    }
+    
     ~JavaInvocation() {
         // If you attempt to destroy the VM with a pending JNI exception,
         // the VM crashes with an "internal error" and good luck to you finding
         // any reference to it on the web.
-        if (env->ExceptionOccurred()) {
+        if (env->ExceptionCheck()) {
             env->ExceptionDescribe();
         }
         
@@ -703,7 +732,13 @@ public:
         jmethodID javaMethod = findMainMethod(javaClass);
         jobjectArray javaArguments = convertArguments(launcherArguments.getMainArguments());
         env->CallStaticVoidMethod(javaClass, javaMethod, javaArguments);
-        return (env->ExceptionOccurred() ? 1 : 0);
+        if (env->ExceptionCheck() == false) {
+            return 0;
+        }
+        std::ostringstream os;
+        reportAnyJavaException(os);
+        os << launcherArguments.getMainClassName() << ".main(...) failed.";
+        throw std::runtime_error(os.str());
     }
 };
 
@@ -714,6 +749,9 @@ std::string ErrorReporter::getUsage() const {
     os << "  -client - use client VM" << std::endl;
     os << "  -server - use server VM" << std::endl;
     os << "  -cp <path> | -classpath <path> - set the class search path" << std::endl;
+#ifdef __CYGWIN__
+    os << "   (As the JVM is a native Windows program, the class path must use Windows directory names separated by semicolons.)" << std::endl;
+#endif
     os << "  -D<name>=<value> - set a system property" << std::endl;
     os << "  -verbose[:class|gc|jni] - enable verbose output" << std::endl;
 #ifdef __APPLE__
