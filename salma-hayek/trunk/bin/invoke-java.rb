@@ -24,7 +24,7 @@ def convert_to_jvm_compatible_pathname(pathname)
   $stderr.puts("Status was:")
   $stderr.puts($?.inspect())
   if $?.success?() != true
-    raise("#{cygpathCommand} failed with $?.inspect(), producing \"#{cygpathOutput}\"")
+    raise("#{cygpathCommand} failed with #{$?.inspect()}, producing \"#{cygpathOutput}\"")
   end
   return cygpathOutput.chomp()
 end
