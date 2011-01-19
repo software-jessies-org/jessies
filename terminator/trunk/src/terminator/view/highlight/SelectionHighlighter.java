@@ -96,7 +96,10 @@ public class SelectionHighlighter implements ClipboardOwner, MouseListener, Mous
     }
     
     public void mouseReleased(MouseEvent event) {
-        dragHandler = null;
+        if (SwingUtilities.isLeftMouseButton(event) && (dragHandler != null)) {
+            selectionChanged();
+            dragHandler = null;
+        }
     }
     
     public void mouseDragged(MouseEvent event) {
@@ -217,6 +220,7 @@ public class SelectionHighlighter implements ClipboardOwner, MouseListener, Mous
         Location start = new Location(0, 0);
         Location end = new Location(view.getModel().getLineCount(), 0);
         setHighlight(start, end);
+        selectionChanged();
     }
     
     /**
@@ -296,7 +300,6 @@ public class SelectionHighlighter implements ClipboardOwner, MouseListener, Mous
         } else {
             highlightStart = start;
             highlightEnd = end;
-            selectionChanged();
         }
         view.repaint();
     }
