@@ -275,12 +275,21 @@ public class PKeyHandler implements KeyListener {
     }
     
     private Range determineRangeToRemove(KeyEvent e) {
+        int position = textArea.getSelectionStart();
+        
+        if (e.isControlDown() && e.isShiftDown()) {
+            // control-shift-backspace => delete line, similar to emacs.
+            final int lineNumber = textArea.getLineOfOffset(position);
+            int start = textArea.getLineStartOffset(lineNumber);
+            int end = Math.min(textArea.getLineEndOffsetBeforeTerminator(lineNumber) + 1, textArea.getTextBuffer().length());
+            return new Range(start, end);
+        }
+        
         if (textArea.hasSelection()) {
             // The user's already done our work for us.
             return new Range(textArea.getSelectionStart(), textArea.getSelectionEnd());
         }
         
-        int position = textArea.getSelectionStart();
         if (position == 0) {
             // We can't remove anything before the beginning.
             return Range.NULL_RANGE;
