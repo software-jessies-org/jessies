@@ -252,6 +252,14 @@ java.awt.datatransfer.UnsupportedFlavorException: Unicode String
 
 <!-- ---------------------------------------------------- -->
 
+<h2>Why can't I paste into rdesktop?</h2>
+
+<p>We recommend that you run rdesktop with the -r clipboard:CLIPBOARD switch.
+Without the switch, Terminator's X11 selection can't be pasted into rdesktop for reasons unknown.
+In any case, as Windows has no direct equivalent of pasting the selection, the symmetrical approach seems likely to cause less confusion.
+
+<!-- ---------------------------------------------------- -->
+
 <h2>Why does Terminator sometimes flash/flicker the whole window?</h2>
 
 <p>A lot of terminal-based programs (such as Bash and Vim) attempt to ring the terminal's bell to indicate that you're trying to do something impossible.
