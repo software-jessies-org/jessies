@@ -173,7 +173,7 @@ public class PKeyHandler implements KeyListener {
         } else if (key == KeyEvent.VK_BACK_SPACE) {
             backspace(event);
         } else if (key == KeyEvent.VK_DELETE) {
-            // Legacy DOS-style cut/delete.
+            // Legacy CUA-style cut/delete (http://en.wikipedia.org/wiki/Cut,_copy,_and_paste).
             if (event.isShiftDown()) {
                 textArea.cut();
             } else {
@@ -186,9 +186,12 @@ public class PKeyHandler implements KeyListener {
                 }
                 delete();
             }
-        } else if (key == KeyEvent.VK_INSERT && event.isShiftDown()) {
-            // Legacy DOS-style paste.
+        } else if (key == KeyEvent.VK_INSERT && event.isShiftDown() && event.isControlDown() == false) {
+            // Legacy CUA-style paste (http://en.wikipedia.org/wiki/Cut,_copy,_and_paste).
             textArea.paste();
+        } else if (key == KeyEvent.VK_INSERT && event.isShiftDown() == false && event.isControlDown()) {
+            // Legacy CUA-style copy (http://en.wikipedia.org/wiki/Cut,_copy,_and_paste).
+            textArea.copy();
         } else if (ENABLE_EMACS_KEYS && event.isControlDown() && key == KeyEvent.VK_Y) {
             // Legacy Emacs-style paste ("yank", which means "copy" in Vi but "paste" in Emacs).
             // FIXME: this is supposed to paste from the "kill buffer", not the clipboard.
