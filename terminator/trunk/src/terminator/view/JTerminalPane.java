@@ -329,6 +329,13 @@ public class JTerminalPane extends JPanel {
             if (TerminatorMenuBar.isKeyboardEquivalent(event)) {
                 return;
             }
+            if (event.getKeyCode() == KeyEvent.VK_INSERT && event.isShiftDown()) {
+                // Legacy CUA-style (http://en.wikipedia.org/wiki/Cut,_copy,_and_paste) paste.
+                // gnome-terminal and xterm paste the X11 selection rather than the clipboard.
+                view.middleButtonPaste();
+                event.consume();
+                return;
+            }
             String sequence = getEscapeSequenceForKeyCode(event);
             if (sequence != null) {
                 if (sequence.length() == 1) {
