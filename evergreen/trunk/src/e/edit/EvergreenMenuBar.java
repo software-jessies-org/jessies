@@ -154,16 +154,19 @@ public class EvergreenMenuBar extends EMenuBar {
         
         // UI guidelines.
         menu.addSeparator();
-        menu.add(makeLocalOrRemoteLink("_Apple Human Interface Guidelines", "/Developer/Documentation/DocSets/com.apple.ADC_Reference_Library.CoreReference.docset/Contents/Resources/Documents/documentation/UserExperience/Conceptual/OSXHIGuidelines/index.html", "http://developer.apple.com/documentation/UserExperience/Conceptual/OSXHIGuidelines/index.html"));
+        menu.add(makeLocalOrRemoteLink("Apple _Human Interface Guidelines", "/Developer/Documentation/DocSets/com.apple.ADC_Reference_Library.CoreReference.docset/Contents/Resources/Documents/documentation/UserExperience/Conceptual/OSXHIGuidelines/index.html", "http://developer.apple.com/documentation/UserExperience/Conceptual/OSXHIGuidelines/index.html"));
         menu.add(makeLocalOrRemoteLink("_GNOME Human Interface Guidelines", null, "http://library.gnome.org/devel/hig-book/stable/"));
         
         // C/C++.
         menu.addSeparator();
         menu.add(makeLocalOrRemoteLink("GNU _C Library Documentation", "/usr/share/doc/glibc-doc/html/index.html", "http://www.gnu.org/software/libc/manual/html_node/index.html"));
+        menu.add(makeLocalOrRemoteLink("_POSIX Header Files", null, "http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/contents.html"));
+        menu.add(makeLocalOrRemoteLink("POSIX _Functions", null, "http://pubs.opengroup.org/onlinepubs/9699919799/functions/contents.html"));
         menu.add(makeLocalOrRemoteLink("_STL Documentation", "/usr/share/doc/stl-manual/html/index.html", "http://www.sgi.com/tech/stl/"));
         
         // Java.
         menu.addSeparator();
+        menu.add(makeLocalOrRemoteLink("_Android API", "~/Downloads/android-sdk-linux/docs/reference/packages.html", "http://developer.android.com/reference/packages.html"));
         menu.add(makeLocalOrRemoteLink("_Java 6 API", "/usr/share/doc/sun-java6-jdk/html/api/overview-summary.html", "http://java.sun.com/javase/6/docs/api/overview-summary.html"));
         menu.add(makeLocalOrRemoteLink("Java _Language Specification, 3e", null, "http://java.sun.com/docs/books/jls/third_edition/html/j3TOC.html"));
         menu.add(makeLocalOrRemoteLink("Java _Tutorial", null, "http://java.sun.com/docs/books/tutorial/"));
@@ -176,13 +179,13 @@ public class EvergreenMenuBar extends EMenuBar {
         // General.
         menu.addSeparator();
         // FIXME: some day it would be nice to have our own regular expression quick reference.
-        menu.add(makeLocalOrRemoteLink("_Regular Expression Documentation", "/usr/share/doc/sun-java6-jdk/html/api/java/util/regex/Pattern.html", PatternUtilities.DOCUMENTATION_URL));
+        menu.add(makeLocalOrRemoteLink("_Regular Expression Documentation", null, PatternUtilities.DOCUMENTATION_URL));
         
         return menu;
     }
     
     private WebLinkAction makeLocalOrRemoteLink(String name, String localFilename, String remoteUrl) {
-        String url = (localFilename != null && FileUtilities.exists(localFilename)) ? "file://" + localFilename : remoteUrl;
+        String url = (localFilename != null && FileUtilities.exists(localFilename)) ? "file://" + FileUtilities.fileFromString(localFilename) : remoteUrl;
         return new WebLinkAction(name, url);
     }
     
