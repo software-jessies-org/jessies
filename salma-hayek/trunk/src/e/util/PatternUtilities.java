@@ -12,7 +12,7 @@ public final class PatternUtilities {
      * Link to this in UI.
      * @see addRegularExpressionHelpToComponent
      */
-    public static final String DOCUMENTATION_URL = "http://java.sun.com/javase/6/docs/api/java/util/regex/Pattern.html";
+    public static final String DOCUMENTATION_URL = "http://developer.android.com/reference/java/util/regex/Pattern.html";
     
     // This character class and the regular expression below are based on the BNF in RFC 1738.
     // Compromises have been made to fit the grammar into a fairly readable regular expression.
