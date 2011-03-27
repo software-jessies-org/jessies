@@ -158,7 +158,6 @@ public class GuiUtilities {
         int underscoreIndex = name.indexOf('_');
         if (underscoreIndex != -1) {
             action.putValue(Action.NAME, name.replaceAll("_", ""));
-            // Mac OS ignores mnemonics on menu items, but not elsewhere.
             if (!GuiUtilities.isMacOs()) {
                 action.putValue(Action.MNEMONIC_KEY, Integer.valueOf(Character.toUpperCase(name.charAt(underscoreIndex + 1))));
                 action.putValue(DISPLAYED_MNEMONIC_INDEX_KEY, underscoreIndex);
@@ -178,7 +177,7 @@ public class GuiUtilities {
      */
     public static JMenu makeMenu(String name, char mnemonic) {
         JMenu menu = new JMenu(name);
-        if (mnemonicsEnabled) {
+        if (!GuiUtilities.isMacOs() && mnemonicsEnabled) {
             menu.setMnemonic(mnemonic);
         }
         return menu;
