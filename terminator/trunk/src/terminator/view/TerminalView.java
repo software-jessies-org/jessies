@@ -690,7 +690,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
                 int findIndex = -1;
                 int findStart = 0, findEnd = -1;
                 for (int start = 0, end, done; start < length && x < maxX; start = done) {
-                    if (findResults != null && findEnd < start && ++findIndex < findResults.length) {
+                    if (findResults != null && findEnd <= start && ++findIndex < findResults.length) {
                         findStart = findResults[findIndex].getStart();
                         findEnd = findResults[findIndex].getEnd();
                     }
