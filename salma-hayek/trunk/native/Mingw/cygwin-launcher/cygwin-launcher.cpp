@@ -43,7 +43,7 @@ public:
         // FIXME: We could make some effort towards Unicode support.
         errorCode = RegQueryValueEx(keyHandle, valueName, 0, &type, &buffer[0], &size);
         if (errorCode != ERROR_SUCCESS) {
-            throw WindowsError("RegQueryValueEx(" + toString(keyHandle) + ", " + valueName + ", 0, &type, &buffer[0], &size)", errorCode);
+            throw WindowsError("RegQueryValueEx(" + toString(keyHandle) + " (\"" + keyName + "\"), \"" + valueName + "\", 0, &type, &buffer[0], &size)", errorCode);
         }
         if (type != REG_SZ) {
             throw std::runtime_error("The type of registry entry hive " + toString(hive) + ", key " + keyName + ", value " + valueName + " was not REG_SZ (" + toString(REG_SZ) + ") as expected but " + toString(type));
