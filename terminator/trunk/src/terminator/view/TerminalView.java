@@ -397,20 +397,34 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
     }
     
     public Location viewToModel(Point point) {
+        return viewToModel(point, false);
+    }
+    
+    public Location viewToModel(Point point, boolean blockMode) {
         Insets insets = getInsets();
         int lineIndex = (point.y - insets.top) / getCharUnitSize().height;
-        int charOffset = 0;
-        // If the line index is off the top or bottom, we leave charOffset = 0.  This gives us nicer
-        // selection functionality.
+        String modelLine = "";
+        // In line mode, if the line index is off the top or bottom, we leave charOffset = 0.
+        // This makes it easier to select the whole first or last line.
         if (lineIndex >= model.getLineCount()) {
             lineIndex = model.getLineCount();
         } else if (lineIndex < 0) {
             lineIndex = 0;
         } else {
-            char[] chars = model.getTextLine(lineIndex).getString().toCharArray();
-            if (chars.length > 0) {
-                charOffset = GuiUtilities.getCharOffset(getFontMetrics(getFont()), 0, point.x - insets.left, chars);
-            }
+            modelLine = model.getTextLine(lineIndex).getString();
+        }
+        // In block mode, there may not be text at the point we want to calculate.
+        // We assume that W (see getCharUnitSize) doesn't have zero width.
+        // This does create very large strings & cause some GC but the measured
+        // performance impact is not prohibitive and only felt during
+        // block selection.  See:
+        // http://groups.google.com/group/terminator-users/browse_thread/thread/a71988c145e39cbb
+        String padding = blockMode ? StringUtilities.nCopies(Math.max(0, point.x - insets.left), 'W') : "";
+        String paddedModelLine = modelLine + padding;
+        char[] chars = paddedModelLine.toCharArray();
+        int charOffset = 0;
+        if (chars.length > 0) {
+            charOffset = GuiUtilities.getCharOffset(getFontMetrics(getFont()), 0, point.x - insets.left, chars);
         }
         return new Location(lineIndex, charOffset);
     }
@@ -613,7 +627,35 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
         return null;
     }
     
-    public String getTabbedString(Location start, Location end) {
+    private int getLineStart(boolean blockMode, Location start, Location end, int lineIndex) {
+        int startOffset = start.getCharOffset();
+        int endOffset = end.getCharOffset();
+        boolean isFirstLine = lineIndex == start.getLineIndex();
+        if (blockMode) {
+            return Math.min(startOffset, endOffset);
+        }
+        if (isFirstLine) {
+            return startOffset;
+        }
+        return 0;
+    }
+    
+    private int getLineEnd(boolean blockMode, Location start, Location end, int lineIndex) {
+        int startOffset = start.getCharOffset();
+        int endOffset = end.getCharOffset();
+        boolean isLastLine = lineIndex == end.getLineIndex();
+        if (blockMode) {
+            return Math.max(startOffset, endOffset);
+        }
+        if (isLastLine) {
+            return endOffset;
+        }
+        TextLine textLine = model.getTextLine(lineIndex);
+        int lineLength = textLine.length();
+        return lineLength;
+    }
+    
+    public String getTabbedString(Location start, Location end, boolean blockMode) {
         StringBuilder buf = new StringBuilder();
         for (int i = start.getLineIndex(); i <= end.getLineIndex(); i++) {
             // Necessary to cope with selections extending to the bottom of the buffer.
@@ -621,8 +663,9 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
                 break;
             }
             TextLine textLine = model.getTextLine(i);
-            int lineStart = (i == start.getLineIndex()) ? start.getCharOffset() : 0;
-            int lineEnd = (i == end.getLineIndex()) ? end.getCharOffset() : textLine.length();
+            // In block mode, even the start of the selection may be beyond the end of the model line.
+            int lineStart = Math.min(textLine.length(), getLineStart(blockMode, start, end, i));
+            int lineEnd = Math.min(textLine.length(), getLineEnd(blockMode, start, end, i));
             buf.append(textLine.getTabbedString(lineStart, lineEnd));
             if (i != end.getLineIndex()) {
                 buf.append('\n');
@@ -717,17 +760,24 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
                     paintCursor(g, "", baseline);
                 }
                 if (hasSelection && selectionStart.getLineIndex() <= i && i <= selectionEnd.getLineIndex()) {
-                    int start = selectionStart.getLineIndex() == i ? selectionStart.getCharOffset() : 0;
-                    boolean toEnd = selectionEnd.getLineIndex() != i;
-                    int end = toEnd ? textLine.length() : selectionEnd.getCharOffset();
+                    boolean blockMode = selectionHighlighter.isBlockMode();
+                    int start = getLineStart(blockMode, selectionStart, selectionEnd, i);
+                    int end = getLineEnd(blockMode, selectionStart, selectionEnd, i);
+                    boolean toEnd = blockMode == false && selectionEnd.getLineIndex() != i;
+                    String paddedLine = textLine.getString();
+                    if (end > length) {
+                        final int charactersOfPaddingRequired = end - length;
+                        // See getCharUnitSize for the 'W'.
+                        paddedLine += StringUtilities.nCopies(charactersOfPaddingRequired, 'W');
+                    }
 
                     // FIXME: this is likely to want some tuning; in particular, we might need to distinguish between light-on-dark and dark-on-light color schemes.
                     Color selectionColor = Terminator.getPreferences().getColor(TerminatorPreferences.SELECTION_COLOR);
                     g.setColor(new Color(selectionColor.getRed(), selectionColor.getGreen(), selectionColor.getBlue(), 128));
 
-                    x = insets.left + (start == 0 ? 0 : metrics.stringWidth(textLine.getSubstring(0, start)));
+                    x = insets.left + (start == 0 ? 0 : metrics.stringWidth(paddedLine.substring(0, start)));
                     int y = baseline - metrics.getMaxAscent() - metrics.getLeading();
-                    int w = toEnd ? maxX - x : metrics.stringWidth(textLine.getSubstring(start, end));
+                    int w = toEnd ? maxX - x : metrics.stringWidth(paddedLine.substring(start, end));
                     int h = charUnitSize.height;
 
                     g.fillRect(x, y, w, h);
