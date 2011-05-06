@@ -23,8 +23,11 @@ public class SelectionHighlighter implements ClipboardOwner, MouseListener, Mous
     // Both null or both non-null.
     private Location highlightStart, highlightEnd;
     // Internally used while dragging. May be null or non-null independently of highlightStart/highlightEnd.
-    private Location startLocation;
+    private Point initialPoint;
     private DragHandler dragHandler;
+    
+    // Whether selections are handled as rectangular blocks instead of whole lines.
+    private boolean blockMode;
     
     /** Creates a SelectionHighlighter for selecting text in the given view, and adds us as mouse listeners to that view. */
     public SelectionHighlighter(TerminalView view) {
@@ -62,29 +65,26 @@ public class SelectionHighlighter implements ClipboardOwner, MouseListener, Mous
         }
         
         // Shift-click should move one end of the selection.
-        if (e.isShiftDown() && startLocation != null) {
-            Location newEndLocation = view.viewToModel(e.getPoint());
+        if (e.isShiftDown() && initialPoint != null) {
             // My intent was that the dragHandler would remain, but apparently dragHandler is always null.
             if (dragHandler == null) {
                 dragHandler = new SingleClickDragHandler();
-                // The following line does nothing, but we should call makeInitialSelection to
-                // protect against future changes in implementation.
-                dragHandler.makeInitialSelection(startLocation);
             }
-            dragHandler.mouseDragged(newEndLocation);
+            mouseDragged(e);
             return;
         }
         
-        Location loc = view.viewToModel(e.getPoint());
+        updateSelectionMode(e);
+        initialPoint = e.getPoint();
+        Location loc = view.viewToModel(initialPoint, blockMode);
         highlightStart = null;
         highlightEnd = null;
-        startLocation = loc;
         
         if (loc.getLineIndex() >= view.getModel().getLineCount()) {
             return;
         }
         dragHandler = getDragHandlerForClick(e);
-        dragHandler.makeInitialSelection(loc);
+        mouseDragged(e);
 
         view.repaint();
     }
@@ -97,6 +97,7 @@ public class SelectionHighlighter implements ClipboardOwner, MouseListener, Mous
     
     public void mouseReleased(MouseEvent event) {
         if (SwingUtilities.isLeftMouseButton(event) && (dragHandler != null)) {
+            // The user may release Ctrl before the mouse button.
             selectionChanged();
             dragHandler = null;
         }
@@ -104,10 +105,18 @@ public class SelectionHighlighter implements ClipboardOwner, MouseListener, Mous
     
     public void mouseDragged(MouseEvent event) {
         if (SwingUtilities.isLeftMouseButton(event) && (dragHandler != null)) {
-            Location loc = view.viewToModel(event.getPoint());
-            dragHandler.mouseDragged(loc);
+            updateSelectionMode(event);
+            Location oldLocation = view.viewToModel(initialPoint, blockMode);
+            Location newLocation = view.viewToModel(event.getPoint(), blockMode);
+            Location start = Location.min(oldLocation, newLocation);
+            Location end = Location.max(oldLocation, newLocation);
+            dragHandler.mouseDragged(start, end);
             view.scrollRectToVisible(new Rectangle(event.getX(), event.getY(), 10, 10));
         }
+    }
+    
+    private void updateSelectionMode(MouseEvent event) {
+        blockMode = event.isControlDown();
     }
     
     private DragHandler getDragHandlerForClick(MouseEvent e) {
@@ -127,26 +136,17 @@ public class SelectionHighlighter implements ClipboardOwner, MouseListener, Mous
     public void mouseExited(MouseEvent event) { }
     
     public interface DragHandler {
-        public void makeInitialSelection(Location pressedLocation);
-        public void mouseDragged(Location newLocation);
+        public void mouseDragged(Location start, Location end);
     }
     
     public class SingleClickDragHandler implements DragHandler {
-        public void makeInitialSelection(Location pressedLocation) { }
-        
-        public void mouseDragged(Location newLocation) {
-            setHighlight(Location.min(startLocation, newLocation), Location.max(startLocation, newLocation));
+        public void mouseDragged(Location start, Location end) {
+            setHighlight(start, end);
         }
     }
     
     public class DoubleClickDragHandler implements DragHandler {
-        public void makeInitialSelection(Location pressedLocation) {
-            setHighlight(getWordStart(pressedLocation), getWordEnd(pressedLocation));
-        }
-        
-        public void mouseDragged(Location newLocation) {
-            Location start = Location.min(startLocation, newLocation);
-            Location end = Location.max(startLocation, newLocation);
+        public void mouseDragged(Location start, Location end) {
             setHighlight(getWordStart(start), getWordEnd(end));
         }
         
@@ -191,13 +191,7 @@ public class SelectionHighlighter implements ClipboardOwner, MouseListener, Mous
     }
     
     public class TripleClickDragHandler implements DragHandler {
-        public void makeInitialSelection(Location pressedLocation) {
-            selectLines(pressedLocation, pressedLocation);
-        }
-        
-        public void mouseDragged(Location newLocation) {
-            Location start = Location.min(startLocation, newLocation);
-            Location end = Location.max(startLocation, newLocation);
+        public void mouseDragged(Location start, Location end) {
             selectLines(start, end);
         }
         
@@ -209,7 +203,7 @@ public class SelectionHighlighter implements ClipboardOwner, MouseListener, Mous
     }
     
     private void clearSelection() {
-        startLocation = null;
+        initialPoint = null;
         highlightStart = null;
         highlightEnd = null;
 
@@ -274,7 +268,7 @@ public class SelectionHighlighter implements ClipboardOwner, MouseListener, Mous
     }
     
     public String getTabbedString() {
-        return hasSelection() ? view.getTabbedString(highlightStart, highlightEnd) : "";
+        return hasSelection() ? view.getTabbedString(highlightStart, highlightEnd, blockMode) : "";
     }
     
     /**
@@ -289,8 +283,7 @@ public class SelectionHighlighter implements ClipboardOwner, MouseListener, Mous
     private void setHighlight(Location start, Location end) {
         TextLine startLine = view.getModel().getTextLine(start.getLineIndex());
         start = new Location(start.getLineIndex(), startLine.getEffectiveCharStartOffset(start.getCharOffset()));
-        // Cope with selections off the bottom of the screen.
-        if (end.getCharOffset() != 0) {
+        if (end.getLineIndex() < view.getModel().getLineCount()) {
             TextLine endLine = view.getModel().getTextLine(end.getLineIndex());
             end = new Location(end.getLineIndex(), endLine.getEffectiveCharEndOffset(end.getCharOffset()));
         }
@@ -304,6 +297,10 @@ public class SelectionHighlighter implements ClipboardOwner, MouseListener, Mous
         view.repaint();
     }
 
+    public boolean isBlockMode() {
+        return blockMode;
+    }
+    
     private boolean isValidLocation(TerminalView view, Location location) {
         TerminalModel model = view.getModel();
         if (location.getLineIndex() >= model.getLineCount()) {
