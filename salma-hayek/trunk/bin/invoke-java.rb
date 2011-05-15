@@ -113,10 +113,9 @@ class Java
   end
   
   def initialize(name, class_name)
-    @dock_name = name
-    @dock_icon = ""
+    @app_name = name
+    @mac_dock_icon = ""
     @png_icon = ""
-    @frame_icon = ""
     @class_name = class_name
     @log_filename = ""
     @initiate_startup_notification = true
@@ -240,7 +239,7 @@ class Java
       suggestion = 'To install a suitable JRE, choose "Add/Remove..." from the GNOME "Applications" menu, show "All available applications", type "sun java" in the search field, and install "Sun Java 6 Runtime".'
     end
     message_lines << suggestion
-    show_alert("#{@dock_name} requires Java 6 or newer.", message_lines.join("\n\n"))
+    show_alert("#{@app_name} requires Java 6 or newer.", message_lines.join("\n\n"))
     exit(1)
   end
 
@@ -262,23 +261,16 @@ class Java
   
   def set_icons(name)
     # FIXME: Is this really human_project_name?
-    dock_icon = "#{@project_root}/lib/#{name}.icns"
-    if File.exist?(dock_icon)
-      @dock_icon = dock_icon
+    mac_dock_icon = "#{@project_root}/lib/#{name}.icns"
+    if File.exist?(mac_dock_icon)
+      @mac_dock_icon = mac_dock_icon
     end
     # FIXME: Is this really machine_project_name?
+    # The 128 pixel icon was traditionally just the about box icon.
+    # These days we let the system scale it down for all other uses too.
     png_icon = "#{@project_root}/lib/#{name.downcase()}-128.png"
     if File.exist?(png_icon)
       @png_icon = png_icon
-    end
-    
-    frame_icon = "#{@project_root}/lib/#{name.downcase()}-32.png"
-    if File.exist?(frame_icon)
-      # We have a special small icon for title bar use, so use it.
-      @frame_icon = frame_icon
-    else
-      # Let the system scale down the big about box icon.
-      @frame_icon = @png_icon
     end
   end
   
@@ -340,7 +332,7 @@ class Java
   
   def invoke(extra_app_arguments = [])
     @extra_app_arguments = extra_app_arguments
-    report_exceptions(@dock_name) { launch() }
+    report_exceptions(@app_name) { launch() }
   end
   
   def chooseSupportBinaryDirectory()
@@ -375,7 +367,7 @@ class Java
     
     # Since we're often started from the command line or from other programs, set up startup notification ourselves if it looks like we should.
     if @initiate_startup_notification && ENV["DISPLAY"] != nil && ENV["DESKTOP_STARTUP_ID"] == nil && target_os() == "Linux"
-      id=`#{findSupportBinary("gnome-startup")} start #{@frame_icon} Starting #{@dock_name}`.chomp()
+      id=`#{findSupportBinary("gnome-startup")} start #{@png_icon} Starting #{@app_name}`.chomp()
       ENV["DESKTOP_STARTUP_ID"] = id
     end
     
@@ -388,7 +380,7 @@ class Java
       add_property("gnome.DESKTOP_STARTUP_ID", desktop_startup_id)
     end
 
-    applicationEnvironmentName = @dock_name.upcase()
+    applicationEnvironmentName = @app_name.upcase()
     logging = ENV["DEBUGGING_#{applicationEnvironmentName}"] == nil && @log_filename != ""
     if logging
       begin
@@ -399,13 +391,13 @@ class Java
       end
     end
     
-    add_property("e.util.Log.applicationName", @dock_name)
+    add_property("e.util.Log.applicationName", @app_name)
 
     args << "-Xmx#{@heap_size}"
 
     if target_os() == "Darwin"
-      args << "-Xdock:name=#{@dock_name}"
-      args << "-Xdock:icon=#{@dock_icon}"
+      args << "-Xdock:name=#{@app_name}"
+      args << "-Xdock:icon=#{@mac_dock_icon}"
       add_property("apple.laf.useScreenMenuBar", "true")
     end
     
@@ -415,10 +407,9 @@ class Java
     end
     
     if @png_icon != ""
+      # TODO: switch to a single org.jessies.pngIcon property.
       add_pathname_property("org.jessies.aboutBoxIcon", @png_icon)
-    end
-    if @frame_icon != ""
-      add_pathname_property("org.jessies.frameIcon", @frame_icon)
+      add_pathname_property("org.jessies.frameIcon", @png_icon)
     end
     add_pathname_property("org.jessies.projectRoot", @project_root)
     add_pathname_property("org.jessies.supportRoot", @salma_hayek)
