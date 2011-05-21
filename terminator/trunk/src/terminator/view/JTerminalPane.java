@@ -573,6 +573,11 @@ public class JTerminalPane extends JPanel {
                 // Strictly, we're supposed to send an escape sequence for these strokes, but I don't know of anything that uses them.
                 host.cycleTab(keyCode == KeyEvent.VK_PAGE_UP ? -1 : 1);
                 return true;
+            } else if (e.isMetaDown() && e.isShiftDown() && (keyCode == KeyEvent.VK_OPEN_BRACKET || keyCode == KeyEvent.VK_CLOSE_BRACKET)) {
+                // Emulates Mac OS X Firefox, Chrome, and Safari's command-{/command-} cycle-tab behavior.
+                // (See the huge comment in CycleTabAction for more on why this isn't on our menu bar on Mac OS.)
+                host.cycleTab(keyCode == KeyEvent.VK_OPEN_BRACKET ? -1 : 1);
+                return true;
             } else if (e.isControlDown() && e.isShiftDown() && (keyCode == KeyEvent.VK_PAGE_UP || keyCode == KeyEvent.VK_PAGE_DOWN)) {
                 // Emulates gnome-terminal's control-shift page up/page down move-tab behavior.
                 // When this clashes with Terminator's native keystroke for scrolling, defer to that.
