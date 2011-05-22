@@ -17,8 +17,12 @@ rm *.deb
 # This has the advantage that the update won't overwrite the running script - which Ruby doesn't like.
 NIGHTLY_BUILD_SCRIPT=~martind/software.jessies.org/work/salma-hayek/bin/nightly-build.rb
 NIGHTLY_BUILD_TREE=~martind/software.jessies.org/nightlies/
-$NIGHTLY_BUILD_SCRIPT --no-update $NIGHTLY_BUILD_TREE clean
-echo $NIGHTLY_BUILD_SCRIPT $NIGHTLY_BUILD_TREE native-dist | ssh whitewater bash --login
+$NIGHTLY_BUILD_SCRIPT $NIGHTLY_BUILD_TREE clean
+{
+# The work area uses a modern svnversion than is available in Debian Etch.
+echo export PATH=/home/martind/software.jessies.org/bluearc:'$PATH'
+echo $NIGHTLY_BUILD_SCRIPT --no-update $NIGHTLY_BUILD_TREE native-dist
+} | dchroot --quiet --chroot ia32 -- bash --login
 $NIGHTLY_BUILD_SCRIPT --no-update $NIGHTLY_BUILD_TREE native-dist
 find $NIGHTLY_BUILD_TREE -name "*.deb" | xargs cp --target-directory=.
 
