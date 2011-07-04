@@ -111,7 +111,7 @@ MISSING_PREREQUISITES += $(MISSING_PRIVATE_FRAMEWORKS)
 
 BUILDING_MINGW = $(filter $(CURDIR)/native/Mingw/%,$(SOURCE_DIRECTORY))
 
-LOCAL_LDFLAGS += $(if $(BUILDING_MINGW),-mno-cygwin)
+LOCAL_LDFLAGS += $(if $(BUILDING_MINGW),$(MINGW_FLAGS.$(MINGW_COMPILER)))
 
 # ----------------------------------------------------------------------------
 # Decide on the default target.
