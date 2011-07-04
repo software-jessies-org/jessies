@@ -368,6 +368,12 @@ HAVE_MINGW_SOURCE := $(wildcard $(CURDIR)/native/Mingw)
 CRT_SHARED_LIBRARIES.Cygwin += $(if $(HAVE_MINGW_SOURCE),.generated/$(TARGET_DIRECTORY)/bin/mingwm10.dll)
 CRT_SHARED_LIBRARIES += $(CRT_SHARED_LIBRARIES.$(TARGET_OS))
 
+# One day we might have to look in eg /usr/share/doc/mingw32-runtime/mingwm10.dll.gz.
+MINGW_DLL_ALTERNATIVES += /usr/i686-pc-mingw32/sys-root/mingw/bin/mingwm10.dll
+MINGW_DLL_ALTERNATIVES += /bin/mingwm10.dll
+EXTANT_MINGW_DLL_ALTERNATIVES := $(wildcard $(MINGW_DLL_ALTERNATIVES))
+MINGW_DLL = $(firstword $(EXTANT_MINGW_DLL_ALTERNATIVES))
+
 # ----------------------------------------------------------------------------
 # Work out what native code, if any, we need to build.
 # ----------------------------------------------------------------------------
@@ -758,8 +764,7 @@ ChangeLog:
 	TERMINFO=$(@D) tic -v1 $< && \
 	mv $(@D)/*/$(@F) $@
 
-# One day we might have to look in eg /usr/share/doc/mingw32-runtime/mingwm10.dll.gz.
-.generated/$(TARGET_DIRECTORY)/bin/mingwm10.dll: /bin/mingwm10.dll
+.generated/$(TARGET_DIRECTORY)/bin/mingwm10.dll: $(MINGW_DLL)
 	mkdir -p $(@D) && \
 	cp $< $@.tmp && \
 	$(MOVE_GENERATED_TARGET_INTO_PLACE)
