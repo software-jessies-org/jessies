@@ -344,7 +344,14 @@ LDFLAGS.Darwin += -framework Cocoa
 # and my pronunciation but also http://www.delorie.com/howto/cygwin/mno-cygwin-howto.html.
 NATIVE_OS_DIRECTORIES.Cygwin += Mingw
 COMPILING_MINGW = $(filter $(CURDIR)/.generated/native/Mingw/%,$<)
-C_AND_CXX_FLAGS.Cygwin += $(if $(COMPILING_MINGW),-mno-cygwin)
+# This page was invaluable when I wanted to downgrade from i686-pc-mingw32-g++ from Cygwin-1.7.9 to g++-3 in Cygwin-1.7.7:
+# http://cygwin.com/ml/cygwin-announce/2011-04/msg00015.html
+MINGW_FLAGS.g++-3 += -mno-cygwin
+# With the newly packaged mingw compiler for Cygwin, cygwin-launcher failed to start
+# due to the absence of either libgcc_s_dw2-1.dll or libstdc++-6.dll.
+# http://stackoverflow.com/questions/4702732/the-program-cant-start-because-libgcc-s-dw2-1-dll-is-missing
+MINGW_FLAGS.i686-pc-mingw32-g++ += -static-libgcc -static-libstdc++
+C_AND_CXX_FLAGS.Cygwin += $(if $(COMPILING_MINGW),$(MINGW_FLAGS.$(MINGW_COMPILER)))
 
 # Facilitate overriding for CXX that's conditional on a per-target, per-directory basis.
 DEFAULT_CXX := $(CXX)
@@ -353,12 +360,11 @@ CXX = $(CXX.$(TARGET_OS))
 
 # Cygwin 1.7 has a g++-4 which can be installed as the default compiler.
 # Its compiler driver has no -mno-cygwin option.
-# The replacement is going to involve invoking a mingw cross-compiler.
-# But there doesn't yet appear to be a mingw cross compiler
-# that the g++-4 driver knows how to invoke.
-# It doesn't know how to invoke the old one because it's in a non-standard place.
-# This is one of the things they want to address with the removal of -mno-cygwin.
-CXX.Cygwin = $(if $(COMPILING_MINGW),g++-3,$(DEFAULT_CXX))
+MINGW_COMPILER = g++-3
+# The newly packaged cross-compiler isn't available in 1.7.7.
+# We have trouble forking after loading the JVM in later versions.
+#MINGW_COMPILER = i686-pc-mingw32-g++
+CXX.Cygwin = $(if $(COMPILING_MINGW),$(MINGW_COMPILER),$(DEFAULT_CXX))
 
 # Mac OS 10.6 ships with gcc 4.2.1 as the default but, until we want to drop 10.4, we need headers like /Developer/SDKs/MacOSX10.4u.sdk/usr/include/c++/4.0.0/sstream
 # The compiler really is one sub-minor version ahead of the directory.
