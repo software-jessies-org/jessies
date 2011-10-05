@@ -5,6 +5,11 @@ public class PRubyTextStyler extends PAbstractLanguageStyler {
         super(textArea);
     }
     
+    @Override protected String getKeywordRegularExpression() {
+        // Ruby symbols begin with a :, and for any keyword k, :k is a valid identifier.
+        return "\\b(?<!:)([A-Za-z_]+)\\b";
+    }
+    
     @Override public void initStyleApplicators() {
         super.initStyleApplicators();
         // An approximate attempt to recognize Ruby regular expression literals.
