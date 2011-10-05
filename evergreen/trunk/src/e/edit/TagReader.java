@@ -199,14 +199,13 @@ public class TagReader {
     public static class Tag {
         public TagType[][] typeSortOrder = new TagType[][] {
             { TagType.NAMESPACE },
-            { TagType.CLASS },
+            { TagType.CLASS, TagType.STRUCT, TagType.UNION },
             { TagType.MACRO },
             { TagType.CONSTRUCTOR },
             { TagType.DESTRUCTOR },
             { TagType.PROTOTYPE, TagType.METHOD },
             { TagType.FIELD, TagType.VARIABLE },
             { TagType.ENUM },
-            { TagType.STRUCT, TagType.UNION },
             { TagType.TYPEDEF }
         };
         public String classSeparator = ".";
