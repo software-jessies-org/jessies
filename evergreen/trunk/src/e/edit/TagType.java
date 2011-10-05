@@ -49,7 +49,7 @@ public enum TagType {
     STRUCT("struct", TagShapes.CIRCLE, true, "struct %s"),
     TITLE("title", TagShapes.SQUARE, true, "%s"),
     TYPEDEF("typedef", null, false, "typedef %s"),
-    UNION("union", TagShapes.CIRCLE, false, "union %s"),
+    UNION("union", TagShapes.CIRCLE, true, "union %s"),
     VARIABLE("variable", TagShapes.TRIANGLE, false, "%s"),
     
     UNKNOWN("unknown", null, false, "%s"),

@@ -9,7 +9,7 @@ import java.util.regex.*;
 
 public class TagReader {
     private static final Pattern TAG_LINE_PATTERN = Pattern.compile("([^\t]+)\t(?:[^\t])+\t(\\d+);\"\t(\\w)(?:\t(.*))?");
-    private static final Pattern CLASS_PATTERN = Pattern.compile("(struct|class|enum|interface|namespace):([^\t]+).*");
+    private static final Pattern CLASS_PATTERN = Pattern.compile("(class|enum|interface|namespace|struct|union):([^\t]+).*");
     
     private TagListener listener;
     private FileType fileType;
