@@ -17,7 +17,7 @@ public class PRubyTextStyler extends PAbstractLanguageStyler {
         // FIXME: this doesn't work for regular expressions containing quotes, because PAbstractLanguageStyler will already have styled them before the regular expression style applicators are run.
         // FIXME: this doesn't work for regular expressions occurring on the lhs of a =~ expression.
         // FIXME: this doesn't work for %r literals (or any other of Ruby's % literals).
-        textArea.addStyleApplicator(new RegularExpressionStyleApplicator(textArea, "[=~(]\\s*(/[^/]*/[ixmonesu])", PStyle.STRING));
+        textArea.addStyleApplicator(new RegularExpressionStyleApplicator(textArea, "[=~(]\\s*(/[^/]*/[ixmonesu]*)", PStyle.STRING));
     }
     
     @Override protected boolean isStartOfCommentToEndOfLine(String line, int atIndex) {
