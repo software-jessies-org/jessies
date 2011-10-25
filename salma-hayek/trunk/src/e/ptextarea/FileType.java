@@ -45,7 +45,7 @@ public class FileType {
     public static final FileType MAKE = new FileType("Make",
                  PNoOpIndenter.class,
                  PMakefileTextStyler.class,
-                 new String[] { "Makefile", "GNUmakefile", "makefile", ".make" });
+                 new String[] { "Makefile", "GNUmakefile", "makefile", ".make", ".mk" });
     
     public static final FileType PATCH = new FileType("Patch",
                  PNoOpIndenter.class,
