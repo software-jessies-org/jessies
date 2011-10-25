@@ -304,13 +304,9 @@ public class PKeyHandler implements KeyListener {
         int lineOffset = position - textArea.getLineStartOffset(lineNumber);
         CharSequence chars = textArea.getTextBuffer();
         if (e.isControlDown()) {
-            // "Hungry delete": delete back to first whitespace/non-whitespace boundary.
+            // Delete to beginning of previous word.
             int startPosition = position - 1;
-            final boolean startedInWhitespace = Character.isWhitespace(chars.charAt(startPosition));
-            while (startPosition > 0 && Character.isWhitespace(chars.charAt(startPosition - 1)) == startedInWhitespace) {
-                startPosition--;
-                charactersToDelete++;
-            }
+            charactersToDelete = position - caretToPreviousWord();
         } else if (e.isAltDown()) {
             // Delete back to beginning of line.
             charactersToDelete = lineOffset;
