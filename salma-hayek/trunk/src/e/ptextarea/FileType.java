@@ -6,7 +6,26 @@ import java.util.regex.*;
 
 public class FileType {
     private static final Map<String, FileType> ALL_FILE_TYPES = new HashMap<String, FileType>();
-
+    
+    /**
+     * Call this function, preferably once, to initialize the preferences for each filetype, and load them from a file.
+     */
+    public static FileTypePreferences preferencesFromFile(String filename) {
+        FileTypePreferences result = new FileTypePreferences(filename);
+        for (FileType type: ALL_FILE_TYPES.values()) {
+            try {
+                PIndenter indenter = type.indenterClass.getConstructor(PTextArea.class).newInstance(new Object[] {null});
+                result.addPreferencesForIndenter(type.getName(), indenter);
+            } catch (Exception ex) {
+                throw new RuntimeException("preferencesFromFile failed", ex);
+            }
+        }
+        if (!filename.isEmpty()) {
+            result.readFromDisk();
+        }
+        return result;
+    }
+    
     public static final FileType ASSEMBLER = new FileType("Assembler",
                  PNoOpIndenter.class,
                  PAssemblerTextStyler.class,
@@ -130,7 +149,12 @@ public class FileType {
         }
     }
     
+    // Included only for backwards compatibility.  Use the new FileTypePreferences.
     public void configureTextArea(PTextArea textArea) {
+        configureTextArea(textArea, preferencesFromFile(""));
+    }
+        
+    public void configureTextArea(PTextArea textArea, FileTypePreferences preferences) {
         if (textArea.getFileType() == this) {
             return;
         }
@@ -138,8 +162,10 @@ public class FileType {
         textArea.setFileType(this);
         textArea.setWrapStyleWord(this == FileType.PLAIN_TEXT);
         try {
-            textArea.setIndenter(indenterClass.getConstructor(PTextArea.class).newInstance(textArea));
-            textArea.setTextStyler(stylerClass.getConstructor(PTextArea.class).newInstance(textArea));
+            PIndenter indenter = indenterClass.getConstructor(PTextArea.class).newInstance(new Object[] {textArea});
+            indenter.setPreferences(new PrefixedPreferences(preferences, getName() + "."));
+            textArea.setIndenter(indenter);
+            textArea.setTextStyler(stylerClass.getConstructor(PTextArea.class).newInstance(new Object[] {textArea}));
         } catch (Exception ex) {
             throw new RuntimeException("configureTextArea failed", ex);
         }
@@ -149,7 +175,7 @@ public class FileType {
     
     public String[] getKeywords() {
         try {
-            final PTextStyler styler = stylerClass.getConstructor(PTextArea.class).newInstance((PTextArea) null);
+            final PTextStyler styler = stylerClass.getConstructor(PTextArea.class).newInstance(new Object[] {null});
             return styler.getKeywords();
         } catch (Exception ex) {
             Log.warn("FileType.getKeywords failed (for file type " + getName() + ")", ex);
