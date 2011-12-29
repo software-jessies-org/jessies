@@ -1,5 +1,7 @@
 package e.ptextarea;
 
+import e.util.*;
+import java.util.*;
 import java.util.regex.*;
 
 /**
@@ -9,9 +11,46 @@ public abstract class PIndenter {
     private static final Pattern INDENTATION_PATTERN = Pattern.compile("(^[ \\t]*(?:\\*(?: |$))?).*$");
     
     protected PTextArea textArea;
+    protected PrefixedPreferences preferences;
     
     public PIndenter(PTextArea textArea) {
         this.textArea = textArea;
+    }
+    
+    public void setPreferences(PrefixedPreferences preferences) {
+        this.preferences = preferences;
+    }
+    
+    /**
+     * Override this function to return the preferences that your indenter supports.
+     * Important: *ALWAYS* first retrieve super.getPreferences() and add to that list.
+     */
+    public ArrayList<Preference> getPreferences() {
+        return new ArrayList<Preference>();
+    }
+    
+    public class Preference {
+        private String key;
+        private Object value;
+        private String description;
+        
+        public Preference(String key, Object value, String description) {
+            this.key = key;
+            this.value = value;
+            this.description = description;
+        }
+        
+        public String getKey() {
+            return key;
+        }
+        
+        public Object getValue() {
+            return value;
+        }
+        
+        public String getDescription() {
+            return description;
+        }
     }
     
     /**
