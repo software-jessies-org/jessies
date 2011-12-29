@@ -10,7 +10,7 @@ public class FileType {
     /**
      * Call this function, preferably once, to initialize the preferences for each filetype, and load them from a file.
      */
-    public static FileTypePreferences preferencesFromFile(String filename) {
+    public static Preferences preferencesFromFile(String filename) {
         FileTypePreferences result = new FileTypePreferences(filename);
         for (FileType type: ALL_FILE_TYPES.values()) {
             try {
@@ -154,7 +154,7 @@ public class FileType {
         configureTextArea(textArea, preferencesFromFile(""));
     }
         
-    public void configureTextArea(PTextArea textArea, FileTypePreferences preferences) {
+    public void configureTextArea(PTextArea textArea, Preferences preferences) {
         if (textArea.getFileType() == this) {
             return;
         }
