@@ -1,6 +1,7 @@
 package e.edit;
 
 import e.gui.*;
+import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -29,6 +30,7 @@ public class Evergreen {
     private CountDownLatch startSignal = new CountDownLatch(1);
     
     private EvergreenPreferences preferences;
+    private Preferences fileTypePreferences;
     
     private InitialState initialState = new InitialState();
     
@@ -122,6 +124,10 @@ public class Evergreen {
     
     public Preferences getPreferences() {
         return preferences;
+    }
+    
+    public Preferences getFileTypePreferences() {
+        return fileTypePreferences;
     }
     
     /** Returns the frame we're using for the main window. */
@@ -724,6 +730,9 @@ public class Evergreen {
         this.preferences = new EvergreenPreferences();
         preferences.readFromDisk();
         preferences.addPreferencesListener(preferencesListener);
+        
+        // Indentation preferences (currently done just by editing text files).
+        this.fileTypePreferences = FileType.preferencesFromFile(getPreferenceFilename("file-type-preferences"));
     }
     
     private void initStatusArea() {

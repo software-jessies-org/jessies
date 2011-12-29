@@ -370,7 +370,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         }
         ++configureCount;
         
-        newFileType.configureTextArea(textArea);
+        newFileType.configureTextArea(textArea, Evergreen.getInstance().getFileTypePreferences());
         
         BugDatabaseHighlighter.highlightBugs(textArea);
         
