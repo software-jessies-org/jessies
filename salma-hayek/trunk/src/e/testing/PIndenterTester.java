@@ -30,41 +30,17 @@ public class PIndenterTester {
     
     public int printDifferences(PrintWriter out) {
         int result = 0;
-        ArrayList<String> baselineMismatch = new ArrayList<String>();
-        ArrayList<String> comparisonMismatch = new ArrayList<String>();
         String newContent = textArea.getTextBuffer().toString();
         TwoFileLineIterator iterator = new TwoFileLineIterator(originalContent, newContent);
         while (iterator.iterateToNext()) {
             if (iterator.areTheTwoLinesEqual()) {
-                if (baselineMismatch.size() != 0) {
-                    dumpMismatch(out, baselineMismatch, comparisonMismatch, iterator.getLineIndex() - baselineMismatch.size());
-                    result++;
-                    baselineMismatch.clear();
-                    comparisonMismatch.clear();
-                }
+                out.println(" " + iterator.getComparison());
             } else {
-                baselineMismatch.add(iterator.getBaseline());
-                comparisonMismatch.add(iterator.getComparison());
+                out.println("!" + iterator.getComparison());
+                result++;
             }
         }
-        if (baselineMismatch.size() != 0) {
-            dumpMismatch(out, baselineMismatch, comparisonMismatch, iterator.getLineIndex() - baselineMismatch.size());
-            result++;
-        }
         return result;
-    }
-    
-    public void dumpMismatch(PrintWriter out, List<String> baseline, List<String> comparison, int firstLineIndex) {
-        out.println("Mismatch from line " + firstLineIndex + " to " + (firstLineIndex + baseline.size() - 1) + " of file " + filename);
-        out.println("Original content:");
-        for (String line: baseline) {
-            out.println(line);
-        }
-        out.println("Re-intended content:");
-        for (String line: comparison) {
-            out.println(line);
-        }
-        out.println("End of mismatch.");
     }
     
     static class TwoFileLineIterator {
