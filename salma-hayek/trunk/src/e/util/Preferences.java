@@ -26,7 +26,7 @@ import javax.swing.event.*;
  * 
  * @author Elliott Hughes
  */
-public abstract class Preferences {
+public abstract class Preferences extends PreferenceGetter {
     private static final Pattern RESOURCE_PATTERN = Pattern.compile("(?:\\S+(?:\\*|\\.))?(\\S+):\\s*(.+)");
     
     private static class KeyAndTab {
@@ -134,26 +134,6 @@ public abstract class Preferences {
     
     public Object get(String key) {
         return preferences.get(key);
-    }
-    
-    public String getString(String key) {
-        return (String) preferences.get(key);
-    }
-    
-    public boolean getBoolean(String key) {
-        return (Boolean) preferences.get(key);
-    }
-    
-    public Color getColor(String key) {
-        return (Color) preferences.get(key);
-    }
-    
-    public Font getFont(String key) {
-        return (Font) preferences.get(key);
-    }
-    
-    public int getInt(String key) {
-        return (Integer) preferences.get(key);
     }
     
     public void initPreferencesMenuItem(JMenu editMenu) {
