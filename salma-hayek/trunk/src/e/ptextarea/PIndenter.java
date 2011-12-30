@@ -29,10 +29,10 @@ public abstract class PIndenter {
         return new ArrayList<Preference>();
     }
     
-    public class Preference {
-        private String key;
-        private Object value;
-        private String description;
+    public static class Preference {
+        private final String key;
+        private final Object value;
+        private final String description;
         
         public Preference(String key, Object value, String description) {
             this.key = key;

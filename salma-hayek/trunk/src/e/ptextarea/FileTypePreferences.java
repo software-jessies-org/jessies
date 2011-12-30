@@ -4,7 +4,7 @@ import e.util.*;
 import java.util.*;
 
 public class FileTypePreferences extends Preferences {
-    private String filename;
+    private final String filename;
     
     public FileTypePreferences(String filename) {
         this.filename = filename;

@@ -9,9 +9,9 @@ import java.awt.*;
  * @author Phil Norman
  */
 
-public class PrefixedPreferences {
-    private Preferences preferences;
-    private String prefix;
+public class PrefixedPreferences extends PreferenceGetter {
+    private final Preferences preferences;
+    private final String prefix;
     
     public PrefixedPreferences(Preferences preferences, String prefix) {
         this.preferences = preferences;
@@ -20,25 +20,5 @@ public class PrefixedPreferences {
     
     public Object get(String key) {
         return preferences.get(prefix + key);
-    }
-    
-    public String getString(String key) {
-        return (String) preferences.get(prefix + key);
-    }
-    
-    public boolean getBoolean(String key) {
-        return (Boolean) preferences.get(prefix + key);
-    }
-    
-    public Color getColor(String key) {
-        return (Color) preferences.get(prefix + key);
-    }
-    
-    public Font getFont(String key) {
-        return (Font) preferences.get(prefix + key);
-    }
-    
-    public int getInt(String key) {
-        return (Integer) preferences.get(prefix + key);
     }
 }
