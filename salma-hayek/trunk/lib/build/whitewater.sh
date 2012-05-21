@@ -29,7 +29,7 @@ find $NIGHTLY_BUILD_TREE -name "*.deb" | xargs cp --target-directory=.
 # When the version number hasn't changed, we must use the same binary, so we put the same md5sum in the Packages file.
 # If we change the md5sum then the apt programs assume that we've been hacked.
 # We don't preserve timestamps during the various copies we do, hence --checksum.
-ls *.deb | rsync --verbose --checksum --files-from=- software@jessies.org:~/downloads/debian/ .
+#ls *.deb | rsync --verbose --checksum --files-from=- software@jessies.org:~/downloads/debian/ .
 
 # If we don't have a Packages file (as well as Packages.gz) we get:
 # Failed to fetch http://deb/software.jessies.org/./Release  Unable to find expected entry  Packages in Meta-index file (malformed Release file?)
@@ -40,4 +40,4 @@ apt-ftparchive release . > Release
 # This has to run as martind@bluearc.com to sign with the right key.
 # The key was exported with gpg --export --armor, then imported by piping that to sudo apt-get add -.
 gpg -sba - - < Release > Release.gpg
-scp Packages Packages.gz Release Release.gpg software@jessies.org:~/downloads/debian/
+#scp Packages Packages.gz Release Release.gpg software@jessies.org:~/downloads/debian/
