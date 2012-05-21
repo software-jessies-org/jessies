@@ -113,7 +113,10 @@ $(addprefix symlink-latest.,$(PUBLISHABLE_INSTALLERS)): symlink-latest.%: %
 	ln -s $(<F) $(DIST_DIRECTORY)/$(LATEST_INSTALLER_LINK) '&&' \
 	ls -t $(DIST_DIRECTORY)/$(call makeInstallerName$(suffix $<),'*') '|' tail -n +8 '|' xargs $(RM)
 
+# Nightly builds won't be able to ask for the password,
+# eg when the file has already been uploaded.
+# So we shouldn't allow that during the daytime either.
 .PHONY: googlecode-upload.%
 $(addprefix googlecode-upload.,$(PUBLISHABLE_INSTALLERS)): googlecode-upload.%: %
 	@echo "-- Uploading $(<F) to code.google.com..." && \
-	$(SALMA_HAYEK)/lib/build/googlecode_upload.py -s '$(SUMMARY)' -p jessies $<
+	$(SALMA_HAYEK)/lib/build/googlecode_upload.py -s '$(SUMMARY)' -p jessies $< < /dev/null
