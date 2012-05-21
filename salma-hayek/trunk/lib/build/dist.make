@@ -53,8 +53,7 @@ PLATFORM_NAME.msi = Windows
 PLATFORM_NAME.pkg = Solaris
 PLATFORM_NAME.rpm = RedHat
 
-PLATFORM_NAME_FOR_PREREQUISITE = $(PLATFORM_NAME$(suffix $<))
-PLATFORM_NAME = $(if $(PLATFORM_NAME_FOR_PREREQUISITE),$(PLATFORM_NAME_FOR_PREREQUISITE),$(error platform name not specified for extension "$(suffix $<)"))
+PLATFORM_NAME = $(PLATFORM_NAME.$(PRIMARY_INSTALLER_EXTENSION))
 SUMMARY = $(PLATFORM_NAME) installer for $(HUMAN_PROJECT_NAME) version $(VERSION_STRING)
 
 # ----------------------------------------------------------------------------
