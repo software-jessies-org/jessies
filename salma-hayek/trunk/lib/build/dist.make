@@ -47,6 +47,16 @@ DIST_SUBDIRECTORY.msi = windows
 DIST_SUBDIRECTORY.pkg = sunos
 DIST_SUBDIRECTORY.rpm = redhat
 
+PLATFORM_NAME.deb = Debian
+PLATFORM_NAME.zip = Mac
+PLATFORM_NAME.msi = Windows
+PLATFORM_NAME.pkg = Solaris
+PLATFORM_NAME.rpm = RedHat
+
+PLATFORM_NAME_FOR_PREREQUISITE = $(PLATFORM_NAME$(suffix $<))
+PLATFORM_NAME = $(if $(PLATFORM_NAME_FOR_PREREQUISITE),$(PLATFORM_NAME_FOR_PREREQUISITE),$(error platform name not specified for extension "$(suffix $<)"))
+SUMMARY = $(PLATFORM_NAME) installer for $(HUMAN_PROJECT_NAME) version $(VERSION_STRING)
+
 # ----------------------------------------------------------------------------
 # Variables above this point, rules below.
 # See universal.make for an explanation.
@@ -78,7 +88,7 @@ publish-changelog: ChangeLog.html
 	mv ChangeLog.html $(DIST_DIRECTORY)/
 
 .PHONY: native-dist
-native-dist: $(addprefix symlink-latest.,$(PUBLISHABLE_INSTALLERS))
+native-dist: $(addprefix googlecode-upload.,$(PUBLISHABLE_INSTALLERS))
 
 # We mustn't overwrite a file on the server whose md5sum is in Packages file or Debian's tools complain mightily.
 # If you want to upload a new installer, then please check-in first, so the version number changes.
@@ -102,3 +112,8 @@ $(addprefix symlink-latest.,$(PUBLISHABLE_INSTALLERS)): symlink-latest.%: %
 	ssh $(DIST_SSH_USER_AND_HOST) $(RM) $(DIST_DIRECTORY)/$(LATEST_INSTALLER_LINK) '&&' \
 	ln -s $(<F) $(DIST_DIRECTORY)/$(LATEST_INSTALLER_LINK) '&&' \
 	ls -t $(DIST_DIRECTORY)/$(call makeInstallerName$(suffix $<),'*') '|' tail -n +8 '|' xargs $(RM)
+
+.PHONY: googlecode-upload.%
+$(addprefix googlecode-upload.,$(PUBLISHABLE_INSTALLERS)): googlecode-upload.%: %
+	@echo "-- Uploading $(<F) to code.google.com..." && \
+	$(SALMA_HAYEK)/lib/build/googlecode_upload.py -s '$(SUMMARY)' -p jessies $<
