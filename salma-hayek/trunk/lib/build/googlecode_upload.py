@@ -49,102 +49,11 @@
 __author__ = 'danderson@google.com (David Anderson)'
 
 import httplib
-import md5
 import os.path
 import optparse
 import getpass
 import base64
 import sys
-
-
-class SvnAuthError(Exception):
-  pass
-
-
-def get_svn_config_dir():
-  """Return user's Subversion configuration directory."""
-  try:
-    from win32com.shell.shell import SHGetFolderPath
-    import win32com.shell.shellcon
-  except ImportError:
-    # If we can't import the win32api, just use ~; this is right on unix, and
-    # returns not entirely unreasonable results on Windows.
-    return os.path.expanduser('~/.subversion')
-
-  # We're on Windows with win32api; use APPDATA.
-  return os.path.join(SHGetFolderPath(0, win32com.shell.shellcon.CSIDL_APPDATA,
-                                      0, 0).encode('utf-8'),
-                      'Subversion')
-
-
-def get_svn_auth_via_svn(project_name, config_dir, realm):
-  """Return (username, password) for project_name in config_dir.
-
-  This uses svn_config_read_auth_data if the Subversion binding is available
-  and new enough (>= 1.5).
-
-  Raises:
-    SvnAuthError if the Subversion binding is missing or too old
-  """
-
-  # Default to returning nothing.
-  result = (None, None)
-
-  try:
-    from svn.core import SVN_AUTH_CRED_SIMPLE, svn_config_read_auth_data
-    from svn.core import SubversionException
-    from svn.core import svn_subr_version
-  except ImportError:
-    raise SvnAuthError
-
-  # svn_config_read_auth_data Python binding wasn't fixed until 1.5.
-  if svn_subr_version().minor < 5:
-    raise SvnAuthError
-
-  # auth may be none even if no exception is raised, e.g. if config_dir does
-  # not exist, or exists but has no entry for realm.
-  try:
-    auth = svn_config_read_auth_data(SVN_AUTH_CRED_SIMPLE, realm, config_dir)
-  except SubversionException:
-    auth = None
-
-  if auth is not None:
-    try:
-      result = (auth['username'], auth['password'])
-    except KeyError:
-      # Missing the keys, so return nothing.
-      pass
-
-  return result
-
-
-def get_svn_auth_directly(project_name, config_dir, realm):
-  """Read the username and password from Subversion's authentication cache.
-  """
-  # Work out the path to the stored configuration we need to read. The filename
-  # is just the MD5 digest of the the realm string.
-  digest = md5.new(realm).hexdigest()
-  auth_file_path = os.path.join(config_dir, 'auth', 'svn.simple', digest)
-
-  try:
-    # Read each line from the file and strip the trailing newlines.
-    lines = open(auth_file_path).readlines()
-    lines = [line.rstrip() for line in lines]
-    # The values come two lines after the corresponding keys.
-    username = lines[lines.index('username') + 2].rstrip()
-    password = lines[lines.index('password') + 2]
-    return (username, password)
-  except:
-    return (None, None)
-
-
-def get_svn_auth(project_name, config_dir):
-  realm = ('<https://%s.googlecode.com:443> Google Code Subversion Repository'
-           % project_name)
-  try:
-    return get_svn_auth_via_svn(project_name, config_dir, realm)
-  except SvnAuthError:
-    return get_svn_auth_directly(project_name, config_dir, realm)
 
 
 def upload(file, project_name, user_name, password, summary, labels=None):
@@ -244,14 +153,10 @@ def encode_upload_request(fields, file_path):
 
 
 def upload_find_auth(file_path, project_name, summary, labels=None,
-                     config_dir=None, user_name=None, tries=3):
+                     user_name=None, password=None, tries=3):
   """Find credentials and upload a file to a Google Code project's file server.
 
   file_path, project_name, summary, and labels are passed as-is to upload.
-
-  If config_dir is None, try get_svn_config_dir(); if it is 'none', skip
-  trying the Subversion configuration entirely.  If user_name is not None, use
-  it for the first attempt; prompt for subsequent attempts.
 
   Args:
     file_path: The local path to the file.
@@ -262,18 +167,14 @@ def upload_find_auth(file_path, project_name, summary, labels=None,
     user_name: Your Google account name.
     tries: How many attempts to make.
   """
-
-  if config_dir != 'none':
-    # Try to load username/password from svn config for first try.
-    if config_dir is None:
-      config_dir = get_svn_config_dir()
-    (svn_username, password) = get_svn_auth(project_name, config_dir)
-    if user_name is None:
-      # If username was not supplied by caller, use svn config.
-      user_name = svn_username
-  else:
-    # Just initialize password for the first try.
-    password = None
+  if user_name is None or password is None:
+    from netrc import netrc
+    authenticators = netrc().authenticators("code.google.com")
+    if authenticators:
+      if user_name is None:
+        user_name = authenticators[0]
+      if password is None:
+        password = authenticators[2]
 
   while tries > 0:
     if user_name is None:
@@ -308,15 +209,14 @@ def upload_find_auth(file_path, project_name, summary, labels=None,
 def main():
   parser = optparse.OptionParser(usage='googlecode-upload.py -s SUMMARY '
                                  '-p PROJECT [options] FILE')
-  parser.add_option('--config-dir', dest='config_dir', metavar='DIR',
-                    help='read svn auth data from DIR'
-                         ' ("none" means not to use svn auth data)')
   parser.add_option('-s', '--summary', dest='summary',
                     help='Short description of the file')
   parser.add_option('-p', '--project', dest='project',
                     help='Google Code project name')
   parser.add_option('-u', '--user', dest='user',
                     help='Your Google Code username')
+  parser.add_option('-w', '--password', dest='password',
+                    help='Your Google Code password')
   parser.add_option('-l', '--labels', dest='labels',
                     help='An optional list of comma-separated labels to attach '
                     'to the file')
@@ -341,7 +241,7 @@ def main():
 
   status, reason, url = upload_find_auth(file_path, options.project,
                                          options.summary, labels,
-                                         options.config_dir, options.user)
+                                         options.user, options.password)
   if url:
     print 'The file was uploaded successfully.'
     print 'URL: %s' % url
