@@ -20,6 +20,16 @@
 # add this on a line on its own:
 # *@+local_domains ${local_part}@bluearc.com EFfrstcb
 
+# # martind 2012-05-22
+# smarthost:
+# driver = manualroute
+# domains = ! +local_domains
+# transport = remote_smtp
+# route_list = * mail.us.dev.bluearc.com byname
+# host_find_failed = defer
+# same_domain_copy_routing = yes
+# no_more
+
 # Anyway, I could indeed access network files but it was insanely slow to do an svn update.
 # I realized that I really didn't want the Windows machine connecting over Samba and doing make clean while
 # the Debian build was happening.
