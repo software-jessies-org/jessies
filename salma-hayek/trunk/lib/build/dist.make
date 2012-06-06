@@ -113,8 +113,9 @@ $(addprefix symlink-latest.,$(PUBLISHABLE_INSTALLERS)): symlink-latest.%: %
 	ls -t $(DIST_DIRECTORY)/$(call makeInstallerName$(suffix $<),'*') '|' tail -n +8 '|' xargs $(RM)
 
 # Nightly builds won't be able to ask for the password,
-# eg when the file has already been uploaded.
-# So we shouldn't allow that during the daytime either.
+# so we shouldn't allow that during the daytime either.
+# When the version number hasn't changed, we must use the same binary, so we put the same md5sum in the Packages file.
+# If we change the md5sum then the apt programs assume that we've been hacked.
 .PHONY: googlecode-upload.%
 $(addprefix googlecode-upload.,$(PUBLISHABLE_INSTALLERS)): googlecode-upload.%: %
 	@echo "-- Uploading $(<F) to code.google.com..." && \
