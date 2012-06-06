@@ -118,4 +118,5 @@ $(addprefix symlink-latest.,$(PUBLISHABLE_INSTALLERS)): symlink-latest.%: %
 .PHONY: googlecode-upload.%
 $(addprefix googlecode-upload.,$(PUBLISHABLE_INSTALLERS)): googlecode-upload.%: %
 	@echo "-- Uploading $(<F) to code.google.com..." && \
+	wget -O $<.tmp http://jessies.googlecode.com/files/$(<F) && mv $<.tmp $< || \
 	$(SALMA_HAYEK)/lib/build/googlecode_upload.py -s '$(SUMMARY)' -p jessies $< < /dev/null
