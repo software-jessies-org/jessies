@@ -14,10 +14,10 @@ else
             # We used to do this to prevent a console window from appearing when started from a desktop shortcut.
             # We've also seen Cygwin's uname report both "CYGWIN_NT-5.0" and "CYGWIN_NT-5.1".
             # A dependency on uname would be a dependency on Cygwin.
-            ruby_os_name = Config::CONFIG["target_os"]
+            ruby_os_name = RbConfig::CONFIG["target_os"]
             # We used to use uname -m (Linux) or arch but that gives the kernel architecture.
             # We're more interested in the architecture of the binaries that we can build and run.
-            @arch = Config::CONFIG["target_cpu"]
+            @arch = RbConfig::CONFIG["target_cpu"]
             if ruby_os_name == "cygwin"
                 @os_name = "Cygwin"
             elsif ruby_os_name == "mswin32"

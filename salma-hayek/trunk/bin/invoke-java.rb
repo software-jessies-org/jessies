@@ -84,7 +84,7 @@ class InAppClient
   def trySendCommand(command)
     sendCommandWithoutExceptionHandling(command)
     return true
-  rescue Exception => ex
+  rescue Exception
     return false
   end
   
@@ -386,7 +386,7 @@ class Java
       begin
         File.new(@log_filename, "w").close() # Like touch(1).
         add_pathname_property("e.util.Log.filename", @log_filename)
-      rescue SystemCallError => ex
+      rescue SystemCallError
         # Inability to create the log file is not fatal.
       end
     end
