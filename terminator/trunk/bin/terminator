@@ -2,9 +2,9 @@
 
 class Terminator
     def initialize()
-        require "fileutils.rb"
-        require "pathname.rb"
-        require "uri"
+        require "cgi"
+        require "fileutils"
+        require "pathname"
         
         # Cope with symbolic links to this script.
         @terminator_home = Pathname.new(__FILE__).realpath().dirname().dirname()
@@ -114,10 +114,10 @@ class Terminator
             directory_safe = true
         rescue SystemCallError => ex
             if directory_exists == false
-                show_alert("Terminator had trouble starting.", "Terminator was unable to create the directory \"#{pathname}\".")
+                show_alert("Terminator had trouble starting.", "Terminator was unable to create the directory \"#{pathname}\" (failing with \"#{ex.message()}\").")
                 exit(1)
             elsif directory_safe == false
-                show_alert("Terminator had trouble starting.", "Terminator was unable to change the permissions on \"#{pathname}\" to make it safe. Others may be able to read your logs or cause new terminals to open on your display.")
+                show_alert("Terminator had trouble starting.", "Terminator was unable to change the permissions on \"#{pathname}\" to make it safe (failing with \"#{ex.message()}\"). Others may be able to read your logs or cause new terminals to open on your display.")
             end
         end
     end
@@ -143,7 +143,7 @@ class Terminator
         arguments.concat(ARGV)
         encodedArguments = arguments.map() {
             |argument|
-            URI.encode(argument)
+            CGI.escape(argument)
         }
         encodedArgumentString = encodedArguments.join(" ")
         # See if there's already a Terminator running that can open us a new window.
