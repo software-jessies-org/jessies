@@ -14,11 +14,11 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
     private static final String PARENTHESIS_INDENT = "parenthesisIndent";
     private static final String SWITCH_LABEL_OUTDENT = "switchLabelOutdent";
     private static final String ACCESS_SPECIFIER_OUTDENT = "accessSpecifierOutdent";
-    
+
     public PCFamilyIndenter(PTextArea textArea) {
         super(textArea);
     }
-    
+
     @Override
     public ArrayList<Preference> getPreferences() {
         ArrayList<Preference> result = super.getPreferences();
@@ -31,13 +31,13 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
         result.add(new Preference(ACCESS_SPECIFIER_OUTDENT, " ", "Outdent for access specifiers"));
         return result;
     }
-    
+
     private void debug(CharSequence message) {
         if (false) {
             System.err.println(message);
         }
     }
-    
+
     @Override public boolean isElectric(char c) {
         FileType fileType = textArea.getFileType();
         if ((c == '#' || c == '<') && (fileType == FileType.C_PLUS_PLUS)) {
@@ -53,7 +53,7 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
         }
         return false;
     }
-    
+
     public boolean isBlockBegin(String activePartOfLine) {
         if (activePartOfLine.length() == 0) {
             return false;
@@ -66,11 +66,11 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
             return PBracketUtilities.isOpenBracket(lastChar);
         }
     }
-    
+
     public boolean isSwitchLabel(String activePartOfLine) {
         return activePartOfLine.matches("(case\\b.*|default\\s*):.*");
     }
-    
+
     /*
      * Returns the contents of the indexed line, after the following changes have been made:
      * 1: Any comment will have been replaced entirely with spaces.
@@ -87,7 +87,7 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
                 // Any lines which contain preprocessor stuff can be dropped for indentation purposes.
                 return "";
             }
-            if (segment.getStyle() == PStyle.COMMENT) {
+            if (segment.getStyle() == PStyle.COMMENT || segment.getStyle() == PStyle.HYPERLINK) {
                 // Ignore comments completely.  Just in case there's a /* */ comment in the middle of some code, we replace the
                 // comment string with the equivalent amount of whitespace, as the extra characters may have some effect on
                 // indentation if there's an open bracket after them.
@@ -111,7 +111,7 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
         }
         return StringUtilities.trimTrailingWhitespace(result.toString());
     }
-    
+
     public LinkedList<String> extractPreviousStatements(int lineIndex) {
         LinkedList<String> result = new LinkedList<String>();
         Stack<Character> brackets = new Stack<Character>();
@@ -170,11 +170,11 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
                     terminate = true;
                 }
             }
-            
+
         }
         return result;
     }
-    
+
     private static class Indent {
         // The 'openBracket' variable is either going to be:
         // '{' or '(' - an actual open bracket.
@@ -183,30 +183,30 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
         private final char openBracket;
         private final String indentation;
         private final String subIndent;
-        
+
         public Indent(char openBracket, String indentation, String subIndent) {
             this.openBracket = openBracket;
             this.indentation = indentation;
             this.subIndent = subIndent;
         }
-        
+
         public String toString() {
             return "Indent[char=" + openBracket + ", ilen=" + indentation.length() + ", sublen=" + subIndent.length() + "]";
         }
-        
+
         public char getOpenBracket() {
             return openBracket;
         }
-        
+
         public String getIndentation() {
             return indentation;
         }
-        
+
         public String getSubIndent() {
             return subIndent;
         }
     }
-    
+
     void printIndentStack(Stack<Indent> indents) {
         debug("Full indent stack:");
         for (Indent indent: indents) {
@@ -214,7 +214,7 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
         }
         debug("<<<");
     }
-    
+
     String calculateNewIndentation(LinkedList<String> previousStatements, String trimmedCurrentLine) {
         if (previousStatements.isEmpty()) {
             return "";
@@ -310,7 +310,7 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
             return indent.getIndentation() + indent.getSubIndent();
         }
     }
-    
+
     // Returns true if a continuation is needed, because 'line' is not terminated.
     // Note that in the case where the lowest element of indentLevels is a parenthesis, we
     // assume that if the last character in the line is a comma, this is a function argument
@@ -325,7 +325,7 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
         }
         return -1 == ":;}{(".indexOf(lastCh);
     }
-    
+
     private Indent dropTrailingCaseOrDefaultOrContinuationIndent(Stack<Indent> indentLevels) {
         Indent result = null;
         while (!indentLevels.empty()) {
@@ -338,23 +338,23 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
         }
         return result;
     }
-    
+
     private boolean alignFunctionArgs() {
         return preferences.getBoolean(ALIGN_FUNCTION_ARGS);
     }
-    
+
     private String getNamespaceIndent() {
         return preferences.getString(NAMESPACE_INDENT);
     }
-    
+
     private String getSwitchLabelOutdent() {
         return preferences.getString(SWITCH_LABEL_OUTDENT);
     }
-    
+
     private String getAccessSpecifierOutdent() {
         return preferences.getString(ACCESS_SPECIFIER_OUTDENT);
     }
-    
+
     private String getOpenBracketIndent(char ch) {
         switch (ch) {
         case '{':
@@ -369,7 +369,7 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
             return "";
         }
     }
-    
+
     /**
      * The 'indentation' is what's been worked out from the previous lines.
      * The 'trimmedLine' argument is all of the current line, but with any leading whitespace
@@ -390,7 +390,7 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
         }
         return removeIndent(indentation, indentToRemove);
     }
-    
+
     private String removeIndent(String indentation, String indentToRemove) {
         if (!indentToRemove.isEmpty()) {
             if (indentation.endsWith(indentToRemove)) {
@@ -399,7 +399,7 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
         }
         return indentation;
     }
-    
+
     // Overridden in the C++ indenter.
     protected boolean isAccessSpecifier(String activePartOfLine) {
         return false;
@@ -407,18 +407,18 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
     protected boolean isNamespace(String activePartOfLine) {
         return false;
     }
-    
+
     @Override public String calculateNewIndentation(int lineIndex) {
         debug("--------------------------------------------------------------------");
         FileType fileType = textArea.getFileType();
-        
+
         String activePartOfLine = getActivePartOfLine(lineIndex);
-        
+
         // A special case for C++'s preprocessor.
         if (fileType == FileType.C_PLUS_PLUS && activePartOfLine.startsWith("#")) {
             return "";
         }
-        
+
         // A special case for C++'s operator<<.
         if (fileType == FileType.C_PLUS_PLUS && activePartOfLine.startsWith("<<")) {
             if (lineIndex == 0) {
@@ -430,7 +430,7 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
                 return StringUtilities.nCopies(previousOperatorOutIndex, ' ');
             }
         }
-        
+
         // TODO: First, check if this line is within a multi-line comment, and if so, apply some comment-specific logic.
         // Then, fall back to the code case:
         LinkedList<String> previousStatements = extractPreviousStatements(lineIndex);
@@ -441,15 +441,15 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
         }
         debug(textArea.getLineContents(lineIndex));
         debug("=======================");
-        
+
         String trimmedLine = StringUtilities.trimLeadingWhitespace(textArea.getLineContents(lineIndex).toString());
         String newIndentation = calculateNewIndentation(previousStatements, trimmedLine);
         debug("Calculated new indentation:");
         debug(newIndentation + trimmedLine);
         String effectiveLine = extractEffectivePartOfLine(lineIndex);
-        
+
         return adjustedIndentationForCurrentLine(newIndentation, StringUtilities.trimLeadingWhitespace(effectiveLine));
     }
-    
+
     protected abstract boolean isLabel(String activePartOfLine);
 }
