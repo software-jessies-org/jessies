@@ -398,7 +398,7 @@ public:
     };
     
     // Once we've successfully opened a shared library, I think we're committed to trying to use it
-    // or else who knows what it's DLL entry point has done.
+    // or else who knows what its DLL entry point has done.
     // Until we've successfully opened it, though, we can keep trying alternatives.
     SharedLibraryHandle openWin32JvmLibrary() const {
         std::ostream& os = errorReporter.progressOStream;
