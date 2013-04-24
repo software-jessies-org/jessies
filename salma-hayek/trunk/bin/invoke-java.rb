@@ -6,6 +6,7 @@ require "set.rb"
 # Takes a POSIX pathname and turns it into a Win32 pathname if we're on Win32.
 # Returns the original pathname on any other OS.
 def convert_to_jvm_compatible_pathname(pathname)
+  pathname = pathname.to_s()
   if target_os() != "Cygwin"
     return pathname
   end
