@@ -57,7 +57,6 @@ end
 
 def filterBuildOutput(inputIo)
   lines = []
-  sawError = false
   while line = inputIo.gets()
     line = line.chomp()
     lines << line
