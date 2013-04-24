@@ -683,7 +683,7 @@ define MAKE_INSTALLER_FILE_LIST
   { \
     $(foreach file,$(patsubst $(PROJECT_ROOT)/%,%,$(FILES_TO_INSTALL)),echo $(file) &&) \
     find $(wildcard $(SUBDIRECTORIES_TO_INSTALL)) $(FIND_EXPRESSION_TO_IGNORE_REVISION_CONTROL_SYSTEM_DIRECTORY) -type f -print; \
-  } | ruby -ne 'chomp!(); puts("Including #{$$_}...")'
+  } | ruby -ne 'puts("Including #{$$_.chomp()}...")'
 endef
 
 # ----------------------------------------------------------------------------
