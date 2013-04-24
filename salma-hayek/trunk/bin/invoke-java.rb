@@ -68,17 +68,16 @@ class InAppClient
     end
     port = $2.to_i()
     secret = IO.read(@secretPathname)
-    require "net/telnet"
-    telnet = Net::Telnet.new("Host" => host, "Port" => port, "Telnetmode" => false)
-    telnet.puts(secret)
-    telnet.puts(command)
-    serverOutput = telnet.readlines()
+    socket = TCPSocket.new(host, port)
+    socket.puts(secret)
+    socket.puts(command)
+    serverOutput = socket.readlines()
     authentication_response = serverOutput.shift().chomp()
     if authentication_response != "Authentication OK"
       raise authentication_response
     end
     print(serverOutput.join(""))
-    telnet.close()
+    socket.close()
   end
   
   def trySendCommand(command)
@@ -92,7 +91,11 @@ class InAppClient
     sendCommandWithoutExceptionHandling(command)
     return true
   rescue Exception => ex
-    $stderr.puts(ex)
+    begin
+      $stderr.puts(ex)
+    rescue Errno::EPIPE
+      raise(ex)
+    end
     return false
   end
 end
