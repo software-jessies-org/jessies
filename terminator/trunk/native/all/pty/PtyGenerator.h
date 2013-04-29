@@ -131,11 +131,11 @@ private:
         int childFd = ptyGenerator.openSlave();
         close(ptyGenerator.masterFd);
 
-#if defined(TIOCSCTTY) && !defined(__sun__)
+#if defined(TIOCSCTTY) && !defined(__sun__) && !defined(__CYGWIN__)
         // The BSD approach is that the controlling terminal for a session is allocated by the session leader by issuing the TIOCSCTTY ioctl.
         // Solaris' termios.h 1.42 now includes a TIOCSCTTY definition, resulting in inappropriate ioctl errors.
         // Once upon a time, there was a suggestion in a comment that earlier SunOS versions might need to avoid this too.
-        // This code is believed unnecessary (now we get O_NOCTTY right) but harmless on Cygwin and Linux.
+        // This code is believed unnecessary (now we get O_NOCTTY right) but harmless on Linux.
         // We need to use this code on Mac OS, or we get an inappropriate ioctl error from the immediately following tcgetpgrp.
         // APUE says that FreeBSD needs it too.
         if (ioctl(childFd, TIOCSCTTY, 0) == -1) {
