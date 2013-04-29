@@ -19,7 +19,15 @@ def convert_to_jvm_compatible_pathname(pathname)
   cygpathCommand = "cygpath --windows '#{pathname}'"
   $stderr.puts("Running:")
   $stderr.puts(cygpathCommand)
-  cygpathOutput = `#{cygpathCommand} 2>&1`
+  cygpathOutput = nil
+  IO.popen("-") {
+    |io|
+    if io == nil
+      $stderr.reopen($stdout)
+      exec("cygpath", "--windows", pathname)
+    end
+    cygpathOutput = io.read()
+  }
   $stderr.puts("Produced:")
   $stderr.puts(cygpathOutput)
   $stderr.puts("Status was:")
