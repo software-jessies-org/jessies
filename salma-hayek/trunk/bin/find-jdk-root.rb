@@ -121,15 +121,28 @@ else
     # On Windows, it's likely that the only Java-related executables on the user's path are %WINDIR%\SYSTEM32\{java,javaw,javaws}.exe.
     # This is unfortunately true even if the user has a properly installed JDK.
     if target_os() == "Cygwin"
-      acceptableMajorVersions = [7, 6, 5]
-      acceptableMajorVersions.each() {
-        |majorVersion|
-        registryKeyFile = "/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Development Kit/1.#{majorVersion}/JavaHome"
-        if File.exists?(registryKeyFile)
-          contents = IO.read(registryKeyFile);
-          # Cygwin's representation of REG_SZ keys contains the null terminator.
-          return convertWindowsFilenameToUnix(contents.chomp("\0"))
+      choices = []
+      Dir.glob("/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Development Kit/1.*/JavaHome").each() {
+        |registryKeyFile|
+        if registryKeyFile.match(/\.(\d+)/) == nil
+          next
         end
+        version = $1.to_i()
+        # See -target in universal.make.
+        if version < 6
+          next
+        end
+        choices << [version, registryKeyFile]
+        end
+      }
+      choices.sort_by() {
+        |choice|
+        choice[0]
+      }.reverse().each() {
+        |version, registryKeyFile|
+        contents = IO.read(registryKeyFile);
+        # Cygwin's representation of REG_SZ keys contains the null terminator.
+        return convertWindowsFilenameToUnix(contents.chomp("\0"))
       }
     end
     
