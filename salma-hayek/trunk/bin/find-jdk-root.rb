@@ -133,7 +133,6 @@ else
           next
         end
         choices << [version, registryKeyFile]
-        end
       }
       choices.sort_by() {
         |choice|
