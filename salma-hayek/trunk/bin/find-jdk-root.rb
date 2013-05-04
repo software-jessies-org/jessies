@@ -121,7 +121,7 @@ else
     # On Windows, it's likely that the only Java-related executables on the user's path are %WINDIR%\SYSTEM32\{java,javaw,javaws}.exe.
     # This is unfortunately true even if the user has a properly installed JDK.
     if target_os() == "Cygwin"
-      acceptableMajorVersions = [6, 5]
+      acceptableMajorVersions = [7, 6, 5]
       acceptableMajorVersions.each() {
         |majorVersion|
         registryKeyFile = "/proc/registry/HKEY_LOCAL_MACHINE/SOFTWARE/JavaSoft/Java Development Kit/1.#{majorVersion}/JavaHome"
