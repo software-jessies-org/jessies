@@ -12,19 +12,22 @@ import java.util.List;
 import terminator.view.*;
 
 public class Terminator {
-    private static final Terminator INSTANCE = new Terminator();
+    private static Terminator instance;
     
     private TerminatorPreferences preferences;
     private Color boldForegroundColor;
     
     private Frames frames = new Frames();
     
-    public static Terminator getSharedInstance() {
-        return INSTANCE;
+    public static synchronized Terminator getSharedInstance() {
+        if (instance == null) {
+            instance = new Terminator();
+        }
+        return instance;
     }
     
     public static TerminatorPreferences getPreferences() {
-        return INSTANCE.preferences;
+        return getSharedInstance().preferences;
     }
     
     private Terminator() {
