@@ -24,7 +24,7 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
         ArrayList<Preference> result = super.getPreferences();
         result.add(new Preference(ALIGN_FUNCTION_ARGS, Boolean.TRUE, "Align args in multi-line function calls"));
         result.add(new Preference(NAMESPACE_INDENT, "", "Indent after C++ 'namespace xx {' lines"));
-        result.add(new Preference(BRACE_INDENT, "  ", "Indent after an open curly brace"));
+        result.add(new Preference(BRACE_INDENT, "    ", "Indent after an open curly brace"));
         result.add(new Preference(SQUARE_BRACKET_INDENT, "    ", "Indent after an open square bracket"));
         result.add(new Preference(PARENTHESIS_INDENT, "    ", "Indent after round brackets (also expression continuation)"));
         result.add(new Preference(SWITCH_LABEL_OUTDENT, "", "Outdent for 'case' and 'default' switch labels"));
