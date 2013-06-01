@@ -293,7 +293,7 @@ public class BuildUi extends JFrame {
                 final ProcessUtilities.ProcessListener processListener = new ProcessListener();
                 final ProcessUtilities.LineListener stdoutListener = new LineListener();
                 final ProcessUtilities.LineListener stderrListener = stdoutListener; // FIXME: differentiate the two streams. different colors?
-                final int status = ProcessUtilities.runCommand(null, ProcessUtilities.makeShellCommandArray(command), processListener, stdoutListener, stderrListener);
+                final int status = ProcessUtilities.runCommand(null, ProcessUtilities.makeShellCommandArray(command), processListener, "", stdoutListener, stderrListener);
                 EventQueue.invokeLater(new Runnable() {
                     public void run() {
                         buildFinished(status);
