@@ -60,14 +60,19 @@ public class ProcessUtilities {
      * Lines written to standard output are appended to 'lines'.
      * Lines written to standard error are appended to 'errors'.
      */
-    public static int backQuote(final File directory, final String[] command, final ArrayList<String> lines, final ArrayList<String> errors) {
+    public static int backQuote(final File directory, final String[] command, final String input, final ArrayList<String> lines, final ArrayList<String> errors) {
         if (lines == null) {
             throw new IllegalArgumentException("ArrayList 'lines' may not be null");
         }
         if (errors == null) {
             throw new IllegalArgumentException("ArrayList 'errors' may not be null");
         }
-        return backQuote(directory, command, new ArrayListLineListener(lines), new ArrayListLineListener(errors));
+        return backQuote(directory, command, input, new ArrayListLineListener(lines), new ArrayListLineListener(errors));
+    }
+    
+    // Tens of users were written before we supported providing input.
+    public static int backQuote(final File directory, final String[] command, final ArrayList<String> lines, final ArrayList<String> errors) {
+        return backQuote(directory, command, "", lines, errors);
     }
     
     /**
@@ -77,8 +82,8 @@ public class ProcessUtilities {
      *
      * If directory is null, the subprocess inherits our working directory.
      */
-    public static int backQuote(final File directory, final String[] commandArray, final LineListener outputLineListener, final LineListener errorLineListener) {
-        return runCommand(directory, commandArray, null, outputLineListener, errorLineListener);
+    public static int backQuote(final File directory, final String[] commandArray, final String input, final LineListener outputLineListener, final LineListener errorLineListener) {
+        return runCommand(directory, commandArray, null, input, outputLineListener, errorLineListener);
     }
     
     /**
@@ -89,7 +94,7 @@ public class ProcessUtilities {
      * 
      * If directory is null, the subprocess inherits our working directory.
      */
-    public static int runCommand(final File directory, final String[] commandArray, final ProcessListener processListener, final LineListener outputLineListener, final LineListener errorLineListener) {
+    public static int runCommand(final File directory, final String[] commandArray, final ProcessListener processListener, final String input, final LineListener outputLineListener, final LineListener errorLineListener) {
         List<String> command = Arrays.asList(commandArray);
         int status = 1; // FIXME: should we signal "something went wrong" more distinctively?
         try {
@@ -97,7 +102,19 @@ public class ProcessUtilities {
             if (processListener != null) {
                 processListener.processStarted(p);
             }
-            p.getOutputStream().close();
+            Thread inputWriterThread = new Thread(new Runnable() {
+                public void run() {
+                    try {
+                        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(p.getOutputStream(), "UTF-8"));
+                        out.append(input);
+                        out.flush();
+                        out.close();
+                    } catch (Exception ex) {
+                        feedExceptionToLineListener(errorLineListener, ex);
+                    }
+                }
+            }, "Process Input: " + shellQuotedFormOf(command));
+            inputWriterThread.start();
             Thread errorReaderThread = new Thread(new Runnable() {
                 public void run() {
                     readLinesFromStream(errorLineListener, p.getErrorStream());
@@ -105,6 +122,7 @@ public class ProcessUtilities {
             }, "Process Back-Quote: " + shellQuotedFormOf(command));
             errorReaderThread.start();
             readLinesFromStream(outputLineListener, p.getInputStream());
+            inputWriterThread.join();
             errorReaderThread.join();
             status = p.waitFor();
         } catch (Exception ex) {
