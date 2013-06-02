@@ -4,11 +4,12 @@ import com.apple.eawt.*;
 import e.gui.*;
 import e.util.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
 import java.util.List;
+import terminator.model.*;
 import terminator.view.*;
 
 public class Terminator {
@@ -101,6 +102,48 @@ public class Terminator {
         new InAppServer("Terminator", System.getProperty("org.jessies.terminator.serverPortFileName"), loopbackAddress, TerminatorServer.class, new TerminatorServer());
     }
     
+    public void flushBiggestScrollBuffer() {
+        TerminalModel victim = null;
+        for (TerminatorFrame frame : getFrames()) {
+            for (JTerminalPane pane : frame.getPanes()) {
+                TerminalModel candidate = pane.getTerminalView().getModel();
+                if (victim == null || candidate.getLineCount() > victim.getLineCount()) {
+                    victim = candidate;
+                }
+            }
+        }
+        if (victim == null) {
+            return;
+        }
+        victim.flushScrollBuffer();
+    }
+    
+    public void checkMemory() {
+        Runtime runtime = Runtime.getRuntime();
+        long neverUsedMemory = runtime.maxMemory() - runtime.totalMemory();
+        long availableMemory = runtime.freeMemory() + neverUsedMemory;
+        // By the time 90% of the memory is gone, we've ground to a halt.
+        if (availableMemory > runtime.maxMemory() / 2) {
+            return;
+        }
+        Log.warn("Available memory down to " + availableMemory + ", flushing biggest scroll buffer...");
+        flushBiggestScrollBuffer();
+        // Turning the scroll buffer to garbage won't necessarily cause it to be collected.
+        // If it's not collected, then we'll clear another scroll buffer, needlessly and again ineffectually.
+        runtime.gc();
+    }
+    
+    private void startMemoryMonitor() {
+        // When streaming blank lines, one check per minute wasn't enough to save us.
+        javax.swing.Timer timer = new javax.swing.Timer(5 * 1000, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                checkMemory();
+            }
+        });
+        timer.setRepeats(true);
+        timer.start();
+    }
+    
     /**
      * Returns whether we did whatever was requested.
      */
@@ -121,6 +164,7 @@ public class Terminator {
                 return false;
             }
             startTerminatorServer();
+            startMemoryMonitor();
             // We have no need to wait for the window to be closed.
         } finally {
             out.flush();

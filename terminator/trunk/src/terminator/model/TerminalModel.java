@@ -21,6 +21,7 @@ public class TerminalModel {
     private boolean insertMode = false;
     private ArrayList<Integer> tabPositions = new ArrayList<Integer>();
     private int maxLineWidth = width;
+    private int flushes = 0;
     
     // Used for reducing the number of lines changed events sent up to the view.
     private int firstLineChanged;
@@ -117,6 +118,15 @@ public class TerminalModel {
         // Redraw ourselves.
         view.repaint();
         checkInvariant();
+    }
+    
+    public void flushScrollBuffer() {
+        clearScrollBuffer();
+        ++ flushes;
+    }
+    
+    public int getFlushes() {
+        return flushes;
     }
     
     public void sizeChanged(Dimension sizeInChars) {
