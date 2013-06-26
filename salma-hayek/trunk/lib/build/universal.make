@@ -88,7 +88,7 @@ NATIVE_PATH_SEPARATOR.Cygwin = ";"
 NATIVE_PATH_SEPARATOR = $(NATIVE_PATH_SEPARATOR.$(TARGET_OS))
 
 convertToNativeFilename.$(TARGET_OS) = $(1)
-# javac is happy with forward slashes (as is the underlying Win32 API).
+# javac is happy with forward slashes (as is the underlying Windows API).
 convertToNativeFilename.Cygwin = $(shell cygpath --mixed $(1))
 convertToNativeFilenames = $(foreach file,$(1),'$(call convertToNativeFilename.$(TARGET_OS),$(file))')
 
@@ -613,7 +613,7 @@ PUBLISHABLE_INSTALLERS.$(MACHINE_PROJECT_NAME) = $(INSTALLERS)
 PUBLISHABLE_INSTALLERS.salma-hayek =
 PUBLISHABLE_INSTALLERS = $(PUBLISHABLE_INSTALLERS.$(MACHINE_PROJECT_NAME))
 
-# Among its many breakages, msiexec is more restrictive about slashes than Win32.
+# Among its many breakages, msiexec is more restrictive about slashes than Windows.
 NATIVE_NAME_FOR_MSI_INSTALLER := $(subst /,\,$(call convertToNativeFilenames,$(INSTALLER.msi)))
 
 # We copy the files we want to install into a directory tree whose layout mimics where they'll be installed.

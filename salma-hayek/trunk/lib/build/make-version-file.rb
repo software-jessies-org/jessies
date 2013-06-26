@@ -73,7 +73,7 @@ def getWorkingCopyVersion(directory)
   end
 end
 
-# Win32's installer's broken idea of "version number" forces us to have a
+# Windows's installer's broken idea of "version number" forces us to have a
 # version number of the form "a.b.c", and also forces us to ensure that
 # a <= 255, b <= 255, and c <= 65535. If we don't, upgrading (replacing an
 # old version with a new version) won't work. See here for the depressing

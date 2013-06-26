@@ -87,7 +87,7 @@ public class PKeyHandler implements KeyListener {
     
     private boolean isInsertableCharacter(KeyEvent e) {
         // On Mac OS, 'alt' is used to insert special characters (alt-3, for example, gives whichever of # and £ isn't on the key cap).
-        // On other systems, we should ignore keys typed with 'alt' down. GNOME and Win32 use 'alt' to traverse menus.
+        // On other systems, we should ignore keys typed with 'alt' down. GNOME and Windows use 'alt' to traverse menus.
         if (GuiUtilities.isMacOs() == false && e.isAltDown()) {
             return false;
         }

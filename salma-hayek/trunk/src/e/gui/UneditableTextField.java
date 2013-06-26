@@ -6,7 +6,7 @@ import javax.swing.border.*;
 
 /**
  * Implements various hacks to best approximate an uneditable text field.
- * Win32 used these heavily to show information that couldn't be edited while making it easy to copy the information.
+ * Windows used these heavily to show information that couldn't be edited while making it easy to copy the information.
  * A good idea that sadly didn't really catch on with the other platforms.
  */
 public class UneditableTextField extends JTextField {
@@ -16,8 +16,8 @@ public class UneditableTextField extends JTextField {
     
     public UneditableTextField(String initialValue) {
         super(initialValue);
-        // Text fields with setEditable(false) don't look very different on any platform but Win32.
-        // Win32 is the only platform that clearly distinguishes between all the combinations of editable and enabled.
+        // Text fields with setEditable(false) don't look very different on any platform but Windows.
+        // Windows is the only platform that clearly distinguishes between all the combinations of editable and enabled.
         // It's sadly unclear that those responsible for the other platforms even understand the distinction.
         // Although Cocoa makes a overly-subtle visual distinction, Apple's Java doesn't reproduce it.
         // As a work-around, we use a trick various Mac OS programs use: make the uneditable text fields look like labels.

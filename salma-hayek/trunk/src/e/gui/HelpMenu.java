@@ -48,7 +48,7 @@ public class HelpMenu {
         }
         
         if (GuiUtilities.isMacOs() == false) {
-            // GNOME and Win32 users expect a link to the application's about box on the help menu.
+            // GNOME and Windows users expect a link to the application's about box on the help menu.
             menu.addSeparator();
             menu.add(new AboutBoxAction());
         }

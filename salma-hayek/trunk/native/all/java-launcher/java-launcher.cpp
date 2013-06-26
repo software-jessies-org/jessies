@@ -246,7 +246,7 @@ public:
         std::string javaHome = readRegistryFile(registryPath);
         // It feels safer if we append the rest of the path in Windows format,
         // though we got away for years with a Windows path containing forward slashes.
-        // (We have some reason to believe that the UTF-16 Win32 file API doesn't support interchangable slashes
+        // (We have some reason to believe that the UTF-16 Windows file API doesn't support interchangeable slashes
         // and we'd like Cygwin to be UTF-16 below so it could present UTF-8 above.)
         std::string jreBin = javaHome + pathFromJavaHomeToJre + "\\bin";
         return jreBin;
@@ -400,7 +400,7 @@ public:
     // Once we've successfully opened a shared library, I think we're committed to trying to use it
     // or else who knows what its DLL entry point has done.
     // Until we've successfully opened it, though, we can keep trying alternatives.
-    SharedLibraryHandle openWin32JvmLibrary() const {
+    SharedLibraryHandle openWindowsJvmLibrary() const {
         std::ostream& os = errorReporter.progressOStream;
         os << "Trying to find ";
         os << sizeof(void*) * 8;
@@ -420,7 +420,7 @@ public:
                 os << std::endl;
             }
         }
-        throw std::runtime_error("openWin32JvmLibrary() failed");
+        throw std::runtime_error("openWindowsJvmLibrary() failed");
     }
     
     SharedLibraryHandle openJvmLibrary() const {
@@ -428,7 +428,7 @@ public:
         // FIXME: we might want to try examining the "Versions" directory instead, rather than assume this is suitable.
         return openSharedLibrary("/System/Library/Frameworks/JavaVM.framework/Versions/A/JavaVM");
 #elif defined(__CYGWIN__)
-        return openWin32JvmLibrary();
+        return openWindowsJvmLibrary();
 #else
         // This only works on Linux if LD_LIBRARY_PATH is already set up to include something like:
         // "$JAVA_HOME/jre/lib/$ARCH/" + jvmDirectory

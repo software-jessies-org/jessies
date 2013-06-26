@@ -8,7 +8,7 @@
 <p>(See also <a href="/salma-hayek/cygwin-problems.html">Cygwin-specific problems</a>.)
 
 <h2>What is Cygwin?</h2>
-<p>Cygwin is a Linux-like environment for MS Windows. You can read more about it on the <a href="http://www.cygwin.com">Cygwin home page</a>, but this page assumes you know what it is and have already decided that you want it. If you're a Unix user and you're stuck with a Win32 box, you probably do. It's quite a remarkable hack.
+<p>Cygwin is a Linux-like environment for MS Windows. You can read more about it on the <a href="http://www.cygwin.com">Cygwin home page</a>, but this page assumes you know what it is and have already decided that you want it. If you're a Unix user and you're stuck with a Windows box, you probably do. It's quite a remarkable hack.
 
 <h2>Installation</h2>
 <p>Download the <a href="http://www.cygwin.com/setup.exe">Cygwin setup.exe</a> (and keep it for later, because you'll want it to update your installation too). Run it now, and hit Next. Answer "Install from Internet" and hit Next. Answer "c:\cygwin", "All Users", "Unix / binary", and hit Next. I don't think the local package directory matters, so just hit Next. Hit Next again. Choose a nearby server and hit Next.
@@ -103,9 +103,9 @@ Note that the -d switch is necessary for domain users.
 
 <h3>Home directory</h3>
 
-<p>If you have a CIFS share on your real Unix box (via Samba, say), it is tempting to map that as a network drive (U:, say). You can then set the Win32 environment variable HOME to "U:\" and Cygwin will do the right thing, including running your existing login scripts. (You may want to have installed Perl and Ruby first, and you'll want to follow the usual rules when messing around with login scripts. In particular, keep a working window open at all times!)
+<p>If you have a CIFS share on your real Unix box (via Samba, say), it is tempting to map that as a network drive (U:, say). You can then set the Windows environment variable HOME to "U:\" and Cygwin will do the right thing, including running your existing login scripts. (You may want to have installed Perl and Ruby first, and you'll want to follow the usual rules when messing around with login scripts. In particular, keep a working window open at all times!)
 
-<p>You can set Win32 environment variables from the control panel. Double-click "System", click the "Advanced" tab, and click the "Environment Variables..." button. Click the upper "New..." button to create a new user variable.
+<p>You can set Windows environment variables from the control panel. Double-click "System", click the "Advanced" tab, and click the "Environment Variables..." button. Click the upper "New..." button to create a new user variable.
 
 <p>While you're there, add a variable called LANG, set to en_US.UTF-8.
 

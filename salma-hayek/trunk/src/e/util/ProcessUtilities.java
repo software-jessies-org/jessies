@@ -266,7 +266,7 @@ public class ProcessUtilities {
      * suitable for executing user input in a manner that's unsurprising to
      * the user.
      * 
-     * On Win32, cmd.exe is used as a command interpreter.
+     * On Windows, cmd.exe is used as a command interpreter.
      * 
      * On other operating systems (assumed to be Unixes), the SHELL environment
      * variable is queried. If this isn't set, a default of /bin/sh is used,

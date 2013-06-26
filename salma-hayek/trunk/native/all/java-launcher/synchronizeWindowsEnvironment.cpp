@@ -10,7 +10,7 @@ void synchronizeWindowsEnvironment() {
     // There is a limit (perhaps 32KiB) on the amount of native Windows environment that a process can have.
     // To side-step this limit for Cygwin programs, when a Cygwin program starts another Cygwin program,
     // it passes the environment through a non-native mechanism, leaving the native environment as it found it.
-    // Windows Java, perhaps in java.dll, seems to get its copy of the environment using the Win32 call
+    // Windows Java, perhaps in java.dll, seems to get its copy of the environment using the Windows call
     // GetEnvironmentStrings (rather than using any MSVCRT data, although that would be accessible to it).
     // So we need to synchronize the Windows environment with the Cygwin one, like cygcheck does.
     // More information, including mailing list links, is in the revision history.
