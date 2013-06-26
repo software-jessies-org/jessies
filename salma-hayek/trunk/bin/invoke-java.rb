@@ -3,7 +3,7 @@
 require "pathname.rb"
 require "set.rb"
 
-# Takes a POSIX pathname and turns it into a Win32 pathname if we're on Win32.
+# Takes a POSIX pathname and turns it into a Windows pathname if we're on Windows.
 # Returns the original pathname on any other OS.
 def convert_to_jvm_compatible_pathname(pathname)
   pathname = pathname.to_s()
@@ -13,7 +13,7 @@ def convert_to_jvm_compatible_pathname(pathname)
   
   # We used to call now-deprecated functions directly from cygwin1.dll.
   # That was in order to prevent cygpath causing a console window to flash up.
-  # That was only believed to be an issue when run from a non-console Win32 application.
+  # That was only believed to be an issue when run from a non-console Windows application.
   # Now our shortcuts run Ruby via ruby-launcher, a Cygwin application.
   # That program ensures that stdout and stderr are open, which I now think is the active ingredient.
   cygpathCommand = "cygpath --windows '#{pathname}'"
@@ -43,7 +43,7 @@ end
 def pathnames_to_path(pathnames)
   native_pathnames = pathnames.uniq().map() { |pathname| convert_to_jvm_compatible_pathname(pathname) }
   jvm_path_separator = File::PATH_SEPARATOR
-  # Cygwin's ruby's File::PATH_SEPARATOR is ':', but the Win32 JVM wants ';'.
+  # Cygwin's ruby's File::PATH_SEPARATOR is ':', but the Windows JVM wants ';'.
   if target_os() == "Cygwin"
     jvm_path_separator = ";"
   end
@@ -311,7 +311,7 @@ class Java
     if target_os() != "Darwin"
       # It's sometimes useful to have classes from "tools.jar".
       # It doesn't exist on Mac OS X but the classes are on the boot class path anyway.
-      # On Win32 it's likely that users don't have a JDK on their path, in
+      # On Windows it's likely that users don't have a JDK on their path, in
       # which case they probably aren't interested in running anything that
       # wouldn't work without "tools.jar", so we cope with not having found
       # a JDK.

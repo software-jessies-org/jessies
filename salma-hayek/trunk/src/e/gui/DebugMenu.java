@@ -70,7 +70,7 @@ public class DebugMenu {
         
         public void actionPerformed(ActionEvent e) {
             // We used to use WebLinkAction with a file: URL so that the user's default text viewer would be used.
-            // Sadly, on Win32, another process can't open the log file while we've got it open for writing, so we have to read it ourselves.
+            // Sadly, on Windows, another process can't open the log file while we've got it open for writing, so we have to read it ourselves.
             
             final PTextArea textArea = JFrameUtilities.makeTextArea("");
             

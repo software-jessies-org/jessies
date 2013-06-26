@@ -165,11 +165,11 @@ public class AboutBox {
     
     private void makeUi(final JDialog dialog) {
         if (GuiUtilities.isMacOs() == false) {
-            // GNOME and Win32 applications give their about boxes titles.
+            // GNOME and Windows applications give their about boxes titles.
             dialog.setTitle("About " + Log.getApplicationName());
         }
         
-        // FIXME: add GNOME and Win32 implementations.
+        // FIXME: add GNOME and Windows implementations.
         // http://developer.apple.com/documentation/UserExperience/Conceptual/OSXHIGuidelines/XHIGWindows/chapter_17_section_5.html#//apple_ref/doc/uid/20000961-TPXREF17
         
         // Mac OS font defaults.
@@ -179,7 +179,7 @@ public class AboutBox {
         Font linkFont = versionFont;
         
         if (GuiUtilities.isWindows()) {
-            // I don't think this is quite the right font, but it seems to be as close as we can get with the Win32 LAF.
+            // I don't think this is quite the right font, but it seems to be as close as we can get with the Windows LAF.
             applicationNameFont = versionFont = copyrightFont = linkFont = UIManager.getFont("MenuItem.font");
         } else if (GuiUtilities.isGtk()) {
             final float PANGO_SCALE_SMALL = (1.0f / 1.2f);
