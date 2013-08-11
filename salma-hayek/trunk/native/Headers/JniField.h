@@ -1,7 +1,8 @@
 #ifndef JNI_FIELD_H_included
 #define JNI_FIELD_H_included
 
-#include <jni.h>
+#include "PortableJni.h"
+
 #include <sstream>
 #include <stdexcept>
 #include <string>

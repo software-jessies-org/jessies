@@ -1,7 +1,8 @@
 #ifndef JNI_ERROR_H_included
 #define JNI_ERROR_H_included
 
-#include <jni.h>
+#include "PortableJni.h"
+
 #include <ostream>
 #include <string>
 

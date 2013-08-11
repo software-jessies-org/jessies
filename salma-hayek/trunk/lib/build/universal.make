@@ -350,7 +350,9 @@ MINGW_FLAGS.g++-3 += -mno-cygwin
 # With the newly packaged mingw compiler for Cygwin, cygwin-launcher failed to start
 # due to the absence of either libgcc_s_dw2-1.dll or libstdc++-6.dll.
 # http://stackoverflow.com/questions/4702732/the-program-cant-start-because-libgcc-s-dw2-1-dll-is-missing
-MINGW_FLAGS.i686-pc-mingw32-g++ += -static-libgcc -static-libstdc++
+MODERN_MINGW_FLAGS += -static-libgcc -static-libstdc++
+MINGW_FLAGS.i686-pc-mingw32-g++ += $(MODERN_MINGW_FLAGS)
+MINGW_FLAGS.x86_64-w64-mingw32-g++ += $(MODERN_MINGW_FLAGS)
 C_AND_CXX_FLAGS.Cygwin += $(if $(COMPILING_MINGW),$(MINGW_FLAGS.$(MINGW_COMPILER)))
 
 # Facilitate overriding for CXX that's conditional on a per-target, per-directory basis.
@@ -360,10 +362,12 @@ CXX = $(CXX.$(TARGET_OS))
 
 # Cygwin 1.7 has a g++-4 which can be installed as the default compiler.
 # Its compiler driver has no -mno-cygwin option.
-MINGW_COMPILER = g++-3
+MINGW_COMPILER.i386 = g++-3
 # The newly packaged cross-compiler isn't available in 1.7.7.
-# We have trouble forking after loading the JVM in later versions.
-#MINGW_COMPILER = i686-pc-mingw32-g++
+# We had trouble forking after loading the JVM in versions between there and 1.7.21.
+#MINGW_COMPILER.i386 = i686-pc-mingw32-g++
+MINGW_COMPILER.amd64 = x86_64-w64-mingw32-g++
+MINGW_COMPILER = $(MINGW_COMPILER.$(TARGET_ARCHITECTURE))
 CXX.Cygwin = $(if $(COMPILING_MINGW),$(MINGW_COMPILER),$(DEFAULT_CXX))
 
 # Mac OS 10.6 ships with gcc 4.2.1 as the default but, until we want to drop 10.4, we need headers like /Developer/SDKs/MacOSX10.4u.sdk/usr/include/c++/4.0.0/sstream
@@ -860,6 +864,7 @@ $(INSTALLER.gz): $(MACHINE_PROJECT_NAME).app
 	PRODUCT_GUID=$(makeGuid) \
 	SHORTCUT_GUID=$(makeGuid) \
 	STANDARD_FILES_GUID=$(makeGuid) \
+	TARGET_DIRECTORY=$(TARGET_DIRECTORY) \
 	UPGRADE_GUID=$(UPGRADE_GUID) \
 	VERSION_STRING=$(VERSION_STRING) \
 	candle -nologo -out $(call convertToNativeFilenames,$@ $<)

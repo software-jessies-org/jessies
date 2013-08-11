@@ -36,16 +36,16 @@
         <!-- This key is in HKCU deliberately to pass ICE43 -->
         <!-- http://forum.installsite.net/index.php?showtopic=15661 says that we need to keep this hack if we ever want the shortcut to be optional -->
         <Registry Id='ShortcutRegistryKey' Root='HKCU' Key='Software\software.jessies.org\$(env.MACHINE_PROJECT_NAME)' Name='ShortcutTarget' Action='write' Type='string' KeyPath='yes' />
-        <Shortcut Id='ShortcutShortcut' Directory='DesktopFolder' Name='Name' LongName='$(env.HUMAN_PROJECT_NAME)' Target='[Resources]salma-hayek\.generated\i386_Cygwin\bin\cygwin-launcher' Arguments='"[projectResources]bin\$(env.MACHINE_PROJECT_NAME)"' WorkingDirectory='DesktopFolder' Icon='$(env.MACHINE_PROJECT_NAME).ico' />
+        <Shortcut Id='ShortcutShortcut' Directory='DesktopFolder' Name='Name' LongName='$(env.HUMAN_PROJECT_NAME)' Target='[Resources]salma-hayek\.generated\$(env.TARGET_DIRECTORY)\bin\cygwin-launcher' Arguments='"[projectResources]bin\$(env.MACHINE_PROJECT_NAME)"' WorkingDirectory='DesktopFolder' Icon='$(env.MACHINE_PROJECT_NAME).ico' />
       </Component>
       <Component Id='OpenHere' Guid='$(env.OPEN_HERE_GUID)'>
         <!-- Orca warns that this is wrong. -->
         <!-- ICE33,WARNING,Reg key RegistryKey_OpenHere_Drive is used in an unsupported way. Shell extension verbs info should be registered via the Verb table. This entry may overwrite a value created through that table. -->
         <!-- I failed to find any example of a WiX installer creating an association with directories (or "drives"). -->
         <Registry Id='RegistryKey_OpenHere_Directory' Root='HKCR' Key='Directory\shell\$(env.MACHINE_PROJECT_NAME)' Action='write' Type='string' Value='Open $(env.HUMAN_PROJECT_NAME) Here' />
-        <Registry Id='RegistryKey_OpenHere_Directory_command' Root='HKCR' Key='Directory\shell\$(env.MACHINE_PROJECT_NAME)\command' Action='write' Type='string' Value='"[Resources]salma-hayek\.generated\i386_Cygwin\bin\cygwin-launcher.exe" "[projectResources]bin\$(env.MACHINE_PROJECT_NAME)" --working-directory "%L"' />
+        <Registry Id='RegistryKey_OpenHere_Directory_command' Root='HKCR' Key='Directory\shell\$(env.MACHINE_PROJECT_NAME)\command' Action='write' Type='string' Value='"[Resources]salma-hayek\.generated\$(env.TARGET_DIRECTORY)\bin\cygwin-launcher.exe" "[projectResources]bin\$(env.MACHINE_PROJECT_NAME)" --working-directory "%L"' />
         <Registry Id='RegistryKey_OpenHere_Drive' Root='HKCR' Key='Drive\shell\$(env.MACHINE_PROJECT_NAME)' Action='write' Type='string' Value='Open $(env.HUMAN_PROJECT_NAME) Here' />
-        <Registry Id='RegistryKey_OpenHere_Drive_command' Root='HKCR' Key='Drive\shell\$(env.MACHINE_PROJECT_NAME)\command' Action='write' Type='string' Value='"[Resources]salma-hayek\.generated\i386_Cygwin\bin\cygwin-launcher.exe" "[projectResources]bin\$(env.MACHINE_PROJECT_NAME)" --working-directory "%L"' />
+        <Registry Id='RegistryKey_OpenHere_Drive_command' Root='HKCR' Key='Drive\shell\$(env.MACHINE_PROJECT_NAME)\command' Action='write' Type='string' Value='"[Resources]salma-hayek\.generated\$(env.TARGET_DIRECTORY)\bin\cygwin-launcher.exe" "[projectResources]bin\$(env.MACHINE_PROJECT_NAME)" --working-directory "%L"' />
       </Component>
     </Directory>
     <!-- I want to keep this as a separate feature in case we ever cave-in to having an installation dialog -->

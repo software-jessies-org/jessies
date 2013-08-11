@@ -32,7 +32,8 @@ public class JavaHpp {
         out.println("#ifndef " + includeGuardName);
         out.println("#define " + includeGuardName);
         
-        out.println("#include <jni.h>");
+        out.println("#include \"PortableJni.h\"");
+
         out.println("#include <JniField.h>");
         out.println("#include <stdexcept>");
         
