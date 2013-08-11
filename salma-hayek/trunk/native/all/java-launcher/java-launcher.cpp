@@ -13,12 +13,12 @@
 #include "JniError.h"
 #include "JniString.h"
 #include "join.h"
+#include "PortableJni.h"
 #include "reportFatalErrorViaGui.h"
 #include "synchronizeWindowsEnvironment.h"
 #include "WindowsDirectoryChange.h"
 #include "WindowsDllErrorModeChange.h"
-
-#include <jni.h>
+#include "WindowsError.h"
 
 #include <algorithm>
 #include <deque>
@@ -168,6 +168,7 @@ SharedLibraryHandle openSharedLibrary(const std::string& sharedLibraryFilename) 
     // This could cause a problem if we try to load an amd64 DLL before going on to try to load an i386 DLL.
     // At least it would be an overt problem rather than the silent failure we got when MSVCR71.DLL wasn't in the current directory and wasn't on the PATH.
     WindowsDllErrorModeChange windowsDllErrorModeChange;
+    std::ostringstream os;
 #if defined(__CYGWIN__)
     // As of winsup/cygwin/dlfcn.cc revision 1.41, dlopen uses LoadLibraryW.
     // The code to generate wide character filenames prepends \\?\.
@@ -186,14 +187,15 @@ SharedLibraryHandle openSharedLibrary(const std::string& sharedLibraryFilename) 
     // nor do we need an LD_LIBRARY_PATH search.
     // dlopen doesn't currently do anything clever with the returned value.
     void* sharedLibraryHandle = LoadLibrary(sharedLibraryFilename.c_str());
+    if (sharedLibraryHandle == 0) {
+        DWORD lastError = GetLastError();
 #else
     void* sharedLibraryHandle = dlopen(sharedLibraryFilename.c_str(), RTLD_LAZY);
-#endif
     if (sharedLibraryHandle == 0) {
-        std::ostringstream os;
         os << "dlopen(\"" << sharedLibraryFilename << "\") failed with " << dlerror() << ".";
+#endif
         os << std::endl;
-        os << "If you can't otherwise explain why that call failed, consider whether all of the shared libraries";
+        os << "If you can't otherwise explain why this call failed, consider whether all of the shared libraries";
         os << " used by this shared library can be found.";
         os << std::endl;
 #if defined(__CYGWIN__)
@@ -201,8 +203,11 @@ SharedLibraryHandle openSharedLibrary(const std::string& sharedLibraryFilename) 
         os << std::endl;
         os << "objdump -p \"" << sharedLibraryFilename << "\" | grep DLL";
         os << std::endl;
-#endif
+        os << "LoadLibrary(\"" << sharedLibraryFilename << "\")";
+        throw WindowsError(os.str(), lastError);
+#else
         throw std::runtime_error(os.str());
+#endif
     }
     return sharedLibraryHandle;
 }
@@ -266,55 +271,90 @@ public:
     }
 };
 
-struct JvmLocation {
-private:
-    std::string jvmDirectory;
-    
-public:
-    typedef std::vector<JvmRegistryKey> JvmRegistryKeys;
-    
-    bool isUnreasonableVersion(std::ostream& os, const std::string& version) const {
-        if (version.empty() || isdigit(version[0]) == false) {
-            // Avoid "CurrentVersion", "BrowserJavaVersion", or anything else Sun might think of.
-            // The registry keys and Sun's installer's behavior regarding them is documented at:
-            // http://java.sun.com/j2se/1.5.0/runtime_windows.html
-            // The first claim on that page (that "CurrentVersion" is the highest-numbered version ever installed) appears to be the true claim.
-            os << "\"";
-            os << version;
-            os << "\" is not a number";
-            os << std::endl;
-            return true;
-        }
-        if (version < "1.6") {
-            os << version;
-            os << " is too old";
-            os << std::endl;
-            return true;
-        }
-        static const char* endLimit = getenv("ORG_JESSIES_LAUNCHER_JVM_LIMIT");
-        if (endLimit != 0 && version >= endLimit) {
-            os << version;
-            os << " is too new";
-            os << std::endl;
-            return true;
-        }
-        return false;
+typedef std::vector<JvmRegistryKey> JvmRegistryKeys;
+
+bool isUnreasonableVersion(std::ostream& os, const std::string& version) {
+    if (version.empty() || isdigit(version[0]) == false) {
+        // Avoid "CurrentVersion", "BrowserJavaVersion", or anything else Sun might think of.
+        // The registry keys and Sun's installer's behavior regarding them is documented at:
+        // http://java.sun.com/j2se/1.5.0/runtime_windows.html
+        // The first claim on that page (that "CurrentVersion" is the highest-numbered version ever installed) appears to be the true claim.
+        os << "\"";
+        os << version;
+        os << "\" is not a number";
+        os << std::endl;
+        return true;
     }
-    
-    void findVersionsInRegistry(std::ostream& os, JvmRegistryKeys& jvmRegistryKeys, const std::string& registryPath, const char* pathFromJavaHomeToJre) const {
-        os << "Looking for registered JVMs under \"";
-        os << registryPath;
+    if (version < "1.6") {
+        os << version;
+        os << " is too old";
+        os << std::endl;
+        return true;
+    }
+    static const char* endLimit = getenv("ORG_JESSIES_LAUNCHER_JVM_LIMIT");
+    if (endLimit != 0 && version >= endLimit) {
+        os << version;
+        os << " is too new";
+        os << std::endl;
+        return true;
+    }
+    return false;
+}
+
+void findVersionsInRegistry(std::ostream& os, JvmRegistryKeys& jvmRegistryKeys, const std::string& registryPath, const char* pathFromJavaHomeToJre) {
+    os << "Looking for registered JVMs under \"";
+    os << registryPath;
+    os << "\" [";
+    os << std::endl;
+    try {
+        for (DirectoryIterator it(registryPath); it.isValid(); ++ it) {
+            std::string version = it->getName();
+            if (isUnreasonableVersion(os, version)) {
+                continue;
+            }
+            JvmRegistryKey jvmRegistryKey(registryPath, version, pathFromJavaHomeToJre);
+            jvmRegistryKeys.push_back(jvmRegistryKey);
+        }
+    } catch (const std::exception& ex) {
+        os << ex.what();
+        os << std::endl;
+    }
+    os << "]";
+    os << std::endl;
+}
+
+SharedLibraryHandle tryVersions(const char* jvmDirectory, HKEY hive, const char* javaVendor, const char* jdkName, const char* jreName) {
+    const std::string registryPrefix = "/proc/registry/" + toString(hive) + "/SOFTWARE/" + javaVendor + "/";
+    const std::string jreRegistryPath = registryPrefix + jreName;
+    const std::string jdkRegistryPath = registryPrefix + jdkName;
+    std::ostream& os = errorReporter.progressOStream;
+    JvmRegistryKeys jvmRegistryKeys;
+    findVersionsInRegistry(os, jvmRegistryKeys, jreRegistryPath, "");
+    // My Sun JDK key says:
+    // "JavaHome"="C:\\Program Files\\Java\\jdk1.5.0_06"
+    // Jesse Kriss's IBM JDK has an appended "jre" component:
+    // "JavaHome"="C:\\Program Files\\IBM\\Java50\\jre"
+    findVersionsInRegistry(os, jvmRegistryKeys, jdkRegistryPath, "\\jre");
+    std::sort(jvmRegistryKeys.begin(), jvmRegistryKeys.end());
+    while (jvmRegistryKeys.empty() == false) {
+        JvmRegistryKey jvmRegistryKey = jvmRegistryKeys.back();
+        jvmRegistryKeys.pop_back();
+        os << "Trying \"";
+        os << jvmRegistryKey;
         os << "\" [";
         os << std::endl;
         try {
-            for (DirectoryIterator it(registryPath); it.isValid(); ++ it) {
-                std::string version = it->getName();
-                if (isUnreasonableVersion(os, version)) {
-                    continue;
-                }
-                JvmRegistryKey jvmRegistryKey(registryPath, version, pathFromJavaHomeToJre);
-                jvmRegistryKeys.push_back(jvmRegistryKey);
-            }
+            std::string jreBin = jvmRegistryKey.readJreBin();
+            // JRE 6 distributes msvcr71.dll in the same directory as java.exe.
+            // At least one installation of Windows XP doesn't have this DLL in its %SystemDir%.
+            // That looks like the way of the future.
+            // Windows looks for DLLs in the current directory (among other places).
+            // Modern Cygwin's chdir doesn't change the Windows current directory.
+            // We need to put the current directory back afterwards otherwise we break javahpp
+            // and any other Java applications which care about the current directory.
+            WindowsDirectoryChange windowsDirectoryChange(jreBin);
+            std::string jvmLocation = jreBin + "\\" + jvmDirectory + "\\jvm.dll";
+            return openSharedLibrary(jvmLocation);
         } catch (const std::exception& ex) {
             os << ex.what();
             os << std::endl;
@@ -322,127 +362,121 @@ public:
         os << "]";
         os << std::endl;
     }
-    
-    SharedLibraryHandle openJvmLibraryUsingSpecificRegistryHive(HKEY hive, const char* javaVendor, const char* jdkName, const char* jreName) const {
-        const std::string registryPrefix = "/proc/registry/" + toString(hive) + "/SOFTWARE/" + javaVendor + "/";
-        const std::string jreRegistryPath = registryPrefix + jreName;
-        const std::string jdkRegistryPath = registryPrefix + jdkName;
-        std::ostream& os = errorReporter.progressOStream;
-        JvmRegistryKeys jvmRegistryKeys;
-        findVersionsInRegistry(os, jvmRegistryKeys, jreRegistryPath, "");
-        // My Sun JDK key says:
-        // "JavaHome"="C:\\Program Files\\Java\\jdk1.5.0_06"
-        // Jesse Kriss's IBM JDK has an appended "jre" component:
-        // "JavaHome"="C:\\Program Files\\IBM\\Java50\\jre"
-        findVersionsInRegistry(os, jvmRegistryKeys, jdkRegistryPath, "\\jre");
-        std::sort(jvmRegistryKeys.begin(), jvmRegistryKeys.end());
-        while (jvmRegistryKeys.empty() == false) {
-            JvmRegistryKey jvmRegistryKey = jvmRegistryKeys.back();
-            jvmRegistryKeys.pop_back();
-            os << "Trying \"";
-            os << jvmRegistryKey;
-            os << "\" [";
-            os << std::endl;
-            try {
-                std::string jreBin = jvmRegistryKey.readJreBin();
-                // JRE 6 distributes msvcr71.dll in the same directory as java.exe.
-                // At least one installation of Windows XP doesn't have this DLL in its %SystemDir%.
-                // That looks like the way of the future.
-                // Windows looks for DLLs in the current directory (among other places).
-                // Modern Cygwin's chdir doesn't change the Windows current directory.
-                // We need to put the current directory back afterwards otherwise we break javahpp
-                // and any other Java applications which care about the current directory.
-                WindowsDirectoryChange windowsDirectoryChange(jreBin);
-                std::string jvmLocation = jreBin + "\\" + jvmDirectory + "\\jvm.dll";
-                return openSharedLibrary(jvmLocation);
-            } catch (const std::exception& ex) {
-                os << ex.what();
-                os << std::endl;
-            }
-            os << "]";
+    std::ostringstream errorOStream;
+    errorOStream << "tryVersions(\"" << jvmDirectory << "\", " << hive << ", " << javaVendor << ", " << jdkName << ", " << jreName << ") failed";
+    throw std::runtime_error(errorOStream.str());
+}
+
+SharedLibraryHandle tryHives(const char* jvmDirectory, const char* javaVendor, const char* jdkName, const char* jreName) {
+    typedef std::deque<HKEY> Hives;
+    Hives hives;
+    hives.push_back(HKEY_CURRENT_USER);
+    hives.push_back(HKEY_LOCAL_MACHINE);
+    for (Hives::const_iterator it = hives.begin(), en = hives.end(); it != en; ++ it) {
+        HKEY hive = *it;
+        try {
+            return tryVersions(jvmDirectory, hive, javaVendor, jdkName, jreName);
+        } catch (const std::exception& ex) {
+            std::ostream& os = errorReporter.progressOStream;
+            os << ex.what();
             os << std::endl;
         }
-        std::ostringstream errorOStream;
-        errorOStream << "openJvmLibraryUsingSpecificRegistryHive(" << hive << ", " << javaVendor << ", " << jdkName << ", " << jreName << ") failed";
-        throw std::runtime_error(errorOStream.str());
     }
+    std::ostringstream os;
+    os << "tryHives(\"" << jvmDirectory << "\", " << javaVendor << ", " << jdkName << ", " << jreName << ") failed";
+    throw std::runtime_error(os.str());
+}
+
+struct JavaVendorRegistryLocation {
+    const char* javaVendor;
+    const char* jdkName;
+    const char* jreName;
     
-    SharedLibraryHandle openJvmLibraryUsingRegistry(const char* javaVendor, const char* jdkName, const char* jreName) const {
-        typedef std::deque<HKEY> Hives;
-        Hives hives;
-        hives.push_back(HKEY_CURRENT_USER);
-        hives.push_back(HKEY_LOCAL_MACHINE);
-        for (Hives::const_iterator it = hives.begin(), en = hives.end(); it != en; ++ it) {
-            HKEY hive = *it;
-            try {
-                return openJvmLibraryUsingSpecificRegistryHive(hive, javaVendor, jdkName, jreName);
-            } catch (const std::exception& ex) {
-                std::ostream& os = errorReporter.progressOStream;
-                os << ex.what();
-                os << std::endl;
-            }
-        }
-        std::ostringstream os;
-        os << "openJvmLibraryUsingRegistry(" << javaVendor << ", " << jdkName << ", " << jreName << ") failed";
-        throw std::runtime_error(os.str());
-    }
-        
-    struct JavaVendorRegistryLocation {
-        const char* javaVendor;
-        const char* jdkName;
-        const char* jreName;
-        
-        JavaVendorRegistryLocation(const char* javaVendor0, const char* jdkName0, const char* jreName0)
-        : javaVendor(javaVendor0), jdkName(jdkName0), jreName(jreName0) {
-        }
-    };
-    
-    // Once we've successfully opened a shared library, I think we're committed to trying to use it
-    // or else who knows what its DLL entry point has done.
-    // Until we've successfully opened it, though, we can keep trying alternatives.
-    SharedLibraryHandle openWindowsJvmLibrary() const {
-        std::ostream& os = errorReporter.progressOStream;
-        os << "Trying to find ";
-        os << sizeof(void*) * 8;
-        os << " bit jvm.dll - we need a 1.6 or newer JRE or JDK.";
-        os << std::endl;
-        os << "Error messages were:";
-        os << std::endl;
-        typedef std::deque<JavaVendorRegistryLocation> JavaVendorRegistryLocations;
-        JavaVendorRegistryLocations javaVendorRegistryLocations;
-        javaVendorRegistryLocations.push_back(JavaVendorRegistryLocation("JavaSoft", "Java Development Kit", "Java Runtime Environment"));
-        javaVendorRegistryLocations.push_back(JavaVendorRegistryLocation("IBM", "Java Development Kit", "Java2 Runtime Environment"));
-        for (JavaVendorRegistryLocations::const_iterator it = javaVendorRegistryLocations.begin(); it != javaVendorRegistryLocations.end(); ++ it) {
-            try {
-                return openJvmLibraryUsingRegistry(it->javaVendor, it->jdkName, it->jreName);
-            } catch (const std::exception& ex) {
-                os << ex.what();
-                os << std::endl;
-            }
-        }
-        throw std::runtime_error("openWindowsJvmLibrary() failed");
-    }
-    
-    SharedLibraryHandle openJvmLibrary() const {
-#if defined(__APPLE__)
-        // FIXME: we might want to try examining the "Versions" directory instead, rather than assume this is suitable.
-        return openSharedLibrary("/System/Library/Frameworks/JavaVM.framework/Versions/A/JavaVM");
-#elif defined(__CYGWIN__)
-        return openWindowsJvmLibrary();
-#else
-        // This only works on Linux if LD_LIBRARY_PATH is already set up to include something like:
-        // "$JAVA_HOME/jre/lib/$ARCH/" + jvmDirectory
-        // "$JAVA_HOME/jre/lib/$ARCH"
-        // "$JAVA_HOME/jre/../lib/$ARCH"
-        // Where $ARCH is "i386" rather than `arch`.
-        return openSharedLibrary("libjvm.so");
-#endif
-    }
-    
-    explicit JvmLocation(bool isClient) {
-        jvmDirectory = isClient ? "client" : "server";
+    JavaVendorRegistryLocation(const char* javaVendor0, const char* jdkName0, const char* jreName0)
+    : javaVendor(javaVendor0), jdkName(jdkName0), jreName(jreName0) {
     }
 };
+
+SharedLibraryHandle tryVendors(const char* jvmDirectory) {
+    typedef std::deque<JavaVendorRegistryLocation> JavaVendorRegistryLocations;
+    JavaVendorRegistryLocations javaVendorRegistryLocations;
+    javaVendorRegistryLocations.push_back(JavaVendorRegistryLocation("JavaSoft", "Java Development Kit", "Java Runtime Environment"));
+    javaVendorRegistryLocations.push_back(JavaVendorRegistryLocation("IBM", "Java Development Kit", "Java2 Runtime Environment"));
+    for (JavaVendorRegistryLocations::const_iterator it = javaVendorRegistryLocations.begin(); it != javaVendorRegistryLocations.end(); ++ it) {
+        try {
+            return tryHives(jvmDirectory, it->javaVendor, it->jdkName, it->jreName);
+        } catch (const std::exception& ex) {
+            std::ostream& os = errorReporter.progressOStream;
+            os << ex.what();
+            os << std::endl;
+        }
+    }
+    std::ostringstream os;
+    os << "tryVendors(\"" << jvmDirectory << "\") failed";
+    throw std::runtime_error(os.str());
+}
+
+SharedLibraryHandle tryDirectories(bool isClient, bool isServer) {
+    typedef std::deque<const char*> JvmDirectories;
+    JvmDirectories jvmDirectories;
+    if (isClient == false && isServer == false) {
+        isClient = true;
+        isServer = true;
+    }
+    if (isClient) {
+        jvmDirectories.push_back("client");
+    }
+    if (isServer) {
+        jvmDirectories.push_back("server");
+    }
+    for (JvmDirectories::const_iterator it = jvmDirectories.begin(), en = jvmDirectories.end(); it != en; ++ it) {
+        const char* jvmDirectory = *it;
+        try {
+            return tryVendors(jvmDirectory);
+        } catch (const std::exception& ex) {
+            std::ostream& os = errorReporter.progressOStream;
+            os << ex.what();
+            os << std::endl;
+        }
+    }
+    std::ostringstream os;
+    os << "tryDirectories(" << isClient << ", " << isServer << ") failed";
+    throw std::runtime_error(os.str());
+}
+
+// Once we've successfully opened a shared library, I think we're committed to trying to use it
+// or else who knows what its DLL entry point has done.
+// Until we've successfully opened it, though, we can keep trying alternatives.
+SharedLibraryHandle openWindowsJvmLibrary(bool isClient, bool isServer) {
+    std::ostream& os = errorReporter.progressOStream;
+    os << "Trying to find ";
+    os << sizeof(void*) * 8;
+    os << " bit jvm.dll - we need a 1.6 or newer JRE or JDK.";
+    os << std::endl;
+    os << "Error messages were:";
+    os << std::endl;
+    return tryDirectories(isClient, isServer);
+}
+
+SharedLibraryHandle openJvmLibrary(bool isClient, bool isServer) {
+#if defined(__APPLE__)
+    (void) isClient;
+    (void) isServer;
+    // FIXME: we might want to try examining the "Versions" directory instead, rather than assume this is suitable.
+    return openSharedLibrary("/System/Library/Frameworks/JavaVM.framework/Versions/A/JavaVM");
+#elif defined(__CYGWIN__)
+    return openWindowsJvmLibrary(isClient, isServer);
+#else
+    (void) isClient;
+    (void) isServer;
+    // This only works on Linux if LD_LIBRARY_PATH is already set up to include something like:
+    // "$JAVA_HOME/jre/lib/$ARCH/" + jvmDirectory
+    // "$JAVA_HOME/jre/lib/$ARCH"
+    // "$JAVA_HOME/jre/../lib/$ARCH"
+    // Where $ARCH is "i386" rather than `arch`.
+    return openSharedLibrary("libjvm.so");
+#endif
+}
 
 bool startsWith(const std::string& st, const std::string& prefix) {
     return st.substr(0, prefix.size()) == prefix;
@@ -470,6 +504,7 @@ class LauncherArgumentParser {
 private:
     Properties properties;
     bool isClient;
+    bool isServer;
     NativeArguments jvmArguments;
     std::string className;
     NativeArguments mainArguments;
@@ -479,7 +514,8 @@ public:
         properties.parse(launcherArguments);
         // Try to set the mailing list address before reporting errors.
         errorReporter.supportAddress = properties["e.gui.HelpMenu.supportAddress"];
-        isClient = true;
+        isClient = false;
+        isServer = false;
         NativeArguments::const_iterator it = launcherArguments.begin();
         NativeArguments::const_iterator end = launcherArguments.end();
         while (it != end && startsWith(*it, "-")) {
@@ -494,7 +530,7 @@ public:
             } else if (option == "-client") {
                 isClient = true;
             } else if (option == "-server") {
-                isClient = false;
+                isServer = true;
             } else if (startsWith(option, "-Xdock:name=")) {
                 setAppVariableFromOption("NAME", option);
             } else if (startsWith(option, "-Xdock:icon=")) {
@@ -534,8 +570,7 @@ public:
         if (jvmSharedLibrary != 0) {
             return openSharedLibrary(jvmSharedLibrary);
         }
-        JvmLocation jvmLocation(isClient);
-        return jvmLocation.openJvmLibrary();
+        return ::openJvmLibrary(isClient, isServer);
     }
     
     NativeArguments getJvmArguments() const {
