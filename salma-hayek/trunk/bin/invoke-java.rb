@@ -295,7 +295,8 @@ class Java
     # sysconf(_SC_PHYS_PAGES) * sysconf(_SC_PAGESIZE) on Solaris?
     @heap_size = "1g"
     if target_os() == "Cygwin"
-      @heap_size = "512m"
+      # 512m makes vmxp-martind issue JVM aborted even during javahpp.
+      @heap_size = "256m"
     end
   end
 
