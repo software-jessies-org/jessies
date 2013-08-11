@@ -364,7 +364,7 @@ CXX = $(CXX.$(TARGET_OS))
 # Its compiler driver has no -mno-cygwin option.
 MINGW_COMPILER.i386 = g++-3
 # The newly packaged cross-compiler isn't available in 1.7.7.
-# We had trouble forking after loading the JVM in versions between there and 1.7.21.
+# We had trouble forking after loading the JVM in versions between there and 1.7.18.
 #MINGW_COMPILER.i386 = i686-pc-mingw32-g++
 MINGW_COMPILER.amd64 = x86_64-w64-mingw32-g++
 MINGW_COMPILER = $(MINGW_COMPILER.$(TARGET_ARCHITECTURE))
