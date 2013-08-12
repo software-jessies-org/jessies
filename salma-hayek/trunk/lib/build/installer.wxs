@@ -15,7 +15,7 @@
     <Media Id='1' Cabinet='project.cab' EmbedCab='yes' />
 
     <Directory Id='TARGETDIR' Name='SourceDir'>
-      <Directory Id='ProgramFilesFolder' Name='Program Files'>
+      <Directory Id='$(env.ProgramFilesFolder)' Name='Program Files'>
         <Directory Id='company' Name='software.jessies.org'>
           <Directory Id='product' Name='$(env.MACHINE_PROJECT_NAME)'>
             <?include component-definitions.wxi ?>
