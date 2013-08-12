@@ -435,6 +435,9 @@ class Java
     # Correctness trumps what I presume is a performance optimization.
     add_property("sun.java2d.d3d", "false")
     
+    if @class_name == "e/util/Launcher"
+      #args << "-verbose:class"
+    end
     args.concat(@extra_java_arguments)
     args << @class_name
     args.concat(@extra_app_arguments)
