@@ -4,26 +4,27 @@
   <Product Id='$(env.PRODUCT_GUID)' Name='$(env.HUMAN_PROJECT_NAME) $(env.VERSION_STRING)' Language='1033' UpgradeCode='$(env.UPGRADE_GUID)' Version='$(env.VERSION_STRING)' Manufacturer='software.jessies.org'>
     <Package Id='????????-????-????-????-????????????' Compressed='yes' InstallerVersion='150' />
     <Upgrade Id='$(env.UPGRADE_GUID)'>
-      <UpgradeVersion Maximum='$(env.VERSION_STRING)' />
+      <UpgradeVersion Maximum='$(env.VERSION_STRING)' Property='PREVIOUSVERSIONSINSTALLED' />
     </Upgrade>
     <Property Id='ALLUSERS' Value='2' />
     <Property Id="ARPCONTACT">software@jessies.org</Property>
     <Property Id='ARPNOMODIFY' Value='1' />
     <Property Id="ARPPRODUCTICON" Value='$(env.MACHINE_PROJECT_NAME).ico' />
     <Property Id="ARPURLINFOABOUT">http://software.jessies.org/$(env.MACHINE_PROJECT_NAME)/</Property>
+    <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
     <Media Id='1' Cabinet='project.cab' EmbedCab='yes' />
 
     <Directory Id='TARGETDIR' Name='SourceDir'>
-      <Directory Id='ProgramFilesFolder' Name='Name' LongName='Program Files'>
-        <Directory Id='company' Name='Name' LongName='software.jessies.org'>
-          <Directory Id='product' Name='Name' LongName='$(env.MACHINE_PROJECT_NAME)'>
+      <Directory Id='ProgramFilesFolder' Name='Program Files'>
+        <Directory Id='company' Name='software.jessies.org'>
+          <Directory Id='product' Name='$(env.MACHINE_PROJECT_NAME)'>
             <?include component-definitions.wxi ?>
-            <Directory Id='Resources' Name='Name' LongName='Resources'>
-              <Directory Id='projectResources' Name='Name' LongName='$(env.MACHINE_PROJECT_NAME)'>
-                <Directory Id='bin' Name='Name' LongName='bin'>
+            <Directory Id='Resources' Name='Resources'>
+              <Directory Id='projectResources' Name='$(env.MACHINE_PROJECT_NAME)'>
+                <Directory Id='bin' Name='bin'>
                   <Component Id='Path' Guid='$(env.PATH_GUID)'>
                     <CreateFolder />
-                    <Environment Id='UpdatePath' Name='PATH' Action='create' System='yes' Part='last' Value='[bin]' />
+                    <Environment Id='UpdatePath' Name='PATH' Action='set' System='yes' Part='last' Value='[bin]' />
                   </Component>
                 </Directory>
               </Directory>
@@ -36,7 +37,7 @@
         <!-- This key is in HKCU deliberately to pass ICE43 -->
         <!-- http://forum.installsite.net/index.php?showtopic=15661 says that we need to keep this hack if we ever want the shortcut to be optional -->
         <Registry Id='ShortcutRegistryKey' Root='HKCU' Key='Software\software.jessies.org\$(env.MACHINE_PROJECT_NAME)' Name='ShortcutTarget' Action='write' Type='string' KeyPath='yes' />
-        <Shortcut Id='ShortcutShortcut' Directory='DesktopFolder' Name='Name' LongName='$(env.HUMAN_PROJECT_NAME)' Target='[Resources]salma-hayek\.generated\$(env.TARGET_DIRECTORY)\bin\cygwin-launcher' Arguments='"[projectResources]bin\$(env.MACHINE_PROJECT_NAME)"' WorkingDirectory='DesktopFolder' Icon='$(env.MACHINE_PROJECT_NAME).ico' />
+        <Shortcut Id='ShortcutShortcut' Directory='DesktopFolder' Name='$(env.HUMAN_PROJECT_NAME)' Target='[Resources]salma-hayek\.generated\$(env.TARGET_DIRECTORY)\bin\cygwin-launcher' Arguments='"[projectResources]bin\$(env.MACHINE_PROJECT_NAME)"' WorkingDirectory='DesktopFolder' Icon='$(env.MACHINE_PROJECT_NAME).ico' />
       </Component>
       <Component Id='OpenHere' Guid='$(env.OPEN_HERE_GUID)'>
         <!-- Orca warns that this is wrong. -->
