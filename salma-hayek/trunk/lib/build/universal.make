@@ -568,6 +568,14 @@ FILE_LIST_TO_WXI = $(BUILD_SCRIPT_PATH)/file-list-to-wxi.rb
 
 WIX_COMPILATION_DIRECTORY = .generated/WiX
 
+WIX_ARCH.i386 = x86
+WIX_ARCH.amd64 = x64
+WIX_ARCH = $(WIX_ARCH.$(TARGET_ARCHITECTURE))
+
+ProgramFilesFolder.i386 = ProgramFilesFolder
+ProgramFilesFolder.amd64 = ProgramFiles64Folder
+ProgramFilesFolder = $(ProgramFilesFolder.$(TARGET_ARCHITECTURE))
+
 makeInstallerName.msi = $(MACHINE_PROJECT_NAME)-$(1).msi
 INSTALLER_EXTENSIONS += msi
 INSTALLER_EXTENSIONS.Cygwin += msi
@@ -862,12 +870,13 @@ $(INSTALLER.gz): $(MACHINE_PROJECT_NAME).app
 	OPEN_HERE_GUID=$(makeGuid) \
 	PATH_GUID=$(makeGuid) \
 	PRODUCT_GUID=$(makeGuid) \
+	ProgramFilesFolder=$(ProgramFilesFolder) \
 	SHORTCUT_GUID=$(makeGuid) \
 	STANDARD_FILES_GUID=$(makeGuid) \
 	TARGET_DIRECTORY=$(TARGET_DIRECTORY) \
 	UPGRADE_GUID=$(UPGRADE_GUID) \
 	VERSION_STRING=$(VERSION_STRING) \
-	candle -nologo -out $(call convertToNativeFilenames,$@ $<)
+	candle -nologo -arch $(WIX_ARCH) -out $(call convertToNativeFilenames,$@ $<)
 
 # Cygwin 1.7 removes all inheritable security when it creates directories.
 # This causes the .msi (but, for no obvious reason, not the .wixobj) to be unreadable.
