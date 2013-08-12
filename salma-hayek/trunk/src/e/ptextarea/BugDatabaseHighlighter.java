@@ -64,14 +64,14 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
         // Group 1 - the text to be underlined.
         // Group 2 - the id, inserted into the template.
         
-        // Sun Java bugs.
-        highlightBug(textArea, "\\b(([4-6]\\d{6}))\\b", "http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=%s");
-        // RFCs; not strictly bugs, but often referenced in comments.
-        highlightBug(textArea, "(?i)\\b(rfc\\s*(\\d{3,4}))\\b", "http://tools.ietf.org/html/rfc%s");
         // Site-local bug database links.
         for (SiteLocalScriptEntry entry : siteLocalScriptEntries) {
             highlightBug(textArea, entry.patternToMatch, entry.linkTemplate);
         }
+        // Sun Java bugs.
+        highlightBug(textArea, "\\b(([4-6]\\d{6}))\\b", "http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=%s");
+        // RFCs; not strictly bugs, but often referenced in comments.
+        highlightBug(textArea, "(?i)\\b(rfc\\s*(\\d{3,4}))\\b", "http://tools.ietf.org/html/rfc%s");
     }
     
     private static void highlightBug(PTextArea textArea, String regularExpression, String urlTemplate) {
