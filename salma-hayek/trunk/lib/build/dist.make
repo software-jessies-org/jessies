@@ -8,7 +8,7 @@
 
 # When $< is "org.jessies.evergreen-4.31.1934-2.x86_64.rpm", we want "org.jessies.evergreen.x86_64.rpm".
 # When $< is "org.jessies.evergreen_4.31.1934_amd64.deb", we want "org.jessies.evergreen.amd64.deb".
-# When $< is "evergreen-4.31.1934.msi", we want "evergreen.msi".
+# When $< is "evergreen-4.31.1934.i386.msi", we want "evergreen.i386.msi".
 # I wonder if we shouldn't say "latest" somewhere in the name.
 # It would be easy to do that were it not for the odd "-2" part that alien adds to the name.
 # When I upload, perhaps I should get rid of that.

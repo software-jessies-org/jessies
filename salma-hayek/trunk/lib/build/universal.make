@@ -576,7 +576,7 @@ ProgramFilesFolder.i386 = ProgramFilesFolder
 ProgramFilesFolder.amd64 = ProgramFiles64Folder
 ProgramFilesFolder = $(ProgramFilesFolder.$(TARGET_ARCHITECTURE))
 
-makeInstallerName.msi = $(MACHINE_PROJECT_NAME)-$(1).msi
+makeInstallerName.msi = $(MACHINE_PROJECT_NAME)-$(1).$(TARGET_ARCHITECTURE).msi
 INSTALLER_EXTENSIONS += msi
 INSTALLER_EXTENSIONS.Cygwin += msi
 
