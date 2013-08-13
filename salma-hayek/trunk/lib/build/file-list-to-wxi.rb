@@ -44,7 +44,7 @@ directoryPathToFileNames.each_pair() {
     |fileName|
     filePathComponents = pathComponents + [fileName]
     filePath = filePathComponents.join("/")
-    puts("<File Id='file#{fileNumber}' Name='#{fileName}' DiskId='1' src='#{filePath}' />")
+    puts("<File Id='file#{fileNumber}' Name='#{fileName}' DiskId='1' Source='#{filePath}' />")
     if fileName == "cygwin-launcher.exe"
       puts(xmlToInjectAfterCygwinLauncher)
     end
