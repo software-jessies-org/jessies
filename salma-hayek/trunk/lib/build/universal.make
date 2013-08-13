@@ -582,7 +582,7 @@ INSTALLER_EXTENSIONS.Cygwin += msi
 
 # Some people can't use an installer that installs to "C:\Program Files".
 # The .msi file's contents don't seem conducive to manual extraction (7-zip says it just contains file1, file2 etc).
-makeInstallerName.gz = $(MACHINE_PROJECT_NAME)-$(1).tar.gz
+makeInstallerName.gz = $(MACHINE_PROJECT_NAME)-$(1).$(TARGET_ARCHITECTURE).tar.gz
 INSTALLER_EXTENSIONS += gz
 # The contents of a .deb or .rpm are easily extracted with the provided tools.
 # So this line is just here for testing.
