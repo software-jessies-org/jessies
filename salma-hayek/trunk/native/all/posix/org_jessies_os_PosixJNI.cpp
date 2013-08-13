@@ -275,7 +275,7 @@ jint org_jessies_os_PosixJNI::link(jstring oldPath, jstring newPath) {
 }
 
 jlong org_jessies_os_PosixJNI::lseek(jint fd, jlong offset, jint whence) {
-    const long result = ::lseek(fd, offset, whence);
+    const off_t result = ::lseek(fd, offset, whence);
     return (result == -1) ? -errno : result;
 }
 
