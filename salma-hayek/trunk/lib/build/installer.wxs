@@ -2,7 +2,7 @@
 <!-- formatted with tidy -wrap 0 -xml -indent -m installer.wxs -->
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
   <Product Id='$(env.PRODUCT_GUID)' Name='$(env.HUMAN_PROJECT_NAME) $(env.VERSION_STRING)' Language='1033' UpgradeCode='$(env.UPGRADE_GUID)' Version='$(env.VERSION_STRING)' Manufacturer='software.jessies.org'>
-    <Package Compressed='yes' InstallerVersion='150' />
+    <Package Compressed='yes' InstallerVersion='200' />
     <Upgrade Id='$(env.UPGRADE_GUID)'>
       <UpgradeVersion Maximum='$(env.VERSION_STRING)' Property='PREVIOUSVERSIONSINSTALLED' />
     </Upgrade>
