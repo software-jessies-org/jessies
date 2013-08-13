@@ -66,6 +66,6 @@
     <InstallExecuteSequence>
       <RemoveExistingProducts After='InstallInitialize' />
     </InstallExecuteSequence>
-    <Icon Id='$(env.MACHINE_PROJECT_NAME).ico' src='Resources\$(env.MACHINE_PROJECT_NAME)\lib\$(env.MACHINE_PROJECT_NAME).ico' />
+    <Icon Id='$(env.MACHINE_PROJECT_NAME).ico' SourceFile='Resources\$(env.MACHINE_PROJECT_NAME)\lib\$(env.MACHINE_PROJECT_NAME).ico' />
   </Product>
 </Wix>
