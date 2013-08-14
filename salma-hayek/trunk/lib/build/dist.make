@@ -56,7 +56,7 @@ PLATFORM_NAME.rpm = RedHat
 PLATFORM_NAME = $(PLATFORM_NAME.$(PRIMARY_INSTALLER_EXTENSION))
 SUMMARY = $(PLATFORM_NAME) installer for $(HUMAN_PROJECT_NAME) version $(VERSION_STRING) ($(TARGET_ARCHITECTURE))
 GOOGLECODE_UPLOAD.script = $(SALMA_HAYEK)/lib/build/googlecode_upload.py -s '$(SUMMARY)' -p jessies $<
-GOOGLECODE_UPLOAD.curl = ( cd $(<D) && curl --netrc -v https://jessies.googlecode.com/files --form-string 'summary=$(SUMMARY)' --form 'filename=@$(<F)' )
+GOOGLECODE_UPLOAD.curl = ( cd $(<D) && curl --fail --netrc -v https://jessies.googlecode.com/files --form-string 'summary=$(SUMMARY)' --form 'filename=@$(<F)' )
 # Contra the claim of https://code.google.com/p/support/wiki/ScriptedUploads,
 # there's no proxy support in Python's httplib, as used by Google's script.
 # I don't assume curl everywhere, even though it's simpler than the script,
@@ -131,5 +131,5 @@ $(addprefix symlink-latest.,$(PUBLISHABLE_INSTALLERS)): symlink-latest.%: %
 .PHONY: googlecode-upload.%
 $(addprefix googlecode-upload.,$(PUBLISHABLE_INSTALLERS)): googlecode-upload.%: %
 	@echo "-- Uploading $(<F) to code.google.com..." && \
-	curl -o $<.tmp http://jessies.googlecode.com/files/$(<F) && mv $<.tmp $< || \
+	{ curl --fail -o $<.tmp http://jessies.googlecode.com/files/$(<F) && mv $<.tmp $<; } || \
 	$(GOOGLECODE_UPLOAD) < /dev/null
