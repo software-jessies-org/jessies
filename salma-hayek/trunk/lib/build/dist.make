@@ -54,7 +54,19 @@ PLATFORM_NAME.pkg = Solaris
 PLATFORM_NAME.rpm = RedHat
 
 PLATFORM_NAME = $(PLATFORM_NAME.$(PRIMARY_INSTALLER_EXTENSION))
-SUMMARY = $(PLATFORM_NAME) installer for $(HUMAN_PROJECT_NAME) version $(VERSION_STRING)
+SUMMARY = $(PLATFORM_NAME) installer for $(HUMAN_PROJECT_NAME) version $(VERSION_STRING) ($(TARGET_ARCHITECTURE))
+GOOGLECODE_UPLOAD.script = $(SALMA_HAYEK)/lib/build/googlecode_upload.py -s '$(SUMMARY)' -p jessies $<
+GOOGLECODE_UPLOAD.curl = ( cd $(<D) && curl --netrc -v https://jessies.googlecode.com/files --form-string 'summary=$(SUMMARY)' --form 'filename=@$(<F)' )
+# Contra the claim of https://code.google.com/p/support/wiki/ScriptedUploads,
+# there's no proxy support in Python's httplib, as used by Google's script.
+# I don't assume curl everywhere, even though it's simpler than the script,
+# because the script can fetch credentials from svn.
+# The curl method requires ~/.netrc containing:
+# machine jessies.googlecode.com login <username> password <password>
+# Where username should not include @gmail.com.
+# Where password should be the code.google.com password, not gmail's.
+GOOGLECODE_METHOD = $(if $(https_proxy),curl,script)
+GOOGLECODE_UPLOAD = $(GOOGLECODE_UPLOAD.$(GOOGLECODE_METHOD))
 
 # ----------------------------------------------------------------------------
 # Variables above this point, rules below.
@@ -120,4 +132,4 @@ $(addprefix symlink-latest.,$(PUBLISHABLE_INSTALLERS)): symlink-latest.%: %
 $(addprefix googlecode-upload.,$(PUBLISHABLE_INSTALLERS)): googlecode-upload.%: %
 	@echo "-- Uploading $(<F) to code.google.com..." && \
 	wget -O $<.tmp http://jessies.googlecode.com/files/$(<F) && mv $<.tmp $< || \
-	$(SALMA_HAYEK)/lib/build/googlecode_upload.py -s '$(SUMMARY)' -p jessies $< < /dev/null
+	$(GOOGLECODE_UPLOAD) < /dev/null
