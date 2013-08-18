@@ -6,10 +6,10 @@ def uuid()
   # Contrary to what the MS documentation says, UuidCreateSequential fills
   # a buffer you give it.
   uuid = "\0" * 16
-  uuid_create = Win32API.new("rpcrt4.dll", "UuidCreateSequential", ['p'], 'i')
+  uuid_create = Win32API.new("rpcrt4.dll", "UuidCreateSequential", ["p"], "i")
   rc = uuid_create.Call(uuid)
   if rc != 0
-    raise "UuidCreateSequential returned #{rc}."
+    raise("UuidCreateSequential returned #{rc}.")
   end
   
   # Output the UUID in the RFC4122 format.
