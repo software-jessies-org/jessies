@@ -61,8 +61,8 @@ else
             end
         elsif target_os() == "Cygwin" || target_os() == "Windows"
             text = "#{message}#{instructions}"
-            require "Win32API"
-            Win32API.new('user32', 'MessageBox', %w(p p p i), 'i').call(0, text, title, 0)
+            require "#{salma_hayek}/lib/User32"
+            User32.MessageBox(0, text, title, 0)
         end
     end
     
