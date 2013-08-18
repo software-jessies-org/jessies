@@ -1,13 +1,18 @@
 #!/usr/bin/ruby -w
+require "dl"
+require "dl/import"
+
+module Rpcrt4
+  extend(DL::Importer)
+  dlload("rpcrt4")
+  extern("int UuidCreateSequential(unsigned char*)")
+end
 
 def uuid()
-  require "Win32API"
-  
   # Contrary to what the MS documentation says, UuidCreateSequential fills
   # a buffer you give it.
   uuid = "\0" * 16
-  uuid_create = Win32API.new("rpcrt4.dll", "UuidCreateSequential", ["p"], "i")
-  rc = uuid_create.Call(uuid)
+  rc = Rpcrt4.UuidCreateSequential(uuid)
   if rc != 0
     raise("UuidCreateSequential returned #{rc}.")
   end
