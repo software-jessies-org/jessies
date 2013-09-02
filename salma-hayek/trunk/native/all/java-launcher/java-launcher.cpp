@@ -828,12 +828,7 @@ void ErrorReporter::generateReport(const std::exception& ex, const std::string& 
 
 #if defined(__CYGWIN__) && defined(__x86_64__)
 
-LONG CALLBACK handleVectoredException(PEXCEPTION_POINTERS exceptionInfo) {
-    // A value that seems unlikely to be used.
-    // http://sota.gen.nz/veh/seh_xp.txt lists some valid values.
-    // Cygwin will pass on anything non-zero:
-    // http://cygwin.com/cgi-bin/cvsweb.cgi/src/winsup/cygwin/exceptions.cc?annotate=1.429&cvsroot=src
-    exceptionInfo->ExceptionRecord->ExceptionFlags |= 1 << 27;
+LONG CALLBACK handleVectoredException(PEXCEPTION_POINTERS) {
     return EXCEPTION_CONTINUE_SEARCH;
 }
 
@@ -845,6 +840,18 @@ static void ignoreSignals() {
     if (handle == 0) {
         // No mention is made of GetLastError() at the MSDN page du jour.
         throw std::runtime_error("AddVectoredContinueHandler failed");
+    }
+    // The handle of the next handler seems to be at our handle.
+    // The previous handle follows.
+    // The rest of the structure remained opaque to me, though I didn't try RtlDecodePointer.
+    void* cygwinHandle = *reinterpret_cast<void**>(handle);
+    ULONG rc = RemoveVectoredContinueHandler(cygwinHandle);
+    if (rc == 0) {
+        throw std::runtime_error("RemoveVectoredContinueHandler(cygwinHandle) failed");
+    }
+    rc = RemoveVectoredContinueHandler(handle);
+    if (rc == 0) {
+        throw std::runtime_error("RemoveVectoredContinueHandler(handle) failed");
     }
 }
 
