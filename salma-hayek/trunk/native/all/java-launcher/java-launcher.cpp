@@ -832,7 +832,7 @@ LONG CALLBACK handleVectoredException(PEXCEPTION_POINTERS) {
     return EXCEPTION_CONTINUE_SEARCH;
 }
 
-static void ignoreSignals() {
+static void deferToHotSpotExceptionHandler() {
     // All the documentation says this means that the handler will be executed last.
     // So why does it have to be like this to subvert Cygwin?
     ULONG firstHandler = 1;
@@ -857,7 +857,7 @@ static void ignoreSignals() {
 
 #else
 
-static void ignoreSignals() {
+static void deferToHotSpotExceptionHandler() {
 }
 
 #endif
@@ -865,7 +865,7 @@ static void ignoreSignals() {
 static int runJvm(const NativeArguments& launcherArguments) {
     try {
         LauncherArgumentParser parser(launcherArguments);
-        ignoreSignals();
+        deferToHotSpotExceptionHandler();
         JavaInvocation javaInvocation(parser);
         return javaInvocation.invokeMain();
     } catch (const UsageError& ex) {
