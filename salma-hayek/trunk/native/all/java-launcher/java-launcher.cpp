@@ -844,7 +844,7 @@ static void ignoreSignals() {
     PVOID handle = AddVectoredContinueHandler(firstHandler, &handleVectoredException);
     if (handle == 0) {
         // No mention is made of GetLastError() at the MSDN page du jour.
-        throw std::runtime_error("AddVectoredExceptionHandler failed");
+        throw std::runtime_error("AddVectoredContinueHandler failed");
     }
 }
 
