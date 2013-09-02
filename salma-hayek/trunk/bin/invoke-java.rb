@@ -440,10 +440,6 @@ class Java
       #args << "-verbose:gc"
       #args << "-verbose:jni"
     end
-    # A speculative and seemingly incomplete work-around for JVM crashes particular to amd64_Cygwin.
-    if target_os() == "Cygwin" && target_architecture() == "amd64"
-      args << "-Xint"
-    end
     args.concat(@extra_java_arguments)
     args << @class_name
     args.concat(@extra_app_arguments)

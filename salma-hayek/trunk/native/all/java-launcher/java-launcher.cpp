@@ -826,9 +826,39 @@ void ErrorReporter::generateReport(const std::exception& ex, const std::string& 
     reportFatalErrorViaGui("Java Launcher", os.str(), supportAddress);
 }
 
+#if defined(__CYGWIN__) && defined(__x86_64__)
+
+LONG CALLBACK handleVectoredException(PEXCEPTION_POINTERS exceptionInfo) {
+    // A value that seems unlikely to be used.
+    // http://sota.gen.nz/veh/seh_xp.txt lists some valid values.
+    // Cygwin will pass on anything non-zero:
+    // http://cygwin.com/cgi-bin/cvsweb.cgi/src/winsup/cygwin/exceptions.cc?annotate=1.429&cvsroot=src
+    exceptionInfo->ExceptionRecord->ExceptionFlags |= 1 << 27;
+    return EXCEPTION_CONTINUE_SEARCH;
+}
+
+static void ignoreSignals() {
+    // All the documentation says this means that the handler will be executed last.
+    // So why does it have to be like this to subvert Cygwin?
+    ULONG firstHandler = 1;
+    PVOID handle = AddVectoredContinueHandler(firstHandler, &handleVectoredException);
+    if (handle == 0) {
+        // No mention is made of GetLastError() at the MSDN page du jour.
+        throw std::runtime_error("AddVectoredExceptionHandler failed");
+    }
+}
+
+#else
+
+static void ignoreSignals() {
+}
+
+#endif
+
 static int runJvm(const NativeArguments& launcherArguments) {
     try {
         LauncherArgumentParser parser(launcherArguments);
+        ignoreSignals();
         JavaInvocation javaInvocation(parser);
         return javaInvocation.invokeMain();
     } catch (const UsageError& ex) {
