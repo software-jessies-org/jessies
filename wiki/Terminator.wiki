@@ -71,7 +71,7 @@ The original implementation and documentation was written by Phil Norman.
 
 The original idea of having a suitably hackable terminal emulator with which to experiment with advanced features came from Elliott Hughes, and he turned Phil's component into an application.
 
-Martin Dorey was responsible for the Cygwin port; we wrote more about <a href="http://elliotth.blogspot.com/2005/08/porting-jni-code-to-win32-with-cygwin.html">Porting JNI code to Win32 with Cygwin</a> and <a href="http://elliotth.blogspot.com/2005/08/javaiofiledescriptor-on-win32.html">java.io.FileDescriptor on Win32</a>.
+Martin Dorey was responsible for the Cygwin port; we wrote more about <a href="http://elliotth.blogspot.com/2005/08/porting-jni-code-to-win32-with-cygwin.html">Porting JNI code to Win32 with Cygwin</a> and [http://elliotth.blogspot.com/2005/08/javaiofiledescriptor-on-win32.html java.io.FileDescriptor on Win32].
 
 Phil wrote the code that took us from nothing to a more-or-less usable replacement for `rxvt` on his own between 2004-04-21 and 2004-05-28. Given that he was on holiday for a week during this time, that made roughly a month of development time.
 
