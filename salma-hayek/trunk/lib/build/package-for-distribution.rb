@@ -400,7 +400,7 @@ if target_os() == "Linux"
         # Although Replaces would remove the need for user intervention, it would be anti-social
         # both to the conflicting package and to anyone using the Scheme interpreter or pane-oriented terminal.
         control.puts("Conflicts: #{machine_project_name}")
-        control.puts("Homepage: http://software.jessies.org/#{machine_project_name}")
+        control.puts("Homepage: https://code.google.com/p/jessies/wiki/#{human_project_name}")
         control.puts("Installed-Size: #{installed_size}")
         control.puts("Maintainer: software.jessies.org team <jessies-software@googlegroups.com>")
         control.puts("Description: #{generate_debian_package_description(human_project_name)}")
@@ -442,7 +442,7 @@ if target_os() == "SunOS"
         pkginfo.puts("DESC=#{extract_package_description_from_html()}")
         pkginfo.puts("VERSION=#{compressed_version_number}")
         pkginfo.puts("CATEGORY=application")
-        pkginfo.puts("VENDOR=http://software.jessies.org/")
+        pkginfo.puts("VENDOR=https://code.google.com/p/jessies/")
         pkginfo.puts("EMAIL=jessies-software@googlegroups.com")
     }
     
