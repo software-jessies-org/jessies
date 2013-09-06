@@ -1,0 +1,71 @@
+#summary Problems with our projects which are specific to Cygwin.
+
+<h1>Cygwin Problems</h1>
+
+<p id="generated-toc" class="generate_from_h2"></p>
+
+<p>(See also <a href="/salma-hayek/cygwin-setup.html">Setting up Cygwin</a>.)
+
+<h2>bash immediately and continually crashes on starting Terminator, or spins after a cd</h2>
+
+<p>Terminator has had problems with Cygwin releases after 1.7.7.
+As <a href="http://groups.google.com/group/terminator-users/msg/d2c57e9306c3d6ae">noted</a> on the mailing list,
+this is how to downgrade to a known good release:
+
+<p><code>
+<a href="http://software.jessies.org/downloads/windows/setup-1.7.7.exe">...\setup-1.7.7.exe</a> -qXNdOs ftp://www.fruitbat.org/pub/cygwin/circa/2011/02/25/154017
+</code>
+
+<h2>Double-clicking on the shortcut icon does nothing</h2>
+
+<p>If you're having trouble starting one of our programs, please try running it from a Cygwin Bash prompt
+instead of from the desktop shortcut icon until you work out what's wrong.
+We have had several of these problems in the past.
+
+<p>Please mail us a bug report including the output when you start the program from a Cygwin Bash prompt.
+(The web page for the particular project you're trying to run should tell you the email address.)
+
+<p>Any console output from our applications (as opposed to the start-up scripts or their interpreters) is recorded in a file.
+For Terminator, these are stored in <tt>~/.terminator/logs/</tt> along with a file containing a log of each tab's output.
+Evergreen's output is logged in your temporary directory.
+SCM's output is not currently logged.
+
+<h2>Why do we use Cygwin?</h2>
+
+<p>The main reason for using Cygwin is that one of our projects, Terminator, requires it.
+NT's built-in POSIX subsystem won't let you launch native Windows applications or interact with the network, so that wasn't an option.
+Cygwin, on the other hand, even contains the Unix98 pseudo-terminal support which we use to support terminal resizing, not to mention containing a port of one of the most widely used ssh programs.
+
+<p>Cygwin is also convenient for us in that it lets us use the same start-up scripts that we use on Linux and Mac OS.
+
+<p>In future, the other projects may be runnable without Cygwin, though probably not before there's a native (non-Cygwin) Ruby 1.9 available.
+(Ruby 1.9 for Windows is still flagged as experimental at the time of writing.)
+Even then, if you're programming or doing system administration on Windows, installing and learning Cygwin would probably be an excellent investment of your time.
+
+<p>We don't distribute the Cygwin DLL because that would cause <a href="http://www.cygwin.com/faq/faq.using.html#faq.using.multiple-copies">problems</a> for our users and because it would <a href="http://www.cygwin.com/license.html">require</a> us to distribute the Cygwin source (which would cost storage and bandwidth and administration effort).
+
+<h2>Why does ls(1) not show me Chinese characters?</h2>
+
+<p>All our projects are designed to work with UTF-8.
+As of Cygwin-1.7, Cygwin supports UTF-8 filenames.
+You may need to configure Cygwin applications, like ls, to produce UTF-8 output and to interpret input as UTF-8.
+I did this on XP with Control Panel, System, Advanced, Environment Variables, System and make a LANG variable with the value en_US.UTF-8.
+
+<h2>Why can't java-launcher find jvm.dll on 64 bit Windows?</h2>
+
+<p>All our projects are designed to work with both 64 bit and 32 bit processors.
+Cygwin itself, however, is 32 bit only.
+Our Cygwin-compiled java-launcher.exe is thus a 32 bit application and cannot load a 64 bit shared library.
+Terminator needs to use a Cygwin-compiled Java launcher in order to be able to load a JNI DLL that uses Cygwin's pseudo-terminal support.
+A 32 bit Java installation should work fine on 64 bit Windows.
+
+<h2>Why does telnet(1) quit without doing anything?</h2>
+
+<p>Microsoft's telnet program does that when started from Cygwin terminals like Terminator and rxvt.
+It works fine from "the Cygwin icon", which launches a console subsystem window, but not from real terminals, which are Windows subsystem applications.
+We recommend that you install Cygwin's inetutils package, which installs a fully working /usr/bin/telnet.
+
+<p>Microsoft's ftp program exhibits a similar symptom, producing no output.
+The solution is, once again, to install Cygwin inetutils.
+
+<p>Similar behavior has been reported for at least one other console subsystem application.
