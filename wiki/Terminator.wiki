@@ -77,7 +77,7 @@ Phil wrote the code that took us from nothing to a more-or-less usable replaceme
 
 Since then, Terminator has been on the long slog towards Joel's <a href="http://www.joelonsoftware.com/articles/fog0000000017.html">ten years</a> of quality.
 
-S&eacute;bastien Pierre contributed the icon.
+Sébastien Pierre contributed the icon.
 
 Matt Hillsdon added URL highlighting and made Terminator easier to embed in Eclipse.
 
