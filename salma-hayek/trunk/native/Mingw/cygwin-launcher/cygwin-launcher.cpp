@@ -156,7 +156,7 @@ int main(int, char** argValues) {
     } catch (const std::exception& ex) {
         std::ostringstream os;
         os << "This program requires Cygwin and Cygwin Ruby.\n";
-        os << "http://software.jessies.org/salma-hayek/cygwin-setup.html might help.\n";
+        os << "https://code.google.com/p/jessies/wiki/CygwinSetup might help.\n";
         os << "\n";
         os << "The rest of this message is only relevant if you have Cygwin and Cygwin Ruby installed.\n";
         os << "\n";

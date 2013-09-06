@@ -402,7 +402,7 @@ public class AboutBox {
         Log.setApplicationName("AboutBoxTest");
         GuiUtilities.initLookAndFeel();
         AboutBox aboutBox = AboutBox.getSharedInstance();
-        aboutBox.setWebSiteAddress("http://software.jessies.org/");
+        aboutBox.setWebSiteAddress("https://code.google.com/p/jessies/");
         aboutBox.addCopyright("Copyright (C) 2006, Elliott Hughes");
         aboutBox.show();
     }

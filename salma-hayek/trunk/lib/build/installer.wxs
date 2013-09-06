@@ -10,7 +10,7 @@
     <Property Id="ARPCONTACT">jessies-software@googlegroups.com</Property>
     <Property Id='ARPNOMODIFY' Value='1' />
     <Property Id="ARPPRODUCTICON" Value='$(env.MACHINE_PROJECT_NAME).ico' />
-    <Property Id="ARPURLINFOABOUT">http://software.jessies.org/$(env.MACHINE_PROJECT_NAME)/</Property>
+    <Property Id="ARPURLINFOABOUT">https://code.google.com/p/jessies/wiki/$(env.HUMAN_PROJECT_NAME)/</Property>
     <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
     <Media Id='1' Cabinet='project.cab' EmbedCab='yes' />
 

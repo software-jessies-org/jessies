@@ -110,7 +110,7 @@ else
                 messageLines << "Exception #{ex.class()}: #{ex.message()}"
                 messageLines << ""
                 messageLines << "Perhaps you need to double click on the Cygwin shortcut again?"
-                messageLines << "See http://software.jessies.org/salma-hayek/cygwin-setup.html"
+                messageLines << "See https://code.google.com/p/jessies/wiki/CygwinSetup"
                 show_alert("Home directory problem", messageLines.join("\n"), @support_address)
                 # If the user has no home directory, then they might be happy starting in /bin,
                 # but Terminator will fail when it can't create ~/.terminator,
