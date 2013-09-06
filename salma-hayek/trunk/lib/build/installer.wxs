@@ -7,7 +7,7 @@
       <UpgradeVersion Maximum='$(env.VERSION_STRING)' Property='PREVIOUSVERSIONSINSTALLED' />
     </Upgrade>
     <Property Id='ALLUSERS' Value='2' />
-    <Property Id="ARPCONTACT">software@jessies.org</Property>
+    <Property Id="ARPCONTACT">jessies-software@googlegroups.com</Property>
     <Property Id='ARPNOMODIFY' Value='1' />
     <Property Id="ARPPRODUCTICON" Value='$(env.MACHINE_PROJECT_NAME).ico' />
     <Property Id="ARPURLINFOABOUT">http://software.jessies.org/$(env.MACHINE_PROJECT_NAME)/</Property>
