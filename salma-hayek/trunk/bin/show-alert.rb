@@ -141,7 +141,7 @@ else
     
     # There are two callers that don't specify the address.
     # One would be hard to eliminate.
-    def report_exceptions(app_name, support_address = "software@jessies.org", &block)
+    def report_exceptions(app_name, support_address = "jessies-software@googlegroups.com", &block)
         ExceptionReporter.new(app_name, support_address, &block)
     end
 end

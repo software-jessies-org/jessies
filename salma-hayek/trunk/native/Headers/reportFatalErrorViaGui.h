@@ -18,7 +18,7 @@
 
 inline void reportFatalErrorViaGui(const std::string& programName, const std::string& applicationMessage, std::string supportAddress) {
     if (supportAddress.empty()) {
-        supportAddress = "software@jessies.org";
+        supportAddress = "jessies-software@googlegroups.com";
     }
     std::ostringstream os;
     os << applicationMessage;
