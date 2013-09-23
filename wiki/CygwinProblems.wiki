@@ -8,13 +8,7 @@
 
 <h2>bash immediately and continually crashes on starting Terminator, or spins after a cd</h2>
 
-<p>Terminator has had problems with Cygwin releases after 1.7.7.
-As <a href="http://groups.google.com/group/terminator-users/msg/d2c57e9306c3d6ae">noted</a> on the mailing list,
-this is how to downgrade to a known good release:
-
-<p><code>
-<a href="http://software.jessies.org/downloads/windows/setup-1.7.7.exe">...\setup-1.7.7.exe</a> -qXNdOs ftp://www.fruitbat.org/pub/cygwin/circa/2011/02/25/154017
-</code>
+<p>Terminator had problems on many systems with Cygwin releases after 1.7.7.  The mailing list contains evidence that these persisted up to and including 1.7.15 but were remedied by the time of 1.7.17.  Whatever changed to fix it was in Cygwin, rather than Terminator, and we never did work out what that was.  That wasn't the first such breakage and perhaps it won't be the last.  When it breaks again, and you want to try a downgrade, instructions for 1.7.7 were <a href="http://groups.google.com/group/terminator-users/msg/d2c57e9306c3d6ae">noted</a> on the mailing list.
 
 <h2>Double-clicking on the shortcut icon does nothing</h2>
 
