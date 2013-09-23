@@ -148,7 +148,7 @@ chmod o-w /cygdrive/c
 </pre>
 <p>Of course, this still leaves every binary on your system world-writable. Strangely, Ruby's happy to run world-writable binaries, as long as the directory they're in isn't world-writable.
 
-<h2>Hints &amp; Tips</h2>
+<h2>Hints and Tips</h2>
 
 <h3>Cygwin's setup log</h3>
 <p>If you update your Cygwin installation frequently, sometimes things will break or just change in a way you're not expecting, and you'll find yourself wondering what version you were running on a particular day. Matt Wilkie offers this tip to see the dates on which you installed the various versions you've used:
