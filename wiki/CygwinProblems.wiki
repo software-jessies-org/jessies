@@ -46,10 +46,10 @@ I did this on XP with Control Panel, System, Advanced, Environment Variables, Sy
 <h2>Why can't java-launcher find jvm.dll on 64 bit Windows?</h2>
 
 <p>All our projects are designed to work with both 64 bit and 32 bit processors.
-Cygwin itself, however, is 32 bit only.
-Our Cygwin-compiled java-launcher.exe is thus a 32 bit application and cannot load a 64 bit shared library.
 Terminator needs to use a Cygwin-compiled Java launcher in order to be able to load a JNI DLL that uses Cygwin's pseudo-terminal support.
-A 32 bit Java installation should work fine on 64 bit Windows.
+Terminator, Java and Cygwin must all have the same bit width.
+The 32 bit versions of Terminator, Java and Cygwin all work fine on 64 bit Windows.
+As of fall 2013, though, there are 64 bit Windows versions of all three.
 
 <h2>Why does telnet(1) quit without doing anything?</h2>
 
