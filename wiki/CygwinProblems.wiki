@@ -54,7 +54,7 @@ As of fall 2013, though, there are 64 bit Windows versions of all three.
 <h2>Why does telnet(1) quit without doing anything?</h2>
 
 <p>Microsoft's telnet program does that when started from Cygwin terminals like Terminator and rxvt.
-It works fine from "the Cygwin icon", which launches a console subsystem window, but not from real terminals, which are Windows subsystem applications.
+It works fine from the pre-2011 "Cygwin icon", which launched a console subsystem window, but not from real terminals, which are Windows subsystem applications.
 We recommend that you install Cygwin's inetutils package, which installs a fully working /usr/bin/telnet.
 
 <p>Microsoft's ftp program exhibits a similar symptom, producing no output.
