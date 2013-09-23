@@ -4,7 +4,7 @@
 
 <p id="generated-toc" class="generate_from_h2"></p>
 
-<p>(See also <a href="/salma-hayek/cygwin-setup.html">Setting up Cygwin</a>.)
+<p>(See also [CygwinSetup].)
 
 <h2>bash immediately and continually crashes on starting Terminator, or spins after a cd</h2>
 
