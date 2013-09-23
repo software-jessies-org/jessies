@@ -10,7 +10,7 @@
 <p>Cygwin is a Linux-like environment for MS Windows. You can read more about it on the <a href="http://www.cygwin.com">Cygwin home page</a>, but this page assumes you know what it is and have already decided that you want it. If you're a Unix user and you're stuck with a Windows box, you probably do. It's quite a remarkable hack.
 
 <h2>Installation</h2>
-<p>Download the <a href="http://www.cygwin.com/setup.exe">Cygwin setup.exe</a> (and keep it for later, because you'll want it to update your installation too). Run it now, and hit Next. Answer "Install from Internet" and hit Next. Answer "c:\cygwin", "All Users", "Unix / binary", and hit Next. I don't think the local package directory matters, so just hit Next. Hit Next again. Choose a nearby server and hit Next.
+<p>Download the <a href="http://cygwin.com/setup-x86.exe">32 bit</a> or <a href="http://cygwin.com/setup-x86_64.exe">64 bit</a> Cygwin setup.exe (and keep it for later, because you'll want it to update your installation too). Run it now, and hit Next. Answer "Install from Internet" and hit Next. Answer "c:\cygwin", "All Users", "Unix / binary", and hit Next. I don't think the local package directory matters, so just hit Next. Hit Next again. Choose a nearby server and hit Next.
 
 <h3>Basic packages</h3>
 <p>You'll now be asked to select packages. The interface is a nightmare along the lines of a mouse-driven dselect(1). Most people seem to have trouble guessing how to use it, so read the next few paragraphs before you start clicking.
