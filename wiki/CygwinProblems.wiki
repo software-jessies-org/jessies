@@ -38,9 +38,7 @@ Cygwin, on the other hand, even contains the Unix98 pseudo-terminal support whic
 
 <p>Cygwin is also convenient for us in that it lets us use the same start-up scripts that we use on Linux and Mac OS.
 
-<p>In future, the other projects may be runnable without Cygwin, though probably not before there's a native (non-Cygwin) Ruby 1.9 available.
-(Ruby 1.9 for Windows is still flagged as experimental at the time of writing.)
-Even then, if you're programming or doing system administration on Windows, installing and learning Cygwin would probably be an excellent investment of your time.
+<p>In future, the other projects may be runnable without Cygwin.  Even then, if you're programming or doing system administration on Windows, installing and learning Cygwin would probably be an excellent investment of your time.
 
 <p>We don't distribute the Cygwin DLL because that would cause <a href="http://www.cygwin.com/faq/faq.using.html#faq.using.multiple-copies">problems</a> for our users and because it would <a href="http://www.cygwin.com/license.html">require</a> us to distribute the Cygwin source (which would cost storage and bandwidth and administration effort).
 
