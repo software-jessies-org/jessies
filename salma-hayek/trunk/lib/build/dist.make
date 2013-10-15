@@ -52,8 +52,9 @@ PLATFORM_NAME.zip = Mac
 PLATFORM_NAME.msi = Windows
 PLATFORM_NAME.pkg = Solaris
 PLATFORM_NAME.rpm = RedHat
+PLATFORM_NAME.gz = $(PLATFORM_NAME.$(PRIMARY_INSTALLER_EXTENSION))
 
-PLATFORM_NAME = $(PLATFORM_NAME.$(PRIMARY_INSTALLER_EXTENSION))
+PLATFORM_NAME = $(PLATFORM_NAME$(suffix $@))
 SUMMARY = $(PLATFORM_NAME) installer for $(HUMAN_PROJECT_NAME) version $(VERSION_STRING) ($(TARGET_ARCHITECTURE))
 GOOGLECODE_UPLOAD.script = $(SALMA_HAYEK)/lib/build/googlecode_upload.py -s '$(SUMMARY)' -p jessies $<
 GOOGLECODE_UPLOAD.curl = ( cd $(<D) && curl --fail --netrc -v https://jessies.googlecode.com/files --form-string 'summary=$(SUMMARY)' --form 'filename=@$(<F)' )
