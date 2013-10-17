@@ -55,35 +55,20 @@ Think about what you'd most like to see.
 <p>I explained above why you should comment the "change set", naming all the files touched, and the relationship between the individual files' changes.
 
 <p>Here's a checklist of things you should try to get into a habit of going through in your mind as you write a check-in comment:
-<ul>
-<li><p><b>Bug/defect number</b> - if you have a bug database, reference it.
-There's likely to be plenty of extra information/dialog in there that shouldn't go to waste.
-This is why SCM and Edit go out of their way to turn your bug/defect numbers into links.
-</li>
 
-<li><p><b>Other people involved</b> - if you go under a bus on your way home from work, who else would be worth talking to when it comes to this code?
-Especially useful if you're doing something as the result of a request without a formal defect number, or as the result of group consensus.
-</li>
+ * <b>Bug/defect number</b> - if you have a bug database, reference it. There's likely to be plenty of extra information/dialog in there that shouldn't go to waste. This is why SCM and Edit go out of their way to turn your bug/defect numbers into links.
 
-<li><p><b>Alternatives rejected</b> - we can see what you <i>did</i> implement, but it's often interesting to know why you didn't implement other alternatives.
-Often this is interesting enough to warrant code comments instead.
-Especially useful if you're replacing one implementation with another is why the old implementation was no longer suitable.
-</li>
+ * <p><b>Other people involved</b> - if you go under a bus on your way home from work, who else would be worth talking to when it comes to this code? Especially useful if you're doing something as the result of a request without a formal defect number, or as the result of group consensus.
 
-<li><p><b>Known limitations</b> - these should probably be FIXME or TODO comments in the code.
-</li>
+ * <p><b>Alternatives rejected</b> - we can see what you <i>did</i> implement, but it's often interesting to know why you didn't implement other alternatives. Often this is interesting enough to warrant code comments instead. Especially useful if you're replacing one implementation with another is why the old implementation was no longer suitable.
 
-<li><p><b>Known performance impact</b> - if you measured the performance impact of your change, say so.
-Mention the tests and the results.
-</li>
+ * <p><b>Known limitations</b> - these should probably be FIXME or TODO comments in the code.
 
-<li><p><b>Evidence to support "premature" optimization</b> - if you're introducing an optimization, point to a demonstration that it's useful, or details of the situations in which it's useful.
-This will discourage others from backing it out rather than fixing it when it's demonstrated to be incorrect.
-</li>
+ * <p><b>Known performance impact</b> - if you measured the performance impact of your change, say so. Mention the tests and the results.
 
-<li><p><b>Text of build errors fixed</b> - if you're fixing a build error, include the exact error text to help later reviewers determine whether it's the most appropriate fix or understand your problem so that they don't re-introduce the build error.
-</li>
-</ul>
+ * <p><b>Evidence to support "premature" optimization</b> - if you're introducing an optimization, point to a demonstration that it's useful, or details of the situations in which it's useful. This will discourage others from backing it out rather than fixing it when it's demonstrated to be incorrect.
+
+ * <p><b>Text of build errors fixed</b> - if you're fixing a build error, include the exact error text to help later reviewers determine whether it's the most appropriate fix or understand your problem so that they don't re-introduce the build error.
 
 <p>I won't insult you by reminding you that saying <i>what</i> you've done is never as useful as <i>why</i> you did it, though such comments can be useful if you accidentally add/change/remove code you didn't mean to touch.
 If it's not mentioned in the check-in comment, that lends credence to the belief that it was a mistake.
