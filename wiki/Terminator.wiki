@@ -49,13 +49,13 @@ Here are some of the features unique to Terminator, or which are rare amongst th
   * *Safe Quit* - Terminator knows when you still have processes running, and brings up a dialog rather than just letting those processes die.
 
   * *UTF-8* - Terminator won't mangle your favorite accented characters, and it copes well with languages such as Greek where there's a mix of normal and wide glyphs:
-<p align="center"><img src="mac-os-greek.png" alt="Greek on Mac OS">
+<p align="center"><img src="http://jessies.googlecode.com/svn/terminator/trunk/www/mac-os-greek.png" alt="Greek on Mac OS">
     The text is Markus Kuhn's <a href="http://www.cl.cam.ac.uk/~mgk25/ucs/examples/UTF-8-demo.txt">UTF-8-demo.txt</a> if you want to see what a mess Terminal.app makes of it. (On Mac OS, Terminal.app beats us on Thai, but we're better at Cyrillic, Greek, and Japanese. Results vary between platforms based on availability and suitability of fonts.)
 
     One side-effect of proper support for variable-width glyphs is that you're not restricted to fixed-width fonts in Terminator, even if the only language you're using is English. GNU readline might get confused about the line length, though.
 
     Here's a more convincingly terminal-like example of fixed-width English and variable-width Japanese; output from javac(1):
-<p align="center"><img src="javac-jp-monaco.png" alt="Japanese javac(1) output on Mac OS">
+<p align="center"><img src="http://jessies.googlecode.com/svn/terminator/trunk/www/javac-jp-monaco.png" alt="Japanese javac(1) output on Mac OS">
 
 
 We think Terminator is the clear choice for the discerning terminal user.
