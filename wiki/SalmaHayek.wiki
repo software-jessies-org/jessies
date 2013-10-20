@@ -7,48 +7,23 @@ I couldn't think of a <i>good</i> name, so I went for a nice name instead.
 
 <p>This list is very incomplete, but gives some idea of a few of the larger facilities on offer:
 
-<ul title="features">
+ * <p><strong>PTextArea</strong> - One of the bigger things we offer is a high-performance text area. It's single-font, like JTextArea, but it's multi-color, like JTextPane. It has none of JTextPane's performance problems, though, and it has a fairly simple interface for adding custom colorers for file types you care about. It comes with colorers for popular languages such as C++, Java, and Ruby.
 
-<li><p><strong>PTextArea</strong> - One of the bigger things we offer is a high-performance text area.
-It's single-font, like JTextArea, but it's multi-color, like JTextPane.
-It has none of JTextPane's performance problems, though, and it has a fairly simple interface for adding custom colorers for file types you care about.
-It comes with colorers for popular languages such as C++, Java, and Ruby.
+ <p>Another big feature is built-in spelling checker support. It's even clever enough to check camelCaseWords if you're editing source, and also offers support for custom exception lists. It's fast, too, and unlike (say) Apple's built-in spelling checker is fast enough to check a whole document when you open it or paste, rather than waiting for you to move the caret out of a word before checking it.
 
-<p>Another big feature is built-in spelling checker support.
-It's even clever enough to check camelCaseWords if you're editing source, and also offers support for custom exception lists.
-It's fast, too, and unlike (say) Apple's built-in spelling checker is fast enough to check a whole document when you open it or paste, rather than waiting for you to move the caret out of a word before checking it.
+ <p>There's also support for hyperlinks, both of the mailer kind where (say) http://software.jessies.org/ is automatically turned into a link, but also in more sophisticated applications where you want arbitrary recognized text to be turned into a link to some function of the recognized text. Edit and SCM use this to link to bug databases and RFCs, for example, so that simply saying "Sun 6227617" or "RFC 2229" in a comment (or in this document as I'm writing it) is enough to get you a link to the relevant document.
 
-<p>There's also support for hyperlinks, both of the mailer kind where (say) http://software.jessies.org/ is automatically turned into a link, but also in more sophisticated applications where you want arbitrary recognized text to be turned into a link to some function of the recognized text.
-Edit and SCM use this to link to bug databases and RFCs, for example, so that simply saying "Sun 6227617" or "RFC 2229" in a comment (or in this document as I'm writing it) is enough to get you a link to the relevant document.
+ * <p><strong>Forms</strong> - Our forms package is also really useful. We think it's the best and easiest way to create dialogs. All the dialogs in all of our programs are produced this way, with a minimal amount of code. There's automatic support for all the features you'd expect, and it's even really easy to add "advanced" functionality like fields that search as-you-type.
 
-<li><p><strong>Forms</strong> - Our forms package is also really useful.
-We think it's the best and easiest way to create dialogs.
-All the dialogs in all of our programs are produced this way, with a minimal amount of code.
-There's automatic support for all the features you'd expect, and it's even really easy to add "advanced" functionality like fields that search as-you-type.
+ * <p><strong>Build System</strong> - Disappointed by the amount of  boilerplate nonsense required by the likes of Ant, and disappointed by the relatively small amount of work such tools actually do for you, we've developed quite a sophisticated build system. It uses GNU make, but don't let that scare you: the whole point is that you can write pretty much anything (pure Java, Java + JNI, pure C++) and it'll do all the work for you.
 
-<li><p><strong>Build System</strong> - Disappointed by the amount of  boilerplate nonsense required by the likes of Ant, and disappointed by the relatively small amount of work such tools actually do for you, we've developed quite a sophisticated build system.
-It uses GNU make, but don't let that scare you: the whole point is that you can write pretty much anything (pure Java, Java + JNI, pure C++) and it'll do all the work for you.
+ <p>If you want, we can also automatically generate installable distributions. For Mac users, we create Mac ".app" bundles (containing universal binaries for Intel and PowerPC) and compress them into ".dmg" files ready for distribution. For Linux users, we create ".deb" and ".rpm" packages. For Solaris users, we create ".pkg" packages. For MS&nbsp;Windows users, we create ".msi" installers.
 
-<p>If you want, we can also automatically generate installable distributions.
-For Mac users, we create Mac ".app" bundles (containing universal binaries for Intel and PowerPC) and compress them into ".dmg" files ready for distribution.
-For Linux users, we create ".deb" and ".rpm" packages.
-For Solaris users, we create ".pkg" packages.
-For MS&nbsp;Windows users, we create ".msi" installers.
+ <p>If you look at the "Makefile" at the top of any of our projects, you'll see that none of them requires more than a single "include" line. That's it! (Strictly, if you want to generate Windows installers you need to specify a UUID for your project. But that's only one extra line, that by definition you should never change.)
 
-<p>If you look at the "Makefile" at the top of any of our projects, you'll see that none of them requires more than a single "include" line.
-That's it!
-(Strictly, if you want to generate Windows installers you need to specify a UUID for your project.
-But that's only one extra line, that by definition you should never change.)
+ * <p><strong>JavaHpp: <tt>javah(1)</tt> for C++ Programmers</strong> - Write your JNI code in C++ for improved clarity and correctness. See <a href="http://elliotth.blogspot.com/2005/06/better-jni-through-c.html">Better JNI through C++</a> for the original motivation. In a nutshell, we generate a C++ class corresponding to the Java class, and automatically write C functions to call the appropriate member function on the C++ class. There's a member function for every native method, that you need to implement. There's a member variable for every field that proxies for the actual Java object's corresponding field, so you can read and write the field as if it were a C++ member variable. C++ exceptions thrown in your JNI code are translated to Java exceptions.
 
-<li><p><strong>JavaHpp: <tt>javah(1)</tt> for C++ Programmers</strong> - Write your JNI code in C++ for improved clarity and correctness.
-See <a href="http://elliotth.blogspot.com/2005/06/better-jni-through-c.html">Better JNI through C++</a> for the original motivation.
-In a nutshell, we generate a C++ class corresponding to the Java class, and automatically write C functions to call the appropriate member function on the C++ class.
-There's a member function for every native method, that you need to implement.
-There's a member variable for every field that proxies for the actual Java object's corresponding field, so you can read and write the field as if it were a C++ member variable.
-C++ exceptions thrown in your JNI code are translated to Java exceptions.
-
-<p>See the Terminator source for a good example of this in use.
-</ul>
+ <p>See the Terminator source for a good example of this in use.
 
 <h2><a name="debian-repository">Using our Debian package repository</a></h2>
 
