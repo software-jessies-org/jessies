@@ -1,5 +1,3 @@
-#summary Terminator FAQ
-
 <h2><a name="this-is-not-gnome-terminator">This is <i>not</i> GNOME Terminator</a></h2>
 
 <p>jessies.org's Terminator is not Chris Jones's <a href="http://www.tenshu.net/p/terminator/">Terminator</a>, sometimes known as <a href="http://www.ohloh.net/p/gnome-terminator">GNOME Terminator</a>.  Ours is a completely unrelated terminal emulator that was using the same lame name <a href="https://answers.launchpad.net/terminator/+question/25861">first</a>.
