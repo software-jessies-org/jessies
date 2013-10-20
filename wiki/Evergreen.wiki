@@ -4,7 +4,7 @@
 
 There are also two new guiding principles: accept regular expressions, output diffs.
 
-<p><img src="main-window.png" width="822" height="594" alt="Evergreen's main window">
+<p><img src="http://jessies.googlecode.com/svn/evergreen/trunk/www/main-window.png" width="822" height="594" alt="Evergreen's main window">
 
 <h2><a name="features">Features</a></h2>
 
@@ -18,7 +18,7 @@ Or what case your co-worker used ("Hyperlink" or "HyperLink"?).
 Just type a substring or regular expression that matches what you want [<a href="manual.html#opening-quickly">full details</a>].
 Evergreen updates a list of the matching files as you type (like iTunes):
 
-<p align="center"><img src="open-quickly.png" width="591" height="322" alt="Open Quickly dialog">
+<p align="center"><img src="http://jessies.googlecode.com/svn/evergreen/trunk/www/open-quickly.png" width="591" height="322" alt="Open Quickly dialog">
 
 <li><p><strong>Find in Files</strong> - You can also search for files to open based on their content [<a href="manual.html#opening-find">full details</a>].
 Evergreen shows a tree of matches, representing the directory hierarchy.
@@ -26,7 +26,7 @@ Files containing definitions are marked as such.
 Searching is done in parallel to take advantage of modern multi-core machines.
 Search results are automatically updated if anything changes:
 
-<p align="center"><img src="find-in-files.png" width="723" height="502" alt="Find in Files dialog">
+<p align="center"><img src="http://jessies.googlecode.com/svn/evergreen/trunk/www/find-in-files.png" width="723" height="502" alt="Find in Files dialog">
 
 <li><p><strong>Find</strong> - You have a fast computer, yet the 'find' function in other editors doesn't take full advantage of that fact.
 Evergreen, like <tt>less(1)</tt>, highlights all the matches, whether you search with C-F or clicked on a match in the "Find in Files" dialog.
@@ -36,12 +36,12 @@ All of this comes together for fluid one-handed searching [<a href="manual.html#
 Finally, Evergreen uses marks next to the scroll bar to give you contextual information about how many matches there are, and how they're clustered.
 You can click on a mark to skip a large clump of uninteresting matches, if you wish:
 
-<p align="center"><img src="find.png" width="748" height="185" alt="Highlighted find matches">
+<p align="center"><img src="http://jessies.googlecode.com/svn/evergreen/trunk/www/find.png" width="748" height="185" alt="Highlighted find matches">
 
 <li><p><strong>Spelling Checking for Source Code</strong> - Not only does Evergreen check your spelling as you type, it understands CamelCase words aren't single-word spelling mistakes but compounds of correctly spelled words.
 In this example, the identifiers have been checked too:
 
-<p align="center"><img src="spelling.png" width="433" height="159" alt="Spelling checking of code">
+<p align="center"><img src="http://jessies.googlecode.com/svn/evergreen/trunk/www/spelling.png" width="433" height="159" alt="Spelling checking of code">
 
 <li><p><strong>Exuberant Ctags Support</strong> - Evergreen uses Exuberant Ctags (if installed) to understand the structure of your file [<a href="manual.html#navigation-tags">full details</a>].
 The symbols in the current file are shown as a tree preserving their hierarchy.
@@ -49,17 +49,17 @@ You can click on an item in the tree to go to the corresponding part of the file
 Conversely, as you edit, the item in the tree corresponding to the current caret position is always highlighted.
 
 <p align="center">
-<img src="tags-panel.png" width="197" height="120" alt="Tags support">
+<img src="http://jessies.googlecode.com/svn/evergreen/trunk/www/tags-panel.png" width="197" height="120" alt="Tags support">
 
 <li><p><strong>Bug Database Links</strong> - References to bugs in your (or others') bug databases are automatically recognized and turned into hyperlinks:
 
 <p align="center">
-<img src="bug-links.png" width="442" height="261" alt="Bug database links">
+<img src="http://jessies.googlecode.com/svn/evergreen/trunk/www/bug-links.png" width="442" height="261" alt="Bug database links">
 
 <li><p><strong>Find/Replace</strong> - Find/replace functionality in other editors has a habit of being awkward in use.
 How much better to be able to see all the changes at once, with the results of the substitutions? Hovering over a match shows the captured groups in a tool tip, so you can check your capturing is as you intended [<a href="manual.html#editing-replace">full details</a>].
 
-<p align="center"><img src="find-replace.png" width="706" height="530" alt="Find and replace">
+<p align="center"><img src="http://jessies.googlecode.com/svn/evergreen/trunk/www/find-replace.png" width="706" height="530" alt="Find and replace">
 
 <p>(This is the obvious exception to the "output diffs" rule.)
 
