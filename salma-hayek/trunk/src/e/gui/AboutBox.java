@@ -65,6 +65,7 @@ public class AboutBox {
     private ArrayList<String> versionLines = new ArrayList<String>();
     private ArrayList<String> copyrightLines = new ArrayList<String>();
     
+    private String packageVersion = "unknown";
     private String projectRevision = "unknown";
     private String libraryRevision = "unknown";
     
@@ -346,7 +347,9 @@ public class AboutBox {
         String buildDate = content[0];
         projectRevision = content[1];
         libraryRevision = content[2];
+        packageVersion = content[3];
         String[] info = new String[] {
+            "Package " + packageVersion,
             "Revision " + projectRevision + " (" + libraryRevision + ")",
             "Built " + buildDate,
         };
@@ -358,12 +361,12 @@ public class AboutBox {
     
     public String getProblemReportSubject() {
         String systemDetails = Log.getSystemDetailsForProblemReport();
-        String subject = "<<<YourSubjectHere>>> " + Log.getApplicationName() + " problem (" + projectRevision + "/" + libraryRevision + "/" + systemDetails + ")";
+        String subject = "<<<YourSubjectHere>>> " + Log.getApplicationName() + " problem (" + packageVersion + "/" + projectRevision + "/" + libraryRevision + "/" + systemDetails + ")";
         return StringUtilities.urlEncode(subject).replaceAll("\\+", "%20");
     }
     
     public String getIdentificationString() {
-        return Log.getApplicationName() + " (" + projectRevision + "/" + libraryRevision + "/" + Log.getSystemDetailsForProblemReport() + ")";
+        return Log.getApplicationName() + " (" + packageVersion + "/" + projectRevision + "/" + libraryRevision + "/" + Log.getSystemDetailsForProblemReport() + ")";
     }
     
     private JButton makeCloseButton(ActionListener actionListener) {
