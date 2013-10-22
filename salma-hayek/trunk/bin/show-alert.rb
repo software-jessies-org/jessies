@@ -9,20 +9,33 @@ else
         
         require "#{salma_hayek}/bin/target-os.rb"
         instructionLines = []
+        begin
+            presumedProjectRoot = Pathname.new($0).realpath().dirname().dirname()
+            buildRevisionLines = IO.read("#{presumedProjectRoot}/.generated/build-revision.txt").split("\n")
+            buildDate = buildRevisionLines.shift()
+            projectVersion = buildRevisionLines.shift()
+            salmaHayekVersion = buildRevisionLines.shift()
+            packageVersion = buildRevisionLines.shift()
+            instructionLines << ""
+            instructionLines << "Package #{packageVersion}"
+            instructionLines << "Revision #{projectVersion} (#{salmaHayekVersion})"
+            instructionLines << "Built #{buildDate}"
+        rescue
+        end
         # Some alerts are self-explanatory.
         if support_address != nil
-            # Some of our error messages end in a newline, some don't.
-            # No-one would notice these instructions without a blank line separating them from the morass of stack or arguments.
-            # Two blank lines would look amateur.
-            if message[-1] != "\n"
-                instructionLines << ""
-            end
             instructionLines << ""
             instructionLines << "Please mail this error message to #{support_address}.";
             if target_os() == "Cygwin" || target_os() == "Windows"
                 instructionLines << "You can copy it to the clipboard with Ctrl-C.";
                 instructionLines << "Windows won't let you select the text but Ctrl-C works anyway.";
             end
+        end
+        # Some of our error messages end in a newline, some don't.
+        # No-one would notice these instructions without a blank line separating them from the morass of stack or arguments.
+        # Two blank lines would look amateur.
+        if message[-1] != "\n" && instructionLines.empty?() == false
+            instructionLines.unshift("")
         end
         instructions = instructionLines.join("\n")
         if target_os() == "Darwin"
