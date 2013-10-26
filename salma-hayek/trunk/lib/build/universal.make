@@ -502,6 +502,9 @@ JAVAC_FLAGS.javac += -target 1.6
 # Ensure we give a clear error if the user attempts to use anything older than Java 6.
 JAVAC_FLAGS.javac += -source 1.6
 
+ALTERNATE_BOOTCLASSPATH := $(wildcard $(subst java-7,java-6,$(JDK_ROOT)/jre/lib/rt.jar))
+JAVAC_FLAGS.javac += $(if $(ALTERNATE_BOOTCLASSPATH),-bootclasspath $(ALTERNATE_BOOTCLASSPATH))
+
 # ----------------------------------------------------------------------------
 # Set ecj flags.
 # ----------------------------------------------------------------------------
