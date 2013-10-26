@@ -122,7 +122,7 @@ endef
 findMakeFriendlyEquivalentName.$(TARGET_OS) = $(1)
 # make-friendly means forward slashes and no spaces.
 # Quoted because the original may contain backslashes.
-findMakeFriendlyEquivalentName.Cygwin = $(shell cygpath --mixed --short-name '$(1)')
+findMakeFriendlyEquivalentName.Cygwin = $(if $(1),$(shell cygpath --mixed --short-name '$(1)'))
 findMakeFriendlyEquivalentName = $(findMakeFriendlyEquivalentName.$(TARGET_OS))
 
 JDK_ROOT_SCRIPT = $(SCRIPT_PATH)/find-jdk-root.rb
@@ -502,7 +502,11 @@ JAVAC_FLAGS.javac += -target 1.6
 # Ensure we give a clear error if the user attempts to use anything older than Java 6.
 JAVAC_FLAGS.javac += -source 1.6
 
-ALTERNATE_BOOTCLASSPATH := $(wildcard $(subst java-7,java-6,$(JDK_ROOT)/jre/lib/rt.jar))
+BOOT_JDK.Linux = $(subst java-7,java-6,$(JDK_ROOT))
+# := deferred to ALTERNATE_BOOTCLASSPATH
+BOOT_JDK.Cygwin = $(call findMakeFriendlyEquivalentName,$(shell ruby -e 'require "$(JDK_ROOT_SCRIPT)"; puts(findBootJdkFromRegistry())'))
+BOOT_JDK = $(BOOT_JDK.$(TARGET_OS))
+ALTERNATE_BOOTCLASSPATH := $(wildcard $(BOOT_JDK)/jre/lib/rt.jar)
 JAVAC_FLAGS.javac += $(if $(ALTERNATE_BOOTCLASSPATH),-bootclasspath $(ALTERNATE_BOOTCLASSPATH))
 
 # ----------------------------------------------------------------------------
