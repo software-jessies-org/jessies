@@ -375,7 +375,7 @@ if target_os() == "Linux"
         # Some programs, like Evergreen, work much better if other tools are available.
         # If a project has a file listing extra dependencies (one per line), add them.
         # Note that we deliberately don't use "Recommends" because people installing at the command-line won't follow your advice, and people installing from a GUI probably won't even see it.
-        extra_depends_filename = "#{project_resource_directory}/lib/DEBIAN-control-Depends.txt"
+        extra_depends_filename = "#{project_resource_directory}/lib/build/DEBIAN-control-Depends.txt"
         if File.exists?(extra_depends_filename)
             extra_depends = IO.readlines(extra_depends_filename).join(", ").gsub("\n", "")
             depends << ", " << extra_depends
