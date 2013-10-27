@@ -1,0 +1,2 @@
+# Divert-Start-At-Version: 27.5.6918
+Divert-From: /usr/share/terminfo/t/terminator
