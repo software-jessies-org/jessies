@@ -405,6 +405,47 @@ if target_os() == "Linux"
         control.puts("Maintainer: software.jessies.org team <jessies-software@googlegroups.com>")
         control.puts("Description: #{generate_debian_package_description(human_project_name)}")
     }
+    diversions_filename = "#{project_resource_directory}/lib/build/DEBIAN-diversions.txt"
+    if File.exists?(diversions_filename)
+        diversion_file_content = IO.read(diversions_filename)
+        if diversion_file_content.match(/^Divert-From: (.+)/) == nil
+            raise("failed to parse Divert-From from #{diversions_filename}")
+        end
+        divertFrom = $1
+        # The https://wiki.debian.org/SummerOfCode2011/DeclarativeDiversions project aimed to automate this part.
+        if diversion_file_content.match(/^# Divert-Start-At-Version: (.+)/) == nil
+            raise("failed to parse Divert-Start-At-Version from #{diversions_filename}")
+        end
+        divertStartAtVersion = $1
+        # Code based on http://www.debian.org/doc/debian-policy/ap-pkg-diversions.html.
+        # dpkg-divert invocation following https://groups.google.com/forum/#!topic/terminator-users/ggMOuxBOtgY.
+        preinstContent = <<EOF
+#!/bin/sh
+if [ upgrade != "$1" ] || dpkg --compare-versions "$2" lt #{divertStartAtVersion}; then
+    dpkg-divert --package #{debian_package_name} --add #{divertFrom}
+fi
+EOF
+        File.open("#{tmp_dir}/DEBIAN/preinst", "w") {
+            |preinst|
+            preinst.write(preinstContent)
+        }
+        system("chmod +x #{tmp_dir}/DEBIAN/preinst")
+        postrmContent = <<EOF
+#!/bin/sh
+if [ remove = "$1" -o abort-install = "$1" -o disappear = "$1" ]; then
+    dpkg-divert --package #{debian_package_name} --remove #{divertFrom}
+fi
+if [ abort-upgrade = "$1" ] && dpkg --compare-versions "$2" lt #{divertStartAtVersion}; then
+    dpkg-divert --package #{debian_package_name} --remove #{divertFrom}
+fi
+EOF
+        File.open("#{tmp_dir}/DEBIAN/postrm", "w") {
+            |postrm|
+            postrm.write(postrmContent)
+        }
+        system("chmod +x #{tmp_dir}/DEBIAN/postrm")
+    end
+    
 end
 if target_os() == "SunOS"
     # Create and check the validity of our package name.
