@@ -190,7 +190,7 @@ class Java
     end
     # If we appear to have found a JVM, extract just the version number.
     # Otherwise return everything the executable said, to give the user some clue as to what went wrong.
-    if java_version.match(/java version "(.*)"/) != nil
+    if java_version.match(/(?:java|openjdk) version "(.*)"/) != nil
       java_version = $1
     end
     return java_version
