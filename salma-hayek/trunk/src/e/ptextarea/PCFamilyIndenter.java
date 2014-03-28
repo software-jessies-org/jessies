@@ -286,7 +286,7 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
             }
             // Check if the line ends with a ';' or a '}'.  If not (and if the line's not empty), the line contains a
             // statement which is continued onto the next line, so we must add a line continuation indent.
-            if (statementContinuesOnNextLine(indentLevels, line)) {
+            if (statementContinuesOnNextLine(indentLevels, line) && isTemplate(line) == false) {
                 indentLevels.push(new Indent(';', defaultIndentation, getOpenBracketIndent(';')));
             }
         }
@@ -405,6 +405,9 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
         return false;
     }
     protected boolean isNamespace(String activePartOfLine) {
+        return false;
+    }
+    protected boolean isTemplate(String activePartOfLine) {
         return false;
     }
 
