@@ -20,6 +20,11 @@ public class PCppIndenter extends PCFamilyIndenter {
         return activePartOfLine.matches("namespace\\s*\\S*\\s*\\{");
     }
     
+    @Override
+    protected boolean isTemplate(String activePartOfLine) {
+        return activePartOfLine.matches("template\\s*<.*>");
+    }
+    
     private static boolean isCppAccessSpecifier(String activePartOfLine) {
         return activePartOfLine.matches("(private|public|protected)\\s*:");
     }
