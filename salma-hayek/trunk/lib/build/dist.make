@@ -56,18 +56,7 @@ PLATFORM_NAME.gz = $(PLATFORM_NAME.$(PRIMARY_INSTALLER_EXTENSION))
 
 PLATFORM_NAME = $(PLATFORM_NAME$(suffix $@))
 SUMMARY = $(PLATFORM_NAME) installer for $(HUMAN_PROJECT_NAME) version $(VERSION_STRING) ($(TARGET_ARCHITECTURE))
-GOOGLECODE_UPLOAD.script = $(SALMA_HAYEK)/lib/build/googlecode_upload.py -s '$(SUMMARY)' -p jessies $<
-GOOGLECODE_UPLOAD.curl = ( cd $(<D) && curl --fail --netrc -v https://jessies.googlecode.com/files --form-string 'summary=$(SUMMARY)' --form 'filename=@$(<F)' )
-# Contra the claim of https://code.google.com/p/support/wiki/ScriptedUploads,
-# there's no proxy support in Python's httplib, as used by Google's script.
-# I don't assume curl everywhere, even though it's simpler than the script,
-# because the script can fetch credentials from svn.
-# The curl method requires ~/.netrc containing:
-# machine jessies.googlecode.com login <username> password <password>
-# Where username should not include @gmail.com.
-# Where password should be the code.google.com password, not gmail's.
-GOOGLECODE_METHOD = $(if $(https_proxy),curl,script)
-GOOGLECODE_UPLOAD = $(GOOGLECODE_UPLOAD.$(GOOGLECODE_METHOD))
+GOOGLE_DRIVE_UPLOAD = cd $(SALMA_HAYEK)/lib/build && ./drive.rb '$(SUMMARY)' 0BzZNCgKvEkQYZDBNTm1HWThOaEU application/octet-stream $<
 
 # ----------------------------------------------------------------------------
 # Variables above this point, rules below.
@@ -100,7 +89,7 @@ publish-changelog: ChangeLog.html
 	mv ChangeLog.html $(DIST_DIRECTORY)/
 
 .PHONY: native-dist
-native-dist: $(addprefix googlecode-upload.,$(PUBLISHABLE_INSTALLERS))
+native-dist: $(addprefix google-drive-upload.,$(PUBLISHABLE_INSTALLERS))
 
 # We mustn't overwrite a file on the server whose md5sum is in Packages file or Debian's tools complain mightily.
 # If you want to upload a new installer, then please check-in first, so the version number changes.
@@ -129,8 +118,7 @@ $(addprefix symlink-latest.,$(PUBLISHABLE_INSTALLERS)): symlink-latest.%: %
 # so we shouldn't allow that during the daytime either.
 # When the version number hasn't changed, we must use the same binary, so we put the same md5sum in the Packages file.
 # If we change the md5sum then the apt programs assume that we've been hacked.
-.PHONY: googlecode-upload.%
-$(addprefix googlecode-upload.,$(PUBLISHABLE_INSTALLERS)): googlecode-upload.%: %
-	@echo "-- Uploading $(<F) to code.google.com..." && \
-	{ curl --fail -o $<.tmp http://jessies.googlecode.com/files/$(<F) && mv $<.tmp $<; } || \
-	$(GOOGLECODE_UPLOAD) < /dev/null
+.PHONY: google-drive-upload.%
+$(addprefix google-drive-upload.,$(PUBLISHABLE_INSTALLERS)): google-drive-upload.%: %
+	@echo "-- Uploading $(<F) to drive.google.com..." && \
+	$(GOOGLE_DRIVE_UPLOAD) < /dev/null
