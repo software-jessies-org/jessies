@@ -49,6 +49,13 @@ def setup()
       :client_secret => client_secrets.client_secret,
       :scope => ['https://www.googleapis.com/auth/drive']
     )
+    # Launchy 2.4.2 is broken on Cygwin64 (probably all of Windows) such that it runs
+    # itself rather than the "start" command.
+    # Even if I hack out the erroneous "launchy" argument from browser.rb (see the check-in comment),
+    # start jibs at the URL for unspecified reasons, possibly related to quoting or length.
+    # By turning on the debug, you get to see the requested URL, which you can copy and paste.
+    # Once you click Accept in Chrome, everything else moves along automatically.
+    ENV["LAUNCHY_DEBUG"] = "true"
     client.authorization = flow.authorize(file_storage)
   else
     client.authorization = file_storage.authorization
