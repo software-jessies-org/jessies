@@ -102,7 +102,10 @@ def insert_file(client, drive, title, description, parentId, mimeType, fileName)
     }
   )
 
-  jj(result.data().to_hash())
+  #jj(result.data().to_hash())
+  if result.status() != 200
+    raise(result)
+  end
 end
 
 def exists(client, drive, parentId, title)
@@ -113,7 +116,10 @@ def exists(client, drive, parentId, title)
   result = client.execute(
     :api_method => drive.children.list,
     :parameters => parameters)
-  jj(result.data().to_hash())
+  #jj(result.data().to_hash())
+  if result.status() != 200
+    raise(result)
+  end
   return result.data().items().empty?() == false
 end
 
