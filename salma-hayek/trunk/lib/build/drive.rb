@@ -39,11 +39,14 @@ def setup()
   client = Google::APIClient.new(:application_name => 'Ruby Drive sample',
       :application_version => '1.0.0')
 
+  $PREVIOUS_VERBOSE = $VERBOSE
+  $VERBOSE = false
   # FileStorage stores auth credentials in a file, so they survive multiple runs
   # of the application. This avoids prompting the user for authorization every
   # time the access token expires, by remembering the refresh token.
   # Note: FileStorage is not suitable for multi-user applications.
   file_storage = Google::APIClient::FileStorage.new(CREDENTIAL_STORE_FILE)
+  $VERBOSE = $PREVIOUS_VERBOSE
   if file_storage.authorization.nil?
     client_secrets = Google::APIClient::ClientSecrets.load
     # The InstalledAppFlow is a helper class to handle the OAuth 2.0 installed
