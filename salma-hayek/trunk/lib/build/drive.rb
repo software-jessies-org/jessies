@@ -1,5 +1,8 @@
 #!/usr/bin/ruby -w
 
+$PREVIOUS_VERBOSE = $VERBOSE
+$VERBOSE = false
+
 # Copyright (C) 2012 Google Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +22,8 @@ require 'google/api_client/client_secrets'
 require 'google/api_client/auth/file_storage'
 require 'google/api_client/auth/installed_app'
 require 'logger'
+
+$VERBOSE = $PREVIOUS_VERBOSE
 
 API_VERSION = 'v2'
 CACHED_API_FILE = "drive-#{API_VERSION}.cache"
@@ -117,6 +122,9 @@ if __FILE__ == $0
   parentId = ARGV.shift()
   mimeType = ARGV.shift()
   fileName = ARGV.shift()
+  if fileName == nil || ARGV.empty?() == false
+    raise("Syntax: drive.rb <description> <id of parent directory> <mime type> <filename>")
+  end
   title = fileName.sub(/^.*\//, "")
   client, drive = setup()
   if exists(client, drive, parentId, title) == false
