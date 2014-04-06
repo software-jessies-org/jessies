@@ -22,7 +22,7 @@ $NIGHTLY_BUILD_SCRIPT $NIGHTLY_BUILD_TREE clean
 # The work area uses a modern svnversion than is available in Debian Etch.
 echo export PATH=/home/martind/software.jessies.org/bluearc:'$PATH'
 echo $NIGHTLY_BUILD_SCRIPT --no-update $NIGHTLY_BUILD_TREE native-dist
-} | dchroot --quiet --chroot ia32 -- bash --login
+} | dchroot --quiet --chroot ia32-squeeze -- bash --login
 $NIGHTLY_BUILD_SCRIPT --no-update $NIGHTLY_BUILD_TREE native-dist
 find $NIGHTLY_BUILD_TREE -name "*.deb" | xargs cp --target-directory=.
 
