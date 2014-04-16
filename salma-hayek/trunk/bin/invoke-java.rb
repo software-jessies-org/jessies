@@ -434,6 +434,8 @@ class Java
     # Work around Sun bug 6961306, which has inconvenienced at least two of our Windows users.
     # Correctness trumps what I presume is a performance optimization.
     add_property("sun.java2d.d3d", "false")
+    # https://bugs.launchpad.net/ubuntu/+source/nvidia-graphics-drivers/+bug/876721
+    add_property("sun.java2d.opengl", "true")
     
     if @class_name != "e/tools/JavaHpp"
       #args << "-verbose:class"
