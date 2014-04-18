@@ -765,8 +765,8 @@ public class Evergreen {
     
     private void initAboutBox() {
         AboutBox aboutBox = AboutBox.getSharedInstance();
-        aboutBox.setWebSiteAddress("http://software.jessies.org/evergreen/");
-        aboutBox.addCopyright("Copyright (C) 1999-2013 software.jessies.org team.");
+        aboutBox.setWebSiteAddress("https://code.google.com/p/jessies/wiki/Evergreen");
+        aboutBox.addCopyright("Copyright (C) 1999-2014 software.jessies.org team.");
         aboutBox.addCopyright("All Rights Reserved.");
         aboutBox.setLicense(AboutBox.License.GPL_2_OR_LATER);
     }
