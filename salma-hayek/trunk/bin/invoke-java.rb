@@ -435,6 +435,14 @@ class Java
     # Correctness trumps what I presume is a performance optimization.
     add_property("sun.java2d.d3d", "false")
     # https://bugs.launchpad.net/ubuntu/+source/nvidia-graphics-drivers/+bug/876721
+    # https://bugs.freedesktop.org/show_bug.cgi?id=41086 suggests it's a bug in xserver-xorg-core.
+    # If we turn on sun.java2d.opengl, then Terminator becomes unusably slow
+    # and CPU hoggy on an Core2 Duo with integrated graphics.
+    # We also get disappearing text when moving windows
+    # right on a Debian Squeeze box with non-free nVidia graphics with
+    # xserver-xorg-core version 2:1.7.7-18.
+    # The two boxes that had the problem that prompted me to enable this
+    # had version 2:1.12.4-6+deb7u2, as does the box with integrated graphics.
     add_property("sun.java2d.opengl", "true")
     
     if @class_name != "e/tools/JavaHpp"
