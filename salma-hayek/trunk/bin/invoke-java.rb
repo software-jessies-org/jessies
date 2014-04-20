@@ -437,13 +437,23 @@ class Java
     # https://bugs.launchpad.net/ubuntu/+source/nvidia-graphics-drivers/+bug/876721
     # https://bugs.freedesktop.org/show_bug.cgi?id=41086 suggests it's a bug in xserver-xorg-core.
     # If we turn on sun.java2d.opengl, then Terminator becomes unusably slow
-    # and CPU hoggy on an Core2 Duo with integrated graphics.
+    # and CPU hoggy on an Core2 Duo with integrated graphics:
+    # 00:02.0 VGA compatible controller: Intel Corporation 82G33/G31 Express Integrated Graphics Controller (rev 10)
     # We also get disappearing text when moving windows
     # right on a Debian Squeeze box with non-free nVidia graphics with
     # xserver-xorg-core version 2:1.7.7-18.
-    # The two boxes that had the problem that prompted me to enable this
+    # The two boxes that had the problem that prompted me to enable opengl
     # had version 2:1.12.4-6+deb7u2, as does the box with integrated graphics.
-    add_property("sun.java2d.opengl", "true")
+    if File.exist?("/usr/bin/dpkg-query")
+      xorgVersion = `dpkg-query --show --showformat '${Version}' xserver-xorg-core`
+      badXorgVersion = "2:1.12.4-6+deb7u2"
+      system("dpkg --compare-versions #{xorgVersion} eq #{badXorgVersion}")
+      runningBadXorgVersion = $?.success?()
+      videoHardware = `lspci`.split("\n").grep(/ VGA /)[0]
+      if runningBadXorgVersion && videoHardware.match(/ Integrated /) == nil
+        add_property("sun.java2d.opengl", "true")
+      end
+    end
     
     if @class_name != "e/tools/JavaHpp"
       #args << "-verbose:class"
