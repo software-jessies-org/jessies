@@ -442,18 +442,14 @@ class Java
     # We also get disappearing text when moving windows
     # right on a Debian Squeeze box with non-free nVidia graphics with
     # xserver-xorg-core version 2:1.7.7-18.
-    # The two boxes that had the problem that prompted me to enable opengl
+    # We get that "ghost text" problem on Wheezy too, if sometimes only when maximized.
+    # And now Evergreen's crashed, plausibly in the nvidia opengl code, per:
+    # https://groups.google.com/forum/#!topic/evergreen-users/h3i6j51VTr8
+    # The two boxes that had the "grains of sand" problem that prompted me to enable opengl
     # had version 2:1.12.4-6+deb7u2, as does the box with integrated graphics.
-    if File.exist?("/usr/bin/dpkg-query")
-      xorgVersion = `dpkg-query --show --showformat '${Version}' xserver-xorg-core`
-      badXorgVersion = "2:1.12.4-6+deb7u2"
-      system("dpkg --compare-versions #{xorgVersion} eq #{badXorgVersion}")
-      runningBadXorgVersion = $?.success?()
-      videoHardware = `lspci`.split("\n").grep(/ VGA /)[0]
-      if runningBadXorgVersion && videoHardware.match(/ Integrated /) == nil
-        add_property("sun.java2d.opengl", "true")
-      end
-    end
+    # I suggest this as a work-around for the "grains of sand" problem on drag-scrolling right:
+    #export _JAVA_OPTIONS='-Dsun.java2d.opengl=true'
+    #add_property("sun.java2d.opengl", "true")
     
     if @class_name != "e/tools/JavaHpp"
       #args << "-verbose:class"
