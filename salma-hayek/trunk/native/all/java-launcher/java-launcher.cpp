@@ -847,7 +847,15 @@ static void deferToHotSpotExceptionHandler() {
     void* cygwinHandle = *reinterpret_cast<void**>(handle);
     ULONG rc = RemoveVectoredContinueHandler(cygwinHandle);
     if (rc == 0) {
-        throw std::runtime_error("RemoveVectoredContinueHandler(" + toString(cygwinHandle) + ") failed");
+        // Between 1.7.28-2 and 1.7.29-2, Cygwin switched to SEH.
+        // It does still register a handler, for "myfault" exceptions,
+        // but that's with AddVectoredExceptionHandler, not the AddVectoredContinueHandler
+        // that it used to use.
+        // Can we guarantee that attempting to deregister someone else's handle here
+        // will always harmlessly fail?
+        // No, so delete this whole function if you're back here long enough after 2014-05-04
+        // for it to be reasonable to expect users to upgrade.
+        //throw std::runtime_error("RemoveVectoredContinueHandler(" + toString(cygwinHandle) + ") failed");
     }
     rc = RemoveVectoredContinueHandler(handle);
     if (rc == 0) {
