@@ -847,7 +847,7 @@ static void deferToHotSpotExceptionHandler() {
     void* cygwinHandle = *reinterpret_cast<void**>(handle);
     ULONG rc = RemoveVectoredContinueHandler(cygwinHandle);
     if (rc == 0) {
-        throw std::runtime_error("RemoveVectoredContinueHandler(cygwinHandle) failed");
+        throw std::runtime_error("RemoveVectoredContinueHandler(" + toString(cygwinHandle) + ") failed");
     }
     rc = RemoveVectoredContinueHandler(handle);
     if (rc == 0) {
