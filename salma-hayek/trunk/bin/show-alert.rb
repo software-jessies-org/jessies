@@ -3,12 +3,8 @@
 if defined?(show_alert)
     # Allow this library to be multiply included without warning.
 else
-    def show_alert(title, message, support_address = nil)
-        require "pathname.rb"
-        salma_hayek = Pathname.new(__FILE__).realpath().dirname().dirname()
-        
-        require "#{salma_hayek}/bin/target-os.rb"
-        instructionLines = []
+    def describe_build()
+        lines = []
         begin
             presumedProjectRoot = Pathname.new($0).realpath().dirname().dirname()
             buildRevisionLines = IO.read("#{presumedProjectRoot}/.generated/build-revision.txt").split("\n")
@@ -16,12 +12,25 @@ else
             projectVersion = buildRevisionLines.shift()
             salmaHayekVersion = buildRevisionLines.shift()
             packageVersion = buildRevisionLines.shift()
-            instructionLines << ""
-            instructionLines << "Package #{packageVersion}"
-            instructionLines << "Revision #{projectVersion} (#{salmaHayekVersion})"
-            instructionLines << "Built #{buildDate}"
+            lines << "Package #{packageVersion}"
+            lines << "Revision #{projectVersion} (#{salmaHayekVersion})"
+            lines << "Built #{buildDate}"
         rescue
         end
+        return lines
+    end
+    
+    # The build-revision file may be updated while we're running.
+    $cached_build_description = describe_build()
+    
+    def show_alert(title, message, support_address = nil)
+        require "pathname.rb"
+        salma_hayek = Pathname.new(__FILE__).realpath().dirname().dirname()
+        
+        require "#{salma_hayek}/bin/target-os.rb"
+        instructionLines = []
+        instructionLines << ""
+        instructionLines.concat($cached_build_description)
         # Some alerts are self-explanatory.
         if support_address != nil
             instructionLines << ""
