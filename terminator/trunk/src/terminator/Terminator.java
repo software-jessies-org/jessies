@@ -126,8 +126,10 @@ public class Terminator {
         if (availableMemory > runtime.maxMemory() / 2) {
             return;
         }
-        Log.warn("Available memory down to " + availableMemory + ", flushing biggest scroll buffer...");
-        flushBiggestScrollBuffer();
+        if (availableMemory < runtime.maxMemory() / 4) {
+            Log.warn("Available memory down to " + availableMemory + ", flushing biggest scroll buffer...");
+            flushBiggestScrollBuffer();
+        }
         // Turning the scroll buffer to garbage won't necessarily cause it to be collected.
         // If it's not collected, then we'll clear another scroll buffer, needlessly and again ineffectually.
         runtime.gc();
