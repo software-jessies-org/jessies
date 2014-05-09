@@ -223,7 +223,9 @@ public class JTerminalPane extends JPanel {
         if (size.equals(currentSizeInChars) == false) {
             try {
                 control.sizeChanged(size, view.getVisibleSize());
-                host.setTerminalSize(size);
+                if (host != null) {
+                    host.setTerminalSize(size);
+                }
             } catch (Exception ex) {
                 if (control != null) {
                     Log.warn("Failed to notify " + control.getPtyProcess() + " of size change", ex);
