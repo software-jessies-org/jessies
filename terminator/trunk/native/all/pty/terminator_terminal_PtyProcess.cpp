@@ -11,13 +11,17 @@
 #include "toString.h"
 #include "unix_exception.h"
 
+#include <pwd.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #ifdef __APPLE__ // sysctl.h doesn't exist on Cygwin.
 #include <sys/sysctl.h>
 #endif
+#include <sys/time.h>
 #include <sys/types.h>
 #include <termios.h>
+#include <utmpx.h>
 
 // Deque is the default choice of container in C++.
 // Using vector connotes a requirement for contiguity.
@@ -217,4 +221,40 @@ jstring terminator_terminal_PtyProcess::nativeListProcessesUsingTty() {
     
     listProcessesUsingTty(processNames, ttyFilename);
     return newStringUtf8(join(", ", processNames));
+}
+
+void terminator_terminal_PtyProcess::nativeUpdateLoginRecord() {
+    utmpx ut;
+    memset(&ut, 0, sizeof(ut));
+    ut.ut_type = fd.get() == -1 ? DEAD_PROCESS : USER_PROCESS;
+    ut.ut_pid = pid.get();
+    std::string ttyFilename(JniString(m_env, slavePtyName.get()));
+    std::string line = ttyFilename.substr(strlen("/dev/"));
+    strncpy(&ut.ut_line[0], &line[0], sizeof(ut.ut_line) - 1);
+    // I get /dev/pts/<n> but this is what man pututxline suggests.
+    // It seems consistent with what gnome-terminal leaves in /var/run/utmp.
+    std::string id = ttyFilename.substr(strlen("/dev/tty"));
+    strncpy(&ut.ut_id[0], &id[0], sizeof(ut.ut_id) - 1);
+    const passwd* pw = getpwuid(getuid());
+    if (pw != 0) {
+        strncpy(&ut.ut_user[0], pw->pw_name, sizeof(ut.ut_user) - 1);
+    }
+    const char* display = getenv("DISPLAY");
+    if (display != 0) {
+        strncpy(&ut.ut_host[0], display, sizeof(ut.ut_host) - 1);
+    }
+    ut.ut_session = pid.get();
+    timeval tv;
+    if (gettimeofday(&tv, 0) == -1) {
+        throw unix_exception("gettimeofday(&tv, 0) failed");
+    }
+    ut.ut_tv.tv_sec = tv.tv_sec;
+    ut.ut_tv.tv_usec = tv.tv_usec;
+    setutxent();
+    if (pututxline(&ut) == 0) {
+        std::ostringstream os;
+        os << "pututxline(" << ut.ut_type << ", " << ut.ut_pid << ", \"" << ut.ut_line << "\", \"" << ut.ut_id << "\", \"" << ut.ut_user << "\", \"" << ut.ut_host << "\", " << ut.ut_session << ", " << ut.ut_tv.tv_sec << ", " << ut.ut_tv.tv_usec << ") failed";
+        throw unix_exception(os.str());
+    }
+    endutxent();
 }
