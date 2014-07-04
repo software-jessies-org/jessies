@@ -150,6 +150,7 @@ public class PtyProcess {
             public Exception call() {
                 try {
                     nativeStartProcess(executable, argv, workingDirectory);
+                    updateLoginRecord();
                     return null;
                 } catch (Exception ex) {
                     return ex;
@@ -202,6 +203,8 @@ public class PtyProcess {
             wasSignaled = true;
             didDumpCore = status.WCOREDUMP();
         }
+        
+        updateLoginRecord();
     }
     
     /**
@@ -248,9 +251,19 @@ public class PtyProcess {
         }
     }
     
+    public void updateLoginRecord() {
+        try {
+            nativeUpdateLoginRecord();
+        } catch (IOException ex) {
+            Log.warn("nativeUpdateLoginRecord failed on " + toString() + ".", ex);
+        }
+    }
+    
     private native void nativeStartProcess(String executable, String[] argv, String workingDirectory) throws IOException;
     
     public native void sendResizeNotification(Dimension sizeInChars, Dimension sizeInPixels) throws IOException;
     
     private native String nativeListProcessesUsingTty() throws IOException;
+    
+    private native void nativeUpdateLoginRecord() throws IOException;
 }
