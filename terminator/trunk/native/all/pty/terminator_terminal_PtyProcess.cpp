@@ -243,7 +243,9 @@ void terminator_terminal_PtyProcess::nativeUpdateLoginRecord() {
     if (display != 0) {
         strncpy(&ut.ut_host[0], display, sizeof(ut.ut_host) - 1);
     }
-    ut.ut_session = pid.get();
+    // Like http://pubs.opengroup.org/onlinepubs/7908799/xsh/utmpx.h.html,
+    // Cygwin doesn't have ut_session, so I guess it isn't important.
+    //ut.ut_session = pid.get();
     timeval tv;
     if (gettimeofday(&tv, 0) == -1) {
         throw unix_exception("gettimeofday(&tv, 0) failed");
@@ -253,7 +255,7 @@ void terminator_terminal_PtyProcess::nativeUpdateLoginRecord() {
     setutxent();
     if (pututxline(&ut) == 0) {
         std::ostringstream os;
-        os << "pututxline(" << ut.ut_type << ", " << ut.ut_pid << ", \"" << ut.ut_line << "\", \"" << ut.ut_id << "\", \"" << ut.ut_user << "\", \"" << ut.ut_host << "\", " << ut.ut_session << ", " << ut.ut_tv.tv_sec << ", " << ut.ut_tv.tv_usec << ") failed";
+        os << "pututxline(" << ut.ut_type << ", " << ut.ut_pid << ", \"" << ut.ut_line << "\", \"" << ut.ut_id << "\", \"" << ut.ut_user << "\", \"" << ut.ut_host << "\", " << ut.ut_tv.tv_sec << ", " << ut.ut_tv.tv_usec << ") failed";
         throw unix_exception(os.str());
     }
     endutxent();
