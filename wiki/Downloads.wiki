@@ -1,7 +1,7 @@
 #summary Downloads
 
-We've had to move the downloads to [https://drive.google.com/folderview?id=0BzZNCgKvEkQYZDBNTm1HWThOaEU&usp=drive_web Google Drive].
-Click the "Switch to List" icon and scroll to the bottom for the most recent offerings.
+We've had to move the downloads to [https://drive.google.com/folderview?id=0BzZNCgKvEkQYZDBNTm1HWThOaEU&usp=drive_web#list Google Drive].
+Scroll to the bottom for the most recent offerings.
 
 The Google Drive folder is linked to from the Project Home, on the left, near the bottom.
 The migration was for reasons explained at https://code.google.com/p/support/wiki/DownloadsFAQ.
