@@ -1,8 +1,6 @@
 #ifndef PARSE_INTEGER_H_included
 #define PARSE_INTEGER_H_included
 
-#define __STDC_LIMIT_MACROS
-
 #include <errno.h>
 #include <inttypes.h>
 
