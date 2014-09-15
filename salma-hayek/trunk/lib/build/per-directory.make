@@ -117,7 +117,8 @@ LOCAL_LDFLAGS += $(if $(BUILDING_MINGW),$(MINGW_FLAGS.$(MINGW_COMPILER)))
 # Post linking changes.
 # ----------------------------------------------------------------------------
 
-NEEDS_SETUID := $(shell grep 'include <utmpx\.h>' $(SOURCES))
+NEEDS_SETUID.Linux = $(shell grep -w pututxline $(SOURCES))
+NEEDS_SETUID := $(NEEDS_SETUID.$(TARGET_OS))
 LOCAL_LDFLAGS += $(if $(NEEDS_SETUID),&& sudo chown root: $(EXECUTABLES) && sudo chmod u+s $(EXECUTABLES))
 
 # ----------------------------------------------------------------------------
