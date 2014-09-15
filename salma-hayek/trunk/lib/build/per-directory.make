@@ -114,6 +114,13 @@ BUILDING_MINGW = $(filter $(CURDIR)/native/Mingw/%,$(SOURCE_DIRECTORY))
 LOCAL_LDFLAGS += $(if $(BUILDING_MINGW),$(MINGW_FLAGS.$(MINGW_COMPILER)))
 
 # ----------------------------------------------------------------------------
+# Post linking changes.
+# ----------------------------------------------------------------------------
+
+NEEDS_SETUID := $(shell grep 'include <utmpx\.h>' $(SOURCES))
+LOCAL_LDFLAGS += $(if $(NEEDS_SETUID),&& sudo chown root: $(EXECUTABLES) && sudo chmod u+s $(EXECUTABLES))
+
+# ----------------------------------------------------------------------------
 # Decide on the default target.
 # ----------------------------------------------------------------------------
 
