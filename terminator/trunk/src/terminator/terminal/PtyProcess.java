@@ -252,11 +252,7 @@ public class PtyProcess {
     }
     
     public void updateLoginRecord() {
-        try {
-            nativeUpdateLoginRecord();
-        } catch (IOException ex) {
-            Log.warn("nativeUpdateLoginRecord failed on " + toString() + ".", ex);
-        }
+        ProcessUtilities.spawn(null, FileUtilities.findSupportBinary("update-login-record").toString(), Integer.toString(fd), Integer.toString(pid), slavePtyName);
     }
     
     private native void nativeStartProcess(String executable, String[] argv, String workingDirectory) throws IOException;
@@ -264,6 +260,4 @@ public class PtyProcess {
     public native void sendResizeNotification(Dimension sizeInChars, Dimension sizeInPixels) throws IOException;
     
     private native String nativeListProcessesUsingTty() throws IOException;
-    
-    private native void nativeUpdateLoginRecord() throws IOException;
 }
