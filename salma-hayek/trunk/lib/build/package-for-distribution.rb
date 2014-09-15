@@ -194,6 +194,10 @@ def copy_files_for_installation(src_root_directory, dst_root_directory)
         $stdout.flush()
         FileUtils.mkdir_p(dst_dirname)
         FileUtils.cp(src_pathname, dst_pathname)
+        stat = File.stat(src_pathname)
+        if stat.setuid?()
+            FileUtils.chmod(stat.mode(), dst_pathname)
+        end
     }
 end
 
