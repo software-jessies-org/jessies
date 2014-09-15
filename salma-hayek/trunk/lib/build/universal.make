@@ -215,6 +215,11 @@ CPPFLAGS.Linux += -D_XOPEN_SOURCE=600
 CPPFLAGS.Linux += -D_BSD_SOURCE
 CPPFLAGS += $(CPPFLAGS.$(TARGET_OS))
 
+# stdint.h tells us that:
+# The ISO C99 standard specifies that in C++ implementations these
+# macros should only be defined if explicitly requested.
+CXXFLAGS += -D__STDC_LIMIT_MACROS
+
 C_AND_CXX_FLAGS += $(C_AND_CXX_FLAGS.$(TARGET_OS))
 CFLAGS += $(C_AND_CXX_FLAGS)
 CXXFLAGS += $(C_AND_CXX_FLAGS)
