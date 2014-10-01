@@ -125,9 +125,9 @@ void launchCygwin(char** argValues) {
     std::string program = directoryPrefix + "ruby-launcher.exe";
     // We mustn't quote the program argument but we must quote argv[0].
     arguments.push_back(quote(program));
-    // Make sure we invoke the Cygwin rubyw, not any native version that might be ahead of it on the PATH.
-    std::string rubyInterpreter = cygwinBin + "\\rubyw.exe";
-    checkReadableFile("Cygwin Rubyw (Ruby with no console window)", rubyInterpreter);
+    // Make sure we invoke the Cygwin ruby, not any native version that might be ahead of it on the PATH.
+    std::string rubyInterpreter = cygwinBin + "\\ruby.exe";
+    checkReadableFile("Cygwin Ruby", rubyInterpreter);
     arguments.push_back(quote(rubyInterpreter));
     while (*argValues != 0) {
         const char* argument = *argValues;
