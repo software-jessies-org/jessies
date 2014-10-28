@@ -20,7 +20,7 @@ require "#{salma_hayek}/bin/show-alert.rb"
 
 # Do we have a good enough version of Mac OS?
 actual_mac_os_version = `sw_vers -productVersion`.chomp()
-if actual_mac_os_version.match(/^10\.[4-9]/) == nil
+if actual_mac_os_version.match(/^10\.(\d+)/) == nil || $1.to_i() < 4
     show_alert("This application requires a newer version of Mac OS X.", "This application requires at least Mac OS 10.4, but you have Mac OS #{actual_mac_os_version}.\n\nPlease upgrade.")
     exit(1)
 end
