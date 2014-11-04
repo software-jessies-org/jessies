@@ -119,7 +119,7 @@ LOCAL_LDFLAGS += $(if $(BUILDING_MINGW),$(MINGW_FLAGS.$(MINGW_COMPILER)))
 
 NEEDS_SETUID.Linux = $(shell grep -w pututxline $(SOURCES))
 NEEDS_SETUID := $(NEEDS_SETUID.$(TARGET_OS))
-LOCAL_LDFLAGS += $(if $(NEEDS_SETUID),&& sudo chown root: $(EXECUTABLES) && sudo chmod u+s,a+rx $(EXECUTABLES))
+LOCAL_LDFLAGS += $(if $(NEEDS_SETUID),&& sudo chown root: $(EXECUTABLES) && sudo chmod u+s$(COMMA)a+rx $(EXECUTABLES))
 
 # ----------------------------------------------------------------------------
 # Decide on the default target.

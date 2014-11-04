@@ -13,6 +13,7 @@
 # Define useful stuff not provided by GNU make.
 # ----------------------------------------------------------------------------
 
+COMMA = ,
 SPACE = $(subst :, ,:)
 
 # I sprinkled the code with calls to dump the wall-clock time and counted the
