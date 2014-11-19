@@ -106,6 +106,12 @@ public class CSIEscapeAction implements TerminalAction {
             return processFontEscape(model, midSequence);
         case 'n':
             return processDeviceStatusReport(model, midSequence);
+        case 'p':
+            if (midSequence.equals("!")) {
+                control.reset();
+                return true;
+            }
+            break;
         case 'r':
             if (midSequence.startsWith("?")) {
                 return restoreDecPrivateModes(midSequence);
@@ -114,10 +120,9 @@ public class CSIEscapeAction implements TerminalAction {
             }
         case 's':
             return saveDecPrivateModes(midSequence);
-        default:
-            Log.warn("unknown CSI sequence " + StringUtilities.escapeForJava(sequence));
-            return false;
         }
+        Log.warn("unknown CSI sequence " + StringUtilities.escapeForJava(sequence));
+        return false;
     }
     
     public boolean clearTabs(TerminalModel model, String seq) {
@@ -157,6 +162,12 @@ public class CSIEscapeAction implements TerminalAction {
             int mode = Integer.parseInt(modeString);
             if (isPrivateMode) {
                 switch (mode) {
+                case 3:
+                    Log.warn("Unsupported private mode: 80 Column Mode (DECCOLM)");
+                    break;
+                case 4:
+                    Log.warn("Unsupported private mode: Jump (Fast) Scroll (DECSCLM)");
+                    break;
                 case 25:
                     model.setCursorVisible(value);
                     break;

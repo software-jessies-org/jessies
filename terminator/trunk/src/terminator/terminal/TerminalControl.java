@@ -205,7 +205,7 @@ public class TerminalControl {
         setAutomaticNewline(false);
         invokeCharacterSet(0);
         designateCharacterSet(0, 'B');
-        designateCharacterSet(1, '0');
+        designateCharacterSet(1, 'B');
         designateCharacterSet(2, 'B');
         designateCharacterSet(3, 'B');
         if (model != null) {
