@@ -109,15 +109,19 @@ public class TerminalModel {
         view.sizeChanged();
         lineIsDirty(0);
         
+        resetCursorPosition();
+        
+        // Redraw ourselves.
+        view.repaint();
+        checkInvariant();
+    }
+    
+    private void resetCursorPosition() {
         // Re-position the cursor.
         // FIXME: it's a bit crazy that these aren't tied!
         // FIXME: it's even crazier that they use different origins!
         setCursorPosition(-1, 1);
         view.setCursorPosition(cursorPosition);
-        
-        // Redraw ourselves.
-        view.repaint();
-        checkInvariant();
     }
     
     public void flushScrollBuffer() {
@@ -279,6 +283,7 @@ public class TerminalModel {
     }
     
     public void fullReset() {
+        resetCursorPosition();
         int firstLineToClear = getFirstDisplayLine();
         for (int i = 0; i < height; i++) {
             getTextLine(firstLineToClear + i).clear();

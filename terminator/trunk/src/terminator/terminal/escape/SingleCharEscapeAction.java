@@ -55,6 +55,7 @@ public class SingleCharEscapeAction implements TerminalAction {
                 CSIEscapeAction.sendDeviceAttributes(control);
                 break;
             case 'c':  // Power on (full reset).
+                control.reset();
                 model.fullReset();
                 break;
                 
