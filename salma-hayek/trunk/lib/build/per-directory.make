@@ -76,14 +76,14 @@ LOCAL_LDFLAGS.Darwin += $(if $(BUILDING_JNI),-arch x86_64 -framework JavaVM)
 # Build shared libraries.
 # ----------------------------------------------------------------------------
 
-LOCAL_SHARED_LIBRARY_EXTENSION = $(if $(BUILDING_JNI),$(JNI_LIBRARY_EXTENSION),$(SHARED_LIBRARY_EXTENSION))
-POTENTIAL_SHARED_LIBRARY = $(LIB_DIRECTORY)/$(patsubst liblib%,lib%,$(SHARED_LIBRARY_PREFIX)$(BASE_NAME)).$(LOCAL_SHARED_LIBRARY_EXTENSION)
+LOCAL_SHARED_LIBRARY_EXTENSIONS = $(sort $(if $(BUILDING_JNI),$(LEGACY_JNI_LIBRARY_EXTENSION)) $(SHARED_LIBRARY_EXTENSION))
+POTENTIAL_SHARED_LIBRARIES = $(addprefix $(LIB_DIRECTORY)/$(patsubst liblib%,lib%,$(SHARED_LIBRARY_PREFIX)$(BASE_NAME)).,$(LOCAL_SHARED_LIBRARY_EXTENSIONS))
 
 BUILDING_SHARED_LIBRARY += $(filter lib%,$(notdir $(SOURCE_DIRECTORY)))
 BUILDING_SHARED_LIBRARY += $(BUILDING_JNI)
 
 LOCAL_LDFLAGS += $(if $(strip $(BUILDING_SHARED_LIBRARY)),$(SHARED_LIBRARY_LDFLAGS))
-SHARED_LIBRARY = $(if $(strip $(BUILDING_SHARED_LIBRARY)),$(POTENTIAL_SHARED_LIBRARY))
+SHARED_LIBRARIES = $(if $(strip $(BUILDING_SHARED_LIBRARY)),$(POTENTIAL_SHARED_LIBRARIES))
 
 # ----------------------------------------------------------------------------
 # Add Cocoa frameworks if we're building Objective-C/C++.
@@ -125,7 +125,7 @@ LOCAL_LDFLAGS += $(if $(NEEDS_SETUID),&& echo "-- Giving $(notdir $(EXECUTABLES)
 # Decide on the default target.
 # ----------------------------------------------------------------------------
 
-DESIRED_TARGETS = $(if $(strip $(SHARED_LIBRARY)),$(SHARED_LIBRARY),$(EXECUTABLES))
+DESIRED_TARGETS = $(if $(strip $(SHARED_LIBRARIES)),$(SHARED_LIBRARIES),$(EXECUTABLES))
 DEFAULT_TARGETS = $(if $(strip $(MISSING_PREREQUISITES)),missing-prerequisites.$(BASE_NAME),$(DESIRED_TARGETS))
 
 define MISSING_PREREQUISITES_RULE
@@ -145,7 +145,7 @@ endef
 # LOCAL_C_AND_CXX_FLAGS is evaluated here, so it can refer to local variables but not automatic ones.
 $(eval $(OBJECTS): C_AND_CXX_FLAGS += $(LOCAL_C_AND_CXX_FLAGS))
 # LOCAL_LDFLAGS is evaluated here, so it can refer to local variables but not automatic ones.
-$(eval $(EXECUTABLES) $(SHARED_LIBRARY): LDFLAGS += $(LOCAL_LDFLAGS))
+$(eval $(EXECUTABLES) $(SHARED_LIBRARIES): LDFLAGS += $(LOCAL_LDFLAGS))
 $(NEW_JNI_HEADER): JNI_BASE_NAME := $(JNI_BASE_NAME)
 $(NEW_JNI_HEADER): JNI_CLASS_NAME := $(JNI_CLASS_NAME)
 missing-prerequisites.$(BASE_NAME): RULE := $(MISSING_PREREQUISITES_RULE)
@@ -159,7 +159,7 @@ missing-prerequisites.$(BASE_NAME): RULE := $(MISSING_PREREQUISITES_RULE)
 # Our linked targets.
 # ----------------------------------------------------------------------------
 
-$(EXECUTABLES) $(SHARED_LIBRARY): $(OBJECTS)
+$(EXECUTABLES) $(SHARED_LIBRARIES): $(OBJECTS)
 	@echo "-- Linking $(notdir $@)..."
 	mkdir -p $(@D) && \
 	$(LD) $^ -o $@ $(LDFLAGS)
