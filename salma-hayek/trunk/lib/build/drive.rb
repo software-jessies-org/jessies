@@ -140,3 +140,20 @@ if __FILE__ == $0
     insert_file(client, drive, title, description, parentId, mimeType, fileName)
   end
 end
+
+# Try removing drive.rb-oath2.json if you get this.
+# Then you'll get a browser pop to confirm access, then it works again.
+# I hadn't uploaded from this machine for a few months.
+# /Users/mad/.gem/ruby/1.8/gems/signet-0.5.0/lib/signet/oauth_2/client.rb:885:in `fetch_access_token': Authorization failed.  Server message: (Signet::AuthorizationError)
+# {
+#  "error" : "invalid_grant"
+# }
+# 	from /Users/mad/.gem/ruby/1.8/gems/signet-0.5.0/lib/signet/oauth_2/client.rb:898:in `fetch_access_token!'
+# 	from /Library/Ruby/Gems/1.8/gems/google-api-client-0.7.1/lib/google/api_client/auth/file_storage.rb:51:in `load_credentials'
+# 	from /Library/Ruby/Gems/1.8/gems/google-api-client-0.7.1/lib/google/api_client/auth/file_storage.rb:46:in `open'
+# 	from /Library/Ruby/Gems/1.8/gems/google-api-client-0.7.1/lib/google/api_client/auth/file_storage.rb:46:in `load_credentials'
+# 	from /Library/Ruby/Gems/1.8/gems/google-api-client-0.7.1/lib/google/api_client/auth/file_storage.rb:39:in `initialize'
+#  	from ./drive.rb:48:in `new'
+# 	from ./drive.rb:48:in `setup'
+#	from ./drive.rb:138
+
