@@ -10,9 +10,18 @@ import java.util.regex.*;
 import org.jdesktop.swingworker.SwingWorker;
 
 public class WorkspaceFileList {
-    // A thread pool for updating the file lists.
-    // One thread per workspace can cause a lot of load during startup, when all workspaces need updating at once.
-    private static final ExecutorService fileListUpdateExecutorService = ThreadUtilities.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), "File List Updater");
+    private static int chooseThreadCount() {
+        // A thread pool for updating the file lists.
+        // One thread per workspace can cause a lot of load during startup, when all workspaces need updating at once.
+        // Indeed, some machines are unusable with more than one thread doing this.
+        // We don't know how to tell them from others that work fine.
+        if (Evergreen.getInstance().getPreferences().getBoolean(EvergreenPreferences.MINIMIZE_INDEXING_IO)) {
+            return 1;
+        }
+        return Runtime.getRuntime().availableProcessors();
+    }
+    
+    private static final ExecutorService fileListUpdateExecutorService = ThreadUtilities.newFixedThreadPool(chooseThreadCount(), "File List Updater");
     
     private final Workspace workspace;
     private final ArrayList<Listener> listeners = new ArrayList<Listener>();
