@@ -1,6 +1,7 @@
 package e.util;
 
 import java.awt.datatransfer.*;
+import java.io.*;
 
 /**
  * Makes selection of large amounts of text on X11 systems cheap by deferring the copy until the user actually tries to paste.
@@ -20,11 +21,16 @@ public abstract class LazyStringSelection implements Transferable, ClipboardOwne
         return flavor.equals(DataFlavor.stringFlavor);
     }
     
-    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException {
+    public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
         if (flavor.equals(DataFlavor.stringFlavor)) {
             synchronized (this) {
                 if (cachedValue == null) {
-                    cachedValue = reallyGetText();
+                    try {
+                        cachedValue = reallyGetText();
+                    } catch (OutOfMemoryError er) {
+                        Log.warn("OutOfMemoryError assembling clipboard", er);
+                        throw new IOException("OutOfMemoryError assembling clipboard", er);
+                    }
                 }
                 return cachedValue;
             }

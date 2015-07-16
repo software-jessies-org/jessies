@@ -189,6 +189,10 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
         try {
             preDispatchEvent();
             super.dispatchEvent(event);
+        } catch (Error er) {
+            // Make sure OutOfMemoryError in particular gets logged.
+            Log.warn("Uncaught exception during event dispatching", er);
+            throw er;
         } finally {
             postDispatchEvent();
             if (haveShownSomeComponent == false) {
