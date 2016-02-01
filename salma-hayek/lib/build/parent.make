@@ -38,4 +38,4 @@ recurse.%:
 
 .PHONY: update
 update:
-	{ $(foreach SUBDIR,$(SUBDIRS),( cd $(SUBDIR) && git pull &);) } | cat
+	git pull
