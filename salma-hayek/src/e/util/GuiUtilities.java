@@ -13,7 +13,11 @@ import org.jessies.os.*;
 
 public class GuiUtilities {
     static {
-        e.debug.EventDispatchThreadHangMonitor.initMonitoring();
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                e.debug.EventDispatchThreadHangMonitor.initMonitoring();
+            }
+        });
     }
     
     /**
