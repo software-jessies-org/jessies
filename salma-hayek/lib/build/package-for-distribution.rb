@@ -403,7 +403,8 @@ if target_os() == "Linux"
         control.puts("Depends: #{depends}")
         # Although Replaces would remove the need for user intervention, it would be anti-social
         # both to the conflicting package and to anyone using the Scheme interpreter or pane-oriented terminal.
-        control.puts("Conflicts: #{machine_project_name}")
+        # And Conflicts stop us from having the pane-oriented terminal installed too.
+        #control.puts("Conflicts: #{machine_project_name}")
         control.puts("Homepage: https://code.google.com/p/jessies/wiki/#{human_project_name}")
         control.puts("Installed-Size: #{installed_size}")
         control.puts("Maintainer: software.jessies.org team <jessies-software@googlegroups.com>")
@@ -412,30 +413,33 @@ if target_os() == "Linux"
     diversions_filename = "#{project_resource_directory}/lib/build/DEBIAN-diversions.txt"
     if File.exists?(diversions_filename)
         diversion_file_content = IO.read(diversions_filename)
-        if diversion_file_content.match(/^Divert-From: (.+)/) == nil
-            raise("failed to parse Divert-From from #{diversions_filename}")
-        end
-        divertFrom = $1
-        # The https://wiki.debian.org/SummerOfCode2011/DeclarativeDiversions project aimed to automate this part.
-        if diversion_file_content.match(/^# Divert-Start-At-Version: (.+)/) == nil
-            raise("failed to parse Divert-Start-At-Version from #{diversions_filename}")
-        end
-        divertStartAtVersion = $1
-        # Code based on http://www.debian.org/doc/debian-policy/ap-pkg-diversions.html.
-        # dpkg-divert invocation following https://groups.google.com/forum/#!topic/terminator-users/ggMOuxBOtgY.
         preinstContent = <<EOF
 #!/bin/sh
+EOF
+        postrmContent = <<EOF
+#!/bin/sh
+EOF
+        divertStartAtVersion = nil
+        divertFrom = nil
+        diversion_file_content.each_line() {
+            |line|
+            # The https://wiki.debian.org/SummerOfCode2011/DeclarativeDiversions project aimed to automate this part.
+            if line.match(/^# Divert-Start-At-Version: (.+)/)
+                divertStartAtVersion = $1
+                next
+            end
+            if line.match(/^Divert-From: (.+)/) == nil
+                next
+            end
+            divertFrom = $1
+            # Code based on http://www.debian.org/doc/debian-policy/ap-pkg-diversions.html.
+            # dpkg-divert invocation following https://groups.google.com/forum/#!topic/terminator-users/ggMOuxBOtgY.
+            preinstContent << <<EOF
 if [ upgrade != "$1" ] || dpkg --compare-versions "$2" lt #{divertStartAtVersion}; then
     dpkg-divert --package #{debian_package_name} --add #{divertFrom}
 fi
 EOF
-        File.open("#{tmp_dir}/DEBIAN/preinst", "w") {
-            |preinst|
-            preinst.write(preinstContent)
-        }
-        system("chmod +x #{tmp_dir}/DEBIAN/preinst")
-        postrmContent = <<EOF
-#!/bin/sh
+            postrmContent << <<EOF
 if [ remove = "$1" -o abort-install = "$1" -o disappear = "$1" ]; then
     dpkg-divert --package #{debian_package_name} --remove #{divertFrom}
 fi
@@ -443,6 +447,18 @@ if [ abort-upgrade = "$1" ] && dpkg --compare-versions "$2" lt #{divertStartAtVe
     dpkg-divert --package #{debian_package_name} --remove #{divertFrom}
 fi
 EOF
+        }
+        if divertFrom == nil
+            raise("failed to parse Divert-From from #{diversions_filename}")
+        end
+        if divertStartAtVersion == nil
+            raise("failed to parse Divert-Start-At-Version from #{diversions_filename}")
+        end
+        File.open("#{tmp_dir}/DEBIAN/preinst", "w") {
+            |preinst|
+            preinst.write(preinstContent)
+        }
+        system("chmod +x #{tmp_dir}/DEBIAN/preinst")
         File.open("#{tmp_dir}/DEBIAN/postrm", "w") {
             |postrm|
             postrm.write(postrmContent)

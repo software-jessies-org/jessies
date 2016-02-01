@@ -1,2 +1,6 @@
 # Divert-Start-At-Version: 27.6.6918
 Divert-From: /usr/share/terminfo/t/terminator
+# Divert-Start-At-Version: 27.62.6975
+Divert-From: /usr/bin/terminator
+Divert-From: /usr/share/man/man1/terminator.1.gz
+Divert-From: /usr/share/applications/terminator.desktop
