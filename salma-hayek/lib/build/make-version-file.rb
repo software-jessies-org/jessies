@@ -83,7 +83,7 @@ def getWorkingCopyVersion(directory)
     return extractMercurialVersionNumber(getMercurialVersion(directory))
   elsif (Pathname.new(directory) + ".svn").exist?()
     return extractSubversionVersionNumber(getSubversionVersion(directory))
-  elsif (Pathname.new(directory) + ".." + ".git").exist?()
+  elsif (Pathname.new(directory).realpath() + ".." + ".git").exist?()
     return extractGitVersionNumber(getGitVersion(directory))
   else
     # An end-user building from source, maybe?
