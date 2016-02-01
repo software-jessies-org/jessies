@@ -38,4 +38,4 @@ recurse.%:
 
 .PHONY: update
 update:
-	git pull
+	cd salma-hayek && git pull
