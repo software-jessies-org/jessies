@@ -59,6 +59,12 @@ class SubversionProject < Project
   end
 end
 
+class GitProject < Project
+  def update()
+    system("git status ; git diff ; git pull")
+  end
+end
+
 projects = []
 
 Dir.glob("#{projects_root}/*/.svn").each() {
@@ -76,14 +82,19 @@ Dir.glob("#{projects_root}/*/.bzr").each() {
   bzr_directory =~ /^(.*\/)\.bzr$/
   projects << BazaarProject.new($1)
 }
+Dir.glob("#{projects_root}/.git").each() {
+  projects << GitProject.new("#{projects_root}/")
+}
 projects.uniq!()
 
 # ----------------------------------------------------------------------------
 # Of the jessies.org projects, salma-hayek must come first. Performance anxiety.
 # ----------------------------------------------------------------------------
 salma_hayek = projects.find() { |item| item.directory().include?("/salma-hayek/") }
-projects.delete(salma_hayek)
-projects.insert(0, salma_hayek)
+if salma_hayek
+  projects.delete(salma_hayek)
+  projects.insert(0, salma_hayek)
+end
 
 # ----------------------------------------------------------------------------
 # Update and build the projects.

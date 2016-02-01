@@ -16,6 +16,7 @@ SIMPLE_TARGETS += clean
 SIMPLE_TARGETS += install
 SIMPLE_TARGETS += installer
 SIMPLE_TARGETS += native
+SIMPLE_TARGETS += native-dist
 SIMPLE_TARGETS += test
 
 define MAKE_SIMPLE_TARGET
