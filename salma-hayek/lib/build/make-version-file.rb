@@ -59,6 +59,23 @@ def extractSubversionVersionNumber(versionString)
   raise Exception.new("Failed to parse version out of svnversion output:\n#{versionString}")
 end
 
+#
+# Git
+#
+
+def getGitVersion(directory)
+  command = "cd #{directory} && git rev-list HEAD"
+  output = `#{command}`.chomp()
+  if $?.success?()
+    return output
+  end
+  raise Exception.new("Failed running #{command}")
+end
+
+def extractGitVersionNumber(versionString)
+  return versionString.split("\n").size()
+end
+
 # --------------------------------------------------------------------------------------------------------
 
 def getWorkingCopyVersion(directory)
@@ -66,6 +83,8 @@ def getWorkingCopyVersion(directory)
     return extractMercurialVersionNumber(getMercurialVersion(directory))
   elsif (Pathname.new(directory) + ".svn").exist?()
     return extractSubversionVersionNumber(getSubversionVersion(directory))
+  elsif (Pathname.new(directory) + ".." + ".git").exist?()
+    return extractGitVersionNumber(getGitVersion(directory))
   else
     # An end-user building from source, maybe?
     # Returning 0 as the version number lets us build without warnings.
