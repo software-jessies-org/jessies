@@ -1,9 +1,9 @@
 #!/usr/bin/ruby -w
-require "dl"
-require "dl/import"
+require "fiddle"
+require "fiddle/import"
 
 module Rpcrt4
-  extend(DL::Importer)
+  extend(Fiddle::Importer)
   dlload("rpcrt4")
   extern("int UuidCreateSequential(unsigned char*)")
 end
