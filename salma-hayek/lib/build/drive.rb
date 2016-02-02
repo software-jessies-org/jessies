@@ -72,7 +72,7 @@ def setup()
   drive = nil
   # Load cached discovered API, if it exists. This prevents retrieving the
   # discovery document on every run, saving a round-trip to API servers.
-  if File.exists? CACHED_API_FILE
+  if File.exist?(CACHED_API_FILE)
     File.open(CACHED_API_FILE) do |file|
       drive = Marshal.load(file)
     end
@@ -156,4 +156,3 @@ end
 #  	from ./drive.rb:48:in `new'
 # 	from ./drive.rb:48:in `setup'
 #	from ./drive.rb:138
-
