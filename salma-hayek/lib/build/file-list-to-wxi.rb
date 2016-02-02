@@ -24,7 +24,6 @@ $stdin.each() {
   directoryPath = pathComponents.join("/")
   directoryPathToFileNames[directoryPath].push(fileName)
 }
-numberOfDirectories = directoryPathToFileNames.length()
 puts("<Include>")
 directoryNumber = 0
 componentNumber = 0
