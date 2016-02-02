@@ -388,8 +388,8 @@ if target_os() == "Linux"
         # Pull our build dependencies from a file rather than hard-coding them here.
         # We get build-essential for free.
         # We could also get per-project build dependencies here.
-        build_depends_filename = "#{salma_hayek}/lib/build/DEBIAN-control-Build-Depends.txt"
-        build_depends = IO.readlines(build_depends_filename).join(", ").gsub("\n", "")
+        #build_depends_filename = "#{salma_hayek}/lib/build/DEBIAN-control-Build-Depends.txt"
+        #build_depends = IO.readlines(build_depends_filename).join(", ").gsub("\n", "")
         # Build-Depends is supposed to be in the source stanza of the source package's control file.
         # We don't have a source package.
         # On Lenny, dpkg-deb throws off warnings when Build-Depends is present in a binary package's control file.
