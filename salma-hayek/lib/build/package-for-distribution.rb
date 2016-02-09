@@ -405,7 +405,7 @@ if target_os() == "Linux"
         # both to the conflicting package and to anyone using the Scheme interpreter or pane-oriented terminal.
         # And Conflicts stop us from having the pane-oriented terminal installed too.
         #control.puts("Conflicts: #{machine_project_name}")
-        control.puts("Homepage: https://code.google.com/p/jessies/wiki/#{human_project_name}")
+        control.puts("Homepage: https://github.com/software-jessies-org/jessies/wiki/#{human_project_name}")
         control.puts("Installed-Size: #{installed_size}")
         control.puts("Maintainer: software.jessies.org team <jessies-software@googlegroups.com>")
         control.puts("Description: #{generate_debian_package_description(human_project_name)}")
@@ -503,7 +503,7 @@ if target_os() == "SunOS"
         pkginfo.puts("DESC=#{extract_package_description_from_html()}")
         pkginfo.puts("VERSION=#{compressed_version_number}")
         pkginfo.puts("CATEGORY=application")
-        pkginfo.puts("VENDOR=https://code.google.com/p/jessies/")
+        pkginfo.puts("VENDOR=https://github.com/software-jessies-org/jessies")
         pkginfo.puts("EMAIL=jessies-software@googlegroups.com")
     }
     

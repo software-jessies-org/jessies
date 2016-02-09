@@ -18,14 +18,14 @@ public class HelpMenu {
         if (webSiteAddress != null) {
             if (Boolean.getBoolean("e.gui.HelpMenu.hasManual")) {
                 // FIXME: GNOME usually says "Contents", but also usually implies there's a local copy.
-                Action manualAction = new WebLinkAction("View _Manual", "https://code.google.com/p/jessies/source/browse/" + Log.getApplicationName().toLowerCase() + "/trunk/www/manual.html");
+                Action manualAction = new WebLinkAction("View _Manual", "https://raw.githubusercontent.com/software-jessies-org/jessies/master/" + Log.getApplicationName().toLowerCase() + "/www/manual.html");
                 GnomeStockIcon.useStockIcon(manualAction, "gtk-help");
                 menu.add(manualAction);
                 menu.addSeparator();
             }
             // FIXME: how useful are the non-FAQ links, especially since you can get to them from the FAQ?
             menu.add(new WebLinkAction("View _Web Page", webSiteAddress));
-            menu.add(new WebLinkAction("View _Change Log", "https://code.google.com/p/jessies/source/list"));
+            menu.add(new WebLinkAction("View _Change Log", "https://github.com/software-jessies-org/jessies/commits/master"));
             menu.add(new WebLinkAction("View _FAQ", webSiteAddress + "FAQ"));
             menu.addSeparator();
         }

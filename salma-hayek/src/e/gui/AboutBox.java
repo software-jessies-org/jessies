@@ -405,8 +405,8 @@ public class AboutBox {
         Log.setApplicationName("AboutBoxTest");
         GuiUtilities.initLookAndFeel();
         AboutBox aboutBox = AboutBox.getSharedInstance();
-        aboutBox.setWebSiteAddress("https://code.google.com/p/jessies/");
-        aboutBox.addCopyright("Copyright (C) 2006, Elliott Hughes");
+        aboutBox.setWebSiteAddress("https://github.com/software-jessies-org/jessies");
+        aboutBox.addCopyright("Copyright (C) 2006-2016, software.jessies.org team");
         aboutBox.show();
     }
 }
