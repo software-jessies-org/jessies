@@ -39,4 +39,5 @@ recurse.%:
 
 .PHONY: update
 update:
-	cd salma-hayek && git pull
+	( cd salma-hayek && git pull )
+	( cd scm && git pull ) || true

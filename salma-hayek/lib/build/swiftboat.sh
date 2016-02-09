@@ -22,7 +22,7 @@ $NIGHTLY_BUILD_SCRIPT $NIGHTLY_BUILD_TREE clean
 echo $NIGHTLY_BUILD_SCRIPT --no-update $NIGHTLY_BUILD_TREE native-dist
 } | dchroot --quiet --chroot ia32-squeeze -- bash --login
 $NIGHTLY_BUILD_SCRIPT --no-update $NIGHTLY_BUILD_TREE native-dist
-find $NIGHTLY_BUILD_TREE -name "*.deb" | xargs cp --target-directory=.
+find -L $NIGHTLY_BUILD_TREE -name "*.deb" | xargs cp --target-directory=.
 
 # If we don't have a Packages file (as well as Packages.gz) we get:
 # Failed to fetch http://deb/software.jessies.org/./Release  Unable to find expected entry  Packages in Meta-index file (malformed Release file?)
