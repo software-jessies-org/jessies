@@ -85,6 +85,8 @@ def getWorkingCopyVersion(directory)
     return extractSubversionVersionNumber(getSubversionVersion(directory))
   elsif (Pathname.new(directory).realpath() + ".." + ".git").exist?()
     return extractGitVersionNumber(getGitVersion(directory))
+  elsif (Pathname.new(directory).realpath() + ".git").exist?()
+    return extractGitVersionNumber(getGitVersion(directory))
   else
     # An end-user building from source, maybe?
     # Returning 0 as the version number lets us build without warnings.
