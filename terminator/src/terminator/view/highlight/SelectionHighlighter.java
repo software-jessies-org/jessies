@@ -116,11 +116,11 @@ public class SelectionHighlighter implements ClipboardOwner, MouseListener, Mous
     }
     
     private void updateSelectionMode(MouseEvent event) {
-
-        if(GuiUtilities.isMacOs()) 
+        if (GuiUtilities.isMacOs()) {
             blockMode = event.isAltDown();
-        else 
+        } else {
             blockMode = event.isControlDown();
+        }
     }
     
     private DragHandler getDragHandlerForClick(MouseEvent e) {
