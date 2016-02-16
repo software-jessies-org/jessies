@@ -355,7 +355,7 @@ public class AboutBox {
         };
         for (String line : info) {
             addVersion(line);
-            Log.warn(line);
+            Log.recordBanner(line);
         }
     }
     

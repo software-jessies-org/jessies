@@ -1,5 +1,6 @@
 package e.util;
 
+import java.util.*;
 import java.util.regex.*;
 
 public class Log {
@@ -41,12 +42,18 @@ public class Log {
         }
     }
     
+    private static ArrayList<String> banners = new ArrayList<String>();
+    
+    public static void recordBanner(String message) {
+        banners.add(message);
+    }
+    
     static {
-        warn(getJavaVersion());
-        warn(getOsVersion());
+        recordBanner(getJavaVersion());
+        recordBanner(getOsVersion());
         String launcherOsVersion = System.getProperty("e.util.Log.launcherOsVersion");
         if (launcherOsVersion != null) {
-            warn(launcherOsVersion);
+            recordBanner(launcherOsVersion);
         }
     }
     
@@ -90,7 +97,15 @@ public class Log {
         warn(message, null);
     }
 
+    private static boolean needBanner = true;
+
     public static void warn(String message, Throwable th) {
+        if (needBanner) {
+            needBanner = false;
+            for (String banner : banners) {
+                out.log(banner, null);
+            }
+        }
         out.log(message, th);
     }
     

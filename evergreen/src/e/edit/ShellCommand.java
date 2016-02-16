@@ -70,7 +70,8 @@ public class ShellCommand {
         // FIXME: this isn't relevant at the moment, because each build gets a new EErrorsWindow.
         //errorsWindow.setVisible(false);
         if (outputDisposition == ToolOutputDisposition.ERRORS_WINDOW) {
-            errorsWindow.setVisible(true);
+            // We might get fewer useless windows if we don't display them until they've something to say.
+            //errorsWindow.setVisible(true);
         }
         
         errorsWindow.showStatus("Started task \"" + command + "\"");
