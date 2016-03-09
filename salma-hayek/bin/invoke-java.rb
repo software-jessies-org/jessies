@@ -496,6 +496,11 @@ class Java
         exit($?.exitstatus())
       end
       
+      # Used for errors that have already been reported, like syntax errors.
+      if $?.exitstatus() == 2
+        exit($?.exitstatus())
+      end
+      
       messageLines = []
       messageLines << "Java failed with " + $?.inspect()
       if logging

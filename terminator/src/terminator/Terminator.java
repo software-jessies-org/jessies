@@ -225,7 +225,8 @@ public class Terminator {
                     Terminator.getSharedInstance().optionsDidChange();
                     
                     if (Terminator.getSharedInstance().parseOriginalCommandLine(Arrays.asList(argumentArray)) == false) {
-                        System.exit(1);
+                        // Any syntax error has already been reported.
+                        System.exit(2);
                     }
                 } catch (Throwable th) {
                     Log.warn("Couldn't start Terminator.", th);
