@@ -18,7 +18,7 @@ public class TerminatorOpener implements Runnable {
     }
     
     private static void showUsage(final PrintWriter out) {
-        out.println("Usage: terminator [--help] [[-n <name>] [--working-directory <directory>] [<command>]]...");
+        out.println("Usage: terminator [--help] [[-n <name>] [--working-directory <directory>] [<shell command line> | -e <command> <argument>...]]...");
     }
     
     public boolean showUsageIfRequested(final PrintWriter out) {
