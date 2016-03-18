@@ -25,8 +25,8 @@ def main(args):
     sys.stderr.write("usage: %s LABEL1 FILENAME1 LABEL2 FILENAME2\n" % sys.argv[0])
     sys.exit(2)
   label1, filename1, label2, filename2 = args
-  print '--- %s' % label1
-  print '+++ %s' % label2
+  print('--- %s' % label1)
+  print('+++ %s' % label2)
   file1_lines = open(filename1).readlines()
   file2_lines = open(filename2).readlines()
   difference_count = 0
