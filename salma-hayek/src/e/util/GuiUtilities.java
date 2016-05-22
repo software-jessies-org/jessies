@@ -471,14 +471,19 @@ public class GuiUtilities {
         if (setWindowOpacityMethod != null) {
             try {
                 setWindowOpacityMethod.invoke(null, (Window) frame, (float) alpha);
+                return;
             } catch (Throwable th) {
-                // We don't want to spam the log just because the system doesn't support transparency.
                 Throwable cause = th.getCause();
-                if (cause == null || cause instanceof UnsupportedOperationException == false) {
+                if (cause != null && cause instanceof UnsupportedOperationException) {
+                    // We don't want to spam the log just because the system doesn't support transparency.
+                } else if (cause != null && cause instanceof IllegalComponentStateException) {
+                    // We don't want to spam the log just because the system is running Java 7 or later,
+                    // where decorated windows can't be made translucent according to
+                    // http://docs.oracle.com/javase/7/docs/api/java/awt/Window.html#setOpacity%28float%29.
+                } else {
                     Log.warn("com.sun.awt.AWTUtilities.setWindowOpacity failed.", th);
                 }
             }
-            return;
         }
         
         try {
@@ -501,10 +506,8 @@ public class GuiUtilities {
                     frame.getRootPane().putClientProperty("Window.alpha", alpha);
                 }
             } else if (isWindows()) {
-                // If you weren't taken care of above, we have no work-around for you.
+                Log.warn("Sorry, we don't know how to create translucent windows on Windows, given that AWTUtilities.setWindowOpacity failed");
             } else {
-                // FIXME: remove this when everyone has setWindowOpacity, which is likely to be long before Compiz becomes less trouble than it's worth.
-                
                 // long windowId = peer.getWindow();
                 Class<?> xWindowPeerClass = Class.forName("sun.awt.X11.XWindowPeer");
                 Method getWindowMethod = xWindowPeerClass.getMethod("getWindow");
