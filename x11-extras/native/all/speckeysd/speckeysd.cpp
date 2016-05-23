@@ -8,6 +8,7 @@
 #include <sys/wait.h>
 
 #include <X11/X.h>
+#include <X11/XKBlib.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
@@ -58,7 +59,7 @@ static void sigchld_handler(int /*signal_number*/) {
 }
 
 static void shell(const char* command) {
-    char* sh = getenv("SHELL");
+    const char* sh = getenv("SHELL");
     if (sh == 0) {
         sh = "/bin/sh";
     }
@@ -156,13 +157,12 @@ static void read_hot_key_file(const char* fname) {
     fclose(fp);
 }
 
-static void keypress(XEvent* ev0) {
-    XKeyEvent* ev = (XKeyEvent*) ev0;
-    KeySym keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
+static void keypress(XEvent* ev) {
+    KeySym keysym = XkbKeycodeToKeysym(dpy, ev->xkey.keycode, 0, ev->xkey.state & ShiftMask ? 1 : 0);
     
     HotKey* h = hotkeys;
     for (; h != NULL; h = h->next) {
-        if (h->keysym == keysym && ev->state == h->modifiers) {
+        if (h->keysym == keysym && ev->xkey.state == h->modifiers) {
             shell(h->command);
             break;
         }
