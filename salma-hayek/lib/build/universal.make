@@ -212,8 +212,10 @@ CPPFLAGS += $(foreach DIRECTORY,$(EXTRA_INCLUDE_PATH),-I$(DIRECTORY))
 # /System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers/MacMemory.h:1587: error: 'bzero' was not declared in this scope
 # The 600 figure is from /usr/include/features.h.
 CPPFLAGS.Linux += -D_XOPEN_SOURCE=600
-# strerror_r isn't POSIX.  On gooch, it requires this.
+# strerror_r isn't POSIX until _POSIX_C_SOURCE >= 200112L.  On gooch, it requires this...
 CPPFLAGS.Linux += -D_BSD_SOURCE
+# ... but on libc6-dev 2.22, that warns unless we also define this:
+CPPFLAGS.Linux += -D_DEFAULT_SOURCE
 CPPFLAGS += $(CPPFLAGS.$(TARGET_OS))
 
 # stdint.h tells us that:
