@@ -197,7 +197,7 @@ class Java
   end
 
   def is_java_new_enough(java_version)
-    return (java_version.match(/^1\.[6-9]\.0/) != nil)
+    return (java_version.match(/^(1\.)?[6-9]/) != nil)
   end
 
   def check_java_version()
