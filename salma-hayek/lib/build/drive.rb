@@ -17,9 +17,9 @@ $VERBOSE = false
 # See the License for the specific language governing permissions and
 # limitations under the License.
 require 'rubygems'
-require 'google/apis/drive_v2'
+require 'google/api_client'
 require 'google/api_client/client_secrets'
-require 'google/api_client/auth/storages/file_store'
+require 'google/api_client/auth/file_storage'
 require 'google/api_client/auth/installed_app'
 require 'logger'
 
@@ -77,7 +77,7 @@ def setup()
       drive = Marshal.load(file)
     end
   else
-    drive = Google::Apis::DriveV2::DriveService.new
+    drive = client.discovered_api('drive', API_VERSION)
     File.open(CACHED_API_FILE, 'w') do |file|
       Marshal.dump(drive, file)
     end
@@ -87,11 +87,23 @@ def setup()
 end
 
 def insert_file(client, drive, title, description, parentId, mimeType, fileName)
-  metadata = {
-    title: title,
-    description: description
-  }
-  drive.insert_file(metadata, upload_source: fileName, content_type: mimeType)
+  file = drive.files.insert.request_schema.new({
+    "title" => title,
+    "description" => description,
+    "mimeType" => mimeType
+  })
+  file.parents = [{"id" => parentId}]
+
+  media = Google::APIClient::UploadIO.new(fileName, mimeType)
+  result = client.execute(
+    :api_method => drive.files.insert,
+    :body_object => file,
+    :media => media,
+    :parameters => {
+      "uploadType" => "multipart",
+      "alt" => "json"
+    }
+  )
 
   #jj(result.data().to_hash())
   if result.status() != 200
@@ -100,7 +112,13 @@ def insert_file(client, drive, title, description, parentId, mimeType, fileName)
 end
 
 def exists(client, drive, parentId, title)
-  result = drive.list_children(parentId, q: "title='#{title}'")
+  parameters = {
+    "folderId" => parentId,
+    "q" => "title='#{title}'"
+  }
+  result = client.execute(
+    :api_method => drive.children.list,
+    :parameters => parameters)
   #jj(result.data().to_hash())
   if result.status() != 200
     raise(result.inspect())
