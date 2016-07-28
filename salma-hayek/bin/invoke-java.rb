@@ -155,7 +155,11 @@ class Java
     init_default_class_path()
     # We don't know the JVM's architecture at this point.
     # We've seen a number of systems which run an i386 JVM on an amd64 kernel.
-    add_pathnames_property("org.jessies.libraryDirectories", Dir.glob("{#{@project_root},#{@salma_hayek}}/.generated/*_#{target_os()}/lib"))
+    libraryDirectories = Dir.glob("{#{@project_root},#{@salma_hayek}}/.generated/*_#{target_os()}/lib")
+    # OpenJDK 64-Bit Server VM warning: You have loaded library /home/martind/jessies/work/salma-hayek/.generated/i386_Linux/lib/libposix.so which might have disabled stack guard. The VM will try to fix the stack guard now.
+    # It's highly recommended that you fix the library with 'execstack -c <libfile>', or link it with '-z noexecstack'.
+    libraryDirectories.sort!()
+    add_pathnames_property("org.jessies.libraryDirectories", libraryDirectories)
     add_pathname_property("org.jessies.binaryDirectory", chooseSupportBinaryDirectory())
     
     set_icons(name)
