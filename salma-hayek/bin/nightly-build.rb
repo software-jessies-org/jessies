@@ -67,23 +67,17 @@ end
 
 projects = []
 
-Dir.glob("#{projects_root}/*/.svn").each() {
-  |svn_directory|
-  svn_directory =~ /^(.*\/)\.svn$/
-  projects << SubversionProject.new($1)
+directoryToClass = {
+  ".svn" => SubversionProject,
+  ".hg" => MercurialProject,
+  ".bzr" => BazaarProject,
+  ".git" => GitProject
 }
-Dir.glob("#{projects_root}/*/.hg").each() {
-  |hg_directory|
-  hg_directory =~ /^(.*\/)\.hg$/
-  projects << MercurialProject.new($1)
-}
-Dir.glob("#{projects_root}/*/.bzr").each() {
-  |bzr_directory|
-  bzr_directory =~ /^(.*\/)\.bzr$/
-  projects << BazaarProject.new($1)
-}
-Dir.glob("#{projects_root}/.git").each() {
-  projects << GitProject.new("#{projects_root}/")
+Dir.glob("#{projects_root}/{,*/}{#{directoryToClass.keys().join(",")}}").each() {
+  |vcs_directory|
+  basename = File.basename(vcs_directory)
+  root = File.dirname(vcs_directory)
+  projects << directoryToClass[basename].new(root)
 }
 projects.uniq!()
 
@@ -103,8 +97,7 @@ failed_updates = []
 failed_builds = []
 projects.each() {
   |project|
-  project.directory() =~ /.*\/([^\/]+)\/$/
-  project_name = $1
+  project_name = File.basename(project.directory())
   Dir.chdir(project.directory())
   if should_update
     print("-- Updating \"#{project_name}\"\n")
