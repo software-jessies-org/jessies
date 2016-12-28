@@ -26,7 +26,9 @@ public class PCPPTextStyler extends PAbstractLanguageStyler {
     
     public String[] getKeywords() {
         return new String[] {
-            // ISO+IEC+14882-1998 2.11 table 3:
+            // ISO/IEC JTC1 SC22 WG21 N3290 2.12 table 4:
+            "alignas",
+            "alignof",
             "asm",
             "auto",
             "bool",
@@ -34,10 +36,14 @@ public class PCPPTextStyler extends PAbstractLanguageStyler {
             "case",
             "catch",
             "char",
+            "char16_t",
+            "char32_t",
             "class",
             "const",
+            "constexpr",
             "const_cast",
             "continue",
+            "decltype",
             "default",
             "delete",
             "do",
@@ -60,6 +66,8 @@ public class PCPPTextStyler extends PAbstractLanguageStyler {
             "mutable",
             "namespace",
             "new",
+            "noexcept",
+            "nullptr",
             "operator",
             "private",
             "protected",
@@ -71,11 +79,13 @@ public class PCPPTextStyler extends PAbstractLanguageStyler {
             "signed",
             "sizeof",
             "static",
+            "static_assert",
             "static_cast",
             "struct",
             "switch",
             "template",
             "this",
+            "thread_local",
             "throw",
             "true",
             "try",
