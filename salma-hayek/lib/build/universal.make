@@ -390,9 +390,10 @@ CXX.Cygwin = $(if $(COMPILING_MINGW),$(MINGW_COMPILER),$(DEFAULT_CXX))
 CXX.Darwin = $(DEFAULT_CXX) -V4.0.1
 
 HAVE_MINGW_SOURCE := $(wildcard $(CURDIR)/native/Mingw)
-CRT_SHARED_LIBRARIES.Cygwin += $(if $(HAVE_MINGW_SOURCE),.generated/$(TARGET_DIRECTORY)/bin/mingwm10.dll)
+CRT_SHARED_LIBRARIES.i386_Cygwin += $(if $(HAVE_MINGW_SOURCE),.generated/$(TARGET_DIRECTORY)/bin/mingwm10.dll)
 CRT_SHARED_LIBRARIES.Cygwin += $(if $(HAVE_MINGW_SOURCE),.generated/$(TARGET_DIRECTORY)/bin/libwinpthread-1.dll)
 CRT_SHARED_LIBRARIES.Cygwin += $(if $(HAVE_MINGW_SOURCE),.generated/$(TARGET_DIRECTORY)/bin/winpthreads.COPYING.txt)
+CRT_SHARED_LIBRARIES += $(CRT_SHARED_LIBRARIES.$(TARGET_DIRECTORY))
 CRT_SHARED_LIBRARIES += $(CRT_SHARED_LIBRARIES.$(TARGET_OS))
 
 # One day we might have to look in eg /usr/share/doc/mingw32-runtime/mingwm10.dll.gz.
@@ -815,14 +816,20 @@ ChangeLog:
 # Redistributables.
 # ----------------------------------------------------------------------------
 
-.generated/$(TARGET_DIRECTORY)/bin/mingwm10.dll: $(MINGW_DLL)
+.generated/i386_Cygwin/bin/mingwm10.dll: $(MINGW_DLL)
 	$(COPY_RULE)
 
-.generated/$(TARGET_DIRECTORY)/bin/libwinpthread-1.dll: /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libwinpthread-1.dll
+.generated/amd64_Cygwin/bin/libwinpthread-1.dll: /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libwinpthread-1.dll
+	$(COPY_RULE)
+
+.generated/i386_Cygwin/bin/libwinpthread-1.dll: /usr/i686-w64-mingw32/sys-root/mingw/bin/libwinpthread-1.dll
 	$(COPY_RULE)
 
 # https://www.neowin.net/forum/topic/1194367-is-libwinpthread-1dll-covered-by-the-gcc-runtime-library-exception/
-.generated/$(TARGET_DIRECTORY)/bin/winpthreads.COPYING.txt: /usr/share/doc/mingw64-x86_64-winpthreads/COPYING
+.generated/amd64_Cygwin/bin/winpthreads.COPYING.txt: /usr/share/doc/mingw64-x86_64-winpthreads/COPYING
+	$(COPY_RULE)
+
+.generated/i386_Cygwin/bin/winpthreads.COPYING.txt: /usr/share/doc/mingw64-i686-winpthreads/COPYING
 	$(COPY_RULE)
 
 # ----------------------------------------------------------------------------
