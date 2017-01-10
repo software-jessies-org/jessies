@@ -367,6 +367,7 @@ MINGW_FLAGS.g++-3 += -mno-cygwin
 # http://stackoverflow.com/questions/4702732/the-program-cant-start-because-libgcc-s-dw2-1-dll-is-missing
 MODERN_MINGW_FLAGS += -static-libgcc -static-libstdc++
 MINGW_FLAGS.i686-pc-mingw32-g++ += $(MODERN_MINGW_FLAGS)
+MINGW_FLAGS.i686-w64-mingw32-g++ += $(MODERN_MINGW_FLAGS)
 MINGW_FLAGS.x86_64-w64-mingw32-g++ += $(MODERN_MINGW_FLAGS)
 C_AND_CXX_FLAGS.Cygwin += $(if $(COMPILING_MINGW),$(MINGW_FLAGS.$(MINGW_COMPILER)))
 
@@ -381,6 +382,10 @@ MINGW_COMPILER.i386 = g++-3
 # The newly packaged cross-compiler isn't available in 1.7.7.
 # We had trouble forking after loading the JVM in versions between there and 1.7.18.
 MINGW_COMPILER.i386 = i686-pc-mingw32-g++
+# The above compiler is gcc-4.7.3 in Cygwin at the time of writing.
+# Whereas the below one is gcc-5.4.0.
+# So MinGW-w64 seems to be the future, even for 32 bit builds.
+MINGW_COMPILER.i386 = i686-w64-mingw32-g++
 MINGW_COMPILER.amd64 = x86_64-w64-mingw32-g++
 MINGW_COMPILER = $(MINGW_COMPILER.$(TARGET_ARCHITECTURE))
 CXX.Cygwin = $(if $(COMPILING_MINGW),$(MINGW_COMPILER),$(DEFAULT_CXX))
