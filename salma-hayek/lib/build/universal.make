@@ -390,18 +390,10 @@ CXX.Cygwin = $(if $(COMPILING_MINGW),$(MINGW_COMPILER),$(DEFAULT_CXX))
 CXX.Darwin = $(DEFAULT_CXX) -V4.0.1
 
 HAVE_MINGW_SOURCE := $(wildcard $(CURDIR)/native/Mingw)
-CRT_SHARED_LIBRARIES.i386_Cygwin += $(if $(HAVE_MINGW_SOURCE),.generated/$(TARGET_DIRECTORY)/bin/mingwm10.dll)
 CRT_SHARED_LIBRARIES.Cygwin += $(if $(HAVE_MINGW_SOURCE),.generated/$(TARGET_DIRECTORY)/bin/libwinpthread-1.dll)
 CRT_SHARED_LIBRARIES.Cygwin += $(if $(HAVE_MINGW_SOURCE),.generated/$(TARGET_DIRECTORY)/bin/winpthreads.COPYING.txt)
 CRT_SHARED_LIBRARIES += $(CRT_SHARED_LIBRARIES.$(TARGET_DIRECTORY))
 CRT_SHARED_LIBRARIES += $(CRT_SHARED_LIBRARIES.$(TARGET_OS))
-
-# One day we might have to look in eg /usr/share/doc/mingw32-runtime/mingwm10.dll.gz.
-# The 64 bit cygwin-launcher.exe doesn't depend on mingwm10.dll.
-MINGW_DLL_ALTERNATIVES += /usr/i686-pc-mingw32/sys-root/mingw/bin/mingwm10.dll
-MINGW_DLL_ALTERNATIVES += /bin/mingwm10.dll
-EXTANT_MINGW_DLL_ALTERNATIVES := $(wildcard $(MINGW_DLL_ALTERNATIVES))
-MINGW_DLL = $(firstword $(EXTANT_MINGW_DLL_ALTERNATIVES))
 
 # ----------------------------------------------------------------------------
 # Work out what native code, if any, we need to build.
@@ -815,9 +807,6 @@ ChangeLog:
 # ----------------------------------------------------------------------------
 # Redistributables.
 # ----------------------------------------------------------------------------
-
-.generated/i386_Cygwin/bin/mingwm10.dll: $(MINGW_DLL)
-	$(COPY_RULE)
 
 .generated/amd64_Cygwin/bin/libwinpthread-1.dll: /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libwinpthread-1.dll
 	$(COPY_RULE)
