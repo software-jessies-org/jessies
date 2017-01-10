@@ -4,7 +4,7 @@ require "fiddle/import"
 
 module Rpcrt4
   extend(Fiddle::Importer)
-  dlload("rpcrt4")
+  dlload("rpcrt4.dll")
   extern("int UuidCreateSequential(unsigned char*)")
 end
 

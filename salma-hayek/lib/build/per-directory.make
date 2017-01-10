@@ -179,7 +179,7 @@ $(NEW_JNI_HEADER): $(PROJECT_ROOT)/.generated/java.build-finished $(JAVAHPP) $(S
 
 $(JNI_OBJECT): $(JNI_HEADER)
 build: $(NEW_JNI_HEADER)
-$(JNI_HEADER): $(NEW_JNI_HEADER);
+$(JNI_HEADER): $(NEW_JNI_HEADER)
 	{ cmp -s $< $@ || { cp $< $@.tmp && mv $@.tmp $@; }; }
 
 endif
@@ -210,7 +210,7 @@ missing-prerequisites.$(BASE_NAME):
 # in the same directory.
 # FIXME: Do dangling links need to be removed?
 $(SOURCE_LINKS) $(HEADER_LINKS): $(COMPILATION_DIRECTORY)/%: $(SOURCE_DIRECTORY)/%
-	$(SYMLINK_RULE)
+	$(COALESCE_RULE)
 
 # ----------------------------------------------------------------------------
 # Dependencies.

@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Work around HDS's firewall's newfound denial of ssh access with:
+# http://stackoverflow.com/a/8081292/18096
+
+# Work around drive.rb's requirement to avoid Ruby 1.8:
+# ln -s ruby.exe /usr/bin/ruby1.9.1.exe
+
+# Download the last JDK 6, so we can find a BOOT_JDK.
+
 # cron-config
 # Install as service, run as yourself (otherwise today exim crashes into /var/log/cron.log), don't set CYGWIN.
 # This requires your Windows password, which, judging by the prompts, you can update with passwd -R.
@@ -8,15 +16,21 @@
 
 # exim-config
 # Install as service, run under the LocalSystem account, don't set CYGWIN.
+# It asks whether the primary hostname is all in lower case.
+# You say "yes", it says that Exim will auto-discover that.
+# It won't.
+# You need a line in /etc/exim.conf saying:
+# primary hostname = vxd0141.corp.hds.com
 # In /etc/exim.conf:
 # the rewrite section is empty by default
 # add this on a line on its own:
 # *@+local_domains ${local_part}@bluearc.com EFfrstcb
+# Yes, I really do mean bluearc.com, not hds.com.
 
 # # martind 2012-05-22
 # smarthost:
 # driver = manualroute
-# domains = ! +local_domains
+# #domains = ! +local_domains
 # transport = remote_smtp
 # route_list = * mail.us.dev.bluearc.com byname
 # host_find_failed = defer
@@ -33,9 +47,11 @@
 # Mounting C:\Documents and Settings\martind on /home/martind, however, works fine.
 
 # When switching to a different major version of Cygwin:
-# cygrunsrv --stop cygserver
+# cygrunsrv --stop exim; cygrunsrv --stop cron; cygrunsrv --stop cygserver
 # cygrunsrv --remove cygserver
 # cygserver-config
+# cygrunsrv --start exim
+# cygrunsrv --start cron
 
 NIGHTLY_BUILD_SCRIPT=~/jessies/work/salma-hayek/bin/nightly-build.rb
 NIGHTLY_BUILD_TREE=~/jessies/nightlies/

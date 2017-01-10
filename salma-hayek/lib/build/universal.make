@@ -116,6 +116,12 @@ define COPY_RULE
 	$(MOVE_GENERATED_TARGET_INTO_PLACE)
 endef
 
+# 2017-01-09 gcc-5.4.0's preprocessor can't find the JNI headers with Cygwin 2.6.1.
+# Something's mishandling a symlink from a directory some eight levels deep.
+COALESCE_RULE.$(TARGET_OS) = $(SYMLINK_RULE)
+COALESCE_RULE.Cygwin = $(COPY_RULE)
+COALESCE_RULE = $(COALESCE_RULE.$(TARGET_OS))
+
 # ----------------------------------------------------------------------------
 # Locate Java.
 # ----------------------------------------------------------------------------
@@ -212,6 +218,7 @@ CPPFLAGS += $(foreach DIRECTORY,$(EXTRA_INCLUDE_PATH),-I$(DIRECTORY))
 # /System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Headers/MacMemory.h:1587: error: 'bzero' was not declared in this scope
 # The 600 figure is from /usr/include/features.h.
 CPPFLAGS.Linux += -D_XOPEN_SOURCE=600
+CPPFLAGS.Cygwin += -D_XOPEN_SOURCE=600
 # strerror_r isn't POSIX until _POSIX_C_SOURCE >= 200112L.  On gooch, it requires this...
 CPPFLAGS.Linux += -D_BSD_SOURCE
 # ... but on libc6-dev 2.22, that warns unless we also define this:
@@ -433,7 +440,7 @@ REVISION_CONTROL_SYSTEM_SCCS = bk
 REVISION_CONTROL_SYSTEM_DIRECTORY := $(firstword $(wildcard $(REVISION_CONTROL_SYSTEM_DIRECTORIES)))
 REVISION_CONTROL_SYSTEM = $(if $(REVISION_CONTROL_SYSTEM_DIRECTORY),$(REVISION_CONTROL_SYSTEM_$(REVISION_CONTROL_SYSTEM_DIRECTORY)),unknown)
 
-FIND_EXPRESSION_TO_IGNORE_REVISION_CONTROL_SYSTEM_DIRECTORY = $(if $(REVISION_CONTROL_SYSTEM_DIRECTORY),-name $(REVISION_CONTROL_SYSTEM_DIRECTORY) -prune -o)
+FIND_EXPRESSION_TO_IGNORE_REVISION_CONTROL_SYSTEM_DIRECTORY = $(if $(filter-out ../%,$(REVISION_CONTROL_SYSTEM_DIRECTORY)),-name $(REVISION_CONTROL_SYSTEM_DIRECTORY) -prune -o)
 
 $(takeProfileSample)
 # Can we really imagine a project without src/?  I'm wondering whether the wildcard is necessary.
