@@ -141,9 +141,10 @@ if __FILE__ == $0
   end
 end
 
-# Try removing drive.rb-oath2.json if you get this.
-# Then you'll get a browser pop to confirm access, then it works again.
-# I hadn't uploaded from this machine for a few months.
+# I hadn't uploaded from this machine for a few months when I got the following error.
+# Removing salma-hayek/lib/build/drive.rb-oath2.json is the first step to fix it.
+# Then, on trying to make native-dist in eg terminator, you should get
+# a browser pop to confirm access, modulo the caveat above re Launchy.
 # /Users/mad/.gem/ruby/1.8/gems/signet-0.5.0/lib/signet/oauth_2/client.rb:885:in `fetch_access_token': Authorization failed.  Server message: (Signet::AuthorizationError)
 # {
 #  "error" : "invalid_grant"
