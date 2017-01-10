@@ -53,6 +53,15 @@
 # cygrunsrv --start exim
 # cygrunsrv --start cron
 
+# You really want the --no flags, as the documentation is enormous.
+# And, oh teh irony, who's going to do anything other than Google for answers anyway?
+# We'll want:
+# http://www.rubydoc.info/github/google/google-api-ruby-client/file/MIGRATING.md
+# ... once we can abandon Ruby 1.9 - pfuff!
+# We haven't even quite managed to abandon Debian Squeeze.
+# That defaults to Ruby 1.8, though we do make it use Ruby 1.9.
+# gem install --no-ri --no-rdoc --version "< 0.9" google-api-client
+
 # See the note in salma-hayek/lib/build/drive.rb about "invalid_grant".
 
 NIGHTLY_BUILD_SCRIPT=~/jessies/work/salma-hayek/bin/nightly-build.rb
