@@ -391,9 +391,12 @@ CXX.Darwin = $(DEFAULT_CXX) -V4.0.1
 
 HAVE_MINGW_SOURCE := $(wildcard $(CURDIR)/native/Mingw)
 CRT_SHARED_LIBRARIES.Cygwin += $(if $(HAVE_MINGW_SOURCE),.generated/$(TARGET_DIRECTORY)/bin/mingwm10.dll)
+CRT_SHARED_LIBRARIES.Cygwin += $(if $(HAVE_MINGW_SOURCE),.generated/$(TARGET_DIRECTORY)/bin/libwinpthread-1.dll)
+CRT_SHARED_LIBRARIES.Cygwin += $(if $(HAVE_MINGW_SOURCE),.generated/$(TARGET_DIRECTORY)/bin/winpthreads.COPYING.txt)
 CRT_SHARED_LIBRARIES += $(CRT_SHARED_LIBRARIES.$(TARGET_OS))
 
 # One day we might have to look in eg /usr/share/doc/mingw32-runtime/mingwm10.dll.gz.
+# The 64 bit cygwin-launcher.exe doesn't depend on mingwm10.dll.
 MINGW_DLL_ALTERNATIVES += /usr/i686-pc-mingw32/sys-root/mingw/bin/mingwm10.dll
 MINGW_DLL_ALTERNATIVES += /bin/mingwm10.dll
 EXTANT_MINGW_DLL_ALTERNATIVES := $(wildcard $(MINGW_DLL_ALTERNATIVES))
@@ -808,10 +811,19 @@ ChangeLog:
 	TERMINFO=$(@D) tic -v1 $< && \
 	mv $(@D)/*/$(@F) $@
 
+# ----------------------------------------------------------------------------
+# Redistributables.
+# ----------------------------------------------------------------------------
+
 .generated/$(TARGET_DIRECTORY)/bin/mingwm10.dll: $(MINGW_DLL)
-	mkdir -p $(@D) && \
-	cp $< $@.tmp && \
-	$(MOVE_GENERATED_TARGET_INTO_PLACE)
+	$(COPY_RULE)
+
+.generated/$(TARGET_DIRECTORY)/bin/libwinpthread-1.dll: /usr/x86_64-w64-mingw32/sys-root/mingw/bin/libwinpthread-1.dll
+	$(COPY_RULE)
+
+# https://www.neowin.net/forum/topic/1194367-is-libwinpthread-1dll-covered-by-the-gcc-runtime-library-exception/
+.generated/$(TARGET_DIRECTORY)/bin/winpthreads.COPYING.txt: /usr/share/doc/mingw64-x86_64-winpthreads/COPYING
+	$(COPY_RULE)
 
 # ----------------------------------------------------------------------------
 # How to build a .app directory and package it into an installer file.
