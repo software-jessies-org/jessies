@@ -22,6 +22,7 @@ $NIGHTLY_BUILD_SCRIPT $NIGHTLY_BUILD_TREE clean
 echo $NIGHTLY_BUILD_SCRIPT --no-update $NIGHTLY_BUILD_TREE native-dist
 } |
 #dchroot --quiet --chroot ia32-squeeze -- bash --login
+# sudo aptitude install libx11-dev:i386
 TARGET_ARCHITECTURE=i386 \
 bash
 $NIGHTLY_BUILD_SCRIPT --no-update $NIGHTLY_BUILD_TREE native-dist
