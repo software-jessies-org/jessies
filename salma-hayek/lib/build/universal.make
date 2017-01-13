@@ -875,8 +875,11 @@ $(INSTALLER.deb): $(MACHINE_PROJECT_NAME).app
 
 $(INSTALLER.rpm): $(INSTALLER.deb)
 	@echo "-- Creating GNU/Linux .rpm package..."
-	mkdir -p $(@D) && \
-	$(RM) $@ && \
+	mkdir -p $(@D)
+	$(RM) $@
+	# While we use Debian Squeeze for i386 builds, we have to endure:
+	# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=622846
+	# alien: error message: find: `<pkgname>-<version>': No such file or directory
 	cd $(@D) && \
 	fakeroot alien --to-rpm $(abspath $<)
 
