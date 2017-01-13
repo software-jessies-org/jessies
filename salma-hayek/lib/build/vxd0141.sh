@@ -3,9 +3,6 @@
 # Work around HDS's firewall's newfound denial of ssh access with:
 # http://stackoverflow.com/a/8081292/18096
 
-# Work around drive.rb's requirement to avoid Ruby 1.8:
-# ln -s ruby.exe /usr/bin/ruby1.9.1.exe
-
 # Download the last JDK 6, so we can find a BOOT_JDK.
 
 # cron-config

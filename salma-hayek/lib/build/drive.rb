@@ -1,4 +1,8 @@
-#!/usr/bin/ruby1.9.1 -w
+#!/usr/bin/ruby -w
+
+if RUBY_VERSION < "1.9"
+  exec("ruby1.9.1", $0, *ARGV)
+end
 
 $PREVIOUS_VERBOSE = $VERBOSE
 $VERBOSE = false
