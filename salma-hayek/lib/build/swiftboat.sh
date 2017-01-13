@@ -20,7 +20,10 @@ NIGHTLY_BUILD_TREE=~martind/jessies/nightlies
 $NIGHTLY_BUILD_SCRIPT $NIGHTLY_BUILD_TREE clean
 {
 echo $NIGHTLY_BUILD_SCRIPT --no-update $NIGHTLY_BUILD_TREE native-dist
-} | dchroot --quiet --chroot ia32-squeeze -- bash --login
+} |
+#dchroot --quiet --chroot ia32-squeeze -- bash --login
+TARGET_ARCHITECTURE=i386 \
+bash
 $NIGHTLY_BUILD_SCRIPT --no-update $NIGHTLY_BUILD_TREE native-dist
 find -L $NIGHTLY_BUILD_TREE -name "*.deb" | xargs cp --target-directory=.
 

@@ -54,7 +54,8 @@ SCRIPTS_WHICH_AFFECT_COMPILER_FLAGS += $(TARGET_OS_SCRIPT)
 TARGET_OS_SCRIPT_OUTPUT := $(shell ruby $(TARGET_OS_SCRIPT))
 TARGET_OS = $(word 1,$(TARGET_OS_SCRIPT_OUTPUT))
 # (TARGET_ARCH has a special meaning to the built-in compilation rules.)
-TARGET_ARCHITECTURE = $(word 2,$(TARGET_OS_SCRIPT_OUTPUT))
+NATIVE_ARCHITECTURE = $(word 2,$(TARGET_OS_SCRIPT_OUTPUT))
+TARGET_ARCHITECTURE ?= $(NATIVE_ARCHITECTURE)
 TARGET_DIRECTORY = $(word 3,$(TARGET_OS_SCRIPT_OUTPUT))
 
 ifneq "$(REQUIRED_MAKE_VERSION)" "$(EARLIER_MAKE_VERSION)"
@@ -234,6 +235,10 @@ C_AND_CXX_FLAGS += $(C_AND_CXX_FLAGS.$(TARGET_OS))
 CFLAGS += $(C_AND_CXX_FLAGS)
 CXXFLAGS += $(C_AND_CXX_FLAGS)
 
+C_AND_CXX_FLAGS.i386-on-amd64 += -m32
+
+C_AND_CXX_FLAGS += $(C_AND_CXX_FLAGS.$(TARGET_ARCHITECTURE)-on-$(NATIVE_ARCHITECTURE))
+
 OBJECTIVE_SOURCE_PATTERNS += %.m
 OBJECTIVE_SOURCE_PATTERNS += %.mm
 
@@ -282,6 +287,10 @@ LDFLAGS.Cygwin += -Wl,--subsystem,windows
 LDFLAGS.Cygwin += -Wl,--enable-auto-import
 
 LDFLAGS += $(LDFLAGS.$(TARGET_OS))
+
+LDFLAGS.i386-on-amd64 += -m32
+
+LDFLAGS += $(LDFLAGS.$(TARGET_ARCHITECTURE)-on-$(NATIVE_ARCHITECTURE))
 
 # ----------------------------------------------------------------------------
 # Extra compiler and (mainly) linker flags for building JNI.
