@@ -233,6 +233,10 @@ public class TestRunner {
         @Override public boolean equals(Object rhs) {
             return (rhs instanceof TestResult) && name.equals(((TestResult) rhs).name);
         }
+        
+        @Override public int hashCode() {
+            return name.hashCode();
+        }
     }
     
     // Check that the given method, which was annotated with @Test, is actually suitable to be a test method.
