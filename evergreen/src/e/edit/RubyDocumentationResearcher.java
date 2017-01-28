@@ -37,7 +37,7 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
         }
         ArrayList<String> lines = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
-        int status = ProcessUtilities.backQuote(null, new String[] { ri, "-T", "-f", "html", string }, lines, errors);
+        int status = ProcessUtilities.backQuote(null, ProcessUtilities.makeShellCommandArray(ri + " -T -f rdoc " + string + " | rdoc --pipe"), lines, errors);
         
         String className = string;
         String lastLine = "";
