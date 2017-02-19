@@ -16,8 +16,8 @@ XCOMM along with this program; if not, write to the Free Software
 XCOMM Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 INCLUDES = -I$(TOP)
-DEPLIBS = $(DEPXLIB) $(DEPSMLIB)
-LOCAL_LIBRARIES = $(XLIB) $(SMLIB)
+DEPLIBS = $(DEPXLIB) $(DEPSMLIB) $(DEPICELIB)
+LOCAL_LIBRARIES = $(XLIB) $(SMLIB) $(ICELIB)
 XCOMM -L./ElectricFence-2.1 -lefence
 DEFINES = -g -DSHAPE -Wall
 
