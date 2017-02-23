@@ -16,8 +16,8 @@ public class FileIgnorer implements FileFinder.Filter {
     /** Names of directories that shouldn't be entered when indexing. */
     private final Pattern uninterestingDirectoryNames;
     
-    // Whether or not to follow symbolic links.
-    private boolean followSymbolicLinks = false;
+    // Whether to include symbolic links even if the link's file name is the same as that of the target.
+    private boolean includeAllSymbolicLinks = false;
     
     public FileIgnorer() {
         this(null);
@@ -29,19 +29,31 @@ public class FileIgnorer implements FileFinder.Filter {
         this.ignoredExtensions = Collections.unmodifiableList(makeIgnoredExtensions());
     }
     
-    public FileIgnorer followSymbolicLinks(boolean followSymbolicLinks) {
-        this.followSymbolicLinks = followSymbolicLinks;
+    public FileIgnorer includeAllSymbolicLinks(boolean includeAllSymbolicLinks) {
+        this.includeAllSymbolicLinks = includeAllSymbolicLinks;
         return this;
     }
     
+    private boolean isSymbolicLinkAcceptable(File file) {
+        if (includeAllSymbolicLinks) {
+            return true;
+        }
+        try {
+            // Ignoring symbolic links with different file names misleadingly suggests that name isn't available.
+            return file.getCanonicalFile().getName().equals(file.getName()) == false;
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+}
+    
     // FileFinder.Filter API.
     public boolean acceptFile(File file, Stat stat) {
-        return !isIgnored(file, false) && (followSymbolicLinks || !stat.isSymbolicLink());
+        return !isIgnored(file, false) && (!stat.isSymbolicLink() || isSymbolicLinkAcceptable(file));
     }
     
     // FileFinder.Filter API.
     public boolean enterDirectory(File directory, Stat stat) {
-        return !isIgnored(directory, true) && (followSymbolicLinks || !stat.isSymbolicLink());
+        return !isIgnored(directory, true) && (!stat.isSymbolicLink() || isSymbolicLinkAcceptable(directory));
     }
     
     private boolean isIgnored(File file, boolean isDirectory) {

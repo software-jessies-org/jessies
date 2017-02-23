@@ -74,7 +74,7 @@ public class ExternalTools {
             return;
         }
         
-        List<File> files = new FileFinder().includeDirectories(true).filesUnder(directory, new FileIgnorer().followSymbolicLinks(true));
+        List<File> files = new FileFinder().includeDirectories(true).filesUnder(directory, new FileIgnorer().includeAllSymbolicLinks(true));
         Collections.sort(files);
         for (File file : files) {
             newFileAlterationMonitor.addPathname(file.toString());
