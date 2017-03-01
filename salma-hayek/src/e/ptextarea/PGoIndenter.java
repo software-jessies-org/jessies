@@ -1,8 +1,11 @@
 package e.ptextarea;
 
 import java.util.*;
+import java.util.regex.*;
 
 public class PGoIndenter extends PSimpleIndenter {
+    private static final Pattern CASE_DEFAULT_PATTERN = Pattern.compile("^[ \\t]+(case.*|default):");
+    
     public PGoIndenter(PTextArea textArea) {
         super(textArea);
     }
@@ -88,18 +91,25 @@ public class PGoIndenter extends PSimpleIndenter {
                 //System.err.println("  level = " + level + "; indent -> '" + indent + "'");
             }
         }
-        // If the current line (the one we're indenting) has leading close-brackets, deal with these too.
         String line = getNonStringBits(lineIndex);
         if (line != null) {
-            for (int i = 0; i < line.length(); i++) {
-                char ch = line.charAt(i);
-                if (isOpen(ch)) {
-                    break;
-                }
-                if (isClose(ch)) {
-                    if (!indents.empty() && (indents.peek().closer == ch)) {
-                        indent = indents.pop().indent;
-                        //System.err.println("  [" + ch + "] popped");
+            if (CASE_DEFAULT_PATTERN.matcher(line).matches() && indent.length() > textArea.getIndentationString().length()) {
+                // Switch statement case and default statements are unindented by one level.
+                // As we've composed the indent ourselves by stitching together textArea.getIndentationString()s,
+                // trimming off from the start is equivalent to trimming off the end.
+                indent = indent.substring(textArea.getIndentationString().length());
+            } else {
+                // If the current line (the one we're indenting) has leading close-brackets, deal with these too.
+                for (int i = 0; i < line.length(); i++) {
+                    char ch = line.charAt(i);
+                    if (isOpen(ch)) {
+                        break;
+                    }
+                    if (isClose(ch)) {
+                        if (!indents.empty() && (indents.peek().closer == ch)) {
+                            indent = indents.pop().indent;
+                            //System.err.println("  [" + ch + "] popped");
+                        }
                     }
                 }
             }
