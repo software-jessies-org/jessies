@@ -51,6 +51,11 @@ public class FileType {
                  PEmailTextStyler.class,
                  new String[] { ".email" });
     
+    public static final FileType GO = new FileType("Go",
+                 PGoIndenter.class,
+                 PGoTextStyler.class,
+                 new String[] { ".go" });
+    
     public static final FileType JAVA = new FileType("Java",
                  PJavaIndenter.class,
                  PJavaTextStyler.class,

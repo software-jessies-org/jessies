@@ -59,4 +59,6 @@ public class PEmailTextStyler extends PAbstractTextStyler {
     public String[] getKeywords() {
         return new String[0];
     }
+    
+    public void initStyleApplicators() {}
 }

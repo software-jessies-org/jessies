@@ -82,6 +82,8 @@ public class TagReader {
             return "C++";
         } else if (fileType == FileType.C_SHARP) {
             return "C#";
+        } else if (fileType == FileType.GO) {
+            return "Go";
         } else if (fileType == FileType.JAVA) {
             return "Java";
         } else if (fileType == FileType.JAVA_SCRIPT) {

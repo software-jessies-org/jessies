@@ -44,8 +44,11 @@ public class PGoTextStyler extends PAbstractTextStyler {
             "uint", "int", "uintptr",
             "string", "error",
 
-            // And fixed values:
+            // Fixed values:
             "false", "true", "nil",
+
+            // Builtins:
+            "delete",
         };
     }
 
@@ -152,7 +155,7 @@ public class PGoTextStyler extends PAbstractTextStyler {
         if (textArea.isLineWrappingInvalid()) {
             return;
         }
-        if (StringUtilities.contains(event.getCharacters(), '`')) {
+        if (StringUtilities.contains(event.getCharacters(), '`') || StringUtilities.contains(event.getCharacters(), '\n')) {
             lastGoodLine = Math.min(lastGoodLine, textArea.getLineList().getLineIndex(event.getOffset()));
             textArea.repaintFromLine(textArea.getSplitLineIndex(lastGoodLine));
         }
@@ -195,6 +198,7 @@ public class PGoTextStyler extends PAbstractTextStyler {
                         if (line.charAt(index) == '`') {
                             inString = true;
                             index++;
+                            break;
                         } else if (isStartOfCommentToEndOfLine(line, index)) {
                             break;
                         }

@@ -22,4 +22,6 @@ public class PPlainTextStyler extends PAbstractTextStyler {
     public String[] getKeywords() {
         return new String[0]; // This isn't a known language, so we have no keywords.
     }
+    
+    public void initStyleApplicators() {}
 }

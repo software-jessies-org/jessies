@@ -1,6 +1,6 @@
 package e.ptextarea;
 
-import java.util.List;
+import java.util.*;
 
 public abstract class PAbstractTextStyler implements PTextStyler {
     protected PTextArea textArea;
@@ -13,5 +13,24 @@ public abstract class PAbstractTextStyler implements PTextStyler {
     
     public boolean keywordsAreCaseSensitive() {
         return true;
+    }
+    
+    protected class TextSegmentListBuilder {
+        private ArrayList<PLineSegment> list = new ArrayList<PLineSegment>();
+        private int lineStartOffset;
+        private int start = 0;
+        
+        public TextSegmentListBuilder(int lineStartOffset) {
+            this.lineStartOffset = lineStartOffset;
+        }
+        
+        public void addStyledSegment(int end, PStyle style) {
+            list.add(new PTextSegment(textArea, lineStartOffset + start, lineStartOffset + end, style));
+            start = end;
+        }
+        
+        public List<PLineSegment> getSegmentList() {
+            return list;
+        }
     }
 }

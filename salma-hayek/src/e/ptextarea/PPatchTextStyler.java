@@ -36,6 +36,8 @@ public class PPatchTextStyler extends PAbstractTextStyler {
         return new String[0]; // Any keywords need to come from the language of the file we're a patch to.
     }
     
+    public void initStyleApplicators() {}
+    
     public static class PatchHighlight extends PColoredHighlight {
         public PatchHighlight(PTextArea textArea, int startIndex, int endIndex, Color color) {
             super(textArea, startIndex, endIndex, color);

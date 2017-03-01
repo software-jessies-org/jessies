@@ -303,23 +303,4 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
     private boolean hasCommentMarker(String text) {
         return text.contains(multiLineCommentStart()) || text.contains(multiLineCommentEnd());
     }
-    
-    protected class TextSegmentListBuilder {
-        private ArrayList<PLineSegment> list = new ArrayList<PLineSegment>();
-        private int lineStartOffset;
-        private int start = 0;
-        
-        public TextSegmentListBuilder(int lineStartOffset) {
-            this.lineStartOffset = lineStartOffset;
-        }
-        
-        public void addStyledSegment(int end, PStyle style) {
-            list.add(new PTextSegment(textArea, lineStartOffset + start, lineStartOffset + end, style));
-            start = end;
-        }
-        
-        public List<PLineSegment> getSegmentList() {
-            return list;
-        }
-    }
 }

@@ -20,4 +20,6 @@ public interface PTextStyler {
      * This lets something like a spelling checker automatically share the knowledge of the keywords.
      */
     public String[] getKeywords();
+    
+    public void initStyleApplicators();
 }
