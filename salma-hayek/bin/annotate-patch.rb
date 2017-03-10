@@ -16,7 +16,7 @@
 # EXAMPLE
 #   Given this patch file, and starting in a directory containing src/tuple.h:
 # 
-example_jikes_patch = <<EOF
+_example_jikes_patch = <<EOF
 Index: src/tuple.h
 ===================================================================
 RCS file: /usr/cvs/jikes/jikes/src/tuple.h,v
@@ -42,7 +42,7 @@ EOF
 # guesses correspond to the best tag in the --- file and the +++ file; I
 # don't yet know whether this is going to be useful):
 # 
-example_result = <<EOF
+_example_result = <<EOF
 --- src/tuple.h 11 Dec 2002 00:55:05 -0000      1.19
 +++ src/tuple.h 26 Nov 2004 21:10:19 -0000
 @@ -90,8 +90,9 @@ Jikes::Tuple.AllocateMoreSpace Jikes::Tuple.AllocateMoreSpace

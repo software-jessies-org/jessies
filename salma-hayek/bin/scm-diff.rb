@@ -16,6 +16,9 @@ def getDiffTool(dir)
       if (dir + "BitKeeper").directory?()
         return "bk diffs -u"
       end
+      if (dir + ".git").directory?()
+        return "git diff"
+      end
       dir = dir.dirname()
     end
   end
