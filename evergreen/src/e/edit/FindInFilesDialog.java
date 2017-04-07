@@ -283,6 +283,10 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
             
             synchronized (matchView) {
                 for (DefaultMutableTreeNode node : treeNodes) {
+                    // Avoid accidental searches locking up the EDT for literally hours.
+                    if (matchView.getRowCount() > 10 * 1000) {
+                        return;
+                    }
                     // I've no idea why new nodes default to being collapsed.
                     matchView.expandOrCollapsePath(node.getPath(), true);
                 }
