@@ -139,7 +139,10 @@ SCRIPTS_WHICH_AFFECT_COMPILER_FLAGS += $(JDK_ROOT_SCRIPT)
 JDK_ROOT := $(call findMakeFriendlyEquivalentName,$(shell ruby $(JDK_ROOT_SCRIPT)))
 
 JDK_INCLUDE.$(TARGET_OS) = $(JDK_ROOT)/include
-JDK_INCLUDE.Darwin = /Developer/SDKs/MacOSX10.6.sdk/$(JDK_ROOT)/Headers
+MAC_SDK.$(TARGET_OS) =
+MAC_SDK.Darwin = $(shell xcodebuild -version $$(xcodebuild -showsdks | cut -f3 | grep osx | head -1) Path)
+MAC_SDK := $(MAC_SDK.$(TARGET_OS))
+JDK_INCLUDE.Darwin = $(JDK_ROOT)/Headers
 JDK_INCLUDE = $(JDK_INCLUDE.$(TARGET_OS))
 
 JDK_BIN_DIR.$(TARGET_OS) = bin
@@ -341,7 +344,7 @@ ifneq "$(NON_EXISTENT_INCLUDE_DIRECTORIES)" ""
 endif
 
 ifeq "$(wildcard $(foreach include,$(EXTRA_INCLUDE_PATH),$(include)/jni_md.h))" ""
-	JDK_ROOT := $(error $(JDK_ROOT) is not a sane location for JDK headers)
+  JDK_ROOT := $(error $(JDK_ROOT) is not a sane location for JDK headers)
 endif
 
 SHARED_LIBRARY_LDFLAGS = $(SHARED_LIBRARY_LDFLAGS.$(TARGET_OS))
@@ -353,7 +356,15 @@ SHARED_LIBRARY_EXTENSION = $(SHARED_LIBRARY_EXTENSION.$(TARGET_OS))
 # http://developer.apple.com/documentation/Porting/Conceptual/PortingUnix/compiling/chapter_4_section_3.html
 # ----------------------------------------------------------------------------
 
-universal_binary_flags = -mmacosx-version-min=10.4 -isysroot /Developer/SDKs/MacOSX10.6.sdk -arch ppc -arch i386
+# Xcode 4.6.3
+# Build version 4H1503
+XCODE_MAJOR_VERSION.$(TARGET_OS) =
+XCODE_MAJOR_VERSION.Darwin = $(shell xcodebuild -version | head -1 | cut -f2 -d" " | cut -f1 -d.)
+XCODE_MAJOR_VERSION := $(XCODE_MAJOR_VERSION.$(TARGET_OS))
+XCODE_SUPPORTS_POWERPC = $(filter 2 3,$(XCODE_MAJOR_VERSION))
+XCODE_ARCHES += $(if $(XCODE_SUPPORTS_POWERPC),ppc)
+XCODE_ARCHES += i386
+universal_binary_flags = -mmacosx-version-min=10.4 -isysroot $(MAC_SDK) $(foreach ARCH,$(XCODE_ARCHES),-arch $(ARCH))
 C_AND_CXX_FLAGS.Darwin += $(universal_binary_flags)
 LDFLAGS.Darwin += $(universal_binary_flags)
 LDFLAGS.Darwin += -lobjc
@@ -401,8 +412,9 @@ MINGW_COMPILER = $(MINGW_COMPILER.$(TARGET_ARCHITECTURE))
 CXX.Cygwin = $(if $(COMPILING_MINGW),$(MINGW_COMPILER),$(DEFAULT_CXX))
 
 # Mac OS 10.6 ships with gcc 4.2.1 as the default but, until we want to drop 10.4, we need headers like /Developer/SDKs/MacOSX10.4u.sdk/usr/include/c++/4.0.0/sstream
+HAVE_MAC_OS_10_4_HEADERS := $(wildcard $(MAC_SDK)/usr/include/c++/4.0.0)
 # The compiler really is one sub-minor version ahead of the directory.
-CXX.Darwin = $(DEFAULT_CXX) -V4.0.1
+CXX.Darwin = $(DEFAULT_CXX) $(if $(HAVE_MAC_OS_10_4_HEADERS),-V4.0.1)
 
 HAVE_MINGW_SOURCE := $(wildcard $(CURDIR)/native/Mingw)
 CRT_SHARED_LIBRARIES.Cygwin += $(if $(HAVE_MINGW_SOURCE),.generated/$(TARGET_DIRECTORY)/bin/libwinpthread-1.dll)

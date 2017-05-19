@@ -45,7 +45,6 @@ public class JavaHpp {
         out.println("class " + proxyClassName + " {");
         out.println("private:");
         out.println("JNIEnv* m_env;");
-        out.println("jobject m_instance;");
         for (Field field : fields) {
             boolean isStatic = ((field.getModifiers() & Modifier.STATIC) != 0);
             out.println("JniField<" + jniTypeNameFor(field.getType()) + ", " + isStatic + "> " + field.getName() + ";");
@@ -56,20 +55,22 @@ public class JavaHpp {
         out.println("// For static methods.");
         out.println(proxyClassName + "(JNIEnv* env)");
         out.println(": m_env(env)");
-        out.println(", m_instance(0)");
         out.println("{ }");
         
         out.println("// For non-static methods.");
         out.println(proxyClassName + "(JNIEnv* env, jobject instance)");
         out.println(": m_env(env)");
-        out.println(", m_instance(instance)");
         for (Field field : fields) {
             if (field.getType().isArray()) {
                 throw new RuntimeException("array fields such as \"" + field.getName() + "\" are not supported");
             }
             out.println(", " + field.getName() + "(env, instance, \"" + field.getName() + "\", \"" + encodedTypeNameFor(field.getType()) + "\")");
         }
-        out.println("{ }");
+        out.println("{");
+        if (fields.length == 0) {
+            out.println("(void) instance;");
+        }
+        out.println("}");
         for (Method method : nativeMethods) {
             StringBuilder proxyMethodArguments = new StringBuilder();
             for (Class<?> parameterType : method.getParameterTypes()) {
