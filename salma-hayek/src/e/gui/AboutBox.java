@@ -406,7 +406,7 @@ public class AboutBox {
         GuiUtilities.initLookAndFeel();
         AboutBox aboutBox = AboutBox.getSharedInstance();
         aboutBox.setWebSiteAddress("https://github.com/software-jessies-org/jessies");
-        aboutBox.addCopyright("Copyright (C) 2006-2016, software.jessies.org team");
+        aboutBox.addCopyright("Copyright (C) 2006-2017, software.jessies.org team");
         aboutBox.show();
     }
 }
