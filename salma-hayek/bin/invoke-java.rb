@@ -472,56 +472,70 @@ class Java
     # Even if it does recur, I was never one to worry much about process table clutter.
     # Having Java crashes that look like installation problems, by contrast, wastes my time.
     # We can relegate this comment to the revision history if the symptom has gone away.
-    failed = system(*args) == false
-    if failed
-      # We're only interested in debugging unexpected exiting here.
-      # When Java gets a SIGINT (signal number 2), it exits "normally" with status 130, so termsig() will be nil here.
-      # Java mimics the behavior of bash in propagating SIGINT like this.
-      deliberateSignals = [
+    pid = fork()
+    if pid == nil
+      exec(*args)
+      raise("exec(*#{args.inspect()}) failed")
+    end
+    
+    Process.waitpid(pid)
+    if $?.success?()
+      return
+    end
+    
+    # We're only interested in debugging unexpected exiting here.
+    # When Java gets a SIGINT (signal number 2), it exits "normally" with status 130, so termsig() will be nil here.
+    # Java mimics the behavior of bash in propagating SIGINT like this.
+    deliberateSignals = [
       "INT",
       "TERM" # We kill Evergreen's children with SIGTERM
-      ]
-      deliberateSignals.each() {
-        |signal|
-        interruptExitStatus = 0x80 + Signal.list()[signal]
-        if $?.exitstatus() == interruptExitStatus
-          exit(interruptExitStatus)
-        end
-        # I can quite often catch Java before it's installed its signal handlers.
-        if $?.termsig() == Signal.list()[signal]
-          exit(interruptExitStatus)
-        end
-      }
-      
-      # It's not an error for a command-line program to exit with a non-zero
-      # exit status.
-      is_gui = @initiate_startup_notification
-      if !is_gui && $?.exitstatus() == 1
-        exit($?.exitstatus())
+    ]
+    deliberateSignals.each() {
+      |signal|
+      interruptExitStatus = 0x80 + Signal.list()[signal]
+      if $?.exitstatus() == interruptExitStatus
+        exit(interruptExitStatus)
       end
-      
-      # Used for errors that have already been reported, like syntax errors.
-      if $?.exitstatus() == 2
-        exit($?.exitstatus())
+      # I can quite often catch Java before it's installed its signal handlers.
+      if $?.termsig() == Signal.list()[signal]
+        exit(interruptExitStatus)
       end
-      
-      messageLines = []
-      messageLines << "Java failed with " + $?.inspect()
-      if logging
-        messageLines << ""
-        # FIXME: The path used here will be in Cygwin format, which isn't the most widely understood on Windows.
-        messageLines << "Please send us the contents of the application log, from #{@log_filename}."
-      end
-      messageLines << ""
-      messageLines << "An idea of what you were doing when Java exited might be useful."
-      messageLines << ""
-      # The application log filename is perhaps of particular interest.
-      messageLines << "Command line was:"
-      messageLines << args.join(" ")
-      # A backtrace appears after the message.
-      messageLines << ""
-      raise messageLines.join("\n")
+    }
+    
+    # It's not an error for a command-line program to exit with a non-zero
+    # exit status.
+    is_gui = @initiate_startup_notification
+    if !is_gui && $?.exitstatus() == 1
+      exit($?.exitstatus())
     end
+    
+    # Used for errors that have already been reported, like syntax errors.
+    if $?.exitstatus() == 2
+      exit($?.exitstatus())
+    end
+    
+    messageLines = []
+    messageLines << "Java failed with " + $?.inspect()
+    if logging
+      messageLines << ""
+      # FIXME: The path used here will be in Cygwin format, which isn't the most widely understood on Windows.
+      messageLines << "Please send us the contents of the application log, from #{@log_filename}."
+    end
+    hotspotCrashDump = "#{Dir.pwd()}/hs_err_pid#{pid}.log"
+    if File.exist?(hotspotCrashDump)
+      # When I tried to include the dump, I was rebuffed by:
+      # (zenity:22774): Gdk-WARNING **: Native Windows wider or taller than 32767 pixels are not supported
+      messageLines << "Please send us the contents of #{hotspotCrashDump}."
+    end
+    messageLines << ""
+    messageLines << "An idea of what you were doing when Java exited might be useful."
+    messageLines << ""
+    # The application log filename is perhaps of particular interest.
+    messageLines << "Command line was:"
+    messageLines << args.join(" ")
+    # A backtrace appears after the message.
+    messageLines << ""
+    raise(messageLines.join("\n"))
   end
 end
 
