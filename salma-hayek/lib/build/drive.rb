@@ -1,6 +1,8 @@
 #!/usr/bin/ruby -w
 
-if RUBY_VERSION < "1.9"
+# This was added to avoid an issue with the jwt gem for ruby1.8 in swiftboat's Squeeze chroot.
+# But stopped uploads from the Mac rat2.
+if RUBY_VERSION < "1.9" && File.exist?("/usr/bin/ruby1.9.1")
   exec("ruby1.9.1", $0, *ARGV)
 end
 
