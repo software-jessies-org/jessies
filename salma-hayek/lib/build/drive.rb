@@ -115,9 +115,10 @@ def insert_file(client, drive, title, description, parentId, mimeType, fileName)
   if result.status() != 200
     raise(result.inspect())
   end
+  return result.data().id()
 end
 
-def exists(client, drive, parentId, title)
+def find_file(client, drive, parentId, title)
   parameters = {
     "folderId" => parentId,
     "q" => "title='#{title}'"
@@ -129,7 +130,57 @@ def exists(client, drive, parentId, title)
   if result.status() != 200
     raise(result.inspect())
   end
-  return result.data().items().empty?() == false
+  items = result.data().items()
+  if items == []
+    return nil
+  end
+  if items.size() != 1
+    raise("What is this Drive madness, with #{items.size()} files all called #{title.inspect()}?")
+  end
+  item = items[0]
+  id = item.id()
+  return id
+end
+
+def copy_file(client, drive, title, parentId, fileId)
+  file = drive.files.copy.request_schema.new({
+    "title" => title,
+  })
+  file.parents = [{"id" => parentId}]
+  parameters = {
+    "fileId" => fileId,
+  }
+  
+  result = client.execute(
+    :api_method => drive.files.copy,
+    :body_object => file,
+    :parameters => parameters)
+  
+  #jj(result.data().to_hash())
+  if result.status() != 200
+    raise(result.inspect())
+  end
+end
+
+def update_file(client, drive, mimeType, fileId, fileName)
+  file = drive.files.update.request_schema.new({
+  })
+  parameters = {
+    "fileId" => fileId,
+    "uploadType" => "multipart",
+  }
+  
+  media = Google::APIClient::UploadIO.new(fileName, mimeType)
+  result = client.execute(
+    :api_method => drive.files.update,
+    :body_object => file,
+    :media => media,
+    :parameters => parameters)
+  
+  #jj(result.data().to_hash())
+  if result.status() != 200
+    raise(result.inspect())
+  end
 end
 
 if __FILE__ == $0
@@ -137,18 +188,31 @@ if __FILE__ == $0
   parentId = ARGV.shift()
   mimeType = ARGV.shift()
   fileName = ARGV.shift()
-  if fileName == nil || ARGV.empty?() == false
-    raise("Syntax: drive.rb <description> <id of parent directory> <mime type> <filename>")
+  latestDirectory = ARGV.shift()
+  latestLink = ARGV.shift()
+  if latestLink == nil || ARGV.empty?() == false
+    raise("Syntax: drive.rb <description> <id of parent directory> <mime type> <filename> <latest directory> <latest link>")
   end
   title = fileName.sub(/^.*\//, "")
   client, drive = setup()
-  if exists(client, drive, parentId, title) == false
-    insert_file(client, drive, title, description, parentId, mimeType, fileName)
+  if find_file(client, drive, parentId, title)
+    exit(0)
+  end
+  fileId = insert_file(client, drive, title, description, parentId, mimeType, fileName)
+  latestFile = find_file(client, drive, latestDirectory, latestLink)
+  if latestFile
+    update_file(client, drive, mimeType, latestFile, fileName)
+  else
+    copy_file(client, drive, latestLink, latestDirectory, fileId)
   end
 end
 
+# The first time you try to upload from a machine, you need to get salma-hayek/lib/build/client_secrets.json.
+# Navigate to https://console.developers.google.com/apis/credentials?pli=1&project=jessies-downloads-uploader
+# and select Native client 1.
+
 # I hadn't uploaded from this machine for a few months when I got the following error.
-# Removing salma-hayek/lib/build/drive.rb-oath2.json is the first step to fix it.
+# Removing salma-hayek/lib/build/drive.rb-oauth2.json is the first step to fix it.
 # Then, on trying to make native-dist in eg terminator, you should get
 # a browser pop to confirm access, modulo the caveat above re Launchy.
 # /Users/mad/.gem/ruby/1.8/gems/signet-0.5.0/lib/signet/oauth_2/client.rb:885:in `fetch_access_token': Authorization failed.  Server message: (Signet::AuthorizationError)

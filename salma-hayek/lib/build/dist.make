@@ -56,7 +56,7 @@ PLATFORM_NAME.gz = $(PLATFORM_NAME.$(PRIMARY_INSTALLER_EXTENSION))
 
 PLATFORM_NAME = $(PLATFORM_NAME$(suffix $@))
 SUMMARY = $(PLATFORM_NAME) installer for $(HUMAN_PROJECT_NAME) version $(VERSION_STRING) ($(TARGET_ARCHITECTURE))
-GOOGLE_DRIVE_UPLOAD = cd $(SALMA_HAYEK)/lib/build && ./drive.rb '$(SUMMARY)' 0BzZNCgKvEkQYZDBNTm1HWThOaEU application/octet-stream $<
+GOOGLE_DRIVE_UPLOAD = cd $(SALMA_HAYEK)/lib/build && ./drive.rb '$(SUMMARY)' 0BzZNCgKvEkQYZDBNTm1HWThOaEU application/octet-stream $< 1_6aBsmCOabtka5akRjo87v2JP1ST7FIU $(LATEST_INSTALLER_LINK)
 
 # ----------------------------------------------------------------------------
 # Variables above this point, rules below.
