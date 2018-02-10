@@ -49,7 +49,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
         TerminatorPreferences preferences = Terminator.getPreferences();
         // The background is no longer set in optionsDidChange
         // The background must be set before the model is created, or Bad Things happen
-        setBackground(preferences.getColor("background"));
+        setBackground(preferences.getColor(TerminatorPreferences.BACKGROUND_COLOR));
         this.model = new TerminalModel(this, preferences.getInt(TerminatorPreferences.INITIAL_COLUMN_COUNT), preferences.getInt(TerminatorPreferences.INITIAL_ROW_COUNT));
         ComponentUtilities.disableFocusTraversal(this);
         setBorder(BorderFactory.createEmptyBorder(1, 4, 4, 4));
@@ -104,7 +104,16 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
     public void optionsDidChange() {
         TerminatorPreferences preferences = Terminator.getPreferences();
         setFont(preferences.getFont(TerminatorPreferences.FONT));
+        setBackground(preferences.getColor(TerminatorPreferences.BACKGROUND_COLOR));
         sizeChanged();
+        // The model keeps a bunch of lines to represent the text in the terminal, which is at least
+        // as high as the terminal itself. Each line has a background colour describing the colour
+        // before any colour adjustments have been made (due to escape sequences etc), and
+        // this is also used to paint the area after any text.
+        // We must ping the model to tell it to adjust the backgrounds of these text lines, otherwise
+        // we end up with all the parts of the terminal without text keeping the old background colour,
+        // in case the options change was adjusting the background.
+        model.optionsDidChange();
     }
     
     public BirdsEye getBirdsEye() {
@@ -716,7 +725,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
             final Location selectionStart = selectionHighlighter.getStart();
             final Location selectionEnd = selectionHighlighter.getEnd();
             final boolean hasSelection = selectionStart != null;
-
+            
             for (int i = firstTextLine; i <= lastTextLine; i++) {
                 boolean drawCursor = (shouldShowCursor() && i == cursorPosition.getLineIndex());
                 int x = insets.left;

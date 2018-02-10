@@ -6,7 +6,7 @@ import javax.swing.*;
 import e.util.*;
 import terminator.terminal.*;
 import terminator.view.*;
-import terminator.Terminator;
+import terminator.*;
 
 public class TerminalModel {
     private TerminalView view;
@@ -58,6 +58,18 @@ public class TerminalModel {
         if (savedPosition != null) {
             cursorPosition = savedPosition;
             setStyle(savedStyle);
+        }
+    }
+    
+    public void optionsDidChange() {
+        Color bg = Terminator.getPreferences().getColor(TerminatorPreferences.BACKGROUND_COLOR);
+        for (TextLine line : textLines) {
+            line.setBackground(bg);
+        }
+        if (savedScreen != null) {
+            for (TextLine line : savedScreen) {
+                line.setBackground(bg);
+            }
         }
     }
     
@@ -156,7 +168,7 @@ public class TerminalModel {
         // Since we don't save the alternate buffer, reset background to default before switching to it.
         // When switching back, we don't want the background that was probably set while in the alternate buffer.
         // FIXME: should we save the screen's old background along with savedScreen?
-        view.setBackground(Terminator.getPreferences().getColor("background"));
+        view.setBackground(Terminator.getPreferences().getColor(TerminatorPreferences.BACKGROUND_COLOR));
         if (useAlternateBuffer) {
             savedScreen = new TextLine[height];
             for (int i = 0; i < height; i++) {

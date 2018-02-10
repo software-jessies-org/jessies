@@ -307,8 +307,11 @@ public class CSIEscapeAction implements TerminalAction {
     
     public boolean processFontEscape(TerminalModel model, String sequence) {
         Style oldStyle = model.getStyle();
-        Color foreground = oldStyle.getForeground();
-        Color background = oldStyle.getBackground();
+        // Grab the *raw* foreground and background colours. This preserves their 'null'ness in the
+        // case that a style has no explicit fg/bg, and must use the current default. This is important
+        // for when someone changes the fg/bg colours in the preferences panel.
+        Color foreground = oldStyle.getRawForeground();
+        Color background = oldStyle.getRawBackground();
         boolean isBold = oldStyle.isBold();
         boolean isReverseVideo = oldStyle.isReverseVideo();
         boolean isUnderlined = oldStyle.isUnderlined();

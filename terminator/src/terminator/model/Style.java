@@ -66,6 +66,18 @@ public final class Style {
         this.isReverseVideo = isReverseVideo;
     }
     
+    // getRawForeground can return null if there's no foreground set. Use this to derive styles which retain
+    // the state of using the default foreground in case it changes.
+    public Color getRawForeground() {
+        return foreground;
+    }
+    
+    // getRawBackground can return null if there's no background set. Use this to derive styles which retain
+    // the state of using the default background in case it changes.
+    public Color getRawBackground() {
+        return background;
+    }
+    
     public Color getForeground() {
         return foreground != null ? foreground : Terminator.getPreferences().getColor(TerminatorPreferences.FOREGROUND_COLOR);
     }
