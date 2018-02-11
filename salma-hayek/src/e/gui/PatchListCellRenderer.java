@@ -25,22 +25,21 @@ public class PatchListCellRenderer extends EListCellRenderer {
     /**
      * Renders lines from a context diff patch in colors inspired by code2html.
      */
-    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean isFocused) {
+    public Component getListCellRendererComponent(JList<String> list, String value, int index, boolean isSelected, boolean isFocused) {
         super.getListCellRendererComponent(list, value, index, isSelected, isFocused);
-        String line = (String) value;
         if (isSelected) {
             // Leave the colors alone so you can still see when a +++, ---, or @@ line is selected.
-        } else if (line.startsWith("+")) {
+        } else if (value.startsWith("+")) {
             setForeground(Color.BLUE);
-            if (line.startsWith("+++ ")) {
+            if (value.startsWith("+++ ")) {
                 setBackground(TRIPLE_PLUS_BACKGROUND);
             }
-        } else if (line.startsWith("-")) {
+        } else if (value.startsWith("-")) {
             setForeground(Color.RED);
-            if (line.startsWith("--- ")) {
+            if (value.startsWith("--- ")) {
                 setBackground(TRIPLE_MINUS_BACKGROUND);
             }
-        } else if (line.startsWith("@@ ")) {
+        } else if (value.startsWith("@@ ")) {
             setForeground(Color.GRAY);
             setBackground(VERY_LIGHT_GRAY);
         }
