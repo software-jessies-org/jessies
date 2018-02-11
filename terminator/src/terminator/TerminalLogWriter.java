@@ -26,6 +26,10 @@ public class TerminalLogWriter {
         // Establish the invariant that writer != null.
         // suspendedWriter is still null - when we're not suspended.
         this.writer = NullWriter.INSTANCE;
+        // If the user has chosen to disable terminal logging, just leave the NullWriter in place.
+        if (!Terminator.getPreferences().getBoolean(TerminatorPreferences.LOG_TERMINAL_ACTIVITY)) {
+            return;
+        }
         this.flushTimer = new Timer(1000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 flush();

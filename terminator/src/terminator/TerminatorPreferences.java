@@ -38,6 +38,12 @@ public class TerminatorPreferences extends Preferences {
      */
     public static final String USE_ALT_AS_META = "useAltAsMeta";
     
+    /**
+     * Whether or not to log everything to files in $HOME/.terminator/logs/.
+     * Users may wish to disable this functionality for security reasons (eg company laptops).
+     */
+    public static final String LOG_TERMINAL_ACTIVITY = "logTerminalActivity";
+    
     private static final Color CREAM = new Color(0xfefaea);
     private static final Color LIGHT_BLUE = new Color(0xb3d4ff);
     private static final Color NEAR_BLACK = new Color(0x181818);
@@ -66,6 +72,7 @@ public class TerminatorPreferences extends Preferences {
         addPreference("Behavior", HIDE_MOUSE_WHEN_TYPING, Boolean.TRUE, "Hide mouse when typing");
         addPreference("Behavior", VISUAL_BELL, Boolean.TRUE, "Visual bell (as opposed to no bell)");
         addPreference("Behavior", USE_ALT_AS_META, Boolean.FALSE, "Use alt key as meta key (for Emacs)");
+        addPreference("Behavior", LOG_TERMINAL_ACTIVITY, Boolean.TRUE, "Log terminal activity in $HOME/.terminator/logs/");
         
         addPreference("Appearance", ANTI_ALIAS, Boolean.TRUE, "Anti-alias text");
         addPreference("Appearance", BLINK_CURSOR, Boolean.TRUE, "Blink cursor");
