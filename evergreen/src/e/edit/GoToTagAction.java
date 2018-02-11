@@ -64,11 +64,11 @@ public class GoToTagAction extends ETextAction {
         } else if (addresses.size() == 1) {
             Evergreen.getInstance().openFile(workspaceRoot + File.separator + addresses.get(0));
         } else {
-            final JList list = new JList(addresses.toArray(new String[addresses.size()]));
+            final JList<String> list = new JList<String>(addresses.toArray(new String[addresses.size()]));
             list.setCellRenderer(new EListCellRenderer(true));
             ComponentUtilities.bindDoubleClickAndEnter(list, new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    final String address = (String) list.getSelectedValue();
+                    final String address = list.getSelectedValue();
                     Evergreen.getInstance().openFile(workspaceRoot + File.separator + address);
                 }
             });
