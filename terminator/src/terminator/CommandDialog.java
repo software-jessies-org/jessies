@@ -21,7 +21,7 @@ public class CommandDialog {
     
     private FormBuilder form;
     private JTextField commandField;
-    private JList historyList;
+    private JList<String> historyList;
     
     public CommandDialog() {
         this.commandField = new JTextField(40);
@@ -42,13 +42,13 @@ public class CommandDialog {
     }
     
     private void initHistoryList() {
-        historyList = new JList();
+        historyList = new JList<String>();
         historyList.setCellRenderer(new EListCellRenderer(true));
         
         // If the user double-clicks on a historical command, or hits enter while the list has focus, run the command without further ado.
         ComponentUtilities.bindDoubleClickAndEnter(historyList, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                commandField.setText((String) historyList.getSelectedValue());
+                commandField.setText(historyList.getSelectedValue());
                 form.getFormDialog().acceptDialog();
             }
         });
@@ -57,8 +57,8 @@ public class CommandDialog {
         ComponentUtilities.initKeyBinding(historyList, KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0), new AbstractAction("remove-entry") {
             public void actionPerformed(ActionEvent e) {
                 synchronized (history) {
-                    for (Object item : historyList.getSelectedValues()) {
-                        history.remove((String) item);
+                    for (String item : historyList.getSelectedValuesList()) {
+                        history.remove(item);
                     }
                 }
                 showMatches();
@@ -74,7 +74,7 @@ public class CommandDialog {
     
     private class MatchFinder extends SwingWorker<Object, Object> {
         private String regularExpression;
-        private DefaultListModel model;
+        private DefaultListModel<String> model;
         private boolean statusGood;
         private String statusText;
         
@@ -84,7 +84,7 @@ public class CommandDialog {
         
         @Override
         protected Object doInBackground() {
-            model = new DefaultListModel();
+            model = new DefaultListModel<String>();
             statusGood = true;
             try {
                 List<String> unsortedMatches;
@@ -125,7 +125,7 @@ public class CommandDialog {
         while (form.show("Run")) {
             String command = commandField.getText().trim();
             if (command.length() == 0) {
-                command = (String) historyList.getSelectedValue();
+                command = historyList.getSelectedValue();
             }
             synchronized (history) {
                 history.add(command);
