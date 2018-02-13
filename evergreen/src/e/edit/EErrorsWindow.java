@@ -29,7 +29,7 @@ import e.util.*;
  * code to do anything useful.
  */
 public class EErrorsWindow extends JFrame {
-    private static final Pattern MAKE_ENTERING_DIRECTORY_PATTERN = Pattern.compile("^make(?:\\[\\d+\\])?: Entering directory `(.*)'$", Pattern.MULTILINE);
+    private static final Pattern MAKE_ENTERING_DIRECTORY_PATTERN = Pattern.compile("^make(?:\\[\\d+\\])?: Entering directory [`'](.*)'$", Pattern.MULTILINE);
     
     /**
      * Matches lines in a Java stack trace, such as "package.Class$Inner$1.method(Class.java:line)"
