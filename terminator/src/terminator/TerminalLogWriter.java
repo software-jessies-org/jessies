@@ -26,16 +26,19 @@ public class TerminalLogWriter {
         // Establish the invariant that writer != null.
         // suspendedWriter is still null - when we're not suspended.
         this.writer = NullWriter.INSTANCE;
-        // If the user has chosen to disable terminal logging, just leave the NullWriter in place.
-        if (!Terminator.getPreferences().getBoolean(TerminatorPreferences.LOG_TERMINAL_ACTIVITY)) {
-            return;
-        }
         this.flushTimer = new Timer(1000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 flush();
             }
         });
         flushTimer.setRepeats(false);
+        // If the user has chosen to disable terminal logging, just leave the NullWriter in place.
+        // Note that this has to occur after the 'flushTimer' initialisation has taken place, otherwise the
+        // 'append' method will throw a null pointer exception, which will prevent the terminal from being
+        // redrawn correctly.
+        if (!Terminator.getPreferences().getBoolean(TerminatorPreferences.LOG_TERMINAL_ACTIVITY)) {
+            return;
+        }
         try {
             initLogging(StringUtilities.join(command, " "));
         } catch (Throwable th) {
