@@ -14,7 +14,7 @@ public class JListCopyAction extends AbstractAction {
     /**
      * Fixes the ActionMap for the given JList.
      */
-    public static void fixCopyFor(JList<String> list) {
+    public static void fixCopyFor(JList list) {
         list.getActionMap().put("copy", new JListCopyAction());
     }
     
@@ -22,15 +22,16 @@ public class JListCopyAction extends AbstractAction {
         super("copy");
     }
     
-    @SuppressWarnings("unchecked")
-        public void actionPerformed(ActionEvent e) {
-        copyListSelectionToClipboard((JList<String>) e.getSource());
+    public void actionPerformed(ActionEvent e) {
+        copyListSelectionToClipboard((JList) e.getSource());
     }
     
-    private void copyListSelectionToClipboard(JList<String> list) {
+    private void copyListSelectionToClipboard(JList list) {
         // Make a StringSelection corresponding to the selected lines.
         StringBuilder buffer = new StringBuilder();
-        for (String line : list.getSelectedValuesList()) {
+        Object[] selectedLines = list.getSelectedValues();
+        for (int i = 0; i < selectedLines.length; ++i) {
+            String line = selectedLines[i].toString();
             buffer.append(line);
             buffer.append('\n');
         }

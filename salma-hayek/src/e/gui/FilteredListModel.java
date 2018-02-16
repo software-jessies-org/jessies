@@ -7,11 +7,11 @@ import javax.swing.*;
 /**
  * Wraps a ListModel and provides substring-based filtering.
  */
-public class FilteredListModel<E> extends AbstractListModel<E> {
-    private ListModel<E> model;
+public class FilteredListModel extends AbstractListModel {
+    private ListModel model;
     private ArrayList<Integer> validIndexes;
     
-    public FilteredListModel(final ListModel<E> model) {
+    public FilteredListModel(final ListModel model) {
         this.model = model;
         setFilter("");
     }
@@ -55,7 +55,7 @@ public class FilteredListModel<E> extends AbstractListModel<E> {
         return searchField;
     }
     
-    public E getElementAt(int index) {
+    public Object getElementAt(int index) {
         int newIndex = validIndexes.get(index);
         return model.getElementAt(newIndex);
     }

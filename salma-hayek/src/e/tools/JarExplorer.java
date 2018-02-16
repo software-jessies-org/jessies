@@ -28,8 +28,8 @@ import javax.swing.*;
 public class JarExplorer extends MainFrame {
     private JCheckBox showLineNumberAndLocalVariableTables;
     private JCheckBox showVerboseDetail;
-    private JList<String> list;
-    private DefaultListModel<String> model;
+    private JList list;
+    private DefaultListModel model;
 
     private PTextArea summaryTextArea;
     private PTextArea detailTextArea;
@@ -70,7 +70,7 @@ public class JarExplorer extends MainFrame {
         zipFile.close();
 
         Collections.sort(entries);
-        model = new DefaultListModel<String>();
+        model = new DefaultListModel();
         for (int i = 0; i < entries.size(); ++i) {
             model.addElement(entries.get(i));
         }
@@ -83,9 +83,9 @@ public class JarExplorer extends MainFrame {
             }
         };
         
-        final FilteredListModel<String> filteredListModel = new FilteredListModel<String>(model);
+        final FilteredListModel filteredListModel = new FilteredListModel(model);
         
-        list = new JList<String>(filteredListModel);
+        list = new JList(filteredListModel);
         list.setCellRenderer(new EListCellRenderer(true));
         list.setVisibleRowCount(10);
         ComponentUtilities.bindDoubleClickAndEnter(list, new ActionListener() {
@@ -127,7 +127,7 @@ public class JarExplorer extends MainFrame {
     }
 
     private void updateInformation() {
-        updateInformation(list.getSelectedValue());
+        updateInformation((String) list.getSelectedValue());
     }
     
     private void updateInformation(String entry) {
