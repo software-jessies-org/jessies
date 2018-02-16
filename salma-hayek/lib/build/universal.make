@@ -15,6 +15,11 @@
 
 COMMA = ,
 SPACE = $(subst :, ,:)
+define NEWLINE_WITH_DELIMITERS
+:
+:
+endef
+NEWLINE = $(subst :,,$(NEWLINE_WITH_DELIMITERS))
 
 # I sprinkled the code with calls to dump the wall-clock time and counted the
 # lines of output to work out between which calls the time was disappearing.
@@ -549,7 +554,23 @@ BOOT_JDK.Linux = $(subst java-8,java-6,$(subst java-7,java-6,$(JDK_ROOT)))
 BOOT_JDK.Cygwin = $(call findMakeFriendlyEquivalentName,$(shell ruby -e 'require "$(JDK_ROOT_SCRIPT)"; puts(findBootJdkFromRegistry())'))
 BOOT_JDK = $(BOOT_JDK.$(TARGET_OS))
 ALTERNATE_BOOTCLASSPATH := $(wildcard $(BOOT_JDK)/jre/lib/rt.jar)
-JAVAC_FLAGS.javac += $(if $(ALTERNATE_BOOTCLASSPATH),-bootclasspath $(ALTERNATE_BOOTCLASSPATH))
+BOOT_JDK_MESSAGE += $(NEWLINE)
+BOOT_JDK_MESSAGE += You need to download a package that will give you $(BOOT_JDK).
+BOOT_JDK_MESSAGE += $(NEWLINE)
+BOOT_JDK_MESSAGE += Do not fix the generics warnings, because that makes us depend on Java 7.
+BOOT_JDK_MESSAGE += $(NEWLINE)
+BOOT_JDK_MESSAGE += That would require additional changes to JAVAC_FLAGS.javac and find-jdk-root.rb.
+BOOT_JDK_MESSAGE += $(NEWLINE)
+BOOT_JDK_MESSAGE += More seriously, it would permanently break our ability to do Mac builds on Snow Leopard.
+BOOT_JDK_MESSAGE += $(NEWLINE)
+# Something else adds the trailing period.
+BOOT_JDK_MESSAGE += Yes, I know it's 2018
+BOOT_JDK_ERROR = $(error $(BOOT_JDK_MESSAGE))
+# The *** does battle with filter-build-output.rb.
+BOOT_JDK_WARNING = $(warning *** $(BOOT_JDK_MESSAGE))
+# Feel free to downgrade the ERROR to WARNING in your local copy.
+BOOT_JDK_DIAGNOSTIC = $(BOOT_JDK_ERROR)
+JAVAC_FLAGS.javac += $(if $(ALTERNATE_BOOTCLASSPATH),-bootclasspath $(ALTERNATE_BOOTCLASSPATH),$(BOOT_JDK_DIAGNOSTIC))
 
 # ----------------------------------------------------------------------------
 # Set ecj flags.
