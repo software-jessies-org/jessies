@@ -192,7 +192,7 @@ public class TerminatorPreferences extends Preferences {
         }
         
         public void addRow(FormPanel formPanel, final String key, final String description) {
-            final JComboBox<String> choices = new JComboBox<String>();
+            final JComboBox choices = new JComboBox();
             for (String paletteName : Palettes.names()) {
                 choices.addItem(paletteName);
             }
