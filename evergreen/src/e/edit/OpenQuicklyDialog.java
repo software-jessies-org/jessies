@@ -17,7 +17,7 @@ import org.jdesktop.swingworker.SwingWorker;
  */
 public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
     private JTextField filenameField = new JTextField(40);
-    private JList<String> matchList;
+    private JList matchList;
     private ELabel status = new ELabel();
     private JButton rescanButton;
     
@@ -34,7 +34,7 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
     
     private class MatchFinder extends SwingWorker<Object, Object> {
         private String regularExpression;
-        private DefaultListModel<String> model;
+        private DefaultListModel model;
         private boolean statusGood;
         private String statusText;
         
@@ -44,7 +44,7 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
         
         @Override
         protected Object doInBackground() {
-            model = new DefaultListModel<String>();
+            model = new DefaultListModel();
             statusGood = true;
             try {
                 final long t0 = System.nanoTime();
@@ -86,7 +86,7 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
     }
     
     private void openFileAtIndex(int index) {
-        String filename = matchList.getModel().getElementAt(index);
+        String filename = (String) matchList.getModel().getElementAt(index);
         Evergreen.getInstance().openFile(workspace.prependRootDirectory(filename));
         
         // Now we've opened a new file, that's where focus should go when we're dismissed.
@@ -102,7 +102,7 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
     }
     
     private void initMatchList() {
-        matchList = new JList<String>();
+        matchList = new JList();
         matchList.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
@@ -168,7 +168,7 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
      * Provides some visual feedback that we're rescanning.
      */
     private synchronized void switchToFakeList() {
-        DefaultListModel<String> model = new DefaultListModel<String>();
+        DefaultListModel model = new DefaultListModel();
         model.addElement("Rescan in progress...");
         matchList.setModel(model);
         matchList.setEnabled(false);

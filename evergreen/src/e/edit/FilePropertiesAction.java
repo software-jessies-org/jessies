@@ -36,10 +36,10 @@ public class FilePropertiesAction extends ETextAction {
         final JTextField indentStringField = new JTextField(initialIndentationString, 40);
         
         // FIXME: if you add a charset here, you'll probably have to modify ByteBufferDecoder so we can read the resulting file back in.
-        final JComboBox<String> charsetCombo = new JComboBox<String>(new String[] { "UTF-8", "ISO-8859-1", "UTF-16BE", "UTF-16LE" });
+        final JComboBox charsetCombo = new JComboBox(new Object[] { "UTF-8", "ISO-8859-1", "UTF-16BE", "UTF-16LE" });
         charsetCombo.setSelectedItem(buffer.getProperty(PTextBuffer.CHARSET_PROPERTY));
         
-        final JComboBox<String> fileTypeCombo = new JComboBox<String>(new Vector<String>(FileType.getAllFileTypeNames()));
+        final JComboBox fileTypeCombo = new JComboBox(new Vector<String>(FileType.getAllFileTypeNames()));
         fileTypeCombo.setSelectedItem(window.getFileType().getName());
         
         FormBuilder form = new FormBuilder(Evergreen.getInstance().getFrame(), "Properties for \"" + window.getFilename() + "\"");

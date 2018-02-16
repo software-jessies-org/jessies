@@ -38,14 +38,14 @@ public class ShowMisspellingsAction extends PTextAction {
             listItems[i] = word + " (" + count + ")";
         }
         
-        final JList<String> list = new JList<String>(listItems);
+        final JList list = new JList(listItems);
         list.setPrototypeCellValue("this would be quite a long misspelling");
         list.setCellRenderer(new EListCellRenderer(true));
         ComponentUtilities.bindDoubleClickAndEnter(list, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 ETextWindow textWindow = (ETextWindow) SwingUtilities.getAncestorOfClass(ETextWindow.class, textArea);
                 // Highlight all matches of this misspelling.
-                String literal = list.getSelectedValue();
+                String literal = (String) list.getSelectedValue();
                 literal = literal.substring(0, literal.indexOf(" ("));
                 FindAction.INSTANCE.findInText(textWindow, regularExpressionForWord(literal));
                 // Go to first match.
