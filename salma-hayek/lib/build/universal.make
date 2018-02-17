@@ -550,9 +550,9 @@ JAVAC_FLAGS.javac += -target 1.6
 JAVAC_FLAGS.javac += -source 1.6
 
 # Multi-arch from Wheezy and up
-BOOT_JDK_ALTERNATIVES += /usr/lib/jvm/java-1.6.0-openjdk-amd64
+BOOT_JDK_ALTERNATIVES += /usr/lib/jvm/java-6-openjdk-amd64
 # Squeeze and before
-BOOT_JDK_ALTERNATIVES += /usr/lib/jvm/java-1.6.0-openjdk
+BOOT_JDK_ALTERNATIVES += /usr/lib/jvm/java-6-openjdk
 BOOT_JDK_ALTERNATIVES += /var/chroot/ia32/usr/lib/jvm/java-6-openjdk
 # := deferred to ALTERNATE_BOOTCLASSPATH
 BOOT_JDK.Linux ?= $(firstword $(wildcard $(BOOT_JDK_ALTERNATIVES)))
