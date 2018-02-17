@@ -543,7 +543,7 @@ JAVAC_FLAGS.javac += -g
 JAVAC_FLAGS.javac += -deprecation
 JAVAC_FLAGS.javac += -Xlint:all -Xlint:-serial
 
-JAVA_MAJOR_VERSION = 6
+JAVA_MAJOR_VERSION := $(shell ruby -e 'require "$(JDK_ROOT_SCRIPT)"; puts(JAVA_MAJOR_VERSION)')
 
 # We should also ensure that we build class files that can be used on the current Java release, regardless of where we build.
 JAVAC_FLAGS.javac += -target 1.$(JAVA_MAJOR_VERSION)
@@ -568,7 +568,7 @@ BOOT_JDK_MESSAGE += You need to install a package that will give you a Java $(JA
 BOOT_JDK_MESSAGE += $(NEWLINE)
 BOOT_JDK_MESSAGE += Do not fix the generics warnings, because that makes us depend on Java 7.
 BOOT_JDK_MESSAGE += $(NEWLINE)
-BOOT_JDK_MESSAGE += That would require additional changes to JAVAC_FLAGS.javac and find-jdk-root.rb.
+BOOT_JDK_MESSAGE += That would require changing JAVA_MAJOR_VERSION in find-jdk-root.rb.
 BOOT_JDK_MESSAGE += $(NEWLINE)
 BOOT_JDK_MESSAGE += More seriously, it would permanently break our ability to do Mac builds on Snow Leopard.
 BOOT_JDK_MESSAGE += $(NEWLINE)

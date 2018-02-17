@@ -128,12 +128,13 @@ else
     }
     return nil
   end
+
+  JAVA_MAJOR_VERSION = 6
   
   def findBootJdkFromRegistry()
     return findJdkFromRegistry() {
       |version|
-      # See -target in universal.make.
-      version == 6
+      version == JAVA_MAJOR_VERSION
     }
   end
   
@@ -156,8 +157,7 @@ else
     if target_os() == "Cygwin"
       jdk_root = findJdkFromRegistry() {
         |version|
-        # See -target in universal.make.
-        version >= 6
+        version >= JAVA_MAJOR_VERSION
       }
       if jdk_root != nil
         return jdk_root
