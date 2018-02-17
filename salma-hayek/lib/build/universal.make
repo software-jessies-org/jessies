@@ -543,17 +543,19 @@ JAVAC_FLAGS.javac += -g
 JAVAC_FLAGS.javac += -deprecation
 JAVAC_FLAGS.javac += -Xlint:all -Xlint:-serial
 
-# We should also ensure that we build class files that can be used on the current Java release, regardless of where we build.
-JAVAC_FLAGS.javac += -target 1.6
+JAVA_MAJOR_VERSION = 6
 
-# Ensure we give a clear error if the user attempts to use anything older than Java 6.
-JAVAC_FLAGS.javac += -source 1.6
+# We should also ensure that we build class files that can be used on the current Java release, regardless of where we build.
+JAVAC_FLAGS.javac += -target 1.$(JAVA_MAJOR_VERSION)
+
+# Ensure we give a clear error if the user attempts to use anything older.
+JAVAC_FLAGS.javac += -source 1.$(JAVA_MAJOR_VERSION)
 
 # Multi-arch from Wheezy and up
-BOOT_JDK_ALTERNATIVES += /usr/lib/jvm/java-6-openjdk-amd64
+BOOT_JDK_ALTERNATIVES += /usr/lib/jvm/java-$(JAVA_MAJOR_VERSION)-openjdk-amd64
 # Squeeze and before
-BOOT_JDK_ALTERNATIVES += /usr/lib/jvm/java-6-openjdk
-BOOT_JDK_ALTERNATIVES += /var/chroot/ia32/usr/lib/jvm/java-6-openjdk
+BOOT_JDK_ALTERNATIVES += /usr/lib/jvm/java-$(JAVA_MAJOR_VERSION)-openjdk
+BOOT_JDK_ALTERNATIVES += /var/chroot/ia32/usr/lib/jvm/java-$(JAVA_MAJOR_VERSION)-openjdk
 # := deferred to ALTERNATE_BOOTCLASSPATH
 BOOT_JDK.Linux ?= $(firstword $(wildcard $(BOOT_JDK_ALTERNATIVES)))
 
@@ -562,7 +564,7 @@ BOOT_JDK.Cygwin = $(call findMakeFriendlyEquivalentName,$(shell ruby -e 'require
 BOOT_JDK = $(BOOT_JDK.$(TARGET_OS))
 ALTERNATE_BOOTCLASSPATH := $(wildcard $(BOOT_JDK)/jre/lib/rt.jar)
 BOOT_JDK_MESSAGE += $(NEWLINE)
-BOOT_JDK_MESSAGE += You need to install a package that will give you a Java 6 JDK, so we can use its rt.jar.
+BOOT_JDK_MESSAGE += You need to install a package that will give you a Java $(JAVA_MAJOR_VERSION) JDK, so we can use its rt.jar.
 BOOT_JDK_MESSAGE += $(NEWLINE)
 BOOT_JDK_MESSAGE += Do not fix the generics warnings, because that makes us depend on Java 7.
 BOOT_JDK_MESSAGE += $(NEWLINE)
@@ -596,10 +598,10 @@ JAVAC_FLAGS.ecj += -warn:-serial
 JAVAC_FLAGS.ecj += -proceedOnError
 
 # We should also ensure that we build class files that can be used on the current Java release, regardless of where we build.
-JAVAC_FLAGS.ecj += -target 1.6
+JAVAC_FLAGS.ecj += -target 1.$(JAVA_MAJOR_VERSION)
 
-# Ensure we give a clear error if the user attempts to use anything older than Java 6.
-JAVAC_FLAGS.ecj += -source 1.6
+# Ensure we give a clear error if the user attempts to use anything older.
+JAVAC_FLAGS.ecj += -source 1.$(JAVA_MAJOR_VERSION)
 
 # ----------------------------------------------------------------------------
 # Set GCJ flags.
