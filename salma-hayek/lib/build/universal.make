@@ -549,7 +549,14 @@ JAVAC_FLAGS.javac += -target 1.6
 # Ensure we give a clear error if the user attempts to use anything older than Java 6.
 JAVAC_FLAGS.javac += -source 1.6
 
-BOOT_JDK.Linux = $(subst java-8,java-6,$(subst java-7,java-6,$(JDK_ROOT)))
+# Multi-arch from Wheezy and up
+BOOT_JDK_ALTERNATIVES += /usr/lib/jvm/java-1.6.0-openjdk-amd64
+# Squeeze and before
+BOOT_JDK_ALTERNATIVES += /usr/lib/jvm/java-1.6.0-openjdk
+BOOT_JDK_ALTERNATIVES += /var/chroot/ia32/usr/lib/jvm/java-6-openjdk
+# := deferred to ALTERNATE_BOOTCLASSPATH
+BOOT_JDK.Linux ?= $(firstword $(wildcard $(BOOT_JDK_ALTERNATIVES)))
+
 # := deferred to ALTERNATE_BOOTCLASSPATH
 BOOT_JDK.Cygwin = $(call findMakeFriendlyEquivalentName,$(shell ruby -e 'require "$(JDK_ROOT_SCRIPT)"; puts(findBootJdkFromRegistry())'))
 BOOT_JDK = $(BOOT_JDK.$(TARGET_OS))
