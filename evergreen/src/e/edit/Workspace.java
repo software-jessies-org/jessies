@@ -14,6 +14,7 @@ public class Workspace extends JPanel {
     private EColumn leftColumn = new EColumn();
     
     private ArrayList<EErrorsWindow> errorsWindows = new ArrayList<EErrorsWindow>();
+    private HashMap<String, EErrorsWindow> errorsWindowsByCmd = new HashMap<String, EErrorsWindow>();
 
     private String workspaceName;
     private String rootDirectory;
@@ -428,6 +429,20 @@ public class Workspace extends JPanel {
         synchronized (errorsWindows) {
             errorsWindows.remove(errorsWindow);
         }
+        // Remove the window from the mapping of command to window, so we don't try to reuse
+        // a destroyed errors window.
+        synchronized (errorsWindowsByCmd) {
+            String cmd = null;
+            for (String k : errorsWindowsByCmd.keySet()) {
+                if (errorsWindowsByCmd.get(k) == errorsWindow) {
+                    cmd = k;
+                    break;
+                }
+            }
+            if (cmd != null) {
+                errorsWindowsByCmd.remove(cmd);
+            }
+        }
     }
     
     public void clearTopErrorsWindow() {
@@ -459,7 +474,14 @@ public class Workspace extends JPanel {
             }
         }
         
-        final EErrorsWindow errorsWindow = createErrorsWindow("Command Output"); // FIXME: be more specific.
+        EErrorsWindow errorsWindow;
+        synchronized (errorsWindowsByCmd) {
+            errorsWindow = errorsWindowsByCmd.get(command);
+            if (errorsWindow == null) {
+                errorsWindow = createErrorsWindow("Command Output"); // FIXME: be more specific.
+                errorsWindowsByCmd.put(command, errorsWindow);
+            }
+        }
         return new ShellCommand(textArea, errorsWindow, directory, command, environment, inputDisposition, outputDisposition);
     }
     
