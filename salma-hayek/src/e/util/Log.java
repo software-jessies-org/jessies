@@ -42,7 +42,7 @@ public class Log {
         }
     }
     
-    private static ArrayList<String> banners = new ArrayList<String>();
+    private static List<String> banners = Collections.synchronizedList(new ArrayList<String>());
     
     public static void recordBanner(String message) {
         banners.add(message);
