@@ -186,6 +186,49 @@ public class Palettes {
     }
     
     /**
+     * Returns an accessor for the given color. This is then used to retrieve the current color at redraw time.
+     */
+    public static class Ink {
+        private int index;
+        private Color fixedColor;
+        private String colorSetting;
+        
+        protected Ink(int index) {
+            this.index = index;
+        }
+        
+        protected Ink(Color fixedColor) {
+            this.fixedColor = fixedColor;
+        }
+        
+        protected Ink(String colorSetting) {
+            this.colorSetting = colorSetting;
+        }
+        
+        public Color get() {
+            if (fixedColor != null) return fixedColor;
+            if (colorSetting != null) return Terminator.getPreferences().getColor(colorSetting);
+            return getColor(index);
+        }
+    }
+    
+    public static Ink getInk(int index) {
+        return new Ink(index);
+    }
+    
+    public static Ink getFixedInk(Color fixedColor) {
+        return new Ink(fixedColor);
+    }
+    
+    public static Ink getBackgroundInk() {
+        return new Ink(TerminatorPreferences.BACKGROUND_COLOR);
+    }
+    
+    public static Ink getForegroundInk() {
+        return new Ink(TerminatorPreferences.FOREGROUND_COLOR);
+    }
+    
+    /**
      * Returns the color corresponding to 'index' (0-255).
      * 
      * These come from the current palette:

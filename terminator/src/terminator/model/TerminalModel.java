@@ -61,18 +61,6 @@ public class TerminalModel {
         }
     }
     
-    public void optionsDidChange() {
-        Color bg = Terminator.getPreferences().getColor(TerminatorPreferences.BACKGROUND_COLOR);
-        for (TextLine line : textLines) {
-            line.setBackground(bg);
-        }
-        if (savedScreen != null) {
-            for (TextLine line : savedScreen) {
-                line.setBackground(bg);
-            }
-        }
-    }
-    
     public void checkInvariant() {
         int highestStartLineIndex = -1;
         for (int lineNumber = 0; lineNumber <= lastValidStartIndex; ++ lineNumber) {
@@ -174,12 +162,12 @@ public class TerminalModel {
             for (int i = 0; i < height; i++) {
                 int lineIndex = getFirstDisplayLine() + i;
                 savedScreen[i] = getTextLine(lineIndex);
-                textLines.set(lineIndex, new TextLine(view.getBackground()));
+                textLines.set(lineIndex, new TextLine(Palettes.getBackgroundInk()));
             }
         } else {
             for (int i = 0; i < height; i++) {
                 int lineIndex = getFirstDisplayLine() + i;
-                textLines.set(lineIndex, i >= savedScreen.length ? new TextLine(view.getBackground()) : savedScreen[i]);
+                textLines.set(lineIndex, i >= savedScreen.length ? new TextLine(Palettes.getBackgroundInk()) : savedScreen[i]);
             }
             for (int i = height; i < savedScreen.length; i++) {
                 textLines.add(savedScreen[i]);
@@ -355,7 +343,7 @@ public class TerminalModel {
     }
     
     public void insertLine(int index) {
-        insertLine(index, new TextLine(view.getBackground()));
+        insertLine(index, new TextLine(Palettes.getBackgroundInk()));
     }
     
     public void insertLine(int index, TextLine lineToInsert) {
@@ -399,7 +387,7 @@ public class TerminalModel {
     public TextLine getTextLine(int index) {
         if (index >= textLines.size()) {
             Log.warn("TextLine requested for index " + index + ", size of buffer is " + textLines.size() + ".", new Exception("stack trace"));
-            return new TextLine(view.getBackground());
+            return new TextLine(Palettes.getBackgroundInk());
         }
         return textLines.get(index);
     }
@@ -417,7 +405,7 @@ public class TerminalModel {
         } else if (this.height < height) {
             for (int i = 0; i < (height - this.height); i++) {
                 if (usingAlternateBuffer() || getFirstDisplayLine() <= 0) {
-                    textLines.add(new TextLine(view.getBackground()));
+                    textLines.add(new TextLine(Palettes.getBackgroundInk()));
                 }
             }
         }
@@ -425,7 +413,7 @@ public class TerminalModel {
         firstScrollLineIndex = 0;
         lastScrollLineIndex = height - 1;
         while (getFirstDisplayLine() < 0) {
-            textLines.add(new TextLine(view.getBackground()));
+            textLines.add(new TextLine(Palettes.getBackgroundInk()));
         }
         checkInvariant();
     }
@@ -529,7 +517,7 @@ public class TerminalModel {
             // The current position is included in the deletion, hence + 1.
             line.writeTextAt(0, StringUtilities.nCopies(cursorPosition.getCharOffset() + 1, ' '), currentStyle);
         } else {
-            line.setBackground(currentStyle.getBackground());
+            line.setBackground(currentStyle.getRawBackground());
             int start = fromStart ? 0 : cursorPosition.getCharOffset();
             line.killText(start, oldLineLength);
         }
@@ -551,16 +539,15 @@ public class TerminalModel {
         int start = fromTop ? getFirstDisplayLine() : cursorPosition.getLineIndex();
         int startClearing = fromTop ? start : start + 1;
         int endClearing = toBottom ? getLineCount() : cursorPosition.getLineIndex();
-        Color currentBackground = currentStyle.getBackground();
         for (int i = startClearing; i < endClearing; i++) {
             TextLine cl = getTextLine(i);
             cl.clear();
-            cl.setBackground(currentBackground);
+            cl.setBackground(currentStyle.getRawBackground());
         }
         TextLine line = getTextLine(cursorPosition.getLineIndex());
         int oldLineLength = line.length();
         if (toBottom) {
-            view.setBackground(currentBackground);
+            view.setBackground(currentStyle.getBackground());
             line.killText(cursorPosition.getCharOffset(), oldLineLength);
         } else /* only fromTop = true */ {
             // The current position is always erased, hence the + 1.
@@ -631,7 +618,7 @@ public class TerminalModel {
     public void scrollDisplayUp() {
         int addIndex = getFirstDisplayLine() + firstScrollLineIndex;
         int removeIndex = getFirstDisplayLine() + lastScrollLineIndex + 1;
-        textLines.add(addIndex, new TextLine(view.getBackground()));
+        textLines.add(addIndex, new TextLine(Palettes.getBackgroundInk()));
         textLines.remove(removeIndex);
         lineIsDirty(addIndex);
         linesChangedFrom(addIndex);
@@ -643,7 +630,7 @@ public class TerminalModel {
     public void deleteLine() {
         int removeIndex = cursorPosition.getLineIndex();
         int addIndex = getFirstDisplayLine() + lastScrollLineIndex + 1;
-        textLines.add(addIndex, new TextLine(view.getBackground()));
+        textLines.add(addIndex, new TextLine(Palettes.getBackgroundInk()));
         textLines.remove(removeIndex);
         lineIsDirty(removeIndex);
         linesChangedFrom(removeIndex);

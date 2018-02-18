@@ -106,14 +106,6 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
         setFont(preferences.getFont(TerminatorPreferences.FONT));
         setBackground(preferences.getColor(TerminatorPreferences.BACKGROUND_COLOR));
         sizeChanged();
-        // The model keeps a bunch of lines to represent the text in the terminal, which is at least
-        // as high as the terminal itself. Each line has a background colour describing the colour
-        // before any colour adjustments have been made (due to escape sequences etc), and
-        // this is also used to paint the area after any text.
-        // We must ping the model to tell it to adjust the backgrounds of these text lines, otherwise
-        // we end up with all the parts of the terminal without text keeping the old background colour,
-        // in case the options change was adjusting the background.
-        model.optionsDidChange();
     }
     
     public BirdsEye getBirdsEye() {
@@ -758,7 +750,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
                         drawCursor = false;
                     }
                 }
-                Color lineBG = textLine.getBackground();
+                Color lineBG = textLine.getBackground().get();
                 if (x < maxX && !getBackground().equals(lineBG)) {
                     // Fill the rest of the line with line's default background
                     g.setColor(lineBG);
