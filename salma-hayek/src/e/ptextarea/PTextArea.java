@@ -128,9 +128,14 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             }
             runnable.run();
             visible = getVisibleRect();
-            int newYPosition = getViewCoordinates(getCoordinates(charToKeepInPosition)).y - visible.y;
-            visible.y += newYPosition - yPosition;
-            scrollRectToVisible(visible);
+            // If this text area isn't visible, the split lines won't have been generated, so the following code will
+            // hit a null pointer exception. The simplest way to avoid this is just to skip the scrolling if we're not
+            // visible.
+            if (!isLineWrappingInvalid()) {
+                int newYPosition = getViewCoordinates(getCoordinates(charToKeepInPosition)).y - visible.y;
+                visible.y += newYPosition - yPosition;
+                scrollRectToVisible(visible);
+            }
         }
     }
     

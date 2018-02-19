@@ -51,7 +51,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         public void open();
     }
     
-    public static class MatchingLine implements ClickableTreeItem {
+    public class MatchingLine implements ClickableTreeItem {
         private String line;
         private File file;
         private Pattern pattern;
@@ -70,6 +70,9 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                 final int lineNumber = Integer.parseInt(line.substring(1, line.indexOf(':', 1)));
                 textWindow.getTextArea().goToLine(lineNumber);
             }
+            
+            // Now we've opened a new file or switched to an already-open one, that's where focus should go when we're dismissed.
+            form.getFormDialog().setShouldRestoreFocus(false);
         }
         
         @Override public String toString() {

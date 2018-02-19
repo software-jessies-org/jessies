@@ -310,8 +310,8 @@ public class CSIEscapeAction implements TerminalAction {
         // Grab the *raw* foreground and background colours. This preserves their 'null'ness in the
         // case that a style has no explicit fg/bg, and must use the current default. This is important
         // for when someone changes the fg/bg colours in the preferences panel.
-        Color foreground = oldStyle.getRawForeground();
-        Color background = oldStyle.getRawBackground();
+        Palettes.Ink foreground = oldStyle.getRawForeground();
+        Palettes.Ink background = oldStyle.getRawBackground();
         boolean isBold = oldStyle.isBold();
         boolean isReverseVideo = oldStyle.isReverseVideo();
         boolean isUnderlined = oldStyle.isUnderlined();
@@ -374,25 +374,25 @@ public class CSIEscapeAction implements TerminalAction {
             case 36:
             case 37:
                 // Set foreground color to one of the original eight colors.
-                foreground = Palettes.getColor(attribute - 30);
+                foreground = Palettes.getInk(attribute - 30);
                 break;
             case 38:
                 // Set foreground color (256-color or 24-bit).
             case 48:
                 // Set background color (256-color or 24-bit).
-                Color newColor = null;
+                Palettes.Ink newColor = null;
                 final int colorMode = nextInt(chunks);
                 switch (colorMode) {
                 case 5:
                     // 256 color mode, as in xterm.
-                    newColor = Palettes.getColor(nextInt(chunks));
+                    newColor = Palettes.getInk(nextInt(chunks));
                     break;
                 case 2:
                     // 24 bit color mode, a konsole extension.
                     final int red = nextInt(chunks);
                     final int green = nextInt(chunks);
                     final int blue = nextInt(chunks);
-                    newColor = new Color(red, green, blue);
+                    newColor = Palettes.getFixedInk(new Color(red, green, blue));
                     break;
                 default:
                     Log.warn("Unknown color mode " + colorMode + " for attribute " + attribute + " in [" + StringUtilities.escapeForJava(sequence));
@@ -416,7 +416,7 @@ public class CSIEscapeAction implements TerminalAction {
             case 46:
             case 47:
                 // Set background color to one of the original eight colors.
-                background = Palettes.getColor(attribute - 40);
+                background = Palettes.getInk(attribute - 40);
                 break;
             case 49:
                 // Use default background color.
@@ -431,7 +431,7 @@ public class CSIEscapeAction implements TerminalAction {
             case 96:
             case 97:
                 // Set foreground color to one of the eight bright colors.
-                foreground = Palettes.getColor(attribute - 82);
+                foreground = Palettes.getInk(attribute - 82);
                 break;
             case 100:
             case 101:
@@ -442,7 +442,7 @@ public class CSIEscapeAction implements TerminalAction {
             case 106:
             case 107:
                 // Set background color to one of the eight bright colors.
-                background = Palettes.getColor(attribute - 92);
+                background = Palettes.getInk(attribute - 92);
                 break;
             default:
                 Log.warn("Unknown attribute " + attribute + " in [" + StringUtilities.escapeForJava(sequence));

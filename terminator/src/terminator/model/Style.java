@@ -11,8 +11,8 @@ public final class Style {
 
     // This style's foreground/background color, or null to indicate this style doesn't affect the foreground/background color.
     // Note that the use of Colors means text styled while a given palette is in use for the lower 16 colors will always use those colors even if the user later switches to a different palette.
-    private final Color foreground;
-    private final Color background;
+    private final Palettes.Ink foreground;
+    private final Palettes.Ink background;
 
     private final boolean isBold;
     private final boolean isUnderlined;
@@ -58,7 +58,7 @@ public final class Style {
         return result;
     }
     
-    private Style(Color foreground, Color background, boolean isBold, boolean isUnderlined, boolean isReverseVideo) {
+    private Style(Palettes.Ink foreground, Palettes.Ink background, boolean isBold, boolean isUnderlined, boolean isReverseVideo) {
         this.foreground = foreground;
         this.background = background;
         this.isBold = isBold;
@@ -68,22 +68,22 @@ public final class Style {
     
     // getRawForeground can return null if there's no foreground set. Use this to derive styles which retain
     // the state of using the default foreground in case it changes.
-    public Color getRawForeground() {
+    public Palettes.Ink getRawForeground() {
         return foreground;
     }
     
     // getRawBackground can return null if there's no background set. Use this to derive styles which retain
     // the state of using the default background in case it changes.
-    public Color getRawBackground() {
+    public Palettes.Ink getRawBackground() {
         return background;
     }
     
     public Color getForeground() {
-        return foreground != null ? foreground : Terminator.getPreferences().getColor(TerminatorPreferences.FOREGROUND_COLOR);
+        return foreground != null ? foreground.get() : Terminator.getPreferences().getColor(TerminatorPreferences.FOREGROUND_COLOR);
     }
     
     public Color getBackground() {
-        return background != null ? background : Terminator.getPreferences().getColor(TerminatorPreferences.BACKGROUND_COLOR);
+        return background != null ? background.get() : Terminator.getPreferences().getColor(TerminatorPreferences.BACKGROUND_COLOR);
     }
     
     public boolean isBold() {
@@ -102,7 +102,7 @@ public final class Style {
         return DEFAULT_STYLE;
     }
     
-    public static Style makeStyle(Color foreground, Color background, boolean isBold, boolean isUnderlined, boolean isReverseVideo) {
+    public static Style makeStyle(Palettes.Ink foreground, Palettes.Ink background, boolean isBold, boolean isUnderlined, boolean isReverseVideo) {
         return new Style(foreground, background, isBold, isUnderlined, isReverseVideo);
     }
 }

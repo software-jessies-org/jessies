@@ -1,7 +1,7 @@
 package terminator.model;
 
 import java.util.*;
-import java.awt.Color;
+import terminator.Palettes;
 
 /**
  * Ties together the String containing the characters on a particular line, and the styles to be applied to each character.
@@ -20,7 +20,7 @@ public class TextLine {
     private static final char TAB_CONTINUE = '\r';
     
     // The default background, used beyond the last character of the line.
-    private Color background;
+    private Palettes.Ink background;
     // The index in characters into the containing buffer of the first character of this line.
     private int lineStartIndex;
     
@@ -38,16 +38,16 @@ public class TextLine {
     // Otherwise, styles.length == text.length(), and the style information for text.charAt(i) is styles[i] (never null).
     private Style[] styles;
     
-    public TextLine(Color bg) {
+    public TextLine(Palettes.Ink bg) {
         background = bg;
         clear();
     }
     
-    public Color getBackground() {
-        return background;
+    public Palettes.Ink getBackground() {
+        return background == null ? Palettes.getBackgroundInk() : background;
     }
     
-    public void setBackground(Color bg) {
+    public void setBackground(Palettes.Ink bg) {
         background = bg;
     }
     
