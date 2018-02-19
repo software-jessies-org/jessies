@@ -83,6 +83,8 @@ class Evergreen
         elsif shouldCloseWorkspace
             exit(send_command(client, "closeWorkspace #{workspace_name}"))
         end
+        #send_command(client, "saveAll")
+        #send_command(client, "rememberState")
         
         # Translate vi line number specifications.
         if ARGV[0] =~ /^\+(\d+)$/
