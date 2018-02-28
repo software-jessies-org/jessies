@@ -156,7 +156,7 @@ public class SelectionHighlighter implements ClipboardOwner, MouseListener, Mous
         
         private Location getWordStart(Location location) {
             final int lineNumber = location.getLineIndex();
-            String line = view.getModel().getTextLine(lineNumber).getString();
+            String line = view.getModel().getDisplayTextLine(lineNumber).getString();
             if (location.getCharOffset() >= line.length()) {
                 return location;
             }
@@ -170,7 +170,7 @@ public class SelectionHighlighter implements ClipboardOwner, MouseListener, Mous
         
         private Location getWordEnd(Location location) {
             final int lineNumber = location.getLineIndex();
-            String line = view.getModel().getTextLine(lineNumber).getString();
+            String line = view.getModel().getDisplayTextLine(lineNumber).getString();
             if (location.getCharOffset() >= line.length()) {
                 return location;
             }
@@ -285,10 +285,10 @@ public class SelectionHighlighter implements ClipboardOwner, MouseListener, Mous
     }
     
     private void setHighlight(Location start, Location end) {
-        TextLine startLine = view.getModel().getTextLine(start.getLineIndex());
+        TextLine startLine = view.getModel().getDisplayTextLine(start.getLineIndex());
         start = new Location(start.getLineIndex(), startLine.getEffectiveCharStartOffset(start.getCharOffset()));
         if (end.getLineIndex() < view.getModel().getLineCount()) {
-            TextLine endLine = view.getModel().getTextLine(end.getLineIndex());
+            TextLine endLine = view.getModel().getDisplayTextLine(end.getLineIndex());
             end = new Location(end.getLineIndex(), endLine.getEffectiveCharEndOffset(end.getCharOffset()));
         }
         if (start.equals(end)) {
@@ -310,7 +310,7 @@ public class SelectionHighlighter implements ClipboardOwner, MouseListener, Mous
         if (location.getLineIndex() >= model.getLineCount()) {
             return false;
         }
-        TextLine line = model.getTextLine(location.getLineIndex());
+        TextLine line = model.getDisplayTextLine(location.getLineIndex());
         // It is common for a selection to start after the last visible character on a line.
         if (location.getCharOffset() > line.length()) {
             return false;

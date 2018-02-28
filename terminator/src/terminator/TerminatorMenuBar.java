@@ -5,6 +5,7 @@ import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import terminator.model.*;
 import terminator.view.*;
 import terminator.view.highlight.*;
 
@@ -25,7 +26,7 @@ public class TerminatorMenuBar extends EMenuBar {
     public TerminatorMenuBar() {
         add(makeFileMenu());
         add(makeEditMenu());
-        add(makeScrollbackMenu());
+        add(makeViewMenu());
         if (GuiUtilities.isMacOs()) {
             add(WindowMenu.getSharedInstance().makeJMenu(customWindowMenuItems));
         } else {
@@ -70,8 +71,8 @@ public class TerminatorMenuBar extends EMenuBar {
         return menu;
     }
     
-    private JMenu makeScrollbackMenu() {
-        JMenu menu = GuiUtilities.makeMenu("Scrollback", 'S');
+    private JMenu makeViewMenu() {
+        JMenu menu = GuiUtilities.makeMenu("View", 'V');
         
         menu.add(new ScrollToTopAction());
         menu.add(new ScrollToBottomAction());
@@ -86,6 +87,7 @@ public class TerminatorMenuBar extends EMenuBar {
         
         menu.addSeparator();
         menu.add(new ClearScrollbackAction());
+        menu.add(new SwitchBufferAction());
         
         return menu;
     }
@@ -598,6 +600,24 @@ public class TerminatorMenuBar extends EMenuBar {
         @Override
         protected void performPaneAction(JTerminalPane terminalPane) {
             terminalPane.getTerminalView().getModel().clearScrollBuffer();
+        }
+    }
+    
+    public static class SwitchBufferAction extends AbstractPaneAction {
+        public SwitchBufferAction() {
+            super("Switch Buffer");
+            putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke("S"));
+        }
+        
+        @Override
+        protected void performPaneAction(JTerminalPane terminalPane) {
+            TerminalModel m = terminalPane.getTerminalView().getModel();
+            m.setViewInactiveBuffer(!m.viewingInactiveBuffer());
+        }
+        
+        @Override
+        public boolean isEnabled() {
+            return super.isEnabled() && getFocusedTerminalPane().getTerminalView().getModel().canViewInactiveBuffer();
         }
     }
     

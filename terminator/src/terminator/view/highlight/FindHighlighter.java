@@ -98,7 +98,7 @@ public class FindHighlighter {
             // FIXME: this strange scoping avoids allocating an ArrayList for lines without matches, but there must be a cleaner way.
             final ArrayList<Range> matches = new ArrayList<Range>();
             for (int i = model.getLineCount() - 1; i >= firstLineIndex; i--) {
-                String text = model.getTextLine(i).getString();
+                String text = model.getDisplayTextLine(i).getString();
                 Matcher matcher = pattern.matcher(text);
                 matches.clear();
                 while (matcher.find()) {

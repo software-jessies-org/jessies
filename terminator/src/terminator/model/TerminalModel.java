@@ -33,6 +33,11 @@ public class TerminalModel {
     // Fields used for saving and restoring the 'real' screen while the alternate buffer is in use.
     private TextLine[] savedScreen;
     
+    // Stores the last alternate buffer (eg last time you ran less or vim etc).
+    private TextLine[] alternateScreen;
+    // Are we currently viewing the opposite of the current buffer?
+    private boolean viewInactiveScreen;
+    
     public TerminalModel(TerminalView view, int width, int height) {
         this.view = view;
         setSize(width, height);
@@ -59,6 +64,31 @@ public class TerminalModel {
             cursorPosition = savedPosition;
             setStyle(savedStyle);
         }
+    }
+    
+    /** Are we currently viewing the non-current buffer? */
+    public boolean viewingInactiveBuffer() {
+        return viewInactiveScreen;
+    }
+    
+    public boolean canViewInactiveBuffer() {
+        // There's always the savedScreen if we're in alternative buffer mode.
+        if (usingAlternateBuffer()) return true;
+        // We're not in alternate buffer mode, so we can only see the inactive buffer if we've saved a previous alternative buffer.
+        return alternateScreen != null;
+    }
+    
+    /** Switch *view only* between normal and alternative buffer. */
+    public void setViewInactiveBuffer(boolean viewInactive) {
+        if (viewInactive == viewInactiveScreen) return;
+        if (viewInactive && !canViewInactiveBuffer()) return;
+        // If we get here, it's safe to switch to view the inactive buffer.
+        viewInactiveScreen = viewInactive;
+        lineIsDirty(getFirstDisplayLine());
+        linesChangedFrom(getFirstDisplayLine());
+        view.linesChangedFrom(getFirstDisplayLine());
+        view.repaint();
+        checkInvariant();
     }
     
     public void checkInvariant() {
@@ -165,8 +195,11 @@ public class TerminalModel {
                 textLines.set(lineIndex, new TextLine(Palettes.getBackgroundInk()));
             }
         } else {
+            // Save the alternative buffer in case the user wants to flip back and see what it contained.
+            alternateScreen = new TextLine[height];
             for (int i = 0; i < height; i++) {
                 int lineIndex = getFirstDisplayLine() + i;
+                alternateScreen[i] = getTextLine(lineIndex);
                 textLines.set(lineIndex, i >= savedScreen.length ? new TextLine(Palettes.getBackgroundInk()) : savedScreen[i]);
             }
             for (int i = height; i < savedScreen.length; i++) {
@@ -384,12 +417,30 @@ public class TerminalModel {
         return width;
     }
     
+    /** Get the logical text line. This is not necessarily the same as what should be displayed, but it is where output should go. */
     public TextLine getTextLine(int index) {
         if (index >= textLines.size()) {
             Log.warn("TextLine requested for index " + index + ", size of buffer is " + textLines.size() + ".", new Exception("stack trace"));
             return new TextLine(Palettes.getBackgroundInk());
         }
         return textLines.get(index);
+    }
+    
+    /** Return the text line to be displayed. This is usually the same as getTextLine, unless we're in "view the other buffer" mode. */
+    public TextLine getDisplayTextLine(int index) {
+        if (!viewInactiveScreen) return getTextLine(index);
+        TextLine[] toView = usingAlternateBuffer() ? savedScreen : alternateScreen;
+        // Find the index within toView.
+        int viewIndex = index + toView.length - getLineCount();
+        // If the index isn't within the 'toView' buffer, fall back to the normal method.
+        // This allows scrolling to still work, and acts as a safety check in case the user starts resizing the terminal.
+        if (viewIndex < 0) return getTextLine(index);
+        // If viewIndex is outside what we have, there's probably been some resize event that has screwed us up.
+        // In such a case, return a blank line. We don't delegate to getTextLine here, so as to avoid mixing the two
+        // buffers (which would look weird).
+        if (viewIndex >= toView.length) return new TextLine(Palettes.getBackgroundInk());
+        // Yay! We can show something alternative.
+        return toView[viewIndex];
     }
     
     public void setSize(int width, int height) {

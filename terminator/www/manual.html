@@ -28,7 +28,7 @@
 
 <h2><a name="scrollback">Scrollback</a></h2>
 
-<p>Terminator has unlimited scrollback. To clear the scrollback for the current terminal, use "Scrollback" > "Clear Scrollback", accessible from the keyboard with alt-k.
+<p>Terminator has unlimited scrollback. To clear the scrollback for the current terminal, use "View" > "Clear Scrollback", accessible from the keyboard with alt-k.
 
 <h2><a name="find">Find</a></h2>
 <!-- this section copied from the Evergreen manual, lightly edited -->
@@ -41,6 +41,12 @@
 <p>You can keep a find active by dismissing the text field with return. (Pressing alt-d or alt-g also dismisses the text field while keeping the find active.)
 
 <p>You can cancel the find (and remove the highlighting) by dismissing the text field with escape. While a find is active, the matches will be updated as you interact with the terminal.
+
+<h2><a name="switchbuffer">Switch Buffer</a></h2>
+
+<p>Terminator supports 'alternate buffers', used by programs such as vim and less to take over the whole visible area without losing your scrollback.
+
+<p>However, with Terminator you can flip easily between the alternative buffer and normal mode, in case you need some information not currently displayed. For example, if you need something emacs was showing until you quit it, you can flip back to the alternative buffer and copy it out. To switch between the current and alternative buffers, use "View" > "Switch Buffer", accessible from the keyboard with alt-s. This will hide the cursor, and any typing on your part will flip you straight back to the normal view.
 
 <h2><a name="logging">Logging</a></h2>
 

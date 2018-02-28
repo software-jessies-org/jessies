@@ -61,7 +61,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
                 requestFocus();
                 if (SwingUtilities.isLeftMouseButton(event) && urlUnderMouse != null && event.isControlDown()) {
                     try {
-                        TextLine line = model.getTextLine(mouseLocation.getLineIndex());
+                        TextLine line = model.getDisplayTextLine(mouseLocation.getLineIndex());
                         String url = line.getTabbedString(urlUnderMouse.getStart(), urlUnderMouse.getEnd());
                         BrowserLauncher.openURL(url);
                     } catch (Throwable th) {
@@ -129,6 +129,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
     }
 
     public void userIsTyping() {
+        model.setViewInactiveBuffer(false);
         blinkOn = true;
         redrawCursorPosition();
         if (Terminator.getPreferences().getBoolean(TerminatorPreferences.HIDE_MOUSE_WHEN_TYPING)) {
@@ -384,7 +385,8 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
     }
     
     public boolean shouldShowCursor() {
-        return displayCursor;
+        // Showing the cursor at all while viewing the inactive buffer looks silly.
+        return displayCursor && !model.viewingInactiveBuffer();
     }
     
     public Color getCursorColor() {
@@ -412,7 +414,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
         } else if (lineIndex < 0) {
             lineIndex = 0;
         } else {
-            modelLine = model.getTextLine(lineIndex).getString();
+            modelLine = model.getDisplayTextLine(lineIndex).getString();
         }
         // In block mode, there may not be text at the point we want to calculate.
         // We assume that W (see getCharUnitSize) doesn't have zero width.
@@ -438,7 +440,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
         // Note that it's okay to have the empty string as the default here because we'll pad if necessary later in this method.
         String line = "";
         if (charCoords.getLineIndex() < model.getLineCount()) {
-            line = model.getTextLine(charCoords.getLineIndex()).getString();
+            line = model.getDisplayTextLine(charCoords.getLineIndex()).getString();
         }
         
         final int offset = Math.max(0, charCoords.getCharOffset());
@@ -651,7 +653,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
         if (isLastLine) {
             return endOffset;
         }
-        TextLine textLine = model.getTextLine(lineIndex);
+        TextLine textLine = model.getDisplayTextLine(lineIndex);
         int lineLength = textLine.length();
         return lineLength;
     }
@@ -663,7 +665,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
             if (i == end.getLineIndex() && end.getCharOffset() == 0) {
                 break;
             }
-            TextLine textLine = model.getTextLine(i);
+            TextLine textLine = model.getDisplayTextLine(i);
             // In block mode, even the start of the selection may be beyond the end of the model line.
             int lineStart = Math.min(textLine.length(), getLineStart(blockMode, start, end, i));
             int lineEnd = Math.min(textLine.length(), getLineEnd(blockMode, start, end, i));
@@ -722,7 +724,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
                 boolean drawCursor = (shouldShowCursor() && i == cursorPosition.getLineIndex());
                 int x = insets.left;
                 int baseline = insets.top + charUnitSize.height * (i + 1) - metrics.getMaxDescent();
-                TextLine textLine = model.getTextLine(i);
+                TextLine textLine = model.getDisplayTextLine(i);
                 final int length = textLine.length();
                 int urlStart = length;
                 int urlEnd = length;
