@@ -176,6 +176,8 @@ public class ExternalTools {
         }
         
         // We accept a shorthand notation for specifying input/output dispositions based on Perl's "open" syntax.
+        // Additionally, we support a special "|?", which is the same as | if the executed program is successful,
+        // but any output on stderr is written to the errors window; only stdout is written to the document.
         ToolInputDisposition inputDisposition = ToolInputDisposition.NO_INPUT;
         ToolOutputDisposition outputDisposition = ToolOutputDisposition.ERRORS_WINDOW;
         if (command.startsWith("<")) {
@@ -188,6 +190,11 @@ public class ExternalTools {
             outputDisposition = ToolOutputDisposition.ERRORS_WINDOW;
             needsFile = true;
             command = command.substring(1);
+        } else if (command.startsWith("|?")) {
+            inputDisposition = ToolInputDisposition.SELECTION_OR_DOCUMENT;
+            outputDisposition = ToolOutputDisposition.REPLACE_IF_OK;
+            needsFile = true;
+            command = command.substring(2);
         } else if (command.startsWith("|")) {
             inputDisposition = ToolInputDisposition.SELECTION_OR_DOCUMENT;
             outputDisposition = ToolOutputDisposition.REPLACE;
