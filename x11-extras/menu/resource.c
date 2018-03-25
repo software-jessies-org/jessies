@@ -1,6 +1,11 @@
 #include "menu.h"
 
-char * view_command;    /* User's view command. */
+/* Command which renders the text to show instead of the clock. This may be
+ * enhanced to show information other than a mere clock, for example it could
+ * be a script (on a laptop) which displays the battery charge level alongside
+ * a clock. The command will be run once per second, and the resulting text
+ * shown in the menu. */
+char * clock_command;
 char * font_name;        /* User's font. */
 char * command[6];        /* User's button commands (element 0 unused). */
 
@@ -10,13 +15,10 @@ get_resources(void) {
     XrmValue value;
     char * resource_manager;
     char * type;
-    int i;
 
     /* Set our fall-back defaults. */
     font_name = DEFAULT_FONT;
-    for (i = 0; i < 6; i++)
-        command[i] = 0;
-    view_command = 0;
+    clock_command = 0;
     
     resource_manager = XResourceManagerString(dpy);
     if (resource_manager == 0)
@@ -32,17 +34,10 @@ get_resources(void) {
         if (strcmp(type, "String") == 0)
             font_name = strdup((char *) value.addr);
 
-    /* Button commands. */
-    for (i = 1; i < 6; i++) {
-        char resource[15];
-        sprintf(resource, "clock.button%i", i);
-        if (XrmGetResource(db, resource, "String", &type, &value) == True)
-            if (strcmp(type, "String") == 0)
-                command[i] = strdup((char *) value.addr);
+    /* Command to run to show the time/status on the right side of the menu. */
+    if (XrmGetResource(db, "menu.clockCommand", "String", &type, &value) == True) {
+        if (strcmp(type, "String") == 0) {
+            clock_command = strdup((char *) value.addr);
+        }
     }
-    
-    /* View command. */
-    if (XrmGetResource(db, "clock.viewCommand", "String", &type, &value) == True)
-        if (strcmp(type, "String") == 0)
-            view_command = strdup((char *) value.addr);
 }

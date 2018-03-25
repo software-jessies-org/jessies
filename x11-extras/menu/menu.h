@@ -53,7 +53,6 @@ extern int ErrorHandler(Display *, XErrorEvent *);
 extern void Panic(char *);
 
 /*    resource.c    */
-extern char * view_command;
+extern char * clock_command;
 extern char * font_name;
-extern char * command[];
 extern void get_resources();
