@@ -1,6 +1,9 @@
 #include "menu.h"
 
-char time_string[17]; /* 1234-67-90 23:56 */
+// By default, we'll only use a handful of bytes in the below time_string,
+// but if we're asked to run an external command to fill it in, we'll allow
+// up to 1024 bytes from the sub-command.
+char time_string[1024]; /* 1234-67-90 23:56 */
 
 /* Dispatcher for main event loop. */
 typedef struct Disp Disp;
@@ -47,8 +50,39 @@ dispatch(XEvent * ev) {
     }
 }
 
+static void runClockCommand() {
+    FILE *fp;
+    fp = popen(clock_command, "r");
+    if (fp == NULL) {
+        snprintf(time_string, sizeof time_string, "Failed to run command '%s'",
+                 clock_command);
+        return;
+    }
+    // Read up to 1024 (well, 1023+terminator) bytes from the sub-process;
+    // we will refuse to display more than that, as screens are only so large.
+    size_t numRead = fread(time_string, sizeof(char), sizeof(time_string) - 1, fp);
+    time_string[numRead] = '\0';
+    // Turn all newlines into spaces, as newlines don't make sense in a single
+    // horizontal line. On the other hand, they're a natural thing for a script
+    // to spit out, so easier to cope with them here than to have to do funky
+    // stuff in script land.
+    for (int i = 0; time_string[i]; i++) {
+        if (time_string[i] == '\n' || time_string[i] == '\r') {
+            // If this newline is the last character in the string, just kill it
+            // with a terminator, rather than adding a space at the end of the
+            // string.
+            time_string[i] = time_string[i + 1] ? ' ' : '\0';
+        }
+    }
+    pclose(fp);
+}
+
 static void
 updateTime() {
+    if (clock_command) {
+        runClockCommand();
+        return;
+    }
     time_t t;
     struct tm tm;
     char * fmt;
@@ -97,9 +131,8 @@ expose(XEvent * ev) {
     /* Draw the clock. */
     updateTime();
     width = XTextWidth(font, time_string, strlen(time_string));
-    XDrawString(dpy, window, gc, display_width - width - 20,
-        1.2 * font->ascent,
-        time_string, strlen(time_string));
+    XDrawString(dpy, window, gc, display_width - width - 20, 1.2 * font->ascent,
+                time_string, strlen(time_string));
 }
 
 static void

@@ -182,13 +182,21 @@ public class ShellCommand {
         case ERRORS_WINDOW:
             errorsWindow.appendLines(isStdErr, lines);
             break;
+        case REPLACE_IF_OK:
+            if (isStdErr) {
+                errorsWindow.appendLines(isStdErr, lines);
+            } else {
+                for (String line : lines) {
+                    capturedOutput.append(line).append('\n');
+                }
+            }
+            break;
         case CLIPBOARD:
         case DIALOG:
         case INSERT:
         case REPLACE:
             for (String line : lines) {
-                capturedOutput.append(line);
-                capturedOutput.append('\n');
+                capturedOutput.append(line).append('\n');
             }
             break;
         }
@@ -226,6 +234,15 @@ public class ShellCommand {
             break;
         case INSERT:
             textArea.replaceSelection(capturedOutput);
+            break;
+        case REPLACE_IF_OK:
+            if (exitStatus == 0) {
+                if (textArea.hasSelection()) {
+                    textArea.replaceSelection(capturedOutput);
+                } else {
+                    textArea.setText(capturedOutput);
+                }
+            }
             break;
         case REPLACE:
             if (textArea.hasSelection()) {
