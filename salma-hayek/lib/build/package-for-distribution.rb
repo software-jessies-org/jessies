@@ -204,7 +204,7 @@ end
 # Copy any compiled terminfo files under /usr/share/terminfo/ or wherever is appropriate for the target.
 def copyTerminfoTo(usr_share_terminfo)
     generated_terminfo_root = ".generated/terminfo/"
-    if File.exists?(generated_terminfo_root) == false
+    if File.exist?(generated_terminfo_root) == false
         return
     end
     FileUtils.mkdir_p(usr_share_terminfo)
@@ -380,7 +380,7 @@ if target_os() == "Linux"
         # If a project has a file listing extra dependencies (one per line), add them.
         # Note that we deliberately don't use "Recommends" because people installing at the command-line won't follow your advice, and people installing from a GUI probably won't even see it.
         extra_depends_filename = "#{project_resource_directory}/lib/build/DEBIAN-control-Depends.txt"
-        if File.exists?(extra_depends_filename)
+        if File.exist?(extra_depends_filename)
             extra_depends = IO.readlines(extra_depends_filename).join(", ").gsub("\n", "")
             depends << ", " << extra_depends
         end
@@ -411,7 +411,7 @@ if target_os() == "Linux"
         control.puts("Description: #{generate_debian_package_description(human_project_name)}")
     }
     diversions_filename = "#{project_resource_directory}/lib/build/DEBIAN-diversions.txt"
-    if File.exists?(diversions_filename)
+    if File.exist?(diversions_filename)
         diversion_file_content = IO.read(diversions_filename)
         preinstContent = <<EOF
 #!/bin/sh
