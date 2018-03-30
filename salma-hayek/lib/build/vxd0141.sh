@@ -7,7 +7,9 @@
 
 # cron-config
 # Install as service, run as yourself (otherwise today exim crashes into /var/log/cron.log), don't set CYGWIN.
-# This requires your Windows password, which, judging by the prompts, you can update with passwd -R.
+# This requires your Windows password, which, despite the prompts, it seems you can't really update with passwd -R.
+# That seems to succeed but doesn't help cron to start.
+# Rerun cron-config instead.
 # In crontab -l:
 # 20 09 * * * /bin/cat /home/mdorey/jessies/work/salma-hayek/lib/build/vxd0141.sh | /bin/bash --login
 
