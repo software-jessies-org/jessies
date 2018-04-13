@@ -17,12 +17,17 @@ Cursor mouse_cursor;    /* Mouse cursor. */
 MenuItem * menu = 0;
 MenuItem * selected = 0;
 
+static int forceRestart;
 char * argv0;
 
 static void readMenu();
 static void addMenuItem(char *, char *);
 static void getEvent(XEvent *);
 static void initCursor(void);
+
+static void restartSelf(int signum) {
+    forceRestart = 1;
+}
 
 /*ARGSUSED*/
 int
@@ -33,6 +38,13 @@ main(int argc, char *argv[]) {
     
     (void) argc;
     argv0 = argv[0];
+    struct sigaction sa;
+    sa.sa_handler = restartSelf;
+    sigemptyset(&(sa.sa_mask));
+    sigaddset(&(sa.sa_mask), SIGHUP);
+    if (sigaction(SIGHUP, &sa, NULL)) {
+        fprintf(stderr, "Failed to set up SIGHUP handler.\n");
+    }
     
     /* Open a connection to the X server. */
     dpy = XOpenDisplay("");
@@ -97,10 +109,13 @@ main(int argc, char *argv[]) {
     XSync(dpy, False);
     
     /* The main event loop. */
-    for (;;) {
+    while (!forceRestart) {
         getEvent(&ev);
         dispatch(&ev);
     }
+    // Someone hit us with a SIGHUP: better exec ourselves to force a config
+    // reload and cope with changing screen sizes.
+    execv(argv0, argv);
 }
 
 static void getEvent(XEvent * ev) {
