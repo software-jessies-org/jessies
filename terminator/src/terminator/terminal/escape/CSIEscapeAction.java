@@ -174,6 +174,9 @@ public class CSIEscapeAction implements TerminalAction {
                 case 47:
                     model.useAlternateBuffer(value);
                     break;
+                case 2004:
+                    model.setBracketedPasteMode(value);
+                    break;
                 default:
                     Log.warn("Unknown private mode " + mode + " in [" + StringUtilities.escapeForJava(seq) + (value ? 'h' : 'l'));
                 }

@@ -179,6 +179,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
         try {
             Transferable contents = clipboard.getContents(this);
             String string = (String) contents.getTransferData(DataFlavor.stringFlavor);
+            string = model.bracketPaste(string);
             terminalControl.sendUtf8String(string);
         } catch (Exception ex) {
             Log.warn("Couldn't paste.", ex);

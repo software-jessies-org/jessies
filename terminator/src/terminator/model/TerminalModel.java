@@ -38,6 +38,8 @@ public class TerminalModel {
     // Are we currently viewing the opposite of the current buffer?
     private boolean viewInactiveScreen;
     
+    private boolean bracketedPasteMode = false;
+    
     public TerminalModel(TerminalView view, int width, int height) {
         this.view = view;
         setSize(width, height);
@@ -692,5 +694,16 @@ public class TerminalModel {
     public void setWindowTitle(String newWindowTitle) {
         JTerminalPane terminalPane = (JTerminalPane) SwingUtilities.getAncestorOfClass(JTerminalPane.class, view);
         terminalPane.setTerminalName(newWindowTitle);
+    }
+    
+    public void setBracketedPasteMode(boolean value) {
+        bracketedPasteMode = value;
+    }
+    
+    public String bracketPaste(String string) {
+        if (bracketedPasteMode == false) {
+            return string;
+        }
+        return Ascii.ESC + "[200~" + string + Ascii.ESC + "[201~";
     }
 }
