@@ -37,6 +37,10 @@ public abstract class Preferences extends PreferenceGetter {
             this.key = key;
             this.tab = tab;
         }
+        
+        public String toString() {
+            return "KeyAndTab['" + key + "', '" + tab + "']";
+        }
     }
     
     // Mutable at any time.
@@ -99,6 +103,9 @@ public abstract class Preferences extends PreferenceGetter {
         defaults.put(key, value);
         descriptions.put(key, description);
         keysInUiOrder.add(new KeyAndTab(key, tabName));
+        if (!tabTitles.contains(tabName)) {
+            addTab(tabName);
+        }
     }
     
     protected void addSeparator() {
@@ -142,7 +149,7 @@ public abstract class Preferences extends PreferenceGetter {
             com.apple.eawt.Application.getApplication().addApplicationListener(new com.apple.eawt.ApplicationAdapter() {
                 @Override
                 public void handlePreferences(com.apple.eawt.ApplicationEvent e) {
-                    showPreferencesDialog();
+                    showPreferencesDialog("Preferences");
                     e.setHandled(true);
                 }
             });
@@ -153,25 +160,36 @@ public abstract class Preferences extends PreferenceGetter {
     }
     
     public Action makeShowPreferencesAction() {
-        return new ShowPreferencesAction(this);
+        // Firefox has 'n' as the mnemonic, but GNOME says 'e'.
+        return makeShowPreferencesAction("Pr_eferences...");
+    }
+    
+    public Action makeShowPreferencesAction(String name) {
+        return new ShowPreferencesAction(this, name);
     }
     
     private static class ShowPreferencesAction extends AbstractAction {
         private Preferences preferences;
+        private String title;
         
-        public ShowPreferencesAction(Preferences preferences) {
-            // Firefox has 'n' as the mnemonic, but GNOME says 'e'.
-            GuiUtilities.configureAction(this, "Pr_eferences...", null);
+        public ShowPreferencesAction(Preferences preferences, String name) {
+            GuiUtilities.configureAction(this, name, null);
             this.preferences = preferences;
             GnomeStockIcon.configureAction(this);
+            // Use a sanitised version of the name as the window title. Remove the underscore
+            // that marks the hotkey, and cut off the trailing '...'.
+            title = name.replaceAll("_", "");
+            if (title.endsWith("...")) {
+                title = title.substring(0, title.length() - 3);
+            }
         }
         
         public void actionPerformed(ActionEvent e) {
-            preferences.showPreferencesDialog();
+            preferences.showPreferencesDialog(title);
         }
     }
     
-    private void showPreferencesDialog() {
+    private void showPreferencesDialog(String title) {
         // Find out which Frame should be the parent of the dialog.
         Component focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getPermanentFocusOwner();
         if (focusOwner instanceof Frame == false) {
@@ -194,7 +212,7 @@ public abstract class Preferences extends PreferenceGetter {
             }
         }
         
-        form = new FormBuilder(parent, "Preferences", tabTitles.size() > 0 ? tabTitles : Arrays.asList("<anonymous>"));
+        form = new FormBuilder(parent, title, tabTitles.size() > 0 ? tabTitles : Arrays.asList("<anonymous>"));
         
         final List<FormPanel> formPanels = form.getFormPanels();
         

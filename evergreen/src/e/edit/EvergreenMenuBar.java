@@ -78,6 +78,7 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(new CompareSelectionAndClipboardAction());
         
         Evergreen.getInstance().getPreferences().initPreferencesMenuItem(menu);
+        menu.add(Evergreen.getInstance().getFileTypePreferences().makeShowPreferencesAction("_Filetype Preferences..."));
         
         return menu;
     }
