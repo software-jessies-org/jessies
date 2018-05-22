@@ -49,12 +49,34 @@ extern "C" {
     typedef jint JNICALL (*CreateJavaVM)(JavaVM**, void**, void*);
 }
 
+struct ProgressOStream : public std::ostream, protected std::streambuf {
+private:
+    std::ostringstream buffer;
+    
+public:
+    std::string str() const {
+        return buffer.str();
+    }
+    
+    ProgressOStream()
+    : std::ostream(this) {
+    }
+    
+protected:
+    using std::ostream::int_type;
+    
+    int_type overflow(int_type ch) {
+        std::cerr.rdbuf()->sputc(ch);
+        return buffer.rdbuf()->sputc(ch);
+    }
+};
+
 struct ErrorReporter {
 public:
     std::string ARGV0;
     NativeArguments launcherArguments;
     std::string supportAddress;
-    std::ostringstream progressOStream;
+    ProgressOStream progressOStream;
     
 private:
     std::string getUsage() const;
@@ -166,6 +188,11 @@ static int mac_runJvm(NativeArguments& launcherArguments) {
 typedef void* SharedLibraryHandle;
 
 SharedLibraryHandle openSharedLibrary(const std::string& sharedLibraryFilename) {
+    {
+        std::ostream& os = errorReporter.progressOStream;
+        os << "Calling openSharedLibrary(\"" << sharedLibraryFilename << "\")...";
+        os << std::endl;
+    }
     // Try to persuade Windows to pop-up a box complaining about unresolved symbols because we don't get anything more informative from dlerror than ENOENT.
     // This could cause a problem if we try to load an amd64 DLL before going on to try to load an i386 DLL.
     // At least it would be an overt problem rather than the silent failure we got when MSVCR71.DLL wasn't in the current directory and wasn't on the PATH.
