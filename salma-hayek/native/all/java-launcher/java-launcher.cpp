@@ -16,7 +16,6 @@
 #include "join.h"
 #include "PortableJni.h"
 #include "reportFatalErrorViaGui.h"
-#include "STRINGIZE.h"
 #include "synchronizeWindowsEnvironment.h"
 #include "WindowsDirectoryChange.h"
 #include "WindowsDllErrorModeChange.h"
@@ -314,7 +313,7 @@ bool isUnreasonableVersion(std::ostream& os, const std::string& version) {
         os << std::endl;
         return true;
     }
-    if (version < "1." STRINGIZE(JAVA_MAJOR_VERSION)) {
+    if (version < "1." + toString(JAVA_MAJOR_VERSION)) {
         os << version;
         os << " is too old";
         os << std::endl;
@@ -480,7 +479,7 @@ SharedLibraryHandle openWindowsJvmLibrary(bool isClient, bool isServer) {
     std::ostream& os = errorReporter.progressOStream;
     os << "Trying to find ";
     os << sizeof(void*) * 8;
-    os << " bit jvm.dll - we need a 1." STRINGIZE(JAVA_MAJOR_VERSION) " or newer JRE or JDK.";
+    os << " bit jvm.dll - we need a 1." << JAVA_MAJOR_VERSION << " or newer JRE or JDK.";
     os << std::endl;
     os << "Error messages were:";
     os << std::endl;
