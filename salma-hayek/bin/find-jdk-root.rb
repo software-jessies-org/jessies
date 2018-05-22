@@ -1,5 +1,7 @@
 #!/usr/bin/ruby -w
 
+require "pathname"
+
 # What this script does
 # ---------------------
 #
@@ -129,7 +131,9 @@ else
     return nil
   end
 
-  JAVA_MAJOR_VERSION = 6
+  salma_hayek = Pathname.new(__FILE__).realpath().dirname().dirname()
+
+  JAVA_MAJOR_VERSION = IO.read("#{salma_hayek}/native/Headers/JAVA_MAJOR_VERSION.h").match(/#define JAVA_MAJOR_VERSION (.+)/)[1].to_i()
   
   def findBootJdkFromRegistry()
     return findJdkFromRegistry() {
