@@ -231,9 +231,11 @@ private:
         unsetenv("WINDOWID");
         
         // The JVM sets LD_LIBRARY_PATH, but this upsets some applications.
-        // We complained in 2005 (Sun bug 6354700), but there's no sign of progress.
+        // We complained in 2005 (Sun bug 6354700), which was fixed in 2011 at least for Java 7.
+        // Now I need LD_LIBRARY_PATH preserved to start eg glxgears on :1
+        // without trying to use the nvidia glx implementation that I use on :0.
         // FIXME: write the initial value to a system property in "invoke-java.rb" and set it back here?
-        unsetenv("LD_LIBRARY_PATH");
+        //unsetenv("LD_LIBRARY_PATH");
         
 #ifdef __APPLE__
         // Apple's Java launcher uses environment variables to implement the -Xdock options.
