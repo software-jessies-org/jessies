@@ -134,8 +134,7 @@ static void UpdateTime() {
   }
   time_t t = time(nullptr);
   struct tm* tm = localtime(&t);
-  const char* fmt = (tm->tm_sec & 1) ? "%Y-%m-%d %H:%M" : "%Y-%m-%d %H.%M";
-  strftime(time_string, sizeof(time_string), fmt, tm);
+  strftime(time_string, sizeof(time_string), "%Y-%m-%d %H:%M", tm);
 }
 
 static int TextWidth(const char* s) {
