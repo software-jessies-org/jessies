@@ -1,22 +1,22 @@
 #include <ctype.h>
 #include <errno.h>
 #include <error.h>
+#include <fcntl.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
-
-#include <unistd.h>
-#include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <time.h>
+#include <unistd.h>
 
+#include <string>
+
+#include <X11/Xft/Xft.h>
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>
 #include <X11/Xutil.h>
-#include <X11/Xft/Xft.h>
-
-#include <string>
 
 // The display.
 static Display* g_display;
@@ -42,18 +42,13 @@ static XftColor g_font_color;
 static bool sinister = false;
 
 // User's view command.
-static char* view_command = nullptr;
-
+static std::string g_view_command;
 // User's font.
-static std::string font_name{"roboto-16"};
-
+static std::string g_font_name{"roboto-16"};
 // User's button commands (element 0 unused).
 static char* command[6] = {};
 
-static char* display_string = nullptr;
-
-static void update_display_string();
-static char* pipe_command(char*);
+static std::string display_string;
 
 static char* xstrdup(const char* p) {
   char* s = strdup(p);
@@ -63,34 +58,57 @@ static char* xstrdup(const char* p) {
   return s;
 }
 
-static void update_display_string() {
-  if (display_string != nullptr) {
-    free(display_string);
+static std::string PipeCommand(const std::string& command) {
+  FILE* fp = popen(command.c_str(), "re");
+  if (fp == nullptr) {
+    return "";
   }
+  // Read up to 1024 (well, 1023+terminator) bytes from the sub-process;
+  // we will refuse to display more than that, as screens are only so large.
+  char buf[BUFSIZ];
+  size_t byte_count = fread(buf, 1, sizeof(buf) - 1, fp);
+  buf[byte_count] = '\0';
+  char* p = buf;
+  // Turn all newlines into spaces, as newlines don't make sense in a single
+  // horizontal line. On the other hand, they're a natural thing for a script
+  // to spit out, so easier to cope with them here than to have to do funky
+  // stuff in script land.
+  for (; *p; ++p) {
+    if (*p < ' ') {
+      *p = ' ';
+    }
+  }
+  // Trim any trailing whitespace.
+  while (p > buf && isspace(*(p - 1))) {
+    *--p = '\0';
+  }
+  pclose(fp);
+  return buf;
+}
 
-  if (view_command != nullptr) {
-    display_string = pipe_command(view_command);
+static void UpdateDisplayString() {
+  if (!g_view_command.empty()) {
+    display_string = PipeCommand(g_view_command);
   } else {
     // Fall back to computing the date & time internally.
     time_t t = time(nullptr);
     struct tm tm = *localtime(&t);
     char time_string[17];  // "1234-67-90 23:56"
     strftime(time_string, sizeof(time_string), "%Y-%m-%d %H:%M", &tm);
-
-    display_string = xstrdup(time_string);
+    display_string = time_string;
   }
 
   // Recompute the window width.
   XGlyphInfo extents;
   XftTextExtentsUtf8(g_display, g_font,
-                     reinterpret_cast<const FcChar8*>(display_string),
-                     strlen(display_string), &extents);
+                     reinterpret_cast<const FcChar8*>(display_string.c_str()),
+                     display_string.size(), &extents);
   window_width = (4 * extents.xOff) / 3;
 }
 
 static void DoExpose(XEvent* ev) {
   // Only handle the last in a group of Expose events.
-  if ((ev && ev->xexpose.count != 0) || display_string == nullptr) {
+  if ((ev && ev->xexpose.count != 0) || display_string.empty()) {
     return;
   }
 
@@ -99,7 +117,8 @@ static void DoExpose(XEvent* ev) {
   XftDrawStringUtf8(
       g_font_draw, &g_font_color, g_font, (window_width - text_width) / 2,
       window_height / 4 + g_font->ascent,
-      reinterpret_cast<const FcChar8*>(display_string), strlen(display_string));
+      reinterpret_cast<const FcChar8*>(display_string.c_str()),
+      display_string.size());
 }
 
 static void DoMappingNotify(XEvent* ev) {
@@ -107,7 +126,7 @@ static void DoMappingNotify(XEvent* ev) {
 }
 
 static void DoEnter(XEvent* ev) {
-  update_display_string();
+  UpdateDisplayString();
   XMoveResizeWindow(g_display, ev->xcrossing.window,
                     sinister ? 0 : display_width - window_width, 0,
                     window_width, window_height);
@@ -152,72 +171,6 @@ static void DoCommand(XEvent* ev) {
   }
 }
 
-static char* pipe_command(char* command) {
-  static const char* sh;
-  int fds[2];
-  char* string;
-
-  if (sh == nullptr) {
-    sh = getenv("SHELL");
-    if (sh == nullptr)
-      sh = "/bin/sh";
-  }
-
-  if (pipe(fds) == -1)
-    return strdup("Execution failed");
-
-  switch (fork()) {
-    case 0: /* Child. */
-      close(ConnectionNumber(g_display));
-      switch (fork()) {
-        case 0:
-          close(0);
-          close(fds[0]);
-          dup2(fds[1], 1);
-          dup2(1, 2);
-
-          execl(sh, sh, "-c", command, nullptr);
-          error(1, errno, "exec \"%s -c %s\" failed", sh, command);
-          exit(EXIT_FAILURE);
-        case -1:
-          error(1, errno, "fork failed");
-        default:
-          _exit(EXIT_SUCCESS);
-      }
-    case -1:  // Error.
-      error(1, errno, "fork failed");
-      break;
-    default: {
-      /* Read from the pipe. */
-      char buf[BUFSIZ];
-      int n;
-
-      close(fds[1]);
-
-      while ((n = read(fds[0], buf, BUFSIZ)) > 0) {
-        int valid = 0;
-        char* p = buf;
-
-        /* How many of the characters do we want? */
-        while (*p++ >= ' ') {
-          valid++;
-        }
-
-        string = (char*)malloc(valid + 1);
-        if (string != 0) {
-          strncpy(string, buf, valid);
-        } else {
-          string = strdup("Out of memory");
-        }
-      }
-
-      wait(0);
-    }
-  }
-
-  return string;
-}
-
 static void DoVisibilityNotify(XEvent* ev) {
   if (ev->xvisibility.state == VisibilityUnobscured) {
     return;
@@ -230,8 +183,9 @@ static void DoVisibilityNotify(XEvent* ev) {
   XQueryTree(g_display, root, &root_return, &parent_return, &wins, &nwins);
   char* name;
   XFetchName(g_display, wins[nwins - 1], &name);
-  if (name == 0 || strcmp(name, "lock"))
+  if (name == 0 || strcmp(name, "lock")) {
     XRaiseWindow(g_display, window);
+  }
 
   XFree(wins);
   XFree(name);
@@ -269,7 +223,7 @@ static void GetResources() {
   char* type;
   if (XrmGetResource(db, "clock.font", "Font", &type, &value) == True) {
     if (strcmp(type, "String") == 0) {
-      font_name = value.addr;
+      g_font_name = value.addr;
     }
   }
 
@@ -288,7 +242,7 @@ static void GetResources() {
   if (XrmGetResource(db, "clock.viewCommand", "String", &type, &value) ==
       True) {
     if (strcmp(type, "String") == 0) {
-      view_command = xstrdup(value.addr);
+      g_view_command = value.addr;
     }
   }
 
@@ -320,9 +274,9 @@ int main(int argc, char* argv[]) {
   unsigned long black = BlackPixel(g_display, screen);
 
   // Get font.
-  g_font = XftFontOpenName(g_display, screen, font_name.c_str());
+  g_font = XftFontOpenName(g_display, screen, g_font_name.c_str());
   if (g_font == nullptr) {
-    error(0, 0, "couldn't find font %s; falling back", font_name.c_str());
+    error(0, 0, "couldn't find font %s; falling back", g_font_name.c_str());
     g_font = XftFontOpenName(g_display, 0, "fixed");
     if (g_font == nullptr) {
       error(1, 0, "can't find a font");
