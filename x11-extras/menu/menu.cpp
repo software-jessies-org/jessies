@@ -11,6 +11,7 @@
 
 #include <string>
 
+#include <X11/Xft/Xft.h>
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>
 
@@ -23,7 +24,7 @@
 // shown in the menu.
 static char* clock_command;
 // User's font.
-static std::string g_font_name{"lucidasans-bold-14"};
+static std::string g_font_name{"roboto-16"};
 
 struct MenuItem {
   MenuItem* next;
@@ -35,10 +36,10 @@ struct MenuItem {
 // The connection to the X server.
 static Display* dpy;
 static int display_width;
-static int display_height;
 
 // Main window.
 static Window window;
+static int window_height;
 // Root window.
 static Window root;
 // The default GC.
@@ -50,7 +51,9 @@ static unsigned long black;
 static unsigned long white;
 
 // Font.
-static XFontStruct* font;
+static XftFont* g_font;
+static XftDraw* g_font_draw;
+static XftColor g_font_color;
 
 static MenuItem* menu = 0;
 static MenuItem* selected = 0;
@@ -135,6 +138,13 @@ static void UpdateTime() {
   strftime(time_string, sizeof(time_string), fmt, tm);
 }
 
+static int TextWidth(const char* s) {
+  XGlyphInfo extents;
+  XftTextExtentsUtf8(dpy, g_font, reinterpret_cast<const FcChar8*>(s),
+                     strlen(s), &extents);
+  return extents.xOff;
+}
+
 static void DoExpose(XEvent* ev) {
   // Only handle the last in a group of Expose events.
   if (ev && ev->xexpose.count != 0) {
@@ -155,12 +165,13 @@ static void DoExpose(XEvent* ev) {
   // Draw the menu.
   int x = 20;
   for (MenuItem* item = menu; item != 0; item = item->next) {
-    int width = XTextWidth(font, item->name, strlen(item->name));
-    XDrawString(dpy, window, gc, x, 1.1 * font->ascent, item->name,
-                strlen(item->name));
+    int width = TextWidth(item->name);
+    XftDrawStringUtf8(
+        g_font_draw, &g_font_color, g_font, x, 1.1 * g_font->ascent,
+        reinterpret_cast<const FcChar8*>(item->name), strlen(item->name));
     if (item == selected) {
       XSetFunction(dpy, gc, GXinvert);
-      XFillRectangle(dpy, window, gc, x - 5, 0, width + 10, 20);
+      XFillRectangle(dpy, window, gc, x - 5, 0, width + 10, window_height);
       XSetFunction(dpy, gc, GXcopy);
     }
     x += 20 + width;
@@ -168,9 +179,11 @@ static void DoExpose(XEvent* ev) {
 
   // Draw the clock.
   UpdateTime();
-  int width = XTextWidth(font, time_string, strlen(time_string));
-  XDrawString(dpy, window, gc, display_width - width - 20, 1.2 * font->ascent,
-              time_string, strlen(time_string));
+  int width = TextWidth(time_string);
+  XftDrawStringUtf8(g_font_draw, &g_font_color, g_font,
+                    display_width - width - 20, 1.2 * g_font->ascent,
+                    reinterpret_cast<const FcChar8*>(time_string),
+                    strlen(time_string));
 }
 
 static void DoNullEvent(XEvent* ev) {
@@ -181,7 +194,7 @@ static void DoNullEvent(XEvent* ev) {
 static MenuItem* WhichItem(int mouseX) {
   int x = 0;
   for (MenuItem* item = menu; item != 0; item = item->next) {
-    int itemWidth = 20 + XTextWidth(font, item->name, strlen(item->name));
+    int itemWidth = 20 + TextWidth(item->name);
     if (mouseX >= x && mouseX <= (x + itemWidth)) {
       return item;
     }
@@ -334,26 +347,28 @@ int main(int argc, char* argv[]) {
   GetResources();
 
   // Find the screen's dimensions.
-  display_width = DisplayWidth(dpy, DefaultScreen(dpy));
-  display_height = DisplayHeight(dpy, DefaultScreen(dpy));
+  int screen = DefaultScreen(dpy);
+  display_width = DisplayWidth(dpy, screen);
 
   // Set up an error handler.
   XSetErrorHandler(ErrorHandler);
 
   // Get the pixel values of the only two colours we use.
-  black = BlackPixel(dpy, DefaultScreen(dpy));
-  white = WhitePixel(dpy, DefaultScreen(dpy));
+  black = BlackPixel(dpy, screen);
+  white = WhitePixel(dpy, screen);
 
   // Get font.
-  font = XLoadQueryFont(dpy, g_font_name.c_str());
-  if (font == nullptr) {
-    font = XLoadQueryFont(dpy, "fixed");
-  }
-  if (font == nullptr) {
-    error(1, 0, "can't find a font");
+  g_font = XftFontOpenName(dpy, screen, g_font_name.c_str());
+  if (g_font == nullptr) {
+    error(0, 0, "couldn't find font %s; falling back", g_font_name.c_str());
+    g_font = XftFontOpenName(dpy, 0, "fixed");
+    if (g_font == nullptr) {
+      error(1, 0, "can't find a font");
+    }
   }
 
   // Create the window.
+  window_height = 1.2 * (g_font->ascent + g_font->descent);
   root = DefaultRootWindow(dpy);
   XSetWindowAttributes attr;
   attr.override_redirect = True;
@@ -364,16 +379,22 @@ int main(int argc, char* argv[]) {
                     ButtonReleaseMask | StructureNotifyMask | EnterWindowMask |
                     LeaveWindowMask;
   window = XCreateWindow(
-      dpy, root, 0, 0, display_width, 1.2 * (font->ascent + font->descent), 0,
-      CopyFromParent, InputOutput, CopyFromParent,
+      dpy, root, 0, 0, display_width, window_height, 0, CopyFromParent,
+      InputOutput, CopyFromParent,
       CWOverrideRedirect | CWBackPixel | CWBorderPixel | CWEventMask, &attr);
+
+  // Create the objects needed to render text in the window.
+  g_font_draw = XftDrawCreate(dpy, window, DefaultVisual(dpy, screen),
+                              DefaultColormap(dpy, screen));
+  XRenderColor xrc = {.red = 0, .green = 0, .blue = 0, .alpha = 0xffff};
+  XftColorAllocValue(dpy, DefaultVisual(dpy, screen),
+                     DefaultColormap(dpy, screen), &xrc, &g_font_color);
 
   // Create GC.
   XGCValues gv;
   gv.foreground = black;
   gv.background = white;
-  gv.font = font->fid;
-  gc = XCreateGC(dpy, window, GCForeground | GCBackground | GCFont, &gv);
+  gc = XCreateGC(dpy, window, GCForeground | GCBackground, &gv);
 
   // Create the menu items.
   ReadMenu();
