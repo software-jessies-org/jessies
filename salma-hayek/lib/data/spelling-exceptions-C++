@@ -3,6 +3,7 @@ elif
 endif
 ifdef
 ifndef
+pragma
 undef
 # POSIX.1 describes these as "in common usage", suggesting _SYSIII as a feature test macro.
 uint
@@ -95,6 +96,7 @@ fwscanf
 getc
 getchar
 getenv
+getline
 gets
 getwc
 getwchar
@@ -313,8 +315,11 @@ ctime
 cwchar
 cwctype
 # Standard headers from C which are still in common use in C++.
+ctype
+stdarg
 stddef
 stdint
+stdlib
 # Some of the standard functions from C99 which are not yet in C++ 2003.
 # From Annex B of ISO/IEC 9899:1999.
 # inttypes.h
@@ -331,3 +336,4 @@ strtoll
 strtoull
 # C99's 6.4.2.2 "Predefined identifiers" offers "__func__", but our spelling checker splits words at punctuation, so we have to accept "func" everywhere or nowhere.
 func
+noreturn
