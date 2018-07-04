@@ -1,4 +1,4 @@
-Terminator, Evergreen, lwm and friends
+# Terminator, Evergreen, lwm and friends
 
 Terminator is a cross-platform GPL terminal emulator with advanced features not yet found elsewhere.
 
