@@ -1,5 +1,3 @@
-#define DEFAULT_FONT "times-14"
-
 #include <ctype.h>
 #include <errno.h>
 #include <error.h>
@@ -16,6 +14,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>
 #include <X11/Xutil.h>
+#include <X11/Xft/Xft.h>
 
 #include <string>
 
@@ -33,10 +32,11 @@ static int window_height;
 
 static Window window; /* Main window. */
 static Window root;   /* Root window. */
-static GC gc;         /* The default GC. */
 
 // Font.
-static XFontStruct* font;
+static XftFont* g_font;
+static XftDraw* g_font_draw;
+static XftColor g_font_color;
 
 // Live on the left rather than the right?
 static bool sinister = false;
@@ -45,7 +45,7 @@ static bool sinister = false;
 static char* view_command = nullptr;
 
 // User's font.
-static std::string font_name{DEFAULT_FONT};
+static std::string font_name{"roboto-16"};
 
 // User's button commands (element 0 unused).
 static char* command[6] = {};
@@ -55,7 +55,7 @@ static char* display_string = nullptr;
 static void update_display_string();
 static char* pipe_command(char*);
 
-static char* sdup(const char* p) {
+static char* xstrdup(const char* p) {
   char* s = strdup(p);
   if (s == 0) {
     error(1, errno, "strdup failed");
@@ -77,24 +77,29 @@ static void update_display_string() {
     char time_string[17];  // "1234-67-90 23:56"
     strftime(time_string, sizeof(time_string), "%Y-%m-%d %H:%M", &tm);
 
-    display_string = sdup(time_string);
+    display_string = xstrdup(time_string);
   }
 
   // Recompute the window width.
-  window_width =
-      4 * XTextWidth(font, display_string, strlen(display_string)) / 3;
+  XGlyphInfo extents;
+  XftTextExtentsUtf8(g_display, g_font,
+                     reinterpret_cast<const FcChar8*>(display_string),
+                     strlen(display_string), &extents);
+  window_width = (4 * extents.xOff) / 3;
 }
 
 static void DoExpose(XEvent* ev) {
   // Only handle the last in a group of Expose events.
-  if ((ev && ev->xexpose.count != 0) || (display_string == 0))
+  if ((ev && ev->xexpose.count != 0) || display_string == nullptr) {
     return;
+  }
 
   // Do the redraw.
-  int width = XTextWidth(font, display_string, strlen(display_string));
-  XDrawString(g_display, ev->xexpose.window, gc, (window_width - width) / 2,
-              window_height / 4 + font->ascent, display_string,
-              strlen(display_string));
+  int text_width = (window_width * 3) / 4;
+  XftDrawStringUtf8(
+      g_font_draw, &g_font_color, g_font, (window_width - text_width) / 2,
+      window_height / 4 + g_font->ascent,
+      reinterpret_cast<const FcChar8*>(display_string), strlen(display_string));
 }
 
 static void DoMappingNotify(XEvent* ev) {
@@ -115,14 +120,16 @@ static void DoLeave(XEvent* ev) {
 
 static void DoCommand(XEvent* ev) {
   int button = ev->xbutton.button;
-  if (command[button] == nullptr)
+  if (command[button] == nullptr) {
     return;
+  }
 
   static const char* sh;
   if (sh == nullptr) {
     sh = getenv("SHELL");
-    if (sh == nullptr)
+    if (sh == nullptr) {
       sh = "/bin/sh";
+    }
   }
 
   switch (fork()) {
@@ -272,7 +279,7 @@ static void GetResources() {
     sprintf(resource, "clock.button%i", i);
     if (XrmGetResource(db, resource, "String", &type, &value) == True) {
       if (strcmp(type, "String") == 0) {
-        command[i] = sdup(value.addr);
+        command[i] = xstrdup(value.addr);
       }
     }
   }
@@ -281,7 +288,7 @@ static void GetResources() {
   if (XrmGetResource(db, "clock.viewCommand", "String", &type, &value) ==
       True) {
     if (strcmp(type, "String") == 0) {
-      view_command = sdup(value.addr);
+      view_command = xstrdup(value.addr);
     }
   }
 
@@ -302,28 +309,28 @@ int main(int argc, char* argv[]) {
   GetResources();
 
   // Find the screen's dimensions.
-  display_width = DisplayWidth(g_display, DefaultScreen(g_display));
-  display_height = DisplayHeight(g_display, DefaultScreen(g_display));
+  int screen = DefaultScreen(g_display);
+  display_width = DisplayWidth(g_display, screen);
+  display_height = DisplayHeight(g_display, screen);
 
   // Set up an error handler.
   XSetErrorHandler(ErrorHandler);
 
   // Get the pixel values of the only two colours we use.
-  unsigned long black = BlackPixel(g_display, DefaultScreen(g_display));
-  unsigned long white = WhitePixel(g_display, DefaultScreen(g_display));
+  unsigned long black = BlackPixel(g_display, screen);
 
   // Get font.
-  font = XLoadQueryFont(g_display, font_name.c_str());
-  if (font == nullptr) {
+  g_font = XftFontOpenName(g_display, screen, font_name.c_str());
+  if (g_font == nullptr) {
     error(0, 0, "couldn't find font %s; falling back", font_name.c_str());
-    font = XLoadQueryFont(g_display, "fixed");
-  }
-  if (font == nullptr) {
-    error(1, 0, "can't find a font");
+    g_font = XftFontOpenName(g_display, 0, "fixed");
+    if (g_font == nullptr) {
+      error(1, 0, "can't find a font");
+    }
   }
 
-  window_width = 100; /* Arbitrary: ephemeral. */
-  window_height = 2 * (font->ascent + font->descent);
+  window_width = 100;  // Arbitrary: ephemeral.
+  window_height = 2 * (g_font->ascent + g_font->descent);
 
   // Create the window.
   root = DefaultRootWindow(g_display);
@@ -339,12 +346,14 @@ int main(int argc, char* argv[]) {
       CopyFromParent, InputOutput, CopyFromParent,
       CWOverrideRedirect | CWBackPixel | CWBorderPixel | CWEventMask, &attr);
 
-  // Create GC.
-  XGCValues gv;
-  gv.foreground = white;
-  gv.background = black;
-  gv.font = font->fid;
-  gc = XCreateGC(g_display, window, GCForeground | GCBackground | GCFont, &gv);
+  // Create the objects needed to render text in the window.
+  g_font_draw =
+      XftDrawCreate(g_display, window, DefaultVisual(g_display, screen),
+                    DefaultColormap(g_display, screen));
+  XRenderColor xrc = {
+      .red = 0xffff, .green = 0xffff, .blue = 0xffff, .alpha = 0xffff};
+  XftColorAllocValue(g_display, DefaultVisual(g_display, screen),
+                     DefaultColormap(g_display, screen), &xrc, &g_font_color);
 
   // Bring up the window.
   XMapRaised(g_display, window);
