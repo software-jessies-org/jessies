@@ -542,6 +542,9 @@ JAVAC_FLAGS.javac += -g
 # Turn on warnings.
 JAVAC_FLAGS.javac += -deprecation
 JAVAC_FLAGS.javac += -Xlint:all -Xlint:-serial
+# We're going to keep targeting Java 6 as long as we're supporting the Mac,
+# so all ignore the warnings we can't currently fix...
+JAVAC_FLAGS.javac += -Xlint:-options,-unchecked,-rawtypes
 
 JAVA_MAJOR_VERSION := $(shell ruby -e 'require "$(JDK_ROOT_SCRIPT)"; puts(JAVA_MAJOR_VERSION)')
 
