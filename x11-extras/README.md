@@ -7,6 +7,28 @@ you get on - whatever you think of them. I'm particularly interested in
 generalisations or simplifications that further the programs' minimalist
 nature.
 
+## clock - A Novel Clock
+
+You might not notice that `clock` is running. It opens a tiny window (4
+square pixels) in the top right of the screen and waits for the pointer
+to enter it. When the pointer does enter, the window expands to display
+the current date and time.
+
+You can set what the "clock" actually displays using the viewCommand
+resource. This is a program to be executed, whose output will be displayed
+as the "time". You can thus call a shell-script which gives both the
+time and battery percentage, say.
+
+For left-handed users, there is the `leftHanded` resource. Giving this
+a value will cause clock to open its window in the top _left_ corner of
+the screen.
+
+You can also set the action of the three mouse buttons using X
+resources. I have xkill on button 2 and lock on button 3. So to lock the
+screen, I throw the mouse and hit button 3. To kill a wayward program
+I throw the mouse, hit button 2, find the window that's to die,
+and kaboom!
+
 ## lock - X Display Locker
 
 `lock` is a simple display locker so that you can safely leave your
@@ -32,6 +54,20 @@ unsurprisingly, `font`. You can also change the system-wide defaults by
 editing `lock.h` and recompiling.
 
 On Linux systems, `lock` disables virtual consoles while running. 
+
+## menu - X Menu
+
+`menu` displays a menu at the top of the screen, based on a
+specification in a `.menu` file which associates labels with commands
+to be executed. There's also a clock at the very right-hand edge of the
+menu bar. I started to use `menu` when a new server arrived at work,
+and I could no longer fit everything I needed on the three buttons
+offered by my earlier `clock` program.
+
+This program is a bit rough around the edges, and has the misfortune of
+working well enough that I have little inclination to polish it. If you
+want to see improvement, you should prod me.  Those who don't live in
+prodding distance could consider sending me mail.
 
 ## x11-reaper - Simple X Session Manager
 
@@ -62,16 +98,6 @@ line or from an on-screen menu or whatever). That's all there is to it!
 be trying to follow them. It's advisable to know what you're doing,
 or you may prevent yourself from being able to use your X server.]
 
-## window - X Window Controller
-
-`window` lets you read and write some of the attributes of
-X windows.
-
-`wselect` shows a cursor and allows you to select a window.
-
-The documentation gives examples of how to use these tools to do cool
-stuff under X without having to do any X programming yourself.
-
 ## speckeysd - Special Keys Daemon
 
 `speckeysd` is an imitation of Sun's Solaris program of the same name. It
@@ -89,38 +115,12 @@ any demand for it.
 Thanks to Tuncer Ayaz, Adam Sampson, and Anselm R. Garbe for their
 improvements.
 
-## menu - X Menu
+## window - X Window Controller
 
-`menu` displays a menu at the top of the screen, based on a
-specification in a `.menu` file which associates labels with commands
-to be executed. There's also a clock at the very right-hand edge of the
-menu bar. I started to use `menu` when a new server arrived at work,
-and I could no longer fit everything I needed on the three buttons
-offered by my earlier `clock` program.
+`window` lets you read and write some of the attributes of
+X windows.
 
-This program is a bit rough around the edges, and has the misfortune of
-working well enough that I have little inclination to polish it. If you
-want to see improvement, you should prod me.  Those who don't live in
-prodding distance could consider sending me mail.
+`wselect` shows a cursor and allows you to select a window.
 
-## clock - A Novel Clock
-
-You might not notice that `clock` is running. It opens a tiny window (4
-square pixels) in the top right of the screen and waits for the pointer
-to enter it. When the pointer does enter, the window expands to display
-the current date and time.
-
-You can set what the "clock" actually displays using the viewCommand
-resource. This is a program to be executed, whose output will be displayed
-as the "time". You can thus call a shell-script which gives both the
-time and battery percentage, say.
-
-For left-handed users, there is the `leftHanded` resource. Giving this
-a value will cause clock to open its window in the top _left_ corner of
-the screen.
-
-You can also set the action of the three mouse buttons using X
-resources. I have xkill on button 2 and lock on button 3. So to lock the
-screen, I throw the mouse and hit button 3. To kill a wayward program
-I throw the mouse, hit button 2, find the window that's to die,
-and kaboom!
+The documentation gives examples of how to use these tools to do cool
+stuff under X without having to do any X programming yourself.
