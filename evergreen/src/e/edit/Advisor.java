@@ -12,35 +12,35 @@ import org.jdesktop.swingworker.SwingWorker;
 
 public class Advisor extends JPanel {
     private static Advisor instance;
-    
+
     private static final ArrayList<WorkspaceResearcher> researchers = new ArrayList<WorkspaceResearcher>();
-    
+
     /** The advice window. */
     private AdvisorHtmlPane advicePane = new AdvisorHtmlPane();
-    
+
     private JTextField searchField = new JTextField(20);
-    
+
     private JFrame frame;
-    
+
     public static synchronized Advisor getInstance() {
         if (instance == null) {
             instance = new Advisor();
         }
         return instance;
     }
-    
+
     private Advisor() {
         super(new BorderLayout());
         add(advicePane.makeToolBar(searchField), BorderLayout.NORTH);
         add(advicePane, BorderLayout.CENTER);
-        
+
         searchField.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 startResearch(searchField.getText());
             }
         });
     }
-    
+
     /**
      * Initializes this class' expensive parts on a new low-priority thread.
      * We used to put off initialization until the researchers were actually needed, but that tends to be early on, and on the EDT.
@@ -50,17 +50,17 @@ public class Advisor extends JPanel {
         executor.execute(new ResearcherInitializationRunnable());
         executor.shutdown();
     }
-    
+
     private static class ResearcherInitializationRunnable implements Runnable {
         public void run() {
             initResearchersInParallel();
         }
     }
-    
+
     private static void initResearchersInParallel() {
         synchronized (researchers) {
             final ConcurrentLinkedQueue<WorkspaceResearcher> newResearchers = new ConcurrentLinkedQueue<WorkspaceResearcher>();
-            
+
             // Run all the researchers' initialization code in parallel.
             final ExecutorService executor = ThreadUtilities.newFixedThreadPool(8, "initResearchersOnBackgroundThread");
             executor.execute(new Runnable() {
@@ -70,7 +70,7 @@ public class Advisor extends JPanel {
             });
             executor.execute(new Runnable() {
                 public void run() {
-                    newResearchers.add(ManPageResearcher.getSharedInstance());
+                    newResearchers.add(new ManPageResearcher());
                 }
             });
             executor.execute(new Runnable() {
@@ -93,7 +93,7 @@ public class Advisor extends JPanel {
                     newResearchers.add(new StlDocumentationResearcher());
                 }
             });
-            
+
             // That's all we want to do with this executor.
             executor.shutdown();
             // But we don't want to unlock the collection until we've finished filling it!
@@ -105,13 +105,13 @@ public class Advisor extends JPanel {
             }
         }
     }
-    
+
     private static ArrayList<WorkspaceResearcher> getResearchers() {
         synchronized (researchers) {
             return researchers;
         }
     }
-    
+
     private synchronized JFrame getFrame() {
         if (frame == null) {
             final String frameTitle = "Evergreen Documentation Browser";
@@ -133,7 +133,7 @@ public class Advisor extends JPanel {
         }
         return frame;
     }
-    
+
     public void setDocumentationVisible() {
         advicePane.clearAdvice();
         // Really, we want getFrame().toFront(), but GNOME breaks that, so we have to work around it.
@@ -142,7 +142,7 @@ public class Advisor extends JPanel {
         }
         getFrame().setVisible(true);
     }
-    
+
     public synchronized void showDocumentation() {
         final String searchTerm = ETextAction.getSearchTerm();
         setDocumentationVisible();
@@ -154,17 +154,17 @@ public class Advisor extends JPanel {
             startResearch(searchTerm);
         }
     }
-    
+
     private class ResearchRunner extends SwingWorker<String, Object> {
         private String searchTerm;
         private ETextWindow textWindow;
-        
+
         private ResearchRunner(String searchTerm) {
             this.searchTerm = searchTerm;
             this.textWindow = ETextAction.getFocusedTextWindow();
             advicePane.setTemporaryText("Searching for documentation on \"" + searchTerm + "\"...");
         }
-        
+
         @Override
         protected String doInBackground() {
             FileType fileType = (textWindow != null) ? textWindow.getFileType() : null;
@@ -181,14 +181,14 @@ public class Advisor extends JPanel {
                     }
                 }
             }
-            
+
             if (newText.length() > 0) {
                 return newText.toString();
             } else {
                 return "No documentation found for \"" + searchTerm + "\".";
             }
         }
-        
+
         @Override
         public void done() {
             String newText;
@@ -204,7 +204,7 @@ public class Advisor extends JPanel {
             setDocumentationText(newText);
         }
     }
-    
+
     public void setDocumentationText(String content) {
         // We've probably stripped the HTML tag.
         if (content.startsWith("<html>") == false) {
@@ -213,22 +213,22 @@ public class Advisor extends JPanel {
         // JEditorPane.setText is thread-safe.
         advicePane.setText(content);
     }
-    
+
     private void startResearch(String text) {
         new ResearchRunner(text).execute();
     }
-    
+
     public void linkClicked(String link) {
         new LinkClickRunner(link).execute();
     }
-    
+
     private class LinkClickRunner extends SwingWorker<Object, Object> {
         private String link;
-        
+
         private LinkClickRunner(String link) {
             this.link = link;
         }
-        
+
         @Override
         protected Object doInBackground() {
             // Anything off the web or local HTML should be displayed in the documentation browser, rather than handed off to the platform's web browser.
@@ -252,7 +252,7 @@ public class Advisor extends JPanel {
             return null;
         }
     }
-    
+
     public static String findToolOnPath(String tool) {
         ArrayList<String> availableTools = new ArrayList<String>();
         ArrayList<String> errors = new ArrayList<String>();
@@ -262,7 +262,7 @@ public class Advisor extends JPanel {
         }
         return availableTools.get(0);
     }
-    
+
     /**
      * Adds all the unique words in the given collection to 'set'.
      */
