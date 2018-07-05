@@ -1,13 +1,6 @@
-To compile menu, type:
-```
-	xmkmf
-	make
-```
-
-You should have a `menu` binary in the current directory.
-
 Menu reads a `.menu` file from its current directory to decide what to
-make available. I've provided my `.menu` file as an example.
+make available (or defaults to a single item "localhost" that starts an
+xterm). I've provided my `.menu` file as an example.
 
 	- Elliott Hughes, 1999-05-28
 
