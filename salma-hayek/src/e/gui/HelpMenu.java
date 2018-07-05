@@ -18,7 +18,7 @@ public class HelpMenu {
         if (webSiteAddress != null) {
             if (Boolean.getBoolean("e.gui.HelpMenu.hasManual")) {
                 // FIXME: GNOME usually says "Contents", but also usually implies there's a local copy.
-                Action manualAction = new WebLinkAction("View _Manual", "https://raw.githubusercontent.com/software-jessies-org/jessies/master/" + Log.getApplicationName().toLowerCase() + "/www/manual.html");
+                Action manualAction = new WebLinkAction("View _Manual", webSiteAddress + "Manual");
                 GnomeStockIcon.useStockIcon(manualAction, "gtk-help");
                 menu.add(manualAction);
                 menu.addSeparator();
