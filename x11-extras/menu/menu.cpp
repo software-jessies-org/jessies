@@ -153,14 +153,6 @@ static void DoExpose(XEvent* ev) {
   // Clear the window.
   XClearWindow(dpy, window);
 
-  // Shave off the corners.
-  XFillRectangle(dpy, window, gc, 0, 0, 10, 10);
-  XFillRectangle(dpy, window, gc, display_width - 10, 0, 10, 10);
-  XSetForeground(dpy, gc, white);
-  XFillArc(dpy, window, gc, 0, 0, 18, 18, 0, 360 * 64);
-  XFillArc(dpy, window, gc, display_width - 18, 0, 18, 18, 0, 360 * 64);
-  XSetForeground(dpy, gc, black);
-
   // Draw the menu.
   int x = 20;
   for (MenuItem* item = menu; item != 0; item = item->next) {
