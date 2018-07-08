@@ -26,6 +26,7 @@ public class JListCopyAction extends AbstractAction {
         copyListSelectionToClipboard((JList) e.getSource());
     }
     
+    @SuppressWarnings("deprecation") // getSelectedValueList requires Java 7.
     private void copyListSelectionToClipboard(JList list) {
         // Make a StringSelection corresponding to the selected lines.
         StringBuilder buffer = new StringBuilder();

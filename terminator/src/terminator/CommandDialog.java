@@ -41,6 +41,7 @@ public class CommandDialog {
         form.getFormDialog().setShouldRestoreFocus(false);
     }
     
+    @SuppressWarnings("deprecation") // getSelectedValueList requires Java 7.
     private void initHistoryList() {
         historyList = new JList();
         historyList.setCellRenderer(new EListCellRenderer(true));
