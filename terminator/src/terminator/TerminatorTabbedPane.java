@@ -135,11 +135,11 @@ public class TerminatorTabbedPane extends TabbedPane {
         
         int newIndex = getTabCount() - 1;
         Component tabEar = new TerminatorTabComponent((JTerminalPane) c);
-        setTabComponentAt_safe(newIndex, tabEar);
+        setTabComponentAt(newIndex, tabEar);
     }
     
     @Override public void setTitleAt(int index, String title) {
-        TerminatorTabComponent c = (TerminatorTabComponent) getTabComponentAt_safe(index);
+        TerminatorTabComponent c = (TerminatorTabComponent) getTabComponentAt(index);
         if (c != null) {
             c.setTitle(title);
         }
@@ -157,7 +157,7 @@ public class TerminatorTabbedPane extends TabbedPane {
     private synchronized void updateSpinnerVisibilities() {
         int index = getSelectedIndex();
         if (index != -1) {
-            TerminatorTabComponent component = (TerminatorTabComponent) getTabComponentAt_safe(index);
+            TerminatorTabComponent component = (TerminatorTabComponent) getTabComponentAt(index);
             if (component != null) {
                 component.stopActivityDisplay();
             }

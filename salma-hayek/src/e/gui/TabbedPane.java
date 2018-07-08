@@ -82,26 +82,7 @@ public class TabbedPane extends JTabbedPane {
         }
         return -1;
     }
-    
-    // We make use of Java 6's custom tab ear components if available, but we still want to work on Java 5 until Java 6 is widespread.
-    // FIXME: Java 6 getTabComponentAt
-    protected Component getTabComponentAt_safe(int index) {
-        try {
-            return (Component) JTabbedPane.class.getMethod("getTabComponentAt", int.class).invoke(this, index);
-        } catch (Exception ex) {
-            return null;
-        }
-    }
-    
-    // We make use of Java 6's custom tab ear components if available, but we still want to work on Java 5 until Java 6 is widespread.
-    // FIXME: Java 6 => setTabComponentAt
-    protected void setTabComponentAt_safe(int index, Component c) {
-        try {
-            JTabbedPane.class.getMethod("setTabComponentAt", int.class, Component.class).invoke(this, index, c);
-        } catch (Exception ex) {
-        }
-    }
-    
+        
     /**
      * Moves a tab from originalIndex to newIndex.
      */
@@ -123,7 +104,7 @@ public class TabbedPane extends JTabbedPane {
         final Icon icon = getIconAt(originalIndex);
         final int mnemonic = getMnemonicAt(originalIndex);
         final String title = getTitleAt(originalIndex);
-        final Component tabComponent = getTabComponentAt_safe(originalIndex);
+        final Component tabComponent = getTabComponentAt(originalIndex);
         
         // We deliberately don't save/restore the tool tip because we assume it's dynamically generated.
         final String toolTip = null;
@@ -144,6 +125,6 @@ public class TabbedPane extends JTabbedPane {
         setEnabledAt(newIndex, enabled);
         setForegroundAt(newIndex, foreground);
         setMnemonicAt(newIndex, mnemonic);
-        setTabComponentAt_safe(newIndex, tabComponent);
+        setTabComponentAt(newIndex, tabComponent);
     }
 }
