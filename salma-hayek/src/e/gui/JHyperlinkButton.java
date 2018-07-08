@@ -49,10 +49,6 @@ public class JHyperlinkButton extends JPanel implements ActionListener {
     }
     
     public void actionPerformed(ActionEvent e) {
-        try {
-            BrowserLauncher.openURL(url);
-        } catch (Throwable th) {
-            SimpleDialog.showDetails(this, "Problem opening URL", th);
-        }
+        GuiUtilities.openUrl(url);
     }
 }

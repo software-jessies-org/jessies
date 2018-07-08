@@ -1,9 +1,11 @@
 package e.util;
 
+import e.gui.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
 import java.lang.reflect.*;
+import java.net.URI;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import javax.swing.*;
@@ -332,6 +334,14 @@ public class GuiUtilities {
             // doesn't work: $ explorer '/select,C:\Program Files'
             // does work: $ explorer '/select,C:\Program' 'Files'
             ProcessUtilities.spawn(null, ("Explorer /select," + fullPathname).split(" "));
+        }
+    }
+    
+    public static void openUrl(String url) {
+        try {
+            Desktop.getDesktop().browse(new URI(url));
+        } catch (Throwable th) {
+            SimpleDialog.showDetails(null, "Problem opening URL", th);
         }
     }
     

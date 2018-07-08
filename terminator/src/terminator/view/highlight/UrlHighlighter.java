@@ -1,7 +1,6 @@
 package terminator.view.highlight;
 
 import e.gui.SimpleDialog;
-import e.util.BrowserLauncher;
 import e.util.PatternUtilities;
 import e.util.Range;
 import java.awt.Cursor;

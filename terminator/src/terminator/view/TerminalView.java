@@ -60,13 +60,9 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
             @Override public void mouseClicked(MouseEvent event) {
                 requestFocus();
                 if (SwingUtilities.isLeftMouseButton(event) && urlUnderMouse != null && event.isControlDown()) {
-                    try {
-                        TextLine line = model.getDisplayTextLine(mouseLocation.getLineIndex());
-                        String url = line.getTabbedString(urlUnderMouse.getStart(), urlUnderMouse.getEnd());
-                        BrowserLauncher.openURL(url);
-                    } catch (Throwable th) {
-                        SimpleDialog.showDetails(TerminalView.this, "Problem opening URL", th);
-                    }
+                    TextLine line = model.getDisplayTextLine(mouseLocation.getLineIndex());
+                    String url = line.getTabbedString(urlUnderMouse.getStart(), urlUnderMouse.getEnd());
+                    GuiUtilities.openUrl(url);
                 }
             }
         });
