@@ -11,6 +11,6 @@ Instructions for building from source are filed under
 Evergreen is free software. See the file COPYING for copying permission.
 All source files are copyright the authors where not otherwise attributed.
 
-There is also a (mailing list)[evergreen-users@googlegroups.com].
+There is also a [mailing list](evergreen-users@googlegroups.com).
 
 Enjoy!
