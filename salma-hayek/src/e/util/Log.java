@@ -34,7 +34,7 @@ public class Log {
         final String logWriterClassName = System.getProperty("e.util.Log.logWriter");
         try {
             if (logWriterClassName != null) {
-                out = (LogWriter) Class.forName(logWriterClassName).newInstance();
+                out = (LogWriter) Class.forName(logWriterClassName).getDeclaredConstructor().newInstance();
             }
         }
         catch (Exception ex) {
