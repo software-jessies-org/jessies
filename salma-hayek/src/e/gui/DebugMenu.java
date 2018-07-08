@@ -166,19 +166,7 @@ public class DebugMenu {
         private String getFramesAsString() {
             // What do Dialog, Frame, and Window all have in common? Window.
             ArrayList<Window> windows = new ArrayList<Window>();
-
-            // Add Java 6's collection of dialogs/frames/windows, without yet requiring Java 6. Equivalent to:
-            //windows.addAll(Arrays.asList(Window.getWindows()));
-            boolean haveWindows = true;
-            try {
-                java.lang.reflect.Method getWindowsMethod = Window.class.getDeclaredMethod("getWindows");
-                windows.addAll(Arrays.asList((Window[]) getWindowsMethod.invoke(null, (Object[]) null)));
-            } catch (Exception ex) {
-                // Ignore. Likely we're on Java 5, where this functionality doesn't exist.
-                haveWindows = false;
-                // We can get the Frames, though. (Every Frame is a Window, so Java 6 users already have the these.)
-                windows.addAll(Arrays.asList(Frame.getFrames()));
-            }
+            windows.addAll(Arrays.asList(Window.getWindows()));
 
             int nonDisplayableCount = 0;
             StringBuilder builder = new StringBuilder();
@@ -201,9 +189,6 @@ public class DebugMenu {
                         ++i;
                     }
                 }
-            }
-            if (haveWindows == false) {
-                builder.append("\n(Upgrade to Java 6 to get the windows too.)");
             }
             return builder.toString();
         }
