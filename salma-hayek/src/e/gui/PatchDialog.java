@@ -1,4 +1,4 @@
-package e.edit;
+package e.gui;
 
 import e.forms.*;
 import e.ptextarea.*;
@@ -11,19 +11,19 @@ import javax.swing.*;
 
 public class PatchDialog {
     /** Highlight color for intraline removals. */
-    private static final Color DARK_RED = Color.decode("#ee9999");
+    public static final Color DARK_RED = Color.decode("#ee9999");
     
     /** Highlight color for - lines. */
-    private static final Color LIGHT_RED = Color.decode("#ffdddd");
+    public static final Color LIGHT_RED = Color.decode("#ffdddd");
     
     /** Highlight color for intraline additions. */
-    private static final Color DARK_GREEN = Color.decode("#99ee99");
+    public static final Color DARK_GREEN = Color.decode("#99ee99");
     
     /** Highlight color for + lines. */
-    private static final Color LIGHT_GREEN = Color.decode("#ddffdd");
+    public static final Color LIGHT_GREEN = Color.decode("#ddffdd");
     
     /** Highlight color for the @@ lines. */
-    private static final Color VERY_LIGHT_GRAY = Color.decode("#eeeeee");
+    public static final Color VERY_LIGHT_GRAY = Color.decode("#eeeeee");
     
     private static final boolean useInternalDiff = true;
     
@@ -45,7 +45,7 @@ public class PatchDialog {
         final ArrayList<String> errors = new ArrayList<String>();
         final int status = ProcessUtilities.backQuote(null, command, lines, errors);
         // Output on stderr is not expected, and worth showing to the user.
-        if (lines.size() == 0) {
+        if (lines.isEmpty()) {
             lines.addAll(errors);
         }
         // POSIX says:
@@ -62,7 +62,12 @@ public class PatchDialog {
         from.dispose();
         to.dispose();
         
-        return useInternalDiff ? makeUnifiedDiff(lines) : lines;
+        // If an error occurred or there were no differences, our work here is done.
+        if (status != 1) return lines;
+        
+        List<String> unifiedDiff = useInternalDiff ? makeUnifiedDiff(lines) : lines;
+        List<String> annotatedUnifiedDiff = annotatePatchUsingTags(unifiedDiff);
+        return annotatedUnifiedDiff;
     }
     
     private static List<String> makeUnifiedDiff(List<String> rawDiff) {
@@ -106,6 +111,18 @@ public class PatchDialog {
             }
         }
         return result;
+    }
+    
+    private static List<String> annotatePatchUsingTags(List<String> lines) {
+        String patch = StringUtilities.join(lines, "\n") + "\n";
+        File patchFile = FileUtilities.createTemporaryFile("e.gui.PatchDialog-patch", ".tmp", "patch file", patch);
+        String[] command = new String[] { FileUtilities.findSupportScript("annotate-patch.rb"), patchFile.toString() };
+        ArrayList<String> newLines = new ArrayList<String>();
+        ArrayList<String> newErrors = new ArrayList<String>();
+        int status = ProcessUtilities.backQuote(null, command, newLines, newErrors);
+        patchFile.delete();
+        System.err.println("annotatePatchUsingTags(" + patchFile.toString() +") status = " + status);
+        return (status == 0) ? newLines : lines;
     }
     
     private static JComponent makePatchView(Font font, Diffable from, Diffable to) {

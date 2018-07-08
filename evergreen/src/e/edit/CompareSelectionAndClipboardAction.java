@@ -1,6 +1,7 @@
 package e.edit;
 
 import e.ptextarea.FileType;
+import e.gui.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.datatransfer.*;
