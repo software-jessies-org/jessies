@@ -142,7 +142,7 @@ public class PKeyHandler implements KeyListener {
         boolean extendingSelection = event.isShiftDown();
         final int key = extractKeyCode(event);
         if (textArea.isEditable() && key == KeyEvent.VK_TAB) {
-            if (event.getModifiers() != 0) {
+            if (event.getModifiersEx() != 0) {
                 // If any modifiers are down, pass on this event.
                 // Pretty much every modifier+tab combination is used for something by at least one system, and we should keep out of the way.
                 return false;

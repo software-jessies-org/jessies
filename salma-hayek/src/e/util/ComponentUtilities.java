@@ -41,7 +41,7 @@ public class ComponentUtilities {
         component.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    listener.actionPerformed(new ActionEvent(component, ActionEvent.ACTION_PERFORMED, null, e.getWhen(), e.getModifiers()));
+                    listener.actionPerformed(new ActionEvent(component, ActionEvent.ACTION_PERFORMED, null, e.getWhen(), e.getModifiersEx()));
                 }
             }
         });

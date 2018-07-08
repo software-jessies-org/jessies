@@ -75,7 +75,7 @@ public class FilenameChooserField extends JPanel {
         // Bind both tab (like Unix) and control-space (like IDEs) to perform auto-completion.
         final String actionName = "org.jessies.FilenameChooserField.autoComplete";
         pathnameField.getActionMap().put(actionName, new AutoCompleteAction());
-        pathnameField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_MASK), actionName);
+        pathnameField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK), actionName);
         pathnameField.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0), actionName);
         
         // Ensure the text field will take up any spare space.

@@ -91,7 +91,7 @@ public class EPopupMenu {
         MenuItem menuItem = new MenuItem((String) action.getValue(Action.NAME));
         KeyStroke key = (KeyStroke) action.getValue(Action.ACCELERATOR_KEY);
         if (key != null) {
-            menuItem.setShortcut(new MenuShortcut(key.getKeyCode(), (key.getModifiers() & InputEvent.SHIFT_MASK) != 0));
+            menuItem.setShortcut(new MenuShortcut(key.getKeyCode(), (key.getModifiers() & InputEvent.SHIFT_DOWN_MASK) != 0));
         }
         menuItem.addActionListener(new ActionListener() {
             public void actionPerformed(final ActionEvent e) {

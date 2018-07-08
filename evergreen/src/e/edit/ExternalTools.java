@@ -238,7 +238,7 @@ public class ExternalTools {
         // In the long run, though, we're going to want to implement our own replacement for that, or a pre-processor.
         int modifiers = 0;
         if (keyboardEquivalent.length() == 1) {
-            modifiers = GuiUtilities.getDefaultKeyStrokeModifier() | InputEvent.SHIFT_MASK;
+            modifiers = GuiUtilities.getDefaultKeyStrokeModifier() | InputEvent.SHIFT_DOWN_MASK;
         }
         
         KeyStroke keyStroke = GuiUtilities.makeKeyStrokeWithModifiers(modifiers, keyboardEquivalent);

@@ -113,9 +113,7 @@ public class GuiUtilities {
         final StringBuilder result = new StringBuilder();
         final int modifiers = keyStroke.getModifiers();
         if (modifiers != 0) {
-            // This uses the appropriate glyphs on Mac OS 10.5 but says things like "meta" on earlier versions.
-            // We could work around that, but 10.6 will be along soon.
-            result.append(KeyEvent.getKeyModifiersText(modifiers));
+            result.append(KeyEvent.getModifiersExText(modifiers));
             if (!GuiUtilities.isMacOs()) {
                 // GTK and Windows both insert a '+' between the modifiers and the key itself.
                 result.append("+");
@@ -135,7 +133,7 @@ public class GuiUtilities {
      * Assumes that you want the platform's default modifier for keyboard equivalents (but see also setDefaultKeyStrokeModifier).
      */
     public static KeyStroke makeKeyStroke(final String key, final boolean shifted) {
-        return makeKeyStrokeWithModifiers(defaultKeyStrokeModifier | (shifted ? InputEvent.SHIFT_MASK : 0), key);
+        return makeKeyStrokeWithModifiers(defaultKeyStrokeModifier | (shifted ? InputEvent.SHIFT_DOWN_MASK : 0), key);
     }
     
     /**

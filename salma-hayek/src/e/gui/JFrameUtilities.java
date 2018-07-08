@@ -140,7 +140,7 @@ public class JFrameUtilities {
         closeOnEsc(frame);
         // Mac OS uses command-W to close a window using the keyboard. Unlike Linux and Windows' alt-f4, though, this isn't done by the window manager.
         if (GuiUtilities.isMacOs()) {
-            KeyStroke commandW = KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.META_MASK, false);
+            KeyStroke commandW = KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.META_DOWN_MASK, false);
             closeOnKeyStroke(frame, commandW);
         }
 

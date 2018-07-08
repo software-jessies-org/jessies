@@ -178,8 +178,8 @@ public class EvergreenMenuBar extends EMenuBar {
     }
 
     @Override protected boolean processKeyBinding(KeyStroke ks, KeyEvent event, int condition, boolean pressed) {
-        int modifier = KeyEvent.ALT_MASK;
-        if ((event.getModifiers() & modifier) == modifier) {
+        int modifier = KeyEvent.ALT_DOWN_MASK;
+        if ((event.getModifiersEx() & modifier) == modifier) {
             char ch = event.getKeyChar();
             final int newIndex = TabbedPane.keyCharToTabIndex(ch);
             if (newIndex != -1) {

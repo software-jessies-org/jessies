@@ -15,8 +15,8 @@ public class AutoCompleteAction extends ETextAction {
     
     public AutoCompleteAction() {
         // All Cocoa text components use alt-escape, but IDEA and Visual Studio both use control-space (and the window manager gets alt-escape under GNOME).
-        super("Complete", GuiUtilities.isMacOs() ? KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, InputEvent.ALT_MASK)
-                                                 : KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_MASK));
+        super("Complete", GuiUtilities.isMacOs() ? KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, InputEvent.ALT_DOWN_MASK)
+                                                 : KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK));
     }
     
     public void actionPerformed(ActionEvent e) {
