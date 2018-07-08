@@ -106,7 +106,7 @@ def annotate_patch()
  
  file.each_line() {
   |line|
-  if line =~ /^=+$/ || line =~ /^=== / || line =~ /^Index: /
+  if line =~ /^=+$/ || line =~ /^=== / || line =~ /^Index: / || line =~ /^diff --git / || line =~ /^index /
    next
   elsif line =~ /^\=\=\=\=\= (\S+) / || line =~ /^\=\=\=\= \S+ - (\S+) \=\=\=\=/
    if test(?r, $1)
