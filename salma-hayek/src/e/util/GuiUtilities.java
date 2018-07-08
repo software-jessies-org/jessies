@@ -41,9 +41,6 @@ public class GuiUtilities {
     // Used by isFontFixedWidth.
     private static final java.awt.font.FontRenderContext DEFAULT_FONT_RENDER_CONTEXT = new java.awt.font.FontRenderContext(null, false, false);
     
-    // FIXME: Action.DISPLAYED_MNEMONIC_INDEX_KEY is only available in Java 6.
-    private static final String DISPLAYED_MNEMONIC_INDEX_KEY = "SwingDisplayedMnemonicIndexKey";
-    
     private static final int COMPONENT_SPACING = calculateComponentSpacing();
     
     private static boolean mnemonicsEnabled = true;
@@ -164,7 +161,7 @@ public class GuiUtilities {
             action.putValue(Action.NAME, name.replaceAll("_", ""));
             if (!GuiUtilities.isMacOs()) {
                 action.putValue(Action.MNEMONIC_KEY, Integer.valueOf(Character.toUpperCase(name.charAt(underscoreIndex + 1))));
-                action.putValue(DISPLAYED_MNEMONIC_INDEX_KEY, underscoreIndex);
+                action.putValue(Action.DISPLAYED_MNEMONIC_INDEX_KEY, underscoreIndex);
             }
         } else {
             action.putValue(Action.NAME, name);
