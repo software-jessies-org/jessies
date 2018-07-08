@@ -37,7 +37,7 @@ public class PatchDialog {
     private static List<String> runDiff(Diffable from, Diffable to) {
         String[] command;
         if (useInternalDiff) {
-            command = new String[] { System.getProperty("org.jessies.supportRoot") + File.separator + "lib" + File.separator + "scripts" + File.separator + "ediff.py", from.label(), from.filename(), to.label(), to.filename() };
+            command = new String[] { FileUtilities.findSupportScript("ediff.py"), from.label(), from.filename(), to.label(), to.filename() };
         } else {
             command = new String[] { "diff", "-N", "-u", "-b", "-B", "-L", from.label(), from.filename(), "-L", to.label(), to.filename() };
         }

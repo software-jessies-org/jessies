@@ -428,6 +428,10 @@ public class FileUtilities {
         return binaryName;
     }
     
+    public static String findSupportScript(String script) {
+        return System.getProperty("org.jessies.supportRoot") + File.separator + "lib" + File.separator + "scripts" + File.separator + script;
+    }
+    
     public static File findSupportBinary(String binaryName) {
         String fileName = mapBinaryName(binaryName);
         String directory = System.getProperty("org.jessies.binaryDirectory");
