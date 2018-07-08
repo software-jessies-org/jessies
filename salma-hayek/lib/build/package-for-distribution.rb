@@ -385,6 +385,12 @@ if target_os() == "Linux"
             depends << ", " << extra_depends
         end
         
+        # Some programs, like Terminator, are able to "provide" an implementation of a virtual package.
+        provides_filename = "#{project_resource_directory}/lib/build/DEBIAN-control-Provides.txt"
+        if File.exist?(provides_filename)
+            control.puts("Provides: #{IO.readlines(provides_filename).join(", ").gsub("\n", "")}")
+        end
+
         # Pull our build dependencies from a file rather than hard-coding them here.
         # We get build-essential for free.
         # We could also get per-project build dependencies here.
@@ -459,6 +465,14 @@ EOF
             preinst.write(preinstContent)
         }
         system("chmod +x #{tmp_dir}/DEBIAN/preinst")
+
+        postinst_filename = "#{project_resource_directory}/lib/build/DEBIAN-postinst"
+        if File.exist?(postinst_filename)
+            FileUtils.cp(postinst_filename, "#{tmp_dir}/DEBIAN/postinst")
+            system("chmod +x #{tmp_dir}/DEBIAN/postinst")
+        end
+        system("chmod +x #{tmp_dir}/DEBIAN/postinst")
+
         File.open("#{tmp_dir}/DEBIAN/postrm", "w") {
             |postrm|
             postrm.write(postrmContent)
