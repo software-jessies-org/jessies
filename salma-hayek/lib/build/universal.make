@@ -523,11 +523,6 @@ EXTRA_JARS := $(wildcard $(foreach PROJECT_ROOT,$(DISTINCT_PROJECT_ROOTS),$(PROJ
 CLASS_PATH += $(SALMA_HAYEK)/.generated/classes
 CLASS_PATH += $(EXTRA_JARS)
 
-# "tools.jar" doesn't exist on Mac OS (the classes are automatically available).
-# Java 6 will do likewise for the other platforms, at which point this can be removed.
-TOOLS_JAR := $(wildcard $(JDK_ROOT)/lib/tools.jar)
-CLASS_PATH += $(TOOLS_JAR)
-
 JAVAC_FLAGS += -classpath $(call makeNativePath,$(CLASS_PATH))
 
 # ----------------------------------------------------------------------------
