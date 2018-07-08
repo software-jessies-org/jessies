@@ -328,6 +328,9 @@ LD = $(CXX)
 EXTRA_INCLUDE_PATH.SunOS += $(JDK_INCLUDE)/solaris
 SHARED_LIBRARY_LDFLAGS.SunOS += -G
 
+EXTRA_INCLUDE_PATH.FreeBSD += $(JDK_INCLUDE)/freebsd
+SHARED_LIBRARY_LDFLAGS.FreeBSD += -shared
+
 EXTRA_INCLUDE_PATH.Linux += $(JDK_INCLUDE)/linux
 SHARED_LIBRARY_LDFLAGS.Linux += -shared
 
@@ -346,10 +349,6 @@ EXTANT_INCLUDE_DIRECTORIES := $(wildcard $(EXTRA_INCLUDE_PATH))
 NON_EXISTENT_INCLUDE_DIRECTORIES = $(filter-out $(EXTANT_INCLUDE_DIRECTORIES),$(EXTRA_INCLUDE_PATH))
 ifneq "$(NON_EXISTENT_INCLUDE_DIRECTORIES)" ""
   $(warning Could not find $(NON_EXISTENT_INCLUDE_DIRECTORIES) - perhaps the first java on your PATH isn't in a JDK)
-endif
-
-ifeq "$(wildcard $(foreach include,$(EXTRA_INCLUDE_PATH),$(include)/jni_md.h))" ""
-  JDK_ROOT := $(error $(JDK_ROOT) is not a sane location for JDK headers)
 endif
 
 SHARED_LIBRARY_LDFLAGS = $(SHARED_LIBRARY_LDFLAGS.$(TARGET_OS))
@@ -562,6 +561,9 @@ BOOT_JDK_ALTERNATIVES += /var/chroot/ia32/usr/lib/jvm/java-$(JAVA_MAJOR_VERSION)
 # := deferred to ALTERNATE_BOOTCLASSPATH
 BOOT_JDK.Linux ?= $(firstword $(wildcard $(BOOT_JDK_ALTERNATIVES)))
 
+# FreeBSD
+BOOT_JDK.FreeBSD = /usr/local/openjdk${JAVA_MAJOR_VERSION}
+
 # := deferred to ALTERNATE_BOOTCLASSPATH
 BOOT_JDK.Cygwin = $(call findMakeFriendlyEquivalentName,$(shell ruby -e 'require "$(JDK_ROOT_SCRIPT)"; puts(findBootJdkFromRegistry())'))
 BOOT_JDK = $(BOOT_JDK.$(TARGET_OS))
@@ -760,16 +762,26 @@ BUILD_TARGETS += $(if $(REVISION_CONTROL_SYSTEM_DIRECTORY),.generated/build-revi
 TIC_SOURCE := $(wildcard lib/terminfo/*.tic)
 # We deliberately omit the intermediate directory.
 COMPILED_TERMINFO = $(patsubst lib/terminfo/%.tic,.generated/terminfo/%,$(TIC_SOURCE))
-BUILD_TARGETS += $(COMPILED_TERMINFO)
 BUILD_TARGETS += $(ALL_PER_DIRECTORY_TARGETS)
 BUILD_TARGETS += $(CRT_SHARED_LIBRARIES)
 
 FILES_TO_INSTALL += $(ALL_PER_DIRECTORY_TARGETS)
 FILES_TO_INSTALL += .generated/build-revision.txt
-FILES_TO_INSTALL += $(COMPILED_TERMINFO)
 FILES_TO_INSTALL += $(CRT_SHARED_LIBRARIES)
 IS_SALMA_HAYEK = $(filter $(SALMA_HAYEK),$(PROJECT_ROOT))
 FILES_TO_INSTALL += $(if $(IS_SALMA_HAYEK),native/Headers/JAVA_MAJOR_VERSION.h)
+
+# Attempting to run 'tic -v1' on the Terminator terminfo file on FreeBSD yields
+# the error:
+#    "lib/terminfo/terminator.tic", line 8, terminal 'terminator': missing sgr string
+# I've been unable to determine what kind of black magic is required to get this
+# working correctly, so for now let's just ignore terminfo for FreeBSD.
+# Anyone using FreeBSD, just install a terminfo/termcap file copied from some
+# other architecture; one copied from Linux works fine on my BSD box.
+ifneq "$(TARGET_OS)" "FreeBSD"
+BUILD_TARGETS += $(COMPILED_TERMINFO)
+FILES_TO_INSTALL += $(COMPILED_TERMINFO)
+endif
 
 SUBDIRECTORIES_TO_INSTALL += bin
 SUBDIRECTORIES_TO_INSTALL += doc

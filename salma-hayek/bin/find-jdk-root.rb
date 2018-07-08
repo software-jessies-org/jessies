@@ -156,6 +156,14 @@ else
       return `java-config --jdk-home`
     end
     
+    # On FreeBSD, the 'javac' family binaries are actually symlinks in /usr/local/bin/,
+    # which point to the script /usr/local/bin/javavm. The actual java version will be
+    # in /usr/local/openjdk<num>.
+    if target_os() == "FreeBSD"
+      jdk_root = "/usr/local/openjdk#{JAVA_MAJOR_VERSION}"
+      return jdk_root
+    end
+  
     # On Windows, it's likely that the only Java-related executables on the user's path are %WINDIR%\SYSTEM32\{java,javaw,javaws}.exe.
     # This is unfortunately true even if the user has a properly installed JDK.
     if target_os() == "Cygwin"

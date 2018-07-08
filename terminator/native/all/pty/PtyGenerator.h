@@ -268,8 +268,8 @@ private:
         
         // On Cygwin, Linux, and Solaris, a better solution iterates over "/proc/self/fd/".
         std::string fdDirectory("/proc/self/fd");
-#ifdef __APPLE__
-        // On Mac OS, there's "/dev/fd/" (which Linux seems to link to "/proc/self/fd/", but which on Solaris appears to be something quite different).
+#if defined(__APPLE__) || defined(__FreeBSD__)
+        // On Mac OS and FreeBSD, there's "/dev/fd/" (which Linux seems to link to "/proc/self/fd/", but which on Solaris appears to be something quite different).
         fdDirectory = "/dev/fd";
 #endif
         
