@@ -4,7 +4,6 @@ X11_TARGETS += clock lock menu speckeysd window x11-reaper
 
 .PHONY: x11
 x11:
-	@# FIXME: this assumes that we've already run xmkmf(1) in each of the directories.
 	@for target in $(X11_TARGETS) ; do make -C $$target ; done
 
 makefiles:
