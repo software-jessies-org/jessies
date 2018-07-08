@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.List;
 import javax.swing.*;
 
-public class SimplePatchDialog {
+public class PatchDialog {
     /** Highlight color for intraline removals. */
     private static final Color DARK_RED = Color.decode("#ee9999");
     
@@ -27,7 +27,7 @@ public class SimplePatchDialog {
     
     private static final boolean useInternalDiff = true;
     
-    private SimplePatchDialog() {
+    private PatchDialog() {
     }
     
     private static JComponent makeScrollablePatchView(Font font, Diffable from, Diffable to) {
@@ -37,7 +37,7 @@ public class SimplePatchDialog {
     private static List<String> runDiff(Diffable from, Diffable to) {
         String[] command;
         if (useInternalDiff) {
-            command = new String[] { Evergreen.getResourceFilename("lib", "scripts", "ediff.py"), from.label(), from.filename(), to.label(), to.filename() };
+            command = new String[] { System.getProperty("org.jessies.supportRoot") + File.separator + "lib" + File.separator + "scripts" + File.separator + "ediff.py", from.label(), from.filename(), to.label(), to.filename() };
         } else {
             command = new String[] { "diff", "-N", "-u", "-b", "-B", "-L", from.label(), from.filename(), "-L", to.label(), to.filename() };
         }
@@ -195,8 +195,8 @@ public class SimplePatchDialog {
         }
     }
     
-    public static void showPatchBetween(String title, Diffable from, Diffable to) {
-        makeDialog(Evergreen.getInstance().getFrame(), ChangeFontAction.getConfiguredFixedFont(), title, null, from, to).showNonModal();
+    public static void showPatchBetween(Frame parent, Font font, String title, Diffable from, Diffable to) {
+        makeDialog(parent, font, title, null, from, to).showNonModal();
     }
     
     public static boolean showPatchBetween(Frame parent, Font font, String title, String question, String buttonLabel, Diffable from, Diffable to) {
@@ -215,7 +215,7 @@ public class SimplePatchDialog {
     // For testing from the command line.
     public static void main(String[] args) {
         if (args.length != 2) {
-            System.err.println("usage: SimplePatchDialog FILE1 FILE2");
+            System.err.println("usage: PatchDialog FILE1 FILE2");
             System.exit(1);
         }
         final File file1 = FileUtilities.fileFromString(args[0]);

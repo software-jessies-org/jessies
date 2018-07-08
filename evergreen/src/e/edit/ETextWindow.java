@@ -401,7 +401,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         
         // We reverse the from/to order because we want reverse patches.
         final String title = verb;
-        return SimplePatchDialog.showPatchBetween(Evergreen.getInstance().getFrame(), ChangeFontAction.getConfiguredFixedFont(), title, question, verb, to, from);
+        return PatchDialog.showPatchBetween(Evergreen.getInstance().getFrame(), ChangeFontAction.getConfiguredFixedFont(), title, question, verb, to, from);
     }
     
     public boolean canRevertToSaved() {

@@ -44,7 +44,7 @@ public class CompareSelectionAndClipboardAction extends ETextAction {
         Diffable selectionDiffable = new Diffable("selection", selection).setFileType(fileType);
         Diffable clipboardDiffable = new Diffable("clipboard", clipboard).setFileType(fileType);
         
-        SimplePatchDialog.showPatchBetween("Selection/Clipboard Comparison", selectionDiffable, clipboardDiffable);
+        PatchDialog.showPatchBetween(Evergreen.getInstance().getFrame(), ChangeFontAction.getConfiguredFixedFont(), "Selection/Clipboard Comparison", selectionDiffable, clipboardDiffable);
     }
     
     private String getClipboardText() {

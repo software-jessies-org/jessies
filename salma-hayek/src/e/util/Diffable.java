@@ -4,7 +4,7 @@ import e.ptextarea.FileType;
 import java.io.*;
 
 /**
- * Input for SimplePatchDialog. Allows callers to simply supply what they have. Temporary files will be created if necessary.
+ * Input for PatchDialog. Allows callers to simply supply what they have. Temporary files will be created if necessary.
  */
 public class Diffable {
     private final String label;
