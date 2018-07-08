@@ -1,0 +1,1 @@
+Evergreen is a cross-platform GPL development environment that tries to be lightweight and language-agnostic yet functional.

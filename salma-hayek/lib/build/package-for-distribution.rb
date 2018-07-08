@@ -64,18 +64,12 @@ def generate_generic_package_description(human_project_name)
     return description
 end
 
-def extract_package_description_from_html()
+def get_package_description()
     description = ""
-    
-    # The first paragraph pulled from our HTML:
-    html_filename = "./www/index.html"
-    if File.exist?(html_filename)
-        html = IO.readlines(html_filename).join("").gsub("\n", " ")
-        if html =~ /<p><strong>(.*?)<\/strong>/
-            description << $1.gsub("&nbsp;", " ")
-        end
+    package_description_filename = "./lib/build/package-description.txt"
+    if File.exist?(package_description_filename)
+        description = IO.readlines(package_description_filename).join("").gsub("\n", " ")
     end
-    
     return description
 end
 
@@ -87,7 +81,7 @@ def generate_debian_package_description(human_project_name)
     description = generate_generic_package_description(human_project_name)
     
     # Then the first paragraph pulled from our HTML:
-    description << "\n " << wrap(extract_package_description_from_html(), 76, "\n ")
+    description << "\n " << wrap(get_package_description(), 76, "\n ")
     
     return description
 end
@@ -514,7 +508,7 @@ if target_os() == "SunOS"
         
         pkginfo.puts("PKG=#{sunos_package_name}")
         pkginfo.puts("NAME=#{human_project_name} - #{generate_generic_package_description(human_project_name)}")
-        pkginfo.puts("DESC=#{extract_package_description_from_html()}")
+        pkginfo.puts("DESC=#{get_package_description()}")
         pkginfo.puts("VERSION=#{compressed_version_number}")
         pkginfo.puts("CATEGORY=application")
         pkginfo.puts("VENDOR=https://github.com/software-jessies-org/jessies")
