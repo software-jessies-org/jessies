@@ -121,10 +121,6 @@ static void DoExpose(XEvent* ev) {
       display_string.size());
 }
 
-static void DoMappingNotify(XEvent* ev) {
-  XRefreshKeyboardMapping((XMappingEvent*)ev);
-}
-
 static void DoEnter(XEvent* ev) {
   UpdateDisplayString();
   XMoveResizeWindow(g_display, ev->xcrossing.window,
@@ -331,9 +327,6 @@ int main(int argc, char* argv[]) {
         break;
       case LeaveNotify:
         DoLeave(&ev);
-        break;
-      case MappingNotify:
-        DoMappingNotify(&ev);
         break;
       case VisibilityNotify:
         DoVisibilityNotify(&ev);

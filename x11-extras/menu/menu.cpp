@@ -223,10 +223,6 @@ static void DoButtonRelease(XEvent* ev) {
   DoExpose(nullptr);
 }
 
-static void DoMappingNotify(XEvent* ev) {
-  XRefreshKeyboardMapping((XMappingEvent*)ev);
-}
-
 static void DoLeave(XEvent* ev) {
   selected = 0;
   DoExpose(nullptr);
@@ -418,9 +414,6 @@ int main(int argc, char* argv[]) {
         break;
       case LeaveNotify:
         DoLeave(&ev);
-        break;
-      case MappingNotify:
-        DoMappingNotify(&ev);
         break;
     }
   }
