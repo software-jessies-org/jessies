@@ -110,12 +110,7 @@ public class FileType {
                  PRubyIndenter.class,
                  PRubyTextStyler.class,
                  new String[] { ".rb" });
-    
-    public static final FileType TALC = new FileType("Talc",
-                 PJavaIndenter.class,
-                 PTalcTextStyler.class,
-                 new String[] { ".talc" });
-    
+        
     public static final FileType VHDL = new FileType("VHDL",
                  PNoOpIndenter.class,
                  PVhdlTextStyler.class,
@@ -255,8 +250,6 @@ public class FileType {
             return FileType.PYTHON;
         } else if (isRubyContent(content)) {
             return FileType.RUBY;
-        } else if (isInterpretedContent(content, "talc")) {
-            return FileType.TALC;
         }
         
         // The following tests are weaker guesses. A Ruby script containing
