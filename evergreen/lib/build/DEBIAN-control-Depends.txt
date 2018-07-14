@@ -3,5 +3,4 @@ glibc-doc (>= 2.3.2)
 manpages-dev
 ri
 rman (>= 3.2)
-stl-manual (>= 3.30)
 tidy

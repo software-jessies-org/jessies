@@ -88,11 +88,6 @@ public class Advisor extends JPanel {
                     newResearchers.add(new RubyDocumentationResearcher());
                 }
             });
-            executor.execute(new Runnable() {
-                public void run() {
-                    newResearchers.add(new StlDocumentationResearcher());
-                }
-            });
 
             // That's all we want to do with this executor.
             executor.shutdown();
