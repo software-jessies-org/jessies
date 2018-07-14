@@ -121,7 +121,6 @@ public class PatchDialog {
         ArrayList<String> newErrors = new ArrayList<String>();
         int status = ProcessUtilities.backQuote(null, command, newLines, newErrors);
         patchFile.delete();
-        System.err.println("annotatePatchUsingTags(" + patchFile.toString() +") status = " + status);
         return (status == 0) ? newLines : lines;
     }
     
