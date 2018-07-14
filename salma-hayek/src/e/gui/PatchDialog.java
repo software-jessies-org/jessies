@@ -113,7 +113,7 @@ public class PatchDialog {
         return result;
     }
     
-    private static List<String> annotatePatchUsingTags(List<String> lines) {
+    public static List<String> annotatePatchUsingTags(List<String> lines) {
         String patch = StringUtilities.join(lines, "\n") + "\n";
         File patchFile = FileUtilities.createTemporaryFile("e.gui.PatchDialog-patch", ".tmp", "patch file", patch);
         String[] command = new String[] { FileUtilities.findSupportScript("annotate-patch.rb"), patchFile.toString() };
@@ -141,10 +141,16 @@ public class PatchDialog {
         
         // FIXME: BugDatabaseHighlighter?
         
+        List<String> diffLines = runDiff(from, to);
+        showDiffInTextArea(textArea, diffLines);
+        return textArea;
+    }
+    
+    public static void showDiffInTextArea(PTextArea textArea, List<String> diffLines) {
         final List<HighlightInfo> highlights = new ArrayList<HighlightInfo>();
         Color color = null;
         int lineNumber = 0; // Lines beginning with '?' don't count!
-        for (String line : runDiff(from, to)) {
+        for (String line : diffLines) {
             if (line.startsWith("?")) {
                 // A '?' line always follows a '+' or '-' line, so choose the dark color corresponding to the last color we used.
                 highlightDifferencesInLine(highlights, textArea, (color == LIGHT_GREEN) ? DARK_GREEN : DARK_RED, lineNumber - 1, line);
@@ -176,8 +182,6 @@ public class PatchDialog {
         for (HighlightInfo highlight : highlights) {
             highlight.apply(textArea);
         }
-        
-        return textArea;
     }
     
     private static void highlightDifferencesInLine(List<HighlightInfo> highlights, PTextArea textArea, Color color, int lineNumber, String pattern) {
