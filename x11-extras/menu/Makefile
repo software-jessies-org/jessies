@@ -1,3 +1,3 @@
 SRCS:=menu.cpp
 menu: Makefile $(SRCS)
-	$(CC) -Wall -Werror -o $@ $(SRCS) -lstdc++ -lX11 -lXft `pkg-config --cflags freetype2`
+	$(CXX) -Wall -Werror -o $@ $(SRCS) `pkg-config --cflags --libs x11 xft`
