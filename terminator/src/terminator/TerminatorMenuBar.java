@@ -617,7 +617,7 @@ public class TerminatorMenuBar extends EMenuBar {
         
         @Override
         public boolean isEnabled() {
-            return super.isEnabled() && getFocusedTerminalPane().getTerminalView().getModel().canViewInactiveBuffer();
+            return super.isEnabled() && getFocusedTerminalPane() != null && getFocusedTerminalPane().getTerminalView().getModel().canViewInactiveBuffer();
         }
     }
     
