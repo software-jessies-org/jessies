@@ -27,6 +27,11 @@ public class ModernScrollBarUI extends BasicScrollBarUI {
         return trackColor;
     }
     
+    public void setTrackColor(Color trackColor) {
+        this.trackColor = trackColor;
+        scrollbar.repaint();
+    }
+    
     @Override protected void configureScrollBarColors() {
         // We already set `trackColor` in the constructor.
     }

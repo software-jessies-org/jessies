@@ -22,6 +22,7 @@ public class JTerminalPane extends JPanel {
     private TerminalControl control;
     private TerminalView view;
     private JScrollPane scrollPane;
+    private JComponent scrollPaneCorner;
     private VisualBellViewport viewport;
     private FindPanel findPanel;
     private String name;
@@ -113,7 +114,11 @@ public class JTerminalPane extends JPanel {
             this.menuItemProvider = host.createMenuItemProvider(this);
         }
         view.optionsDidChange();
-        viewport.setBackground(view.getBackground());
+        Color background = view.getBackground();
+        viewport.setBackground(background);
+        ((ModernScrollBarUI) scrollPane.getHorizontalScrollBar().getUI()).setTrackColor(background);
+        ((ModernScrollBarUI) scrollPane.getVerticalScrollBar().getUI()).setTrackColor(background);
+        scrollPaneCorner.setBackground(background);
         updateTerminalSize();
         scrollPane.invalidate();
         validate();
@@ -145,7 +150,8 @@ public class JTerminalPane extends JPanel {
         Color background = preferences.getColor(TerminatorPreferences.BACKGROUND_COLOR);
         scrollPane.getHorizontalScrollBar().setUI(new ModernScrollBarUI(background));
         scrollPane.getVerticalScrollBar().setUI(new ModernScrollBarUI(background));
-        scrollPane.setCorner(JScrollPane.LOWER_RIGHT_CORNER, GuiUtilities.isMacOs() ? new MacScrollBarCorner() : new ScrollBarCorner(background));
+        scrollPaneCorner = GuiUtilities.isMacOs() ? new MacScrollBarCorner() : new ScrollBarCorner(background);
+        scrollPane.setCorner(JScrollPane.LOWER_RIGHT_CORNER, scrollPaneCorner);
         
         optionsDidChange();
         
