@@ -19,6 +19,14 @@ public class ModernScrollBarUI extends BasicScrollBarUI {
     private static final Color ROLL_COLOR = new Color(168, 168, 168);
     private static final Color BASE_COLOR = new Color(190, 190, 190);
     
+    public static void modernize(JScrollPane scrollPane, Color background) {
+        scrollPane.getHorizontalScrollBar().setUI(new ModernScrollBarUI(background));
+        scrollPane.getVerticalScrollBar().setUI(new ModernScrollBarUI(background));
+        JComponent scrollPaneCorner = new JPanel();
+        scrollPaneCorner.setBackground(background);
+        scrollPane.setCorner(JScrollPane.LOWER_RIGHT_CORNER, scrollPaneCorner);
+    }
+    
     public ModernScrollBarUI(Color trackColor) {
         this.trackColor = trackColor;
     }
