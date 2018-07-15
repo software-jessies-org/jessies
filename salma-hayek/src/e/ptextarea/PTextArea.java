@@ -20,6 +20,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     
     public static final int NO_MARGIN = -1;
     
+    public static final Color LINE_NUMBERS_BACKGROUND_COLOR = new Color(0x888888);
+    public static final Color LINE_NUMBERS_FOREGROUND_COLOR = new Color(0xeeeeee);
+    public static final Color MARGIN_BOUNDARY_COLOR = new Color(0.93f, 0.93f, 0.93f);
+    public static final Color MARGIN_OUTSIDE_COLOR = new Color(0.97f, 0.97f, 0.97f);
+    
     private SelectionHighlight selection;
     private boolean selectionEndIsAnchor;  // Otherwise, selection start is anchor.
     

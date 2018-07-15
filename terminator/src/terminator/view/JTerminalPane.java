@@ -139,9 +139,13 @@ public class JTerminalPane extends JPanel {
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setViewport(viewport);
-        if (GuiUtilities.isMacOs()) {
-            scrollPane.setCorner(JScrollPane.LOWER_RIGHT_CORNER, new FakeScrollBar());
-        }
+        
+        // TODO: track background color changes
+        TerminatorPreferences preferences = Terminator.getPreferences();
+        Color background = preferences.getColor(TerminatorPreferences.BACKGROUND_COLOR);
+        scrollPane.getHorizontalScrollBar().setUI(new ModernScrollBarUI(background));
+        scrollPane.getVerticalScrollBar().setUI(new ModernScrollBarUI(background));
+        scrollPane.setCorner(JScrollPane.LOWER_RIGHT_CORNER, GuiUtilities.isMacOs() ? new MacScrollBarCorner() : new ScrollBarCorner(background));
         
         optionsDidChange();
         
@@ -179,7 +183,7 @@ public class JTerminalPane extends JPanel {
     // I don't know how to get a JScrollBar to do the rendering for us, so for now here's a work-around.
     // FIXME: this is broken if Apple change the scroll bar appearance or the user has a high-DPI display.
     // Ideally, I'd have liked to have the bird view to the inside of the vertical scroll bar, encroaching on the terminal's space.
-    private static class FakeScrollBar extends JComponent {
+    private static class MacScrollBarCorner extends JComponent {
         private Color[] colors;
         public Color[] getColors() {
             if (colors == null) {
@@ -199,6 +203,12 @@ public class JTerminalPane extends JPanel {
                 g.drawLine(0, x, getWidth(), x);
                 ++x;
             }
+        }
+    }
+    
+    static class ScrollBarCorner extends JPanel {
+        ScrollBarCorner(Color background) {
+            setBackground(background);
         }
     }
     

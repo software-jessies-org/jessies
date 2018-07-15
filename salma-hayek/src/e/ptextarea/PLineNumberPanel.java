@@ -10,17 +10,14 @@ import javax.swing.*;
  * A JScrollPane row header that shows line numbers.
  */
 public class PLineNumberPanel extends JComponent {
-    private final static Color BACKGROUND_COLOR = new Color(0x888888);
-    private final static Color FOREGROUND_COLOR = new Color(0xeeeeee);
-    
     private final PTextArea textArea;
     
     public PLineNumberPanel(PTextArea textArea) {
         this.textArea = textArea;
         
         setBorder(BorderFactory.createEmptyBorder(1, 4, 0, 4));
-        setBackground(BACKGROUND_COLOR);
-        setForeground(FOREGROUND_COLOR);
+        setBackground(PTextArea.LINE_NUMBERS_BACKGROUND_COLOR);
+        setForeground(PTextArea.LINE_NUMBERS_FOREGROUND_COLOR);
         setOpaque(true);
         
         textArea.addComponentListener(new ComponentAdapter() {

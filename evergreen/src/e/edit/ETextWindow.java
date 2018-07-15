@@ -67,8 +67,9 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         this.watermarkViewPort = new WatermarkViewPort();
         watermarkViewPort.setView(textArea);
         
-        this.scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        this.scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setViewport(watermarkViewPort);
+        scrollPane.getVerticalScrollBar().setUI(new ModernScrollBarUI(PTextArea.MARGIN_OUTSIDE_COLOR));
         
         this.lineNumbers = new PLineNumberPanel(textArea);
         
