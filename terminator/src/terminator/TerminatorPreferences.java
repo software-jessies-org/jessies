@@ -51,6 +51,8 @@ public class TerminatorPreferences extends Preferences {
     private static final Color NEAR_WHITE = new Color(0xeeeeee);
     private static final Color SELECTION_BLUE = new Color(0x1c2bff);
     private static final Color VERY_DARK_BLUE = new Color(0x000045);
+    private static final Color DARK_GREY = new Color(0x2c2c2c);
+    private static final Color LIGHT_GREY = new Color(0xdcdcdc);
     
     @Override protected String getPreferencesFilename() {
         return System.getProperty("org.jessies.terminator.optionsFile");
@@ -98,6 +100,7 @@ public class TerminatorPreferences extends Preferences {
         buttons.add(makePresetButton("White on Black", Color.BLACK, NEAR_WHITE, Color.GREEN, Color.DARK_GRAY));
         buttons.add(makePresetButton("Black on White", Color.WHITE, NEAR_BLACK, Color.BLUE, LIGHT_BLUE));
         buttons.add(makePresetButton("Black on Cream", CREAM, NEAR_BLACK, Color.RED, LIGHT_BLUE));
+        buttons.add(makePresetButton("Dark Theme", DARK_GREY, LIGHT_GREY, Color.GREEN, SELECTION_BLUE));
         ComponentUtilities.tieButtonSizes(buttons);
         
         String description = "Presets:";
