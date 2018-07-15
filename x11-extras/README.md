@@ -7,6 +7,11 @@ you get on - whatever you think of them. I'm particularly interested in
 generalisations or simplifications that further the programs' minimalist
 nature.
 
+To build:
+```
+cmake . && make
+```
+
 ## clock - A Novel Clock
 
 You might not notice that `clock` is running. It opens a tiny window (4
@@ -54,6 +59,10 @@ unsurprisingly, `font`. You can also change the system-wide defaults by
 editing `lock.h` and recompiling.
 
 On Linux systems, `lock` disables virtual consoles while running. 
+
+Note that `lock` relies on passwords being stored in /etc/passwd, which
+hasn't been true since the 1990s (when it was written). To be useful
+today, it would need to be rewritten to use PAM.
 
 ## menu - X Menu
 
