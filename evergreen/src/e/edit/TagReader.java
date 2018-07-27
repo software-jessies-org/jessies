@@ -35,7 +35,8 @@ public class TagReader {
     
     private String chooseCtagsBinary() {
         // We don't cache this to give the user a chance to fix things while we're running.
-        for (String candidateCtags : Arrays.asList("ctags-exuberant", "exuberant-ctags", "ectags")) {
+        // exctags is on FreeBSD.
+        for (String candidateCtags : Arrays.asList("ctags-exuberant", "exuberant-ctags", "ectags", "exctags")) {
             if (FileUtilities.findOnPath(candidateCtags) != null) {
                 return candidateCtags;
             }
@@ -69,7 +70,6 @@ public class TagReader {
         for (String error : errors) {
             Log.warn("ctags: " + error);
         }
-        
         return tagsFile;
     }
     

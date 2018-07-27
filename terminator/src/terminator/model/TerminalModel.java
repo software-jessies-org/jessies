@@ -496,7 +496,9 @@ public class TerminalModel {
     private void textAdded(int length) {
         TextLine textLine = getTextLine(cursorPosition.getLineIndex());
         updateMaxLineWidth(textLine.length());
-        lineIsDirty(cursorPosition.getLineIndex() + 1);  // cursorPosition's line still has a valid *start* index.
+        // cursorPosition's line still has a valid *start* index, so we invalidate
+        // only the next line's start position.
+        lineIsDirty(cursorPosition.getLineIndex() + 1);
         linesChangedFrom(cursorPosition.getLineIndex());
         moveCursorHorizontally(length);
     }

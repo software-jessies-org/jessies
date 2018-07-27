@@ -1299,7 +1299,96 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
      * Replaces the entire contents of this text area with the given CharSequence.
      */
     public void setText(CharSequence newText) {
-        getTextBuffer().replace(new SelectionSetter(), 0, getTextBuffer().length(), newText, new SelectionSetter(0));
+        getTextBuffer().replace(new SelectionSetter(), 0, getTextBuffer().length(), newText, new SelectionSetter(guessTargetCaretPos(newText)));
+    }
+    
+    /**
+     * Looks at the new text, compares it with the existing text, and guesses where best to place the caret in the new text.
+     *
+     * If the processing seems to be purely reformatting, we try to keep the caret where it was by looking at the non-whitespace
+     * characters. Otherwise, we just try to stay roughly the same distance into the file.
+     */
+    public int guessTargetCaretPos(CharSequence newText) {
+        // We delegate to guessTargetCaretPos, which does the actual processing, but we actually want to find the
+        // location based on the *reversed* char sequences. This is because some processing tools will not only
+        // reformat, but may also modify imports (there are tools in golang which do this). As import statements
+        // are always at the start of the file, they will cause us to fall back to proportional caret positioning
+        // when they're modified.
+        // By doing the calculation based on reversed CharSequences, we side-step this problem.
+        CharSequence oldReversed = new ReversedCharSequence(getTextBuffer());
+        CharSequence newReversed = new ReversedCharSequence(newText);
+        int oldPosReversed = oldReversed.length() - 1 - getSelectionStart();
+        int newPosReversed = guessTargetCaretPos(oldReversed, oldPosReversed, newReversed);
+        return newText.length() - 1 - newPosReversed;
+    }
+    
+    // ReversedCharSequence implements only the minimal interface of CharSequence we need for guessTargetCaretPos, namely
+    // length() and charAt(int). The subSequence and toString() are not implemented properly.
+    private static class ReversedCharSequence implements CharSequence {
+        private CharSequence seq;
+        
+        public ReversedCharSequence(CharSequence seq) {
+            this.seq = seq;
+        }
+        
+        public int length() {
+            return seq.length();
+        }
+        
+        public char charAt(int i) {
+            return seq.charAt(seq.length() - 1 - i);
+        }
+        
+        public CharSequence subSequence(int s, int e) {
+            throw new UnsupportedOperationException("ReversedCharSequence doesn't implement subSequence");
+        }
+        
+        public String toString() {
+            throw new UnsupportedOperationException("ReversedCharSequence doesn't implement toString");
+        }
+    }
+    
+    private int guessTargetCaretPos(CharSequence oldText, int oldPos, CharSequence newText) {
+        if (oldText.length() == 0) {
+            // This also prevents a divide by zero if we fall back to keeping the same proportional distance into the file.
+            return 0;
+        }
+        int newPos = 0;
+        for (int i = 0; i < oldText.length(); i++) {
+            if (i == oldPos) {
+                // We've reached the caret location in the original text. Whatever equivalent index
+                // we've found in the new text is our best guess at where the caret should end up.
+                return newPos;
+            }
+            char oldCh = oldText.charAt(i);
+            if (ignoreCharForCaretGuessing(oldCh)) {
+                // If the same character is present in the new text, try to skip past it too.
+                // This allows us to more accurately keep the caret position around skippable characters,
+                // for example when reformatting code when the caret is positioned after a space.
+                if (newPos < newText.length() && oldCh == newText.charAt(newPos)) {
+                    newPos++;
+                }
+                continue;
+            }
+            char newCh = ' ';
+            while (newPos < newText.length() && ignoreCharForCaretGuessing(newCh)) {
+                newCh = newText.charAt(newPos++);
+            }
+            if (oldCh != newCh) {
+                // If we see non-indent-affected chars differ in the old vs new content, we assume this is not
+                // a simple case of reformatting. Just try to keep roughly the same distance into the file.
+                break;
+            }
+        }
+        return oldPos * newText.length() / oldText.length();
+    }
+    
+    private boolean ignoreCharForCaretGuessing(char ch) {
+        // For caret position guessing, ignore all whitespace, as that's precisely what's going to be
+        // changed by code formatting tools. In addition, we ignore common comment demarking characters,
+        // as some formatters will splurge comments across multiple lines, thus adding to the set of
+        // comment markers.
+        return Character.isWhitespace(ch) || ch == '*' || ch == '/' || ch == '#';
     }
     
     /**
