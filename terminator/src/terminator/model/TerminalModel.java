@@ -40,6 +40,11 @@ public class TerminalModel {
     
     private boolean bracketedPasteMode = false;
     
+    // Whether we've already printed a warning about too much input having been chopped.
+    // Such a warning is only printed once per terminal, in order to avoid massive input
+    // causing massive logging.
+    private boolean warnedAboutExcessiveWidth = false;
+    
     public TerminalModel(TerminalView view, int width, int height) {
         this.view = view;
         setSize(width, height);
@@ -482,6 +487,22 @@ public class TerminalModel {
      */
     public void processLine(String untranslatedLine) {
         String line = view.getTerminalControl().translate(untranslatedLine);
+        // Java is unable to correctly render windowing components wider than 32768 pixels,
+        // and at sizes much larger than that, we end up with things getting horribly slow.
+        // For example, cat a multi-megabyte file with no newlines, and Terminator can lock
+        // up on you for many seconds.
+        int maxChars = 32700 / view.getCharUnitSize().width;
+        int charsLeft = maxChars - cursorPosition.getCharOffset();
+        if (charsLeft <= 0) {
+            return;
+        }
+        if (line.length() > charsLeft) {
+            if (!warnedAboutExcessiveWidth) {
+                warnedAboutExcessiveWidth = true;
+                Log.warn("Line too wide in terminal; chopping input");
+            }
+            line = line.substring(0, charsLeft);
+        }
         TextLine textLine = getTextLine(cursorPosition.getLineIndex());
         if (insertMode) {
             //Log.warn("Inserting text \"" + line + "\" at " + cursorPosition + ".");

@@ -3,6 +3,7 @@ package terminator.view;
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
+import java.awt.image.*;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
@@ -44,6 +45,18 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
     private Range urlUnderMouse = null;
     // Init line index to 0 so we never need to check if it's a valid line index, but don't have a valid char offset.
     private Location mouseLocation = new Location(0, -1);
+    
+    // The following constants define how the 'output truncated' watermark is displayed.
+    // Processes running in Terminator can output arbitrary text, and as we don't line-wrap,
+    // this can cause the terminal window to get an unbounded width. Java does not correctly
+    // render GUI components wider than 32768 pixels, plus some of our code is going to get
+    // inefficient for very long lines. To avoid lock-ups, we simply drop text after a
+    // certain point, dictated by whatever text will fit in 32700 pixels.
+    // The watermark is displayed when we get close to this extreme right-hand edge, in a pale
+    // red colour reminiscent of how Evergreen tells us about files being modified in disk.
+    private static final int TRUNCATION_WATERMARK_BEGIN_X = 32500;
+    private static final Color TRUNCATION_COLOR = new Color(250, 150, 150);
+    private static final String[] TRUNCATION_WARNING = {"output", "truncated"};
     
     public TerminalView() {
         TerminatorPreferences preferences = Terminator.getPreferences();
@@ -690,7 +703,33 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
         }
         return out;
     }
-
+    
+    private BufferedImage getTruncationWarning() {
+        // Stolen from Evergreen's WatermarkViewPort.
+        FontMetrics metrics = getFontMetrics(getFont());
+        int fontHeight = metrics.getMaxAscent() + metrics.getMaxDescent();
+        int stringWidth = 0;
+        int[] lineWidths = new int[TRUNCATION_WARNING.length];
+        for (int i = 0; i < TRUNCATION_WARNING.length; i++) {
+            lineWidths[i] = metrics.stringWidth(TRUNCATION_WARNING[i]);
+            stringWidth = Math.max(stringWidth, lineWidths[i]);
+        }
+        // Not entirely accurate, but gives us some nice spacing.
+        int imageSize = (int)((fontHeight * TRUNCATION_WARNING.length + stringWidth) / Math.sqrt(2));
+        BufferedImage image = new BufferedImage(imageSize, imageSize, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = image.createGraphics();
+        g.setColor(getBackground());
+        g.fillRect(0, 0, imageSize, imageSize);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.translate(imageSize / 2, imageSize / 2);
+        g.rotate(-Math.PI / 4);
+        g.setColor(TRUNCATION_COLOR);
+        for (int i = 0; i < TRUNCATION_WARNING.length; i++) {
+            g.drawString(TRUNCATION_WARNING[i], -lineWidths[i] / 2, i * fontHeight);
+        }
+        return image;
+    }
+    
     @Override public void paintComponent(Graphics oldGraphics) {
         Stopwatch.Timer timer = paintComponentStopwatch.start();
         try {
@@ -703,6 +742,22 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
             Rectangle rect = g.getClipBounds();
             g.setColor(getBackground());
             g.fill(rect);
+            
+            // If we're getting close to the right-hand edge, paint the watermark to warn the user that some
+            // of their text has been dropped.
+            // The watermark is pale red text with the words 'output truncated', drawn at a 45 degree angle.
+            // If you generate a particularly long line, for example by running this:
+            // for i in {0..4700};do echo -n foo4567890;done
+            // ...then you should see the watermark if you scroll completely to the right.
+            if (rect.x + rect.width > TRUNCATION_WATERMARK_BEGIN_X) {
+                BufferedImage im = getTruncationWarning();
+                int yMin = rect.y - rect.y % im.getHeight();
+                for (int x = TRUNCATION_WATERMARK_BEGIN_X; x < rect.x + rect.width; x += im.getWidth()) {
+                    for (int y = yMin; y < rect.y + rect.height; y += im.getHeight()) {
+                        g.drawImage(im, x, y, null);
+                    }
+                }
+            }
             
             // We manually "clip" for performance, but we're quite loose about it.
             // This avoids accidental pathological cases (hopefully) and doesn't seem to have any significant cost.
