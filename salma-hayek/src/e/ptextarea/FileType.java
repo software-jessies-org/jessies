@@ -76,11 +76,6 @@ public class FileType {
                  PPatchTextStyler.class,
                  new String[] { ".diff", ".patch" });
     
-    public static final FileType PBASIC = new FileType("PBASIC",
-                 PNoOpIndenter.class,
-                 PPBasicTextStyler.class,
-                 new String[] { ".bs1", ".bs2", ".bse", ".bsx", ".bsp", ".bpe", ".bpx" });
-    
     public static final FileType PERL = new FileType("Perl",
                  PPerlIndenter.class,
                  PPerlTextStyler.class,
