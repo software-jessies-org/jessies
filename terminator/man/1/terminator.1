@@ -1,14 +1,21 @@
-.TH TERMINATOR "1" "" "" "User Commands"
+.TH TERMINATOR "1" "" "jessies.org" "User Commands"
 .SH NAME
 terminator \- terminal emulator
 .SH SYNOPSIS
-terminator [[\-n NAME] [\-\-working\-directory DIR] [COMMAND]]...
+.B terminator
+[[\-n NAME] [\-\-working\-directory DIR] [COMMAND]]...
 .SH DESCRIPTION
 Each call to "terminator" creates a single window containing an arbitrary number of tabs.
 
-X11-like \-xrm arguments are accepted but ignored for backwards compatibility.
+X11-like
+.B \-xrm
+arguments are accepted but ignored for backwards compatibility.
 
-XTerm-like \-e and \-T options are fully supported for backwards compatibility.
+XTerm-like
+.B \-e
+and
+.B \-T
+options are fully supported for backwards compatibility.
 .SH EXAMPLES
 This command (all one line) opens one new window containing two tabs called "console 1" and "console 2".
 .nf
