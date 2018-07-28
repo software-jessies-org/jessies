@@ -28,6 +28,7 @@ public class GuiUtilities {
     private GuiUtilities() {
     }
     
+    @SuppressWarnings("deprecation") // getMenuShortcutKeyMaskEx requires Java 10.
     private static final int defaultKeyStrokeModifier = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
     
     /**
