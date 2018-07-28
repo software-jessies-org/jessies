@@ -86,9 +86,11 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
         }
         
         // Checks whether the given stack looks like it's waiting for another event.
-        // This relies on JDK implementation details.
+        // This relies on JDK implementation details, so we might have to support a few possibilities.
+        // If you're seeing spurious warnings whenever you have a dialog up, check that this hasn't changed.
         private boolean isWaitingForNextEvent(StackTraceElement[] currentStack) {
-            return stackTraceElementIs(currentStack[0], "java.lang.Object", "wait", true) && stackTraceElementIs(currentStack[1], "java.lang.Object", "wait", false) && stackTraceElementIs(currentStack[2], "java.awt.EventQueue", "getNextEvent", false);
+            return /* Java 10 */ (stackTraceElementIs(currentStack[0], "jdk.internal.misc.Unsafe", "park", true) && stackTraceElementIs(currentStack[3], "java.awt.EventQueue", "getNextEvent", false)) ||
+                   /* Java 5 */ (stackTraceElementIs(currentStack[0], "java.lang.Object", "wait", true) && stackTraceElementIs(currentStack[1], "java.lang.Object", "wait", false) && stackTraceElementIs(currentStack[2], "java.awt.EventQueue", "getNextEvent", false));
         }
         
         private void examineHang() {
