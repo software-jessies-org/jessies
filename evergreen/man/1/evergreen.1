@@ -13,16 +13,18 @@ If Evergreen is already running, the file will be opened in that instance and th
 Otherwise, a new Evergreen instance will start and the command will return when the user quits.
 
 You can supply addresses such as "file.cpp:12" in order to go straight to line 12 of "file.cpp".
-To facilitate the easy pasting of entire grep(1) matches collected via selection of the entire line, anything after the address is ignored.
+To facilitate the easy pasting of entire
+.BR grep(1)
+matches collected via selection of the entire line, anything after the address is ignored.
 For this reason, it is not possible to open more than one file in one command.
 
 If the given path is a directory, a new workspace will be created for that project.
 .SH "SEE ALSO"
+.BR edit-and-block (1).
+
 More documentation is available on our
 .UR https://github.com/software-jessies-org/jessies/wiki/Evergreen
 github wiki
 .UE
-.PP
-See also \&\fIedit-and-block\fR\|(1).
 .SH "REPORTING BUGS"
 Report bugs to <evergreen-users@googlegroups.com>.
