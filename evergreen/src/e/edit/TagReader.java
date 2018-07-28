@@ -92,8 +92,6 @@ public class TagReader {
             return "Make";
         } else if (fileType == FileType.RUBY) {
             return "Ruby";
-        } else if (fileType == FileType.PBASIC) {
-            return "Basic";
         } else if (fileType == FileType.PERL) {
             return "Perl";
         } else if (fileType == FileType.PHP) {
