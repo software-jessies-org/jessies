@@ -1,8 +1,12 @@
-.TH EVERGREEN "1" "" "" "User Commands"
+.TH EVERGREEN "1" "" "jessies.org" "User Commands"
 .SH NAME
 evergreen \- programmer's development environment
 .SH SYNOPSIS
-evergreen [\-\-block] FILE
+.B evergreen
+[\-\-block] FILE[:LINE]
+.br
+.B evergreen
+DIR
 .SH DESCRIPTION
 Opens the given file in Evergreen.
 If Evergreen is already running, the file will be opened in that instance and the command will return immediately.
@@ -11,11 +15,14 @@ Otherwise, a new Evergreen instance will start and the command will return when 
 You can supply addresses such as "file.cpp:12" in order to go straight to line 12 of "file.cpp".
 To facilitate the easy pasting of entire grep(1) matches collected via selection of the entire line, anything after the address is ignored.
 For this reason, it is not possible to open more than one file in one command.
+
+If the given path is a directory, a new workspace will be created for that project.
 .SH "SEE ALSO"
 More documentation is available on our
 .UR https://github.com/software-jessies-org/jessies/wiki/Evergreen
 github wiki
 .UE
+.PP
 See also \&\fIedit-and-block\fR\|(1).
 .SH "REPORTING BUGS"
 Report bugs to <evergreen-users@googlegroups.com>.
