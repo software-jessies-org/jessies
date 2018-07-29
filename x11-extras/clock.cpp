@@ -114,11 +114,11 @@ static void DoExpose(XEvent* ev) {
 
   // Do the redraw.
   int text_width = (window_width * 3) / 4;
-  XftDrawStringUtf8(
-      g_font_draw, &g_font_color, g_font, (window_width - text_width) / 2,
-      window_height / 4 + g_font->ascent,
-      reinterpret_cast<const FcChar8*>(display_string.c_str()),
-      display_string.size());
+  XftDrawStringUtf8(g_font_draw, &g_font_color, g_font,
+                    (window_width - text_width) / 2,
+                    window_height / 4 + g_font->ascent,
+                    reinterpret_cast<const FcChar8*>(display_string.c_str()),
+                    display_string.size());
 }
 
 static void DoEnter(XEvent* ev) {
