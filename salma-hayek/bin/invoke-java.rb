@@ -455,11 +455,6 @@ class Java
     #export _JAVA_OPTIONS='-Dsun.java2d.opengl=true'
     #add_property("sun.java2d.opengl", "true")
     
-    if @class_name != "e/tools/JavaHpp"
-      #args << "-verbose:class"
-      #args << "-verbose:gc"
-      #args << "-verbose:jni"
-    end
     args.concat(@extra_java_arguments)
     args << @class_name
     args.concat(@extra_app_arguments)
