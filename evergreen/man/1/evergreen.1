@@ -2,11 +2,13 @@
 .SH NAME
 evergreen \- programmer's development environment
 .SH SYNOPSIS
-.B evergreen
-[\-\-block] FILE[:LINE]
-.br
-.B evergreen
-DIR
+.SY evergreen
+.OP \-\-block
+.RI [ FILE\fR[:\fILINE\fR]]
+.YS
+.SY evergreen
+.I DIR
+.YS
 .SH DESCRIPTION
 Opens the given file in Evergreen.
 If Evergreen is already running, the file will be opened in that instance and the command will return immediately.
