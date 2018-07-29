@@ -700,32 +700,38 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     }
     
     private void writeToFile(File file) {
-        // Only Java has newline hygiene as part of its language specification, but it probably applies to most computer languages.
-        // For now, though, we let authors of plain text do what they like.
         if (getFileType() != FileType.PLAIN_TEXT) {
-            // Remember what was selected/where the caret was.
-            final int selectionStart = textArea.getSelectionStart();
-            final int selectionEnd = textArea.getSelectionEnd();
-            
-            ensureBufferDoesNotEndInMultipleNewlines();
-            ensureBufferEndsInSingleNewline();
-            
-            // Restore the selection/caret as well as we can.
-            final int maxCaretIndex = textArea.getTextBuffer().length();
-            textArea.select(Math.min(maxCaretIndex, selectionStart), Math.min(maxCaretIndex, selectionEnd));
-            
-            // Trim any trailing whitespace, if configured to do so.
-            // This code can do a perfect job of maintaining the selection, so it comes outside the cruder code above.
-            trimTrailingWhitespace();
+            if (Evergreen.getInstance().getPreferences().getBoolean(EvergreenPreferences.REFORMAT_ON_SAVE)) {
+                ReformatFileAction.reformat(this);
+            } else {
+                doBasicFormattingFixes();
+            }
         }
-        
         textArea.getTextBuffer().writeToFile(file);
     }
     
-    private void trimTrailingWhitespace() {
-        if (Evergreen.getInstance().getPreferences().getBoolean(EvergreenPreferences.TRIM_TRAILING_WHITESPACE) == false) {
-            return;
+    private void doBasicFormattingFixes() {
+        // Remember what was selected/where the caret was.
+        final int selectionStart = textArea.getSelectionStart();
+        final int selectionEnd = textArea.getSelectionEnd();
+        
+        // Only Java has newline hygiene as part of its language specification,
+        // but it's probably desirable for most computer languages.
+        ensureBufferDoesNotEndInMultipleNewlines();
+        ensureBufferEndsInSingleNewline();
+        
+        // Restore the selection/caret as well as we can.
+        final int maxCaretIndex = textArea.getTextBuffer().length();
+        textArea.select(Math.min(maxCaretIndex, selectionStart), Math.min(maxCaretIndex, selectionEnd));
+        
+        // Trim any trailing whitespace, if configured to do so.
+        // This code can do a perfect job of maintaining the selection, so it comes outside the cruder code above.
+        if (Evergreen.getInstance().getPreferences().getBoolean(EvergreenPreferences.TRIM_TRAILING_WHITESPACE)) {
+            trimTrailingWhitespace();
         }
+    }
+    
+    private void trimTrailingWhitespace() {
         PTextBuffer buffer = textArea.getTextBuffer();
         Pattern trailingWhitespacePattern = Pattern.compile("([ \t]+)$", Pattern.MULTILINE);
         if (trailingWhitespacePattern.matcher(buffer).find()) {

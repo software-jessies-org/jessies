@@ -11,6 +11,7 @@ public class EvergreenPreferences extends Preferences {
     public static final String FIXED_FONT = "fixedFont";
     public static final String HIDE_MOUSE_WHEN_TYPING = "hideMouseWhenTyping";
     public static final String SHOW_LINE_NUMBERS = "showLineNumbers";
+    public static final String REFORMAT_ON_SAVE = "reformatOnSave";
     public static final String TRIM_TRAILING_WHITESPACE = "trimTrailingWhitespace";
     public static final String UNINTERESTING_EXTENSIONS = "uninterestingExtensions";
     public static final String MINIMIZE_INDEXING_IO = "minimizeIndexingIo";
@@ -23,6 +24,7 @@ public class EvergreenPreferences extends Preferences {
     
     protected void initPreferences() {
         addPreference(DEFAULT_INDENTATION, "    ", "Default indentation string");
+        addPreference(REFORMAT_ON_SAVE, Boolean.FALSE, "Reformat files on save");
         addPreference(TRIM_TRAILING_WHITESPACE, Boolean.FALSE, "Trim trailing whitespace on save");
         addSeparator();
         addPreference(FIXED_FONT, new Font(GuiUtilities.getMonospacedFontName(), Font.PLAIN, 12), "Fixed font");
