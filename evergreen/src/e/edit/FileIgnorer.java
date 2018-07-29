@@ -92,6 +92,8 @@ public class FileIgnorer implements FileFinder.Filter {
         // autotools directories:
         patterns.add("\\.deps");
         patterns.add("autom4te\\.cache");
+        // cmake's equivalent:
+        patterns.add("CMakeFiles");
         // SCM directories:
         patterns.add("\\.bzr");
         patterns.add("\\.hg");
