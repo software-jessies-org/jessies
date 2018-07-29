@@ -151,7 +151,6 @@ class Java
     @extra_java_arguments = []
     @extra_app_arguments = []
 
-    init_default_heap_size()
     init_default_class_path()
     # We don't know the JVM's architecture at this point.
     # We've seen a number of systems which run an i386 JVM on an amd64 kernel.
@@ -290,20 +289,6 @@ class Java
     end
   end
   
-  def init_default_heap_size()
-    # Default heap size.
-    # FIXME: I suspect that our users with 1 GiB Linux boxes would have more responsive machines with a lower setting.
-    # Portably determining how much RAM we have is a game.
-    # sysctl hw.usermem on Mac OS
-    # cat /proc/meminfo on Linux and Cygwin
-    # sysconf(_SC_PHYS_PAGES) * sysconf(_SC_PAGESIZE) on Solaris?
-    @heap_size = "1g"
-    if target_os() == "Cygwin"
-      # 512m makes vmxp-martind issue JVM aborted even during javahpp.
-      @heap_size = "256m"
-    end
-  end
-
   def init_default_class_path()
     # Users need the classes.jar, but developers need the two directories.
     # This speeds things up for the users at the expense to the developers of the time it takes the JVM to check for the non-existent classes.jar, which shouldn't be a problem.
@@ -409,8 +394,6 @@ class Java
     end
     
     add_property("e.util.Log.applicationName", @app_name)
-
-    args << "-Xmx#{@heap_size}"
 
     if target_os() == "Darwin"
       args << "-Xdock:name=#{@app_name}"
