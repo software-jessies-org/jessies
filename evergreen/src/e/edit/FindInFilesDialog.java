@@ -15,7 +15,6 @@ import javax.swing.event.*;
 import javax.swing.tree.*;
 
 import java.util.List;
-import org.jdesktop.swingworker.SwingWorker;
 
 public class FindInFilesDialog implements WorkspaceFileList.Listener {
     /** How our worker threads know whether they're still relevant. */

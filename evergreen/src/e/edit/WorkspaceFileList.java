@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.regex.*;
-import org.jdesktop.swingworker.SwingWorker;
+import javax.swing.*;
 
 public class WorkspaceFileList {
     private static int chooseThreadCount() {

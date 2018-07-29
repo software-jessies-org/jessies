@@ -12,7 +12,6 @@ import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.tree.*;
-import org.jdesktop.swingworker.SwingWorker;
 
 public class TagsUpdater {
     private static final ExecutorService executorService = ThreadUtilities.newSingleThreadExecutor("Tags Updater");

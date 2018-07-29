@@ -8,7 +8,7 @@ import java.awt.datatransfer.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
-import org.jdesktop.swingworker.SwingWorker;
+import javax.swing.*;
 
 public class ShellCommand {
     private final PTextArea textArea;

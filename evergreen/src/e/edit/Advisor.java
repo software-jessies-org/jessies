@@ -8,7 +8,6 @@ import java.awt.event.*;
 import java.util.*;
 import java.util.concurrent.*;
 import javax.swing.*;
-import org.jdesktop.swingworker.SwingWorker;
 
 public class Advisor extends JPanel {
     private static Advisor instance;

@@ -6,7 +6,7 @@ import java.awt.event.*;
 import java.util.concurrent.*;
 import java.util.regex.*;
 import java.util.ArrayList;
-import org.jdesktop.swingworker.SwingWorker;
+import javax.swing.*;
 import terminator.model.*;
 import terminator.view.*;
 

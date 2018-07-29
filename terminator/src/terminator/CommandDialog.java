@@ -9,7 +9,6 @@ import java.io.*;
 import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
-import org.jdesktop.swingworker.SwingWorker;
 import terminator.view.*;
 
 /**
