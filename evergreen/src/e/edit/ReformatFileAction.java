@@ -4,6 +4,7 @@ import e.gui.*;
 import e.ptextarea.*;
 import e.util.*;
 import java.awt.event.*;
+import java.io.*;
 import java.util.*;
 import java.util.regex.*;
 
@@ -41,7 +42,18 @@ public class ReformatFileAction extends ETextAction {
         
         // TODO: explicitly check for a clang-format binary?
         
-        // TODO: check for .clang-format file in parent directories.
+        // Check for a .clang-format file in one of the parent directories.
+        File f = textWindow.getFile();
+        boolean foundClangFormat = false;
+        while ((f = f.getParentFile()) != null) {
+            if (new File(f, ".clang-format").exists()) {
+                foundClangFormat = true;
+                break;
+            }
+        }
+        if (!foundClangFormat) {
+            return "No .clang-format file found.";
+        }
         
         // TODO: if there's a selection, only format those lines?
         // TODO: add the ability to only format lines that have been changed?

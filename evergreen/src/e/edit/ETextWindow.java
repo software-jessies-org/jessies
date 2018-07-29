@@ -252,6 +252,10 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         return birdView;
     }
     
+    public File getFile() {
+        return file;
+    }
+    
     public String getFilename() {
         return filename;
     }
