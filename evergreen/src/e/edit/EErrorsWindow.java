@@ -270,10 +270,13 @@ public class EErrorsWindow extends JFrame {
         }
         
         public void run() {
-            // This conditional stops the errors window from grabbing the focus every time it's updated.
-            if (isVisible() == false) {
-                setVisible(true);
-            }
+            // You always want the errors window visible if there are errors.
+            setVisible(true);
+            
+            // And you probably want it on top, so it's visible to a human.
+            // TODO: do we need to keep track of whether we've started a new build/whatever and only toFront if it's our first time through here since then?
+            toFront();
+            
             textArea.append(text);
             if (isStdErr) {
                 disableAutoScroll();
