@@ -131,7 +131,8 @@ class Java
     @class_name = class_name
     @log_filename = ""
     @initiate_startup_notification = true
-
+    @java_version = 0
+    
     # The 'realpath' calls are to cope with symbolic links to the launch
     # script and this script.
     # We look at the PROJECT_ROOT environment variable first so that we can
@@ -199,15 +200,16 @@ class Java
     return java_version
   end
 
-  def is_java_new_enough(java_version)
-    return java_version.sub(/^1\./, "").match(/^(\d+)/) && $1.to_i() >= 6
-  end
-
   def check_java_version()
-    actual_java_version = get_java_version(@launcher)
-    if is_java_new_enough(actual_java_version)
+    java_version_string = get_java_version(@launcher)
+    if java_version_string.sub(/^1\./, "").match(/^(\d+)/)
+      @java_version = $1.to_i()
+    end
+    
+    if @java_version >= 6
       return
     end
+    
     # The "java" on the path was no good.
     # Can we salvage the situation by finding a suitable JVM?
     
@@ -361,7 +363,11 @@ class Java
 
     # check_java_version may alter @launcher to get us something that works.
     args = [ @launcher ]
-
+    
+    if @java_version >= 9
+      args << "--illegal-access=debug"
+    end
+    
     add_pathnames_property("java.class.path", @class_path)
     
     # Fix the path so that cygwin1.dll is on it.
