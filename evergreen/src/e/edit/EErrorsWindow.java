@@ -43,7 +43,6 @@ public class EErrorsWindow extends JFrame {
     private PTextArea textArea;
     private JScrollPane scrollPane;
     private EStatusBar statusBar;
-    private int currentBuildErrorCount;
     private Process process;
     
     private boolean shouldAutoScroll;
@@ -127,7 +126,6 @@ public class EErrorsWindow extends JFrame {
     
     public void taskDidStart(Process process) {
         EventQueue.invokeLater(new ClearRunnable());
-        this.currentBuildErrorCount = 0;
         this.process = process;
         killButton.setEnabled(true);
     }
@@ -135,7 +133,7 @@ public class EErrorsWindow extends JFrame {
     public void taskDidExit(int exitStatus) {
         killButton.setEnabled(false);
         this.process = null;
-        if (exitStatus == 0 && currentBuildErrorCount == 0) {
+        if (exitStatus == 0) {
             Thread waitThenHide = new Thread(new Runnable() {
                 public void run() {
                     // Add a short pause before hiding, so the user gets chance to see that everything went okay.
@@ -300,12 +298,6 @@ public class EErrorsWindow extends JFrame {
     }
     
     public void appendLines(boolean isStdErr, List<String> lines) {
-        for (String line : lines) {
-            // FIXME: this is a bit weak, and no longer necessary for our builds. The FIXME in this file about treating stderr specially might be a better way forward if we want to keep a hack.
-            if (line.contains("***") || line.contains("warning:")) {
-                ++currentBuildErrorCount;
-            }
-        }
         EventQueue.invokeLater(new AppendRunnable(isStdErr, lines));
     }
     
