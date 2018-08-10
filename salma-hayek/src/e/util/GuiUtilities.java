@@ -14,6 +14,20 @@ import javax.swing.event.*;
 import org.jessies.os.*;
 
 public class GuiUtilities {
+    /**
+     * On FreeBSD and some other systems, Java's Desktop.getDesktop().browse() function doesn't work.
+     * We have a work-around for this, by executing a user-provided command if the function fails.
+     * The following is the help text we show in the error dialog, for when the user can use this
+     * work-around, but has not done so yet.
+     */
+    private static final String WEB_BROWSER_HELP_TEXT = "Java's ability to open URLs on your platform is broken, sorry.\n\n" +
+        "To work around this, please set the environment variable\n" +
+        "'JESSIES_WEB_BROWSER' to the command you wish to run to open web URLs.\n" +
+        "Then restart this application with the environment variable set, and the\n" +
+        "specified command will be run to open URLs, with the URL as argument.\n\n" +
+        "If you use bash, adding the following to your .bashrc file should work:\n" +
+        "export JESSIES_WEB_BROWSER=firefox\n";
+        
     static {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -338,6 +352,16 @@ public class GuiUtilities {
     public static void openUrl(String url) {
         try {
             Desktop.getDesktop().browse(new URI(url));
+        } catch (UnsupportedOperationException ex) {
+            String openUrl = System.getenv("JESSIES_WEB_BROWSER");
+            if (openUrl == null) {
+                SimpleDialog.showDetails(null, "Cannot open URL " + url, WEB_BROWSER_HELP_TEXT);
+                return;
+            }
+            ArrayList<String> lines = new ArrayList<String>();
+            if (ProcessUtilities.backQuote(null, new String[] {openUrl, url}, lines, lines) != 0) {
+                SimpleDialog.showAlert(null, "JESSIES_WEB_BROWSER command " + openUrl + " failed:", StringUtilities.join(lines, "\n"));
+            }
         } catch (Throwable th) {
             SimpleDialog.showDetails(null, "Problem opening URL", th);
         }
