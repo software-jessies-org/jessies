@@ -32,6 +32,11 @@ public class TerminatorPreferences extends Preferences {
     public static final String VISUAL_BELL = "visualBell";
     
     /**
+     * Experimental preference for acting on error links (from compilers).
+     */
+    public static final String ERROR_LINK_CMD = "errorLinkCommand";
+    
+    /**
      * Whether or not the alt key should be meta.
      * If true, you can't use alt as part of your system's input method.
      * If false, you can't comfortably use emacs(1).
@@ -75,6 +80,7 @@ public class TerminatorPreferences extends Preferences {
         addPreference("Behavior", VISUAL_BELL, Boolean.TRUE, "Visual bell (as opposed to no bell)");
         addPreference("Behavior", USE_ALT_AS_META, Boolean.FALSE, "Use alt key as meta key (for Emacs)");
         addPreference("Behavior", LOG_TERMINAL_ACTIVITY, Boolean.TRUE, "Log terminal activity in $HOME/.terminator/logs/");
+        addPreference("Behavior", ERROR_LINK_CMD, "", "Error link handling script");
         
         addPreference("Appearance", ANTI_ALIAS, Boolean.TRUE, "Anti-alias text");
         addPreference("Appearance", BLINK_CURSOR, Boolean.TRUE, "Blink cursor");

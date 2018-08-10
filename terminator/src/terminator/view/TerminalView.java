@@ -75,7 +75,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
                 if (SwingUtilities.isLeftMouseButton(event) && urlUnderMouse != null && event.isControlDown()) {
                     TextLine line = model.getDisplayTextLine(mouseLocation.getLineIndex());
                     String url = line.getTabbedString(urlUnderMouse.getStart(), urlUnderMouse.getEnd());
-                    GuiUtilities.openUrl(url);
+                    openUrlOrError(url);
                 }
             }
         });
@@ -108,6 +108,21 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
         cursorBlinker = new CursorBlinker(this);
         selectionHighlighter = new SelectionHighlighter(this);
         birdsEye = new FindBirdsEye(this);
+    }
+    
+    private void openUrlOrError(String url) {
+        // This may be an error pattern rather than a URL; if so, run the configured command.
+        if (PatternUtilities.ERROR_PATTERN.matcher(url).matches()) {
+            JTerminalPane terminalPane = (JTerminalPane) SwingUtilities.getAncestorOfClass(JTerminalPane.class, this);
+            String title = terminalPane.getTerminalName();
+            ArrayList<String> lines = new ArrayList<String>();
+            String cmd = Terminator.getPreferences().getString(TerminatorPreferences.ERROR_LINK_CMD);
+            if (ProcessUtilities.backQuote(null, new String[] {cmd, url, title}, lines, lines) != 0) {
+                SimpleDialog.showAlert(this, "External command " + cmd + " failed:", StringUtilities.join(lines, "\n"));
+            }
+        } else {
+            GuiUtilities.openUrl(url);
+        }
     }
     
     public void optionsDidChange() {
