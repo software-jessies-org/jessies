@@ -29,6 +29,7 @@ public class BuildAction extends ETextAction {
     // Returns a map from filenames to build tools.
     private static Map<String, BuildTool> initBuildTools() {
         final HashMap<String, BuildTool> result = new HashMap<String, BuildTool>();
+        result.put("CMakeLists.txt", new BuildTool("CMakeLists.txt", "cmake -GNinja -H. -B.out && ninja -C `realpath .out`"));
         result.put("Makefile", new BuildTool("Makefile", "make --print-directory"));
         result.put("build.xml", new BuildTool("build.xml", "ant -emacs -quiet"));
         // TODO: if you have source that only builds with clang, how do you tell meson that?
