@@ -269,11 +269,16 @@ public class EErrorsWindow extends JFrame {
         
         public void run() {
             // You always want the errors window visible if there are errors.
-            setVisible(true);
+            // This conditional stops the errors window from grabbing the focus every time it's updated.
+            if (isVisible() == false) {
+                setVisible(true);
+            }
             
-            // And you probably want it on top, so it's visible to a human.
-            // TODO: do we need to keep track of whether we've started a new build/whatever and only toFront if it's our first time through here since then?
-            toFront();
+            // If we're going from zero lines to one line, that's an important event:
+            // we want to let the user know that their job produced output.
+            if (textArea.getLineCount() == 0) {
+                toFront();
+            }
             
             textArea.append(text);
             if (isStdErr) {
