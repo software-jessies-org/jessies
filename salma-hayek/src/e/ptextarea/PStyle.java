@@ -18,8 +18,6 @@ public enum PStyle {
     PATCH_AT("patch-at", Color.GRAY, Font.PLAIN),
     PATCH_MINUS("patch-minus", Color.RED, Font.PLAIN),
     PATCH_PLUS("patch-plus", Color.BLUE, Font.PLAIN),
-    NORMAL_BOLD("normal-bold", NORMAL.getColor(), Font.BOLD),
-    NORMAL_ITALIC("normal-italic", NORMAL.getColor(), Font.ITALIC)
     ;
     
     private String name;
