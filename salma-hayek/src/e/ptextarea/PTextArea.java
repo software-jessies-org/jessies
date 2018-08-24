@@ -1317,9 +1317,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         // By doing the calculation based on reversed CharSequences, we side-step this problem.
         CharSequence oldReversed = new ReversedCharSequence(getTextBuffer());
         CharSequence newReversed = new ReversedCharSequence(newText);
-        int oldPosReversed = oldReversed.length() - 1 - getSelectionStart();
+        int oldPosReversed = oldReversed.length() - getSelectionStart();
         int newPosReversed = guessTargetCaretPos(oldReversed, oldPosReversed, newReversed);
-        return newText.length() - 1 - newPosReversed;
+        return newText.length() - newPosReversed;
     }
     
     // ReversedCharSequence implements only the minimal interface of CharSequence we need for guessTargetCaretPos, namely
@@ -1380,7 +1380,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
                 break;
             }
         }
-        return oldPos * newText.length() / oldText.length();
+        return (int) ((long) oldPos * newText.length() / oldText.length());
     }
     
     private boolean ignoreCharForCaretGuessing(char ch) {
