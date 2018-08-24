@@ -170,6 +170,8 @@ public class PKeyHandler implements KeyListener {
             moveLeft(byWord, extendingSelection);
         } else if (key == KeyEvent.VK_RIGHT) {
             moveRight(byWord, extendingSelection);
+        } else if (key == KeyEvent.VK_K && event.isShiftDown() && event.isControlDown()) {
+            killLine(event);
         } else if (key == KeyEvent.VK_BACK_SPACE) {
             backspace(event);
         } else if (key == KeyEvent.VK_DELETE) {
@@ -275,6 +277,12 @@ public class PKeyHandler implements KeyListener {
         if (range.isNonEmpty()) {
             textArea.delete(range.getStart(), range.length());
         }
+    }
+    
+    // Visual Studio Code's ctrl-shift-K to delete the current line can reuse
+    // the ctrl-shift-backspace implementation.
+    private void killLine(KeyEvent e) {
+        backspace(e);
     }
     
     private Range determineRangeToRemove(KeyEvent e) {
