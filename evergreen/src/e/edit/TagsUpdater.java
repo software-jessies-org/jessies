@@ -12,7 +12,6 @@ import java.util.regex.*;
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.tree.*;
-import org.jdesktop.swingworker.SwingWorker;
 
 public class TagsUpdater {
     private static final ExecutorService executorService = ThreadUtilities.newSingleThreadExecutor("Tags Updater");
@@ -24,7 +23,7 @@ public class TagsUpdater {
     private static int latestSerialNumber = 0;
 
     private ETree tree;
-    private JScrollPane uiPanel;
+    private JScrollPane scrollPane;
 
     private boolean followCaretChanges;
 
@@ -130,8 +129,9 @@ public class TagsUpdater {
         });
         tree.setFont(UIManager.getFont("TableHeader.font"));
         tree.setCellRenderer(new TagsPanel.TagsTreeRenderer(getTextArea()));
-
-        uiPanel = new JScrollPane(tree);
+        
+        scrollPane = new JScrollPane(tree);
+        ModernScrollBarUI.modernize(scrollPane, UIManager.getColor("Tree.background"));
     }
 
     public ETextWindow getTextWindow() {
@@ -159,7 +159,7 @@ public class TagsUpdater {
     }
 
     public void showTags() {
-        Evergreen.getInstance().getTagsPanel().setTagsTree(uiPanel);
+        Evergreen.getInstance().getTagsPanel().setTagsTree(scrollPane);
     }
 
     /**

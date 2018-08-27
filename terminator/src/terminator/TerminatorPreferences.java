@@ -32,6 +32,11 @@ public class TerminatorPreferences extends Preferences {
     public static final String VISUAL_BELL = "visualBell";
     
     /**
+     * Experimental preference for acting on error links (from compilers).
+     */
+    public static final String ERROR_LINK_CMD = "errorLinkCommand";
+    
+    /**
      * Whether or not the alt key should be meta.
      * If true, you can't use alt as part of your system's input method.
      * If false, you can't comfortably use emacs(1).
@@ -51,6 +56,8 @@ public class TerminatorPreferences extends Preferences {
     private static final Color NEAR_WHITE = new Color(0xeeeeee);
     private static final Color SELECTION_BLUE = new Color(0x1c2bff);
     private static final Color VERY_DARK_BLUE = new Color(0x000045);
+    private static final Color DARK_GREY = new Color(0x2c2c2c);
+    private static final Color LIGHT_GREY = new Color(0xdcdcdc);
     
     @Override protected String getPreferencesFilename() {
         return System.getProperty("org.jessies.terminator.optionsFile");
@@ -73,6 +80,7 @@ public class TerminatorPreferences extends Preferences {
         addPreference("Behavior", VISUAL_BELL, Boolean.TRUE, "Visual bell (as opposed to no bell)");
         addPreference("Behavior", USE_ALT_AS_META, Boolean.FALSE, "Use alt key as meta key (for Emacs)");
         addPreference("Behavior", LOG_TERMINAL_ACTIVITY, Boolean.TRUE, "Log terminal activity in $HOME/.terminator/logs/");
+        addPreference("Behavior", ERROR_LINK_CMD, "", "Error link handling script");
         
         addPreference("Appearance", ANTI_ALIAS, Boolean.TRUE, "Anti-alias text");
         addPreference("Appearance", BLINK_CURSOR, Boolean.TRUE, "Blink cursor");
@@ -98,6 +106,7 @@ public class TerminatorPreferences extends Preferences {
         buttons.add(makePresetButton("White on Black", Color.BLACK, NEAR_WHITE, Color.GREEN, Color.DARK_GRAY));
         buttons.add(makePresetButton("Black on White", Color.WHITE, NEAR_BLACK, Color.BLUE, LIGHT_BLUE));
         buttons.add(makePresetButton("Black on Cream", CREAM, NEAR_BLACK, Color.RED, LIGHT_BLUE));
+        buttons.add(makePresetButton("Dark Theme", DARK_GREY, LIGHT_GREY, Color.GREEN, SELECTION_BLUE));
         ComponentUtilities.tieButtonSizes(buttons);
         
         String description = "Presets:";

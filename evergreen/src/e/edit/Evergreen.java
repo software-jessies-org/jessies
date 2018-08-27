@@ -159,14 +159,6 @@ public class Evergreen {
         return SimpleDialog.askQuestion(getFrame(), title, message, continueTextYes, continueTextNo);
     }
 
-    private void showDocument(String url) {
-        try {
-            BrowserLauncher.openURL(url);
-        } catch (Throwable th) {
-            SimpleDialog.showDetails(getFrame(), "Hyperlink", th);
-        }
-    }
-    
     /**
      * Sees if any of the "path.rewrite" configuration applies to the given filename,
      * and replaces the matching prefix with the appropriate substitution. Returns the
@@ -226,7 +218,7 @@ public class Evergreen {
                 }
             } else {
                 // Everything else is the platform's problem.
-                showDocument(filename);
+                GuiUtilities.openUrl(filename);
                 return null;
             }
         }
@@ -766,7 +758,7 @@ public class Evergreen {
     private void initAboutBox() {
         AboutBox aboutBox = AboutBox.getSharedInstance();
         aboutBox.setWebSiteAddress("https://github.com/software-jessies-org/jessies/wiki/Evergreen");
-        aboutBox.addCopyright("Copyright (C) 1999-2017 software.jessies.org team.");
+        aboutBox.addCopyright("Copyright (C) 1999-2018 software.jessies.org team.");
         aboutBox.addCopyright("All Rights Reserved.");
         aboutBox.setLicense(AboutBox.License.GPL_2_OR_LATER);
     }

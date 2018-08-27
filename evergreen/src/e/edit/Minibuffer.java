@@ -57,6 +57,7 @@ public class Minibuffer extends JPanel implements FocusListener {
         }
     }
     
+    @SuppressWarnings("deprecation") // https://bugs.openjdk.java.net/browse/JDK-8183518
     private void addListeners() {
         textField.getDocument().addDocumentListener(new DocumentAdapter() {
             public void documentChanged() {

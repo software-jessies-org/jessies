@@ -1,9 +1,11 @@
 package e.util;
 
+import e.gui.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
 import java.lang.reflect.*;
+import java.net.URI;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import javax.swing.*;
@@ -12,6 +14,20 @@ import javax.swing.event.*;
 import org.jessies.os.*;
 
 public class GuiUtilities {
+    /**
+     * On FreeBSD and some other systems, Java's Desktop.getDesktop().browse() function doesn't work.
+     * We have a work-around for this, by executing a user-provided command if the function fails.
+     * The following is the help text we show in the error dialog, for when the user can use this
+     * work-around, but has not done so yet.
+     */
+    private static final String WEB_BROWSER_HELP_TEXT = "Java's ability to open URLs on your platform is broken, sorry.\n\n" +
+        "To work around this, please set the environment variable\n" +
+        "'JESSIES_WEB_BROWSER' to the command you wish to run to open web URLs.\n" +
+        "Then restart this application with the environment variable set, and the\n" +
+        "specified command will be run to open URLs, with the URL as argument.\n\n" +
+        "If you use bash, adding the following to your .bashrc file should work:\n" +
+        "export JESSIES_WEB_BROWSER=firefox\n";
+        
     static {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
@@ -26,6 +42,7 @@ public class GuiUtilities {
     private GuiUtilities() {
     }
     
+    @SuppressWarnings("deprecation") // getMenuShortcutKeyMaskEx requires Java 10.
     private static final int defaultKeyStrokeModifier = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
     
     /**
@@ -38,9 +55,6 @@ public class GuiUtilities {
     
     // Used by isFontFixedWidth.
     private static final java.awt.font.FontRenderContext DEFAULT_FONT_RENDER_CONTEXT = new java.awt.font.FontRenderContext(null, false, false);
-    
-    // FIXME: Action.DISPLAYED_MNEMONIC_INDEX_KEY is only available in Java 6.
-    private static final String DISPLAYED_MNEMONIC_INDEX_KEY = "SwingDisplayedMnemonicIndexKey";
     
     private static final int COMPONENT_SPACING = calculateComponentSpacing();
     
@@ -113,9 +127,7 @@ public class GuiUtilities {
         final StringBuilder result = new StringBuilder();
         final int modifiers = keyStroke.getModifiers();
         if (modifiers != 0) {
-            // This uses the appropriate glyphs on Mac OS 10.5 but says things like "meta" on earlier versions.
-            // We could work around that, but 10.6 will be along soon.
-            result.append(KeyEvent.getKeyModifiersText(modifiers));
+            result.append(KeyEvent.getModifiersExText(modifiers));
             if (!GuiUtilities.isMacOs()) {
                 // GTK and Windows both insert a '+' between the modifiers and the key itself.
                 result.append("+");
@@ -135,7 +147,7 @@ public class GuiUtilities {
      * Assumes that you want the platform's default modifier for keyboard equivalents (but see also setDefaultKeyStrokeModifier).
      */
     public static KeyStroke makeKeyStroke(final String key, final boolean shifted) {
-        return makeKeyStrokeWithModifiers(defaultKeyStrokeModifier | (shifted ? InputEvent.SHIFT_MASK : 0), key);
+        return makeKeyStrokeWithModifiers(defaultKeyStrokeModifier | (shifted ? InputEvent.SHIFT_DOWN_MASK : 0), key);
     }
     
     /**
@@ -164,7 +176,7 @@ public class GuiUtilities {
             action.putValue(Action.NAME, name.replaceAll("_", ""));
             if (!GuiUtilities.isMacOs()) {
                 action.putValue(Action.MNEMONIC_KEY, Integer.valueOf(Character.toUpperCase(name.charAt(underscoreIndex + 1))));
-                action.putValue(DISPLAYED_MNEMONIC_INDEX_KEY, underscoreIndex);
+                action.putValue(Action.DISPLAYED_MNEMONIC_INDEX_KEY, underscoreIndex);
             }
         } else {
             action.putValue(Action.NAME, name);
@@ -334,6 +346,24 @@ public class GuiUtilities {
             // doesn't work: $ explorer '/select,C:\Program Files'
             // does work: $ explorer '/select,C:\Program' 'Files'
             ProcessUtilities.spawn(null, ("Explorer /select," + fullPathname).split(" "));
+        }
+    }
+    
+    public static void openUrl(String url) {
+        try {
+            Desktop.getDesktop().browse(new URI(url));
+        } catch (UnsupportedOperationException ex) {
+            String openUrl = System.getenv("JESSIES_WEB_BROWSER");
+            if (openUrl == null) {
+                SimpleDialog.showDetails(null, "Cannot open URL " + url, WEB_BROWSER_HELP_TEXT);
+                return;
+            }
+            ArrayList<String> lines = new ArrayList<String>();
+            if (ProcessUtilities.backQuote(null, new String[] {openUrl, url}, lines, lines) != 0) {
+                SimpleDialog.showAlert(null, "JESSIES_WEB_BROWSER command " + openUrl + " failed:", StringUtilities.join(lines, "\n"));
+            }
+        } catch (Throwable th) {
+            SimpleDialog.showDetails(null, "Problem opening URL", th);
         }
     }
     

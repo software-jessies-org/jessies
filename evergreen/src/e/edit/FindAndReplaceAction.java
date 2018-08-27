@@ -9,7 +9,6 @@ import java.awt.event.*;
 import java.util.concurrent.*;
 import java.util.regex.*;
 import javax.swing.*;
-import org.jdesktop.swingworker.SwingWorker;
 
 /**
  * Opens a find and replace dialog.

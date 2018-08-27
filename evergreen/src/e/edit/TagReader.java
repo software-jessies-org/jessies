@@ -35,7 +35,8 @@ public class TagReader {
     
     private String chooseCtagsBinary() {
         // We don't cache this to give the user a chance to fix things while we're running.
-        for (String candidateCtags : Arrays.asList("ctags-exuberant", "exuberant-ctags", "ectags")) {
+        // exctags is on FreeBSD.
+        for (String candidateCtags : Arrays.asList("ctags-exuberant", "exuberant-ctags", "ectags", "exctags")) {
             if (FileUtilities.findOnPath(candidateCtags) != null) {
                 return candidateCtags;
             }
@@ -69,7 +70,6 @@ public class TagReader {
         for (String error : errors) {
             Log.warn("ctags: " + error);
         }
-        
         return tagsFile;
     }
     
@@ -92,15 +92,13 @@ public class TagReader {
             return "Make";
         } else if (fileType == FileType.RUBY) {
             return "Ruby";
-        } else if (fileType == FileType.PBASIC) {
-            return "Basic";
         } else if (fileType == FileType.PERL) {
             return "Perl";
         } else if (fileType == FileType.PHP) {
             return "PHP";
         } else if (fileType == FileType.PYTHON) {
             return "Python";
-        } else if (fileType == FileType.EMAIL || fileType == FileType.PATCH || fileType == FileType.PLAIN_TEXT || fileType == FileType.PROTO || fileType == FileType.TALC || fileType == FileType.VHDL || fileType == FileType.XML) {
+        } else if (fileType == FileType.EMAIL || fileType == FileType.PATCH || fileType == FileType.PLAIN_TEXT || fileType == FileType.PROTO || fileType == FileType.VHDL || fileType == FileType.XML) {
             return null;
         } else {
             throw new RuntimeException("Don't know what ctags(1) calls \"" + fileType + "\"");

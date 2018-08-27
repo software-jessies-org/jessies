@@ -39,12 +39,14 @@ public class PPatchTextStyler extends PAbstractTextStyler {
     public void initStyleApplicators() {}
     
     public static class PatchHighlight extends PColoredHighlight {
+        public static final String HIGHLIGHTER_NAME = "PatchHighlight";
+        
         public PatchHighlight(PTextArea textArea, int startIndex, int endIndex, Color color) {
             super(textArea, startIndex, endIndex, color);
         }
         
         public String getHighlighterName() {
-            return "PatchHighlight";
+            return HIGHLIGHTER_NAME;
         }
     }
 }

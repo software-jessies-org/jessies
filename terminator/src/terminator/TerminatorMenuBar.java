@@ -110,16 +110,16 @@ public class TerminatorMenuBar extends EMenuBar {
      * Tests whether the given event corresponds to a keyboard equivalent.
      */
     public static boolean isKeyboardEquivalent(KeyEvent event) {
-        // Windows seems to use ALT_MASK|CTRL_MASK instead of ALT_GRAPH_MASK.
+        // Windows seems to use ALT_DOWN_MASK|CTRL_DOWN_MASK instead of ALT_GRAPH_DOWN_MASK.
         // We don't want those events, despite the lax comparison later.
-        final int fakeWindowsAltGraph = InputEvent.ALT_MASK | InputEvent.CTRL_MASK;
-        if ((event.getModifiers() & fakeWindowsAltGraph) == fakeWindowsAltGraph) {
+        final int fakeWindowsAltGraph = InputEvent.ALT_DOWN_MASK | InputEvent.CTRL_DOWN_MASK;
+        if ((event.getModifiersEx() & fakeWindowsAltGraph) == fakeWindowsAltGraph) {
             return false;
         }
         // This comparison is more inclusive than you might expect.
         // If the default modifier is alt, say, we still want to accept alt+shift.
         final int expectedModifiers = defaultKeyStrokeModifiers;
-        return ((event.getModifiers() & expectedModifiers) == expectedModifiers);
+        return ((event.getModifiersEx() & expectedModifiers) == expectedModifiers);
     }
     
     /**
@@ -147,7 +147,7 @@ public class TerminatorMenuBar extends EMenuBar {
     // Semi-duplicated from GuiUtilities so we can apply our custom modifiers if needed.
     // Use the GuiUtilities version for actions that aren't terminal-related, to get the system-wide defaults.
     private static KeyStroke makeShiftedKeyStroke(String key) {
-        return GuiUtilities.makeKeyStrokeWithModifiers(defaultKeyStrokeModifiers | InputEvent.SHIFT_MASK, key);
+        return GuiUtilities.makeKeyStrokeWithModifiers(defaultKeyStrokeModifiers | InputEvent.SHIFT_DOWN_MASK, key);
     }
     
     private static Component getFocusedComponent() {
@@ -617,7 +617,7 @@ public class TerminatorMenuBar extends EMenuBar {
         
         @Override
         public boolean isEnabled() {
-            return super.isEnabled() && getFocusedTerminalPane().getTerminalView().getModel().canViewInactiveBuffer();
+            return super.isEnabled() && getFocusedTerminalPane() != null && getFocusedTerminalPane().getTerminalView().getModel().canViewInactiveBuffer();
         }
     }
     
@@ -653,7 +653,7 @@ public class TerminatorMenuBar extends EMenuBar {
                 // Since the tab tool tip already recommends Firefox-like control-tab/control-shift-tab, let's do the same on the menu.
                 // We use KeyStroke.getKeyStroke directly here because we know exactly what keystrokes we want.
                 // The whole point of this code is to avoid having Terminator's custom modifiers applied.
-                putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.CTRL_MASK | (delta < 0 ? InputEvent.SHIFT_MASK : 0)));
+                putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_TAB, InputEvent.CTRL_DOWN_MASK | (delta < 0 ? InputEvent.SHIFT_DOWN_MASK : 0)));
             } else {
                 // Given the above, why keep advertising these?
                 // 1. We have no manual documenting the alternatives.

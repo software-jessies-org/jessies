@@ -344,7 +344,7 @@ public class FormDialog {
     private void initKeyboardCloseBehavior() {
         closeOnKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false));
         if (GuiUtilities.isMacOs()) {
-            closeOnKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.META_MASK, false));
+            closeOnKeyStroke(KeyStroke.getKeyStroke(KeyEvent.VK_W, InputEvent.META_DOWN_MASK, false));
         }
     }
     

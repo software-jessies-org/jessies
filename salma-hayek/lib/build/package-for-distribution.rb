@@ -64,18 +64,12 @@ def generate_generic_package_description(human_project_name)
     return description
 end
 
-def extract_package_description_from_html()
+def get_package_description()
     description = ""
-    
-    # The first paragraph pulled from our HTML:
-    html_filename = "./www/index.html"
-    if File.exist?(html_filename)
-        html = IO.readlines(html_filename).join("").gsub("\n", " ")
-        if html =~ /<p><strong>(.*?)<\/strong>/
-            description << $1.gsub("&nbsp;", " ")
-        end
+    package_description_filename = "./lib/build/package-description.txt"
+    if File.exist?(package_description_filename)
+        description = IO.readlines(package_description_filename).join("").gsub("\n", " ")
     end
-    
     return description
 end
 
@@ -87,7 +81,7 @@ def generate_debian_package_description(human_project_name)
     description = generate_generic_package_description(human_project_name)
     
     # Then the first paragraph pulled from our HTML:
-    description << "\n " << wrap(extract_package_description_from_html(), 76, "\n ")
+    description << "\n " << wrap(get_package_description(), 76, "\n ")
     
     return description
 end
@@ -385,6 +379,12 @@ if target_os() == "Linux"
             depends << ", " << extra_depends
         end
         
+        # Some programs, like Terminator, are able to "provide" an implementation of a virtual package.
+        provides_filename = "#{project_resource_directory}/lib/build/DEBIAN-control-Provides.txt"
+        if File.exist?(provides_filename)
+            control.puts("Provides: #{IO.readlines(provides_filename).join(", ").gsub("\n", "")}")
+        end
+
         # Pull our build dependencies from a file rather than hard-coding them here.
         # We get build-essential for free.
         # We could also get per-project build dependencies here.
@@ -459,6 +459,14 @@ EOF
             preinst.write(preinstContent)
         }
         system("chmod +x #{tmp_dir}/DEBIAN/preinst")
+
+        postinst_filename = "#{project_resource_directory}/lib/build/DEBIAN-postinst"
+        if File.exist?(postinst_filename)
+            FileUtils.cp(postinst_filename, "#{tmp_dir}/DEBIAN/postinst")
+            system("chmod +x #{tmp_dir}/DEBIAN/postinst")
+        end
+        system("chmod +x #{tmp_dir}/DEBIAN/postinst")
+
         File.open("#{tmp_dir}/DEBIAN/postrm", "w") {
             |postrm|
             postrm.write(postrmContent)
@@ -500,7 +508,7 @@ if target_os() == "SunOS"
         
         pkginfo.puts("PKG=#{sunos_package_name}")
         pkginfo.puts("NAME=#{human_project_name} - #{generate_generic_package_description(human_project_name)}")
-        pkginfo.puts("DESC=#{extract_package_description_from_html()}")
+        pkginfo.puts("DESC=#{get_package_description()}")
         pkginfo.puts("VERSION=#{compressed_version_number}")
         pkginfo.puts("CATEGORY=application")
         pkginfo.puts("VENDOR=https://github.com/software-jessies-org/jessies")

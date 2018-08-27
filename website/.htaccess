@@ -1,3 +1,0 @@
-Options +FollowSymLinks +IncludesNoExec
-RedirectPermanent /Evergreen http://software.jessies.org/evergreen
-AddType application/x-apple-diskimage .dmg

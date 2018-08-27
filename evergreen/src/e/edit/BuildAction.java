@@ -10,6 +10,8 @@ import java.util.*;
  * Implements "Build Project" and "Build and Test Project".
  */
 public class BuildAction extends ETextAction {
+    private static final Map<String, BuildTool> buildTools = initBuildTools();
+    
     private final boolean test;
     
     private boolean building = false;
@@ -24,21 +26,16 @@ public class BuildAction extends ETextAction {
         buildProject();
     }
     
-    public static class BuildTool {
-        // The name of the "makefile" (which may be, say, an Ant "build.xml" file).
-        String makefileName;
-        // The command to build this kind of "makefile".
-        String command;
-        
-        BuildTool(String makefileName, String command) {
-            this.makefileName = makefileName;
-            this.command = command;
-        }
-    }
-    
     // Returns a map from filenames to build tools.
-    private static Map<String, BuildTool> getBuildTools() {
+    private static Map<String, BuildTool> initBuildTools() {
         final HashMap<String, BuildTool> result = new HashMap<String, BuildTool>();
+        result.put("CMakeLists.txt", new BuildTool("CMakeLists.txt", "cmake -GNinja -H. -B.out && ninja -C `realpath .out`"));
+        result.put("Makefile", new BuildTool("Makefile", "make --print-directory"));
+        result.put("build.xml", new BuildTool("build.xml", "ant -emacs -quiet"));
+        // TODO: if you have source that only builds with clang, how do you tell meson that?
+        result.put("meson.build", new BuildTool("meson.build", "if [ ! -d .out ]; then CXX=clang++ meson .out; fi && ninja -C `realpath .out`"));
+        
+        // Any user-defined build tools? TODO: does anyone use this?
         for (Map.Entry<String, String> tool : Parameters.getStrings("build.").entrySet()) {
             final String key = tool.getKey().substring("build.".length());
             result.put(key, new BuildTool(key, tool.getValue()));
@@ -46,31 +43,7 @@ public class BuildAction extends ETextAction {
         return result;
     }
     
-    private void buildProject() {
-        final Workspace workspace = Evergreen.getInstance().getCurrentWorkspace();
-        
-        // Choosing the build tool relies on the focused text window, so do it before we risk popping up dialogs.
-        final BuildTool buildTool = chooseBuildTool();
-        if (buildTool == null) {
-            // FIXME: list supported kinds of build instructions.
-            Evergreen.getInstance().showAlert("Build instructions not found", "No build instructions could be found.");
-            return;
-        }
-        
-        if (building) {
-            // FIXME: work harder to recognize possibly-deliberate duplicate builds (different targets or makefiles, for example).
-            Evergreen.getInstance().showAlert("A target is already being built", "Please wait for the current build to complete before starting another.");
-            return;
-        }
-        final boolean shouldContinue = workspace.prepareForAction("Save before building?", "Some files are currently modified but not saved.");
-        if (shouldContinue == false) {
-            return;
-        }
-        
-        invokeBuildTool(workspace, buildTool);
-    }
-    
-    private static String getMakefileSearchStartDirectory() {
+    private String getMakefileSearchStartDirectory() {
         final ETextWindow focusedTextWindow = getFocusedTextWindow();
         if (focusedTextWindow != null) {
             return focusedTextWindow.getContext();
@@ -79,53 +52,46 @@ public class BuildAction extends ETextAction {
         }
     }
     
-    public static BuildTool chooseBuildTool() {
-        final Map<String, BuildTool> buildTools = getBuildTools();
+    private void buildProject() {
+        // Choosing the build tool relies on the focused text window to tell us
+        // where to start looking, so do it before we risk popping up dialogs.
         File directory = FileUtilities.fileFromString(getMakefileSearchStartDirectory());
-        while (directory != null) {
+        
+        // We search up from the currently-selected source file's directory,
+        // stopping at the first match.
+        for (; directory != null; directory = directory.getParentFile()) {
             for (String filename : directory.list()) {
                 final BuildTool buildTool = buildTools.get(filename);
                 if (buildTool != null) {
-                    buildTool.makefileName = directory.toString() + File.separator + buildTool.makefileName;
-                    return buildTool;
+                    invokeBuildTool(buildTool, directory);
+                    return;
                 }
             }
-            directory = directory.getParentFile();
         }
-        return null;
+        
+        Evergreen.getInstance().showAlert("Build instructions not found", "No " + StringUtilities.join(buildTools.keySet(), "/") + " found.");
     }
     
-    private void invokeBuildTool(Workspace workspace, BuildTool tool) {
-        addTarget(workspace, tool);
-        try {
-            final String directory = FileUtilities.fileFromString(tool.makefileName).getParentFile().toString();
-            final ShellCommand shellCommand = workspace.makeShellCommand(null, directory, tool.command, ToolInputDisposition.NO_INPUT, ToolOutputDisposition.ERRORS_WINDOW);
-            shellCommand.setLaunchRunnable(new Runnable() {
-                public void run() {
-                    building = true;
-                }
-            });
-            shellCommand.setCompletionRunnable(new Runnable() {
-                public void run() {
-                    building = false;
-                }
-            });
-            shellCommand.runCommand();
-        } catch (IOException ex) {
-            Evergreen.getInstance().showAlert("Unable to invoke build tool", "Can't start task (" + ex.getMessage() + ").");
-            Log.warn("Couldn't start \"" + tool.command + "\"", ex);
+    private void invokeBuildTool(BuildTool tool, File directory) {
+        if (building) {
+            // FIXME: work harder to recognize possibly-deliberate duplicate builds (different targets or makefiles, for example).
+            Evergreen.getInstance().showAlert("A target is already being built", "Please wait for the current build to complete before starting another.");
+            return;
         }
-    }
-    
-    private void addTarget(Workspace workspace, BuildTool tool) {
-        // FIXME: it would be good if we better understood what was being specified here. Personally, I mainly pass "-j".
-        final String workspaceTarget = workspace.getBuildTarget();
-        if (workspaceTarget.length() != 0) {
-            tool.command += " " + workspaceTarget;
+        final Workspace workspace = Evergreen.getInstance().getCurrentWorkspace();
+        final boolean shouldContinue = workspace.prepareForAction("Save before building?", "Some files are currently modified but not saved.");
+        if (shouldContinue == false) {
+            return;
         }
-        // FIXME: does this work for Ant?
-        if (test) {
-            tool.command += " test";
-        }
+        
+        tool.invoke(workspace, directory, test, new Runnable() {
+            public void run() {
+                building = true;
+            }
+        }, new Runnable() {
+            public void run() {
+                building = false;
+            }
+        });
     }
 }

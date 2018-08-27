@@ -24,6 +24,8 @@ public final class PatternUtilities {
      */
     public static final Pattern HYPERLINK_PATTERN = Pattern.compile("\\b(https?://[A-Za-z0-9.:-]+[A-Za-z0-9](/~?"+SEARCH_CHARS+"*(\\?"+SEARCH_CHARS+"*)?)?(\\#"+SEARCH_CHARS+"+)?)(?<![),.])");
     
+    public static final Pattern ERROR_PATTERN = Pattern.compile("[/\\w\\d\\._-]+:\\d+(:\\d+)?:");
+    
     @Test private static void testHyperlinkPattern() {
         Assert.matches(HYPERLINK_PATTERN, "pre http://software.jessies.org post", "http://software.jessies.org");
         Assert.matches(HYPERLINK_PATTERN, "pre http://software.jessies.org/ post", "http://software.jessies.org/");

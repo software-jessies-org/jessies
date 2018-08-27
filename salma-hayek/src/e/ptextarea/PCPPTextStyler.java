@@ -26,14 +26,15 @@ public class PCPPTextStyler extends PAbstractLanguageStyler {
     
     public String[] getKeywords() {
         return new String[] {
-            // ISO/IEC JTC1 SC22 WG21 N3290 2.11 table 3:
-            "override",
-            "final",
-            // ISO/IEC JTC1 SC22 WG21 N3290 2.12 table 4:
+            // https://en.cppreference.com/w/cpp/keyword
             "alignas",
             "alignof",
+            "and",
+            "and_eq",
             "asm",
             "auto",
+            "bitand",
+            "bitor",
             "bool",
             "break",
             "case",
@@ -42,6 +43,7 @@ public class PCPPTextStyler extends PAbstractLanguageStyler {
             "char16_t",
             "char32_t",
             "class",
+            "compl",
             "const",
             "constexpr",
             "const_cast",
@@ -59,6 +61,7 @@ public class PCPPTextStyler extends PAbstractLanguageStyler {
             "extern",
             "false",
             "float",
+            "final",
             "for",
             "friend",
             "goto",
@@ -70,8 +73,13 @@ public class PCPPTextStyler extends PAbstractLanguageStyler {
             "namespace",
             "new",
             "noexcept",
+            "not",
+            "not_eq",
             "nullptr",
             "operator",
+            "or",
+            "or_eq",
+            "override",
             "private",
             "protected",
             "public",
@@ -103,16 +111,6 @@ public class PCPPTextStyler extends PAbstractLanguageStyler {
             "volatile",
             "wchar_t",
             "while",
-            // ISO+IEC+14882-1998 2.11 table 4:
-            "and",
-            "and_eq",
-            "bitand",
-            "bitor",
-            "compl",
-            "not",
-            "not_eq",
-            "or",
-            "or_eq",
             "xor",
             "xor_eq",
         };

@@ -79,12 +79,7 @@ public class HtmlPane extends JPanel implements Scrollable {
         if (e instanceof HTMLFrameHyperlinkEvent) {
             ((HTMLDocument) textPane.getDocument()).processHTMLFrameHyperlinkEvent((HTMLFrameHyperlinkEvent) e);
         } else {
-            String url = e.getURL().toString();
-            try {
-                BrowserLauncher.openURL(url);
-            } catch (Throwable th) {
-                SimpleDialog.showDetails(null, "Problem opening URL", th);
-            }
+            GuiUtilities.openUrl(e.getURL().toString());
         }
     }
     

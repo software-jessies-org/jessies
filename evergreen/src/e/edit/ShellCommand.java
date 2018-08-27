@@ -8,7 +8,7 @@ import java.awt.datatransfer.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
-import org.jdesktop.swingworker.SwingWorker;
+import javax.swing.*;
 
 public class ShellCommand {
     private final PTextArea textArea;
@@ -63,16 +63,6 @@ public class ShellCommand {
         process = makeProcessBuilder().start();
 
         EventQueue.invokeLater(launchRunnable);
-        
-        // This causes ugly flickering if the window's already on the top of the stack, but it fixes the problem on small screens where your main window covers your build window and you don't remember/want to close the build window before you start editing.
-        // As usual, we can't use toFront because the GNOME morons (okay, well-intentioned fascists, but aren't fascists always well-intentioned in their own minds?) broke it for us, and Sun hasn't worked around the breakage.
-        // I don't know of any way to test whether we're already on top.
-        // FIXME: this isn't relevant at the moment, because each build gets a new EErrorsWindow.
-        //errorsWindow.setVisible(false);
-        if (outputDisposition == ToolOutputDisposition.ERRORS_WINDOW) {
-            // We might get fewer useless windows if we don't display them until they've something to say.
-            //errorsWindow.setVisible(true);
-        }
         
         errorsWindow.showStatus("Started task \"" + command + "\"");
         errorsWindow.taskDidStart(process);

@@ -20,7 +20,7 @@ public class HorizontalScrollWheelListener implements MouseWheelListener {
             return;
         }
         
-        if ((e.getModifiers() & InputEvent.SHIFT_MASK) != 0) {
+        if ((e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0) {
             if (e.getWheelRotation() == 0) {
                 return;
             }

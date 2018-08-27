@@ -131,7 +131,8 @@ class Java
     @class_name = class_name
     @log_filename = ""
     @initiate_startup_notification = true
-
+    @java_version = 0
+    
     # The 'realpath' calls are to cope with symbolic links to the launch
     # script and this script.
     # We look at the PROJECT_ROOT environment variable first so that we can
@@ -151,7 +152,6 @@ class Java
     @extra_java_arguments = []
     @extra_app_arguments = []
 
-    init_default_heap_size()
     init_default_class_path()
     # We don't know the JVM's architecture at this point.
     # We've seen a number of systems which run an i386 JVM on an amd64 kernel.
@@ -200,15 +200,16 @@ class Java
     return java_version
   end
 
-  def is_java_new_enough(java_version)
-    return java_version.sub(/^1\./, "").match(/^(\d+)/) && $1.to_i() >= 6
-  end
-
   def check_java_version()
-    actual_java_version = get_java_version(@launcher)
-    if is_java_new_enough(actual_java_version)
+    java_version_string = get_java_version(@launcher)
+    if java_version_string.sub(/^1\./, "").match(/^(\d+)/)
+      @java_version = $1.to_i()
+    end
+    
+    if @java_version >= 6
       return
     end
+    
     # The "java" on the path was no good.
     # Can we salvage the situation by finding a suitable JVM?
     
@@ -290,20 +291,6 @@ class Java
     end
   end
   
-  def init_default_heap_size()
-    # Default heap size.
-    # FIXME: I suspect that our users with 1 GiB Linux boxes would have more responsive machines with a lower setting.
-    # Portably determining how much RAM we have is a game.
-    # sysctl hw.usermem on Mac OS
-    # cat /proc/meminfo on Linux and Cygwin
-    # sysconf(_SC_PHYS_PAGES) * sysconf(_SC_PAGESIZE) on Solaris?
-    @heap_size = "1g"
-    if target_os() == "Cygwin"
-      # 512m makes vmxp-martind issue JVM aborted even during javahpp.
-      @heap_size = "256m"
-    end
-  end
-
   def init_default_class_path()
     # Users need the classes.jar, but developers need the two directories.
     # This speeds things up for the users at the expense to the developers of the time it takes the JVM to check for the non-existent classes.jar, which shouldn't be a problem.
@@ -376,7 +363,11 @@ class Java
 
     # check_java_version may alter @launcher to get us something that works.
     args = [ @launcher ]
-
+    
+    if @java_version >= 9
+      args << "--illegal-access=debug"
+    end
+    
     add_pathnames_property("java.class.path", @class_path)
     
     # Fix the path so that cygwin1.dll is on it.
@@ -410,8 +401,6 @@ class Java
     
     add_property("e.util.Log.applicationName", @app_name)
 
-    args << "-Xmx#{@heap_size}"
-
     if target_os() == "Darwin"
       args << "-Xdock:name=#{@app_name}"
       args << "-Xdock:icon=#{@mac_dock_icon}"
@@ -433,7 +422,7 @@ class Java
     
     # Work around Sun bug 6274341.
     add_property("java.awt.Window.locationByPlatform", "true")
-    # Work around the Metal LAF's ugliness. Not needed in Java 6?
+    # Work around the Metal LAF's ugliness.
     add_property("swing.boldMetal", "false")
     # Work around Sun bug 6961306, which has inconvenienced at least two of our Windows users.
     # Correctness trumps what I presume is a performance optimization.
@@ -455,11 +444,6 @@ class Java
     #export _JAVA_OPTIONS='-Dsun.java2d.opengl=true'
     #add_property("sun.java2d.opengl", "true")
     
-    if @class_name != "e/tools/JavaHpp"
-      #args << "-verbose:class"
-      #args << "-verbose:gc"
-      #args << "-verbose:jni"
-    end
     args.concat(@extra_java_arguments)
     args << @class_name
     args.concat(@extra_app_arguments)

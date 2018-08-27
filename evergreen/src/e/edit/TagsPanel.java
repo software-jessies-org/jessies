@@ -116,7 +116,10 @@ public class TagsPanel extends JPanel {
                     setForeground(tag.visibilityColor() == TagReader.Tag.PRIVATE ? Color.GRAY : Color.BLACK);
                 }
                 
-                Font font = ChangeFontAction.getConfiguredFont();
+                Preferences preferences = Evergreen.getInstance().getPreferences();
+                boolean fixed = preferences.getBoolean(EvergreenPreferences.ALWAYS_USE_FIXED_FONT);
+                Font font = fixed ? preferences.getFont(EvergreenPreferences.FIXED_FONT)
+                                  : preferences.getFont(EvergreenPreferences.PROPORTIONAL_FONT);
                 if (tag.isStatic && tag.visibilityColor() != TagReader.Tag.PRIVATE) {
                     font = font.deriveFont(Font.BOLD);
                 }

@@ -9,7 +9,6 @@ import java.io.*;
 import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
-import org.jdesktop.swingworker.SwingWorker;
 import terminator.view.*;
 
 /**
@@ -41,6 +40,7 @@ public class CommandDialog {
         form.getFormDialog().setShouldRestoreFocus(false);
     }
     
+    @SuppressWarnings("deprecation") // getSelectedValueList requires Java 7.
     private void initHistoryList() {
         historyList = new JList();
         historyList.setCellRenderer(new EListCellRenderer(true));

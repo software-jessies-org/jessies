@@ -151,8 +151,8 @@ public class SimpleDialog {
         pane.setInitialValue(options[0]);
         JDialog dialog = pane.createDialog(owner, title);
         
-        // FIXME: requires Java 6. We may need to let the user choose other modalities.
-        //dialog.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
+        // FIXME: we may need to let the user choose other modalities.
+        dialog.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
         
         dialog.setVisible(true);
         dialog.dispose();

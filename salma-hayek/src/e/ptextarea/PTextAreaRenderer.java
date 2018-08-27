@@ -8,9 +8,6 @@ import javax.swing.*;
 final class PTextAreaRenderer {
     private static final Stopwatch paintStopwatch = Stopwatch.get("PTextAreaRenderer.render");
     
-    private static final Color MARGIN_BOUNDARY_COLOR = new Color(0.93f, 0.93f, 0.93f);
-    private static final Color MARGIN_OUTSIDE_COLOR = new Color(0.97f, 0.97f, 0.97f);
-    
     // Used to get help us match the native UI when we're disabled.
     private static final JLabel disabledLabel;
     static {
@@ -124,9 +121,9 @@ final class PTextAreaRenderer {
         int rightHandMarginColumn = textArea.getRightHandMarginColumn();
         if (rightHandMarginColumn != PTextArea.NO_MARGIN) {
             int offset = plainFontMetrics.stringWidth("n") * rightHandMarginColumn + textArea.getInsets().left;
-            g.setColor(MARGIN_BOUNDARY_COLOR);
+            g.setColor(PTextArea.MARGIN_BOUNDARY_COLOR);
             g.drawLine(offset, bounds.y, offset, bounds.y + bounds.height);
-            g.setColor(MARGIN_OUTSIDE_COLOR);
+            g.setColor(PTextArea.MARGIN_OUTSIDE_COLOR);
             g.fillRect(offset + 1, bounds.y, bounds.x + bounds.width - offset - 1, bounds.height);
             whiteBackgroundWidth = (offset - bounds.x);
         }

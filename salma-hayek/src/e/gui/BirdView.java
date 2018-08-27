@@ -24,8 +24,6 @@ public class BirdView extends JComponent {
     private BirdsEye birdsEye;
     private JScrollBar scrollBar;
 
-    private Method method;
-
     private BitSet matchingLines = new BitSet();
     
     private int nearestLineToMouseInBirdView = -1;
@@ -38,12 +36,6 @@ public class BirdView extends JComponent {
     public BirdView(BirdsEye birdsEye, JScrollBar scrollBar) {
         this.birdsEye = birdsEye;
         this.scrollBar = scrollBar;
-        try {
-            method = BasicScrollBarUI.class.getDeclaredMethod("getTrackBounds");
-            method.setAccessible(true);
-        } catch (Exception ex) {
-            Log.warn("Couldn't get access to getTrackBounds", ex);
-        }
         initMouseListener();
         initScrollBarMotionListener();
     }
@@ -124,17 +116,10 @@ public class BirdView extends JComponent {
     public Rectangle getUsableArea() {
         Rectangle usableArea = new Rectangle(0, 0, getWidth() - 1, getHeight() - 1);
         ScrollBarUI scrollUi = scrollBar.getUI();
-        if (method != null && scrollUi instanceof BasicScrollBarUI) {
-            BasicScrollBarUI basicUi = (BasicScrollBarUI) scrollUi;
-            try {
-                Rectangle trackArea = (Rectangle) method.invoke(basicUi, new Object[0]);
-                JScrollPane pane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, scrollBar);
-                usableArea.y = trackArea.y + pane.getInsets().top;
-                usableArea.height = trackArea.height;
-            } catch (Exception ex) {
-                Log.warn("Couldn't invoke getTrackBounds; won't try again", ex);
-                method = null;
-            }
+        if (scrollUi instanceof ModernScrollBarUI) {
+            JScrollPane pane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, scrollBar);
+            usableArea.y = pane.getInsets().top;
+            usableArea.height = scrollBar.getHeight();
         } else if (GuiUtilities.isMacOs()) {
             // These values were measured using Pixie. I don't know how to get them at run-time.
             usableArea.y += 10;
@@ -151,6 +136,10 @@ public class BirdView extends JComponent {
     }
 
     public void paintComponent(Graphics g) {
+        ScrollBarUI scrollUi = scrollBar.getUI();
+        if (scrollUi instanceof ModernScrollBarUI) {
+            g.setColor(((ModernScrollBarUI) scrollUi).getTrackColor());
+        }
         if (GuiUtilities.isMacOs()) {
             // Mac OS' Panel.background describes itself as "apple.laf.CColorPaintUIResource[r=200,g=200,b=200]".
             // Unfortunately, this doesn't appear to be a color meant for use by normal Java code, and is presumably a tag for native code.

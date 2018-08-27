@@ -22,6 +22,7 @@ class Evergreen
     
     def help()
         puts("usage: evergreen [--block] FILE[:LINE]")
+        puts("       evergreen DIR")
         puts("       evergreen --new-workspace DIR [NAME]")
         puts("       evergreen --close-workspace NAME")
         exit(1)
@@ -102,7 +103,13 @@ class Evergreen
         # If we were given a filename, try to open it in an already-running instance.
         filename = ARGV[0]
         if filename != nil
-            exit(send_command(client, "#{shouldBlock ? 'openAndBlock' : 'open'} #{File.expand_path(filename)}"))
+            if File.directory?(filename)
+                workspace_root = Pathname.new(filename).realpath()
+                workspace_name = workspace_root.basename()
+                exit(send_command(client, "newWorkspace #{File.expand_path(workspace_root)}\t#{workspace_name}"))
+            else
+                exit(send_command(client, "#{shouldBlock ? 'openAndBlock' : 'open'} #{File.expand_path(filename)}"))
+            end
         end
         
         invoker = Java.new("Evergreen", "e/edit/Evergreen")

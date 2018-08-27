@@ -67,8 +67,9 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         this.watermarkViewPort = new WatermarkViewPort();
         watermarkViewPort.setView(textArea);
         
-        this.scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        this.scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setViewport(watermarkViewPort);
+        scrollPane.getVerticalScrollBar().setUI(new ModernScrollBarUI(PTextArea.MARGIN_OUTSIDE_COLOR));
         
         this.lineNumbers = new PLineNumberPanel(textArea);
         
@@ -251,6 +252,10 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         return birdView;
     }
     
+    public File getFile() {
+        return file;
+    }
+    
     public String getFilename() {
         return filename;
     }
@@ -401,7 +406,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         
         // We reverse the from/to order because we want reverse patches.
         final String title = verb;
-        return SimplePatchDialog.showPatchBetween(Evergreen.getInstance().getFrame(), ChangeFontAction.getConfiguredFixedFont(), title, question, verb, to, from);
+        return PatchDialog.showPatchBetween(Evergreen.getInstance().getFrame(), ChangeFontAction.getConfiguredFixedFont(), title, question, verb, to, from);
     }
     
     public boolean canRevertToSaved() {
@@ -695,32 +700,38 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     }
     
     private void writeToFile(File file) {
-        // Only Java has newline hygiene as part of its language specification, but it probably applies to most computer languages.
-        // For now, though, we let authors of plain text do what they like.
         if (getFileType() != FileType.PLAIN_TEXT) {
-            // Remember what was selected/where the caret was.
-            final int selectionStart = textArea.getSelectionStart();
-            final int selectionEnd = textArea.getSelectionEnd();
-            
-            ensureBufferDoesNotEndInMultipleNewlines();
-            ensureBufferEndsInSingleNewline();
-            
-            // Restore the selection/caret as well as we can.
-            final int maxCaretIndex = textArea.getTextBuffer().length();
-            textArea.select(Math.min(maxCaretIndex, selectionStart), Math.min(maxCaretIndex, selectionEnd));
-            
-            // Trim any trailing whitespace, if configured to do so.
-            // This code can do a perfect job of maintaining the selection, so it comes outside the cruder code above.
-            trimTrailingWhitespace();
+            if (Evergreen.getInstance().getPreferences().getBoolean(EvergreenPreferences.REFORMAT_ON_SAVE)) {
+                ReformatFileAction.reformat(this);
+            } else {
+                doBasicFormattingFixes();
+            }
         }
-        
         textArea.getTextBuffer().writeToFile(file);
     }
     
-    private void trimTrailingWhitespace() {
-        if (Evergreen.getInstance().getPreferences().getBoolean(EvergreenPreferences.TRIM_TRAILING_WHITESPACE) == false) {
-            return;
+    private void doBasicFormattingFixes() {
+        // Remember what was selected/where the caret was.
+        final int selectionStart = textArea.getSelectionStart();
+        final int selectionEnd = textArea.getSelectionEnd();
+        
+        // Only Java has newline hygiene as part of its language specification,
+        // but it's probably desirable for most computer languages.
+        ensureBufferDoesNotEndInMultipleNewlines();
+        ensureBufferEndsInSingleNewline();
+        
+        // Restore the selection/caret as well as we can.
+        final int maxCaretIndex = textArea.getTextBuffer().length();
+        textArea.select(Math.min(maxCaretIndex, selectionStart), Math.min(maxCaretIndex, selectionEnd));
+        
+        // Trim any trailing whitespace, if configured to do so.
+        // This code can do a perfect job of maintaining the selection, so it comes outside the cruder code above.
+        if (Evergreen.getInstance().getPreferences().getBoolean(EvergreenPreferences.TRIM_TRAILING_WHITESPACE)) {
+            trimTrailingWhitespace();
         }
+    }
+    
+    private void trimTrailingWhitespace() {
         PTextBuffer buffer = textArea.getTextBuffer();
         Pattern trailingWhitespacePattern = Pattern.compile("([ \t]+)$", Pattern.MULTILINE);
         if (trailingWhitespacePattern.matcher(buffer).find()) {

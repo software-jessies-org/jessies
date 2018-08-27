@@ -20,6 +20,8 @@ public class PCTextStyler extends PAbstractLanguageStyler {
     
     public String[] getKeywords() {
         return new String[] {
+            // https://en.cppreference.com/w/c/keyword
+            "asm",
             "auto",
             "break",
             "case",
@@ -36,12 +38,15 @@ public class PCTextStyler extends PAbstractLanguageStyler {
             "for",
             "goto",
             "if",
+            "inline",
             "int",
             "long",
             "register",
+            "restrict",
             "return",
             "short",
             "signed",
+            "sizeof",
             "static",
             "struct",
             "switch",
@@ -50,7 +55,18 @@ public class PCTextStyler extends PAbstractLanguageStyler {
             "unsigned",
             "void",
             "volatile",
-            "while"
+            "while",
+            "_Alignas",
+            "_Alignof",
+            "_Atomic",
+            "_Bool",
+            "_Complex",
+            "_Generic",
+            "_Imaginary",
+            "_Noreturn",
+            "_Pragma",
+            "_Static_assert",
+            "_Thread_local",
         };
     }
 }

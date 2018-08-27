@@ -15,7 +15,6 @@ import javax.swing.event.*;
 import javax.swing.tree.*;
 
 import java.util.List;
-import org.jdesktop.swingworker.SwingWorker;
 
 public class FindInFilesDialog implements WorkspaceFileList.Listener {
     /** How our worker threads know whether they're still relevant. */
@@ -448,7 +447,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         // Set a custom cell renderer, and tell the tree that all cells have the same height to improve performance.
         matchView.setCellRenderer(new MatchTreeCellRenderer());
         TreeCellRenderer renderer = matchView.getCellRenderer();
-        JComponent rendererComponent = (JComponent) renderer.getTreeCellRendererComponent(matchView, new DefaultMutableTreeNode("Hello"), true, true, true, 0, true);
+        JComponent rendererComponent = (JComponent) renderer.getTreeCellRendererComponent(matchView, new DefaultMutableTreeNode(new MatchingLine("Hello", null, null)), true, true, true, 0, true);
         matchView.setRowHeight(rendererComponent.getPreferredSize().height);
         matchView.setLargeModel(true);
         
@@ -489,7 +488,8 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
     }
     
     public static class MatchTreeCellRenderer extends DefaultTreeCellRenderer {
-        private Font defaultFont = null;
+        private Font defaultFileFont = null;
+        private Font defaultCodeFont = null;
         
         public MatchTreeCellRenderer() {
             setClosedIcon(null);
@@ -502,10 +502,16 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
             
             // Unlike the foreground Color, the Font gets remembered, so we
             // need to manually revert it each time.
-            if (defaultFont == null) {
-                defaultFont = ChangeFontAction.getConfiguredFont();
+            if (defaultCodeFont == null) {
+                Preferences preferences = Evergreen.getInstance().getPreferences();
+                boolean fixed = preferences.getBoolean(EvergreenPreferences.ALWAYS_USE_FIXED_FONT);
+                defaultCodeFont = fixed ? preferences.getFont(EvergreenPreferences.FIXED_FONT)
+                                        : preferences.getFont(EvergreenPreferences.PROPORTIONAL_FONT);
             }
-            c.setFont(defaultFont);
+            if (defaultFileFont == null) {
+                Preferences preferences = Evergreen.getInstance().getPreferences();
+                defaultFileFont = preferences.getFont(EvergreenPreferences.PROPORTIONAL_FONT);
+            }
             
             // Work around JLabel's tab-rendering stupidity.
             String text = getText();
@@ -514,6 +520,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
             }
             
             DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+            c.setFont((node.getUserObject() instanceof MatchingLine) ? defaultCodeFont : defaultFileFont);
             if (node.getUserObject() instanceof MatchingFile) {
                 MatchingFile file = (MatchingFile) node.getUserObject();
                 if (file.containsDefinition()) {

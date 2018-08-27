@@ -247,8 +247,7 @@ public class FileUtilities {
         String[] directories = path.split(File.pathSeparator);
         for (String directory : directories) {
             File file = fileFromParentAndString(directory, executableName);
-            if (file.exists()) {
-                // FIXME: in Java 6, check for executable permission too.
+            if (file.exists() && file.canExecute()) {
                 return file;
             }
         }
@@ -429,12 +428,15 @@ public class FileUtilities {
         return binaryName;
     }
     
+    public static String findSupportScript(String script) {
+        return System.getProperty("org.jessies.supportRoot") + File.separator + "lib" + File.separator + "scripts" + File.separator + script;
+    }
+    
     public static File findSupportBinary(String binaryName) {
         String fileName = mapBinaryName(binaryName);
         String directory = System.getProperty("org.jessies.binaryDirectory");
         File path = new File(directory, fileName);
-        if (path.exists()) {
-            // FIXME: in Java 6, check for executable permission too.
+        if (path.exists() && path.canExecute()) {
             return path;
         }
         return null;

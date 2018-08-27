@@ -24,11 +24,7 @@ public class WebLinkAction extends AbstractAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        try {
-            BrowserLauncher.openURL(url);
-        } catch (IOException ex) {
-            SimpleDialog.showDetails(null, (String) getValue(NAME), ex);
-        }
+        GuiUtilities.openUrl(url);
     }
     
     private static String urlFromFile(File file) {

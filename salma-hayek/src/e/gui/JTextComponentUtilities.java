@@ -39,6 +39,7 @@ public class JTextComponentUtilities {
         textComponent.select(startOffset, endOffset);
     }
     
+    @SuppressWarnings("deprecation") // modelToView2D isn't available until Java 9.
     public static void ensureVisibilityOfOffset(JTextComponent textComponent, int offset) {
         JViewport viewport = (JViewport) SwingUtilities.getAncestorOfClass(JViewport.class, textComponent);
         if (viewport == null) {

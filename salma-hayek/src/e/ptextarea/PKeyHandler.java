@@ -142,7 +142,7 @@ public class PKeyHandler implements KeyListener {
         boolean extendingSelection = event.isShiftDown();
         final int key = extractKeyCode(event);
         if (textArea.isEditable() && key == KeyEvent.VK_TAB) {
-            if (event.getModifiers() != 0) {
+            if (event.getModifiersEx() != 0) {
                 // If any modifiers are down, pass on this event.
                 // Pretty much every modifier+tab combination is used for something by at least one system, and we should keep out of the way.
                 return false;
@@ -170,6 +170,8 @@ public class PKeyHandler implements KeyListener {
             moveLeft(byWord, extendingSelection);
         } else if (key == KeyEvent.VK_RIGHT) {
             moveRight(byWord, extendingSelection);
+        } else if (key == KeyEvent.VK_K && event.isShiftDown() && event.isControlDown()) {
+            killLine(event);
         } else if (key == KeyEvent.VK_BACK_SPACE) {
             backspace(event);
         } else if (key == KeyEvent.VK_DELETE) {
@@ -275,6 +277,12 @@ public class PKeyHandler implements KeyListener {
         if (range.isNonEmpty()) {
             textArea.delete(range.getStart(), range.length());
         }
+    }
+    
+    // Visual Studio Code's ctrl-shift-K to delete the current line can reuse
+    // the ctrl-shift-backspace implementation.
+    private void killLine(KeyEvent e) {
+        backspace(e);
     }
     
     private Range determineRangeToRemove(KeyEvent e) {

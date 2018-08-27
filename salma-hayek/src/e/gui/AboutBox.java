@@ -283,7 +283,7 @@ public class AboutBox {
     
     private static void addLabel(JPanel panel, Font font, String text) {
         // FIXME: Mac OS actually uses selectable text components which is handy for copying & pasting version information.
-        // FIXME: support HTML and automatically install code to change the mouse cursor when hovering over links, and use BrowserLauncher when a link is clicked?
+        // FIXME: support HTML and automatically install code to change the mouse cursor when hovering over links, and use GuiUtilities.openUrl when a link is clicked?
         JLabel label = new JLabel(text);
         label.setFont(font);
         addLabel(panel, label);

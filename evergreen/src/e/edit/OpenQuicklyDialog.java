@@ -8,7 +8,6 @@ import java.awt.event.*;
 import java.util.List;
 import java.util.regex.*;
 import javax.swing.*;
-import org.jdesktop.swingworker.SwingWorker;
 
 /**
  * Improves on Apple Project Builder's "Open Quickly", which just pops up a dialog where you type a name.

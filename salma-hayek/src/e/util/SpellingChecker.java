@@ -67,9 +67,7 @@ public class SpellingChecker {
             out = new PrintWriter(ispell.getOutputStream());
             
             String greeting = in.readLine();
-            if (greeting != null && greeting.startsWith("@(#) International Ispell ")) {
-                Log.warn("SpellingChecker: connected to " + execArguments[0] + " okay: " + greeting + ".");
-            } else {
+            if (greeting == null || greeting.startsWith("@(#) International Ispell ") == false) {
                 throw new IOException("Garbled ispell response: " + greeting);
             }
             out.println("!"); // Set terse mode.

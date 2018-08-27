@@ -22,9 +22,6 @@ public class GnomeStockIcon {
         GTK_ICON_SIZE_DIALOG // 48x48
     }
     
-    // Java 6: this is in Action in Java 6.
-    private static final String LARGE_ICON_KEY = "SwingLargeIconKey";
-    
     private static HashMap<String, String> nameMap;
     private static HashMap<String, Integer> mnemonicMap;
     
@@ -42,7 +39,7 @@ public class GnomeStockIcon {
         }
         Icon buttonIcon = getStockIcon(name, Size.GTK_ICON_SIZE_BUTTON);
         if (buttonIcon != null) {
-            action.putValue(/*Action.*/LARGE_ICON_KEY, buttonIcon);
+            action.putValue(Action.LARGE_ICON_KEY, buttonIcon);
         }
     }
     

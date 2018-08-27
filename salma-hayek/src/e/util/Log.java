@@ -34,7 +34,7 @@ public class Log {
         final String logWriterClassName = System.getProperty("e.util.Log.logWriter");
         try {
             if (logWriterClassName != null) {
-                out = (LogWriter) Class.forName(logWriterClassName).newInstance();
+                out = (LogWriter) Class.forName(logWriterClassName).getDeclaredConstructor().newInstance();
             }
         }
         catch (Exception ex) {
@@ -42,21 +42,36 @@ public class Log {
         }
     }
     
-    private static List<String> banners = Collections.synchronizedList(new ArrayList<String>());
+    private static ArrayList<String> banners = initBanners();
     
-    public static void recordBanner(String message) {
-        banners.add(message);
-    }
-    
-    static {
-        recordBanner(getJavaVersion());
-        recordBanner(getOsVersion());
+    private static ArrayList<String> initBanners() {
+        ArrayList<String> result = new ArrayList<String>();
+        result.add(getJavaVersion());
+        result.add(getOsVersion());
         String launcherOsVersion = System.getProperty("e.util.Log.launcherOsVersion");
         if (launcherOsVersion != null) {
-            recordBanner(launcherOsVersion);
+            result.add(launcherOsVersion);
         }
+        return result;
+    }
+
+    private static void flushBanners() {
+        for (String banner : banners) {
+            out.log(banner, null);
+        }
+        banners.clear();
     }
     
+    public static void recordBanner(String message) {
+        synchronized (banners) {
+            if (banners.isEmpty()) {
+                out.log(message, null);
+            } else {
+                banners.add(message);
+            }
+        }
+    }
+
     public static String getApplicationName() {
         return applicationName;
     }
@@ -97,14 +112,9 @@ public class Log {
         warn(message, null);
     }
 
-    private static boolean needBanner = true;
-
     public static void warn(String message, Throwable th) {
-        if (needBanner) {
-            needBanner = false;
-            for (String banner : banners) {
-                out.log(banner, null);
-            }
+        synchronized (banners) {
+            if (!banners.isEmpty()) flushBanners();
         }
         out.log(message, th);
     }

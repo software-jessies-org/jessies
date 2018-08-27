@@ -87,7 +87,7 @@ public class Terminator {
     private void initAboutBox() {
         AboutBox aboutBox = AboutBox.getSharedInstance();
         aboutBox.setWebSiteAddress("https://github.com/software-jessies-org/jessies/wiki/Terminator");
-        aboutBox.addCopyright("Copyright (C) 2004-2016 software.jessies.org team.");
+        aboutBox.addCopyright("Copyright (C) 2004-2018 software.jessies.org team.");
         aboutBox.addCopyright("All Rights Reserved.");
         aboutBox.setLicense(AboutBox.License.GPL_2_OR_LATER);
     }
@@ -201,9 +201,9 @@ public class Terminator {
         // We can avoid the question on Mac OS for now because disabling input methods doesn't currently work properly, and we don't get the key events anyway.
         if (GuiUtilities.isMacOs() == false) {
             final boolean useAltAsMeta = preferences.getBoolean(TerminatorPreferences.USE_ALT_AS_META);
-            int modifiers = KeyEvent.ALT_MASK;
+            int modifiers = KeyEvent.ALT_DOWN_MASK;
             if (useAltAsMeta) {
-                modifiers = KeyEvent.SHIFT_MASK | KeyEvent.CTRL_MASK;
+                modifiers = KeyEvent.SHIFT_DOWN_MASK | KeyEvent.CTRL_DOWN_MASK;
             }
             TerminatorMenuBar.setDefaultKeyStrokeModifiers(modifiers);
             // When useAltAsMeta is true, we want Alt-F to go to Emacs.
