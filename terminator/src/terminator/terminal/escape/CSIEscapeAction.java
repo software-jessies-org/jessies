@@ -174,6 +174,25 @@ public class CSIEscapeAction implements TerminalAction {
                 case 47:
                     model.useAlternateBuffer(value);
                     break;
+                case 1047:
+                    model.useAlternateBuffer(value);
+                    break;
+                case 1048:
+                    if (value) {
+                        model.saveCursor();
+                    } else {
+                        model.restoreCursor();
+                    }
+                    break;
+                case 1049:
+                    if (value) {
+                        model.saveCursor();
+                        model.useAlternateBuffer(value);
+                    } else {
+                        model.useAlternateBuffer(value);
+                        model.restoreCursor();                        
+                    }
+                    break;
                 case 2004:
                     model.setBracketedPasteMode(value);
                     break;
