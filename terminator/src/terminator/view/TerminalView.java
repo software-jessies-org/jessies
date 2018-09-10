@@ -24,7 +24,15 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
     private boolean displayCursor = true;
     private boolean blinkOn = true;
     private CursorBlinker cursorBlinker;
-
+    private int cursorStyle = 1;
+    private static final int CURSOR_BLINKING_BLOCK = 0;
+    private static final int CURSOR_DEFAULT = 1;
+    private static final int CURSOR_STEADY_BLOCK = 2;
+    private static final int CURSOR_BLINKING_UNDERLINE = 3;
+    private static final int CURSOR_STEADY_UNDERLINE = 4;
+    private static final int CURSOR_BLINKING_BAR = 5;
+    private static final int CURSOR_STEADY_BAR = 6;
+    
     private SelectionHighlighter selectionHighlighter;
     private FindHighlighter findHighlighter;
     private UrlHighlighter urlHighlighter;
@@ -409,14 +417,16 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
         }
     }
     
+    public void setCursorStyle(int style) {
+        if (this.cursorStyle != style) {
+            this.cursorStyle = style;
+            redrawCursorPosition();
+        }
+    }
+    
     public boolean shouldShowCursor() {
         // Showing the cursor at all while viewing the inactive buffer looks silly.
         return displayCursor && !model.viewingInactiveBuffer();
-    }
-    
-    public Color getCursorColor() {
-        // Is this ever called when !blinkOn?
-        return Terminator.getPreferences().getColor(blinkOn ? TerminatorPreferences.CURSOR_COLOR : TerminatorPreferences.BACKGROUND_COLOR);
     }
     
     public void blinkCursor() {
@@ -864,29 +874,40 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
      * the 'off' state.
      */
     private void paintCursor(Graphics2D g, String characterUnderCursor, int baseline) {
-        g.setColor(getCursorColor());
         Rectangle cursorRect = modelToView(cursorPosition);
         final int bottomY = cursorRect.y + cursorRect.height - 1;
         if (isFocusOwner()) {
             TerminatorPreferences preferences = Terminator.getPreferences();
+            
+            // If the style is the default (which is almost always is), work out what that means from the preferences.
+            boolean preferBlink = preferences.getBoolean(TerminatorPreferences.BLINK_CURSOR);
+            int style = cursorStyle;
+            if (style == CURSOR_DEFAULT) {
+                if (preferences.getBoolean(TerminatorPreferences.BLOCK_CURSOR)) {
+                    style = preferBlink ? CURSOR_BLINKING_BLOCK : CURSOR_STEADY_BLOCK;
+                } else {
+                    style = preferBlink ? CURSOR_BLINKING_UNDERLINE : CURSOR_STEADY_UNDERLINE;
+                }
+            }
+            
             // The CursorBlinker may have left blinkOn in either state if the user changed the cursor blink preference.
             // Ignore blinkOn if the cursor shouldn't be blinking right now.
-            boolean cursorIsVisible = (preferences.getBoolean(TerminatorPreferences.BLINK_CURSOR) == false) || blinkOn;
-            if (preferences.getBoolean(TerminatorPreferences.BLOCK_CURSOR)) {
-                // Block.
-                if (cursorIsVisible) {
-                    // Paint over the character underneath.
-                    g.fill(cursorRect);
-                    // Redraw the character in the
-                    // background color.
-                    g.setColor(getBackground());
-                    g.drawString(characterUnderCursor, cursorRect.x, baseline);
-                }
+            boolean cursorIsVisible = ((style == 2 || style == 4 || style == 6)) || blinkOn;
+            if (!cursorIsVisible) return;
+            
+            g.setColor(Terminator.getPreferences().getColor(cursorIsVisible ? TerminatorPreferences.CURSOR_COLOR : TerminatorPreferences.BACKGROUND_COLOR));
+            
+            if (style == CURSOR_STEADY_BLOCK || style == CURSOR_BLINKING_BLOCK) {
+                // Paint over the character underneath.
+                g.fill(cursorRect);
+                // Redraw the character in the background color.
+                g.setColor(getBackground());
+                g.drawString(characterUnderCursor, cursorRect.x, baseline);
+            } else if (style == CURSOR_STEADY_UNDERLINE || style == CURSOR_BLINKING_UNDERLINE) {
+                g.drawLine(cursorRect.x, bottomY, cursorRect.x + cursorRect.width - 1, bottomY);
             } else {
-                // Underline.
-                if (cursorIsVisible) {
-                    g.drawLine(cursorRect.x, bottomY, cursorRect.x + cursorRect.width - 1, bottomY);
-                }
+                // Bar. (xterm takes "bar" quite literally, so we don't draw a caret.)
+                g.fillRect(cursorRect.x, cursorRect.y, 2, cursorRect.height);
             }
         } else {
             // For some reason, terminals always seem to use an

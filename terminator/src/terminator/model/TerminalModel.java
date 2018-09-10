@@ -566,6 +566,10 @@ public class TerminalModel {
         view.setCursorVisible(isDisplayed);
     }
     
+    public void setCursorStyle(int style) {
+        view.setCursorStyle(style);
+    }
+    
     /** Inserts lines at the current cursor position. */
     public void insertLines(int count) {
         for (int i = 0; i < count; i++) {

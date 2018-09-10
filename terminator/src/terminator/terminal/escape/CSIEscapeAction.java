@@ -112,6 +112,15 @@ public class CSIEscapeAction implements TerminalAction {
                 return true;
             }
             break;
+        case 'q':
+            if (sequence.charAt(sequence.length() - 2) == ' ') {
+                int style = Integer.parseInt(sequence.substring(1, sequence.length() - 2));
+                model.setCursorStyle(style);
+                return true;
+            } else {
+                Log.warn("unknown CSI q sequence " + StringUtilities.escapeForJava(sequence));
+            }
+            break;
         case 'r':
             if (midSequence.startsWith("?")) {
                 return restoreDecPrivateModes(midSequence);
