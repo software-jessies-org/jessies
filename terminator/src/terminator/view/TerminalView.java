@@ -915,6 +915,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
             // of what shape they're using for the focused cursor.
             // It's not obvious what else they could do that would
             // look better.
+            g.setColor(Terminator.getPreferences().getColor(TerminatorPreferences.CURSOR_COLOR));
             g.drawRect(cursorRect.x, cursorRect.y, cursorRect.width - 1, cursorRect.height - 1);
         }
     }
