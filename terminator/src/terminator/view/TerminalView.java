@@ -49,10 +49,10 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
     private final ArrayList<Range[]> urlMatches = new ArrayList<Range[]>();
     private final ArrayList<Range[]> findMatches = new ArrayList<Range[]>();
     
-    // If non-null, the row of this is mouseLocation.getLineIndex()
+    // If non-null, the row of this is urlMouseLocation.getLineIndex()
     private Range urlUnderMouse = null;
     // Init line index to 0 so we never need to check if it's a valid line index, but don't have a valid char offset.
-    private Location mouseLocation = new Location(0, -1);
+    private Location urlMouseLocation = new Location(0, -1);
     
     // The following constants define how the 'output truncated' watermark is displayed.
     // Processes running in Terminator can output arbitrary text, and as we don't line-wrap,
@@ -77,39 +77,84 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
         setOpaque(true);
         optionsDidChange();
         addFocusListener(this);
-        addMouseListener(new MouseAdapter() {
-            @Override public void mouseClicked(MouseEvent event) {
-                requestFocus();
-                if (SwingUtilities.isLeftMouseButton(event) && urlUnderMouse != null && event.isControlDown()) {
-                    TextLine line = model.getDisplayTextLine(mouseLocation.getLineIndex());
-                    String url = line.getTabbedString(urlUnderMouse.getStart(), urlUnderMouse.getEnd());
-                    openUrlOrError(url);
+        MouseAdapter mouseAdapter = new MouseAdapter() {
+            // Used to check whether a drag has actually moved to a new character cell.
+            private Location lastLocation;
+            
+            @Override public void mouseClicked(MouseEvent e) {
+                if (model.isMouseTrackingEnabled()) {
+                    // Nothing. Just press and release.
+                } else {
+                    requestFocus();
+                    if (SwingUtilities.isLeftMouseButton(e) && urlUnderMouse != null && e.isControlDown()) {
+                        TextLine line = model.getDisplayTextLine(urlMouseLocation.getLineIndex());
+                        String url = line.getTabbedString(urlUnderMouse.getStart(), urlUnderMouse.getEnd());
+                        openUrlOrError(url);
+                    }
                 }
             }
-        });
-        addMouseMotionListener(new MouseMotionAdapter() {
+            @Override public void mousePressed(MouseEvent e) {
+                if (model.isMouseTrackingEnabled() && e.getButton() < 4) {
+                    terminalControl.sendSGR(e.getButton() - 1, viewToModel(e.getPoint(), true), 'M');
+                    e.consume();
+                }
+            }
+            @Override public void mouseReleased(MouseEvent e) {
+                if (model.isMouseTrackingEnabled() && e.getButton() < 4) {
+                    lastLocation = null;
+                    terminalControl.sendSGR(e.getButton() - 1, viewToModel(e.getPoint(), true), 'm');
+                    e.consume();
+                }
+            }
+            @Override public void mouseDragged(MouseEvent e) {
+                if (model.isCellMotionMouseTrackingEnabled()) {
+                    Location l = viewToModel(e.getPoint(), true);
+                    if (!l.equals(lastLocation)) {
+                        // No button changed, so getButton returns 0 and we need to work it out ourselves.
+                        int button = 0;
+                        int modifiers = e.getModifiersEx();
+                        if ((modifiers & MouseEvent.BUTTON2_DOWN_MASK) != 0) button = 1;
+                        if ((modifiers & MouseEvent.BUTTON3_DOWN_MASK) != 0) button = 2;
+                        terminalControl.sendSGR(32 + button, l, 'M');
+                        lastLocation = l;
+                    }
+                    e.consume();
+                }
+            }
+            
             @Override public void mouseMoved(MouseEvent event) {
                 Location location = viewToModel(event.getPoint());
-                if (location.equals(mouseLocation)) {
+                if (location.equals(urlMouseLocation)) {
                     return;
                 }
                 // Lines to be repainted:
                 // The line the mouse left, if there was a URL
                 // The line the mouse entered, if there is a URL
                 if (urlUnderMouse != null) {
-                    repaintLine(mouseLocation.getLineIndex());
+                    repaintLine(urlMouseLocation.getLineIndex());
                 }
                 urlUnderMouse = getUrlForLocation(location);
-                mouseLocation = location;
+                urlMouseLocation = location;
                 if (urlUnderMouse != null) {
-                    repaintLine(mouseLocation.getLineIndex());
+                    repaintLine(urlMouseLocation.getLineIndex());
                 }
                 // There's a minor problem with setting the cursor in the mouse motion listener: It doesn't change the cursor if a URL is created or destroyed by additional output.
                 // Still, that's a small price to pay.
-                setCursor(urlUnderMouse != null ? Cursor.getPredefinedCursor(Cursor.HAND_CURSOR) : Cursor.getDefaultCursor() );
+                setCursor(urlUnderMouse != null ? Cursor.getPredefinedCursor(Cursor.HAND_CURSOR) : Cursor.getDefaultCursor());
             }
-        });
-        addMouseWheelListener(HorizontalScrollWheelListener.INSTANCE);
+            
+            @Override public void mouseWheelMoved(MouseWheelEvent e) {
+                if (model.isMouseTrackingEnabled()) {
+                    terminalControl.sendSGR(e.getWheelRotation() < 0 ? 64 : 65, viewToModel(e.getPoint(), true), 'M');
+                    e.consume();
+                } else {
+                    HorizontalScrollWheelListener.INSTANCE.mouseWheelMoved(e);
+                }
+            }
+        };
+        addMouseListener(mouseAdapter);
+        addMouseMotionListener(mouseAdapter);
+        addMouseWheelListener(mouseAdapter);
         findHighlighter = new FindHighlighter();
         urlHighlighter = new UrlHighlighter();
         becomeDropTarget();
@@ -517,8 +562,8 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
     
     public void setUrlMatches(int lineIndex, Range[] matches) {
         resizeAndSet(urlMatches, lineIndex, matches);
-        if (lineIndex == mouseLocation.getLineIndex()) {
-            urlUnderMouse = getUrlForLocation(mouseLocation);
+        if (lineIndex == urlMouseLocation.getLineIndex()) {
+            urlUnderMouse = getUrlForLocation(urlMouseLocation);
         }
     }
     
@@ -805,7 +850,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
                 final int length = textLine.length();
                 int urlStart = length;
                 int urlEnd = length;
-                if (urlUnderMouse != null && i == mouseLocation.getLineIndex()) {
+                if (urlUnderMouse != null && i == urlMouseLocation.getLineIndex()) {
                     urlStart = urlUnderMouse.getStart();
                     urlEnd = urlUnderMouse.getEnd();
                 }

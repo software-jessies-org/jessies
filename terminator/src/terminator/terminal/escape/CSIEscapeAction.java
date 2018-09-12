@@ -183,6 +183,12 @@ public class CSIEscapeAction implements TerminalAction {
                 case 47:
                     model.useAlternateBuffer(value);
                     break;
+                case 1002:
+                    model.setCellMotionMouseTracking(value);
+                    break;
+                case 1006:
+                    model.setMouseTracking(value);
+                    break;
                 case 1047:
                     model.useAlternateBuffer(value);
                     break;

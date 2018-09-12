@@ -38,8 +38,11 @@ public class TerminalModel {
     // Are we currently viewing the opposite of the current buffer?
     private boolean viewInactiveScreen;
     
-    private boolean bracketedPasteMode = false;
+    private boolean mouseTracking;
+    private boolean cellMotionMouseTracking;
     
+    private boolean bracketedPasteMode = false;
+        
     // Whether we've already printed a warning about too much input having been chopped.
     // Such a warning is only printed once per terminal, in order to avoid massive input
     // causing massive logging.
@@ -183,6 +186,22 @@ public class TerminalModel {
         int lineIndex = Math.min(location.getLineIndex(), textLines.size() - 1);
         int charOffset = Math.min(location.getCharOffset(), width - 1);
         return new Location(lineIndex, charOffset);
+    }
+    
+    public void setMouseTracking(boolean state) {
+        this.mouseTracking = state;
+    }
+    
+    public boolean isMouseTrackingEnabled() {
+        return mouseTracking;
+    }
+    
+    public void setCellMotionMouseTracking(boolean state) {
+        this.cellMotionMouseTracking = state;
+    }
+    
+    public boolean isCellMotionMouseTrackingEnabled() {
+        return cellMotionMouseTracking;
     }
     
     /** Sets or unsets the use of the alternate buffer. */

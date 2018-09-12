@@ -606,6 +606,10 @@ public class TerminalControl {
         });
     }
     
+    public void sendSGR(int code, Location l, char m) {
+        sendUtf8String(Ascii.ESC + "[<" + code + ";" + (l.getCharOffset() + 1) + ";" + (l.getLineIndex() + 1) + m);
+    }
+    
     private void reportFailedSend(String kind, String value, Exception ex) {
         Log.warn("Couldn't send " + kind + " \"" + StringUtilities.escapeForJava(value) + "\" to " + ptyProcess, ex);
     }
