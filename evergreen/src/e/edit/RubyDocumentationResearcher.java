@@ -5,9 +5,6 @@ import e.ptextarea.*;
 import e.util.*;
 
 public class RubyDocumentationResearcher implements WorkspaceResearcher {
-    public RubyDocumentationResearcher() {
-    }
-    
     public String research(String string) {
         String ri = Advisor.findToolOnPath("ri");
         if (ri == null) {
