@@ -48,7 +48,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
         SpellingChecker.getSharedSpellingCheckerInstance().addSpellingExceptionsFor(FileType.C_PLUS_PLUS, uniqueWords);
 
         final long t1 = System.nanoTime();
-        Log.warn("Learned of " + pageCount + " man pages in " + TimeUtilities.nsToString(t1 - t0) + ".");
+        Log.warn("Learned of " + pageCount + " man pages (" + uniqueWords.size() + " unique words) in " + TimeUtilities.nsToString(t1 - t0) + ".");
     }
 
     private static List<File> findManPageDirectories() {
