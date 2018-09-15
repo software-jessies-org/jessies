@@ -6,28 +6,6 @@ import e.util.*;
 
 public class RubyDocumentationResearcher implements WorkspaceResearcher {
     public RubyDocumentationResearcher() {
-        final long t0 = System.nanoTime();
-        
-        final String listRubyWordsScript = Evergreen.getResourceFilename("lib", "scripts", "list-ruby-words.rb");
-        
-        final ArrayList<String> lines = new ArrayList<String>();
-        final ArrayList<String> errors = new ArrayList<String>();
-        final int status = ProcessUtilities.backQuote(null, new String[] { listRubyWordsScript }, lines, errors);
-        if (status != 0) {
-            return;
-        }
-        final Set<String> uniqueIdentifiers = new TreeSet<String>();
-        for (String line : lines) {
-            uniqueIdentifiers.add(line);
-        }
-        
-        // Prime the spelling checker with all the unique words we found.
-        final Set<String> uniqueWords = new TreeSet<String>();
-        Advisor.extractUniqueWords(uniqueIdentifiers, uniqueWords);
-        SpellingChecker.getSharedSpellingCheckerInstance().addSpellingExceptionsFor(FileType.RUBY, uniqueWords);
-        
-        final long t1 = System.nanoTime();
-        Log.warn("Learned " + uniqueWords.size() + " Ruby words in " + TimeUtilities.nsToString(t1 - t0) + ".");
     }
     
     public String research(String string) {

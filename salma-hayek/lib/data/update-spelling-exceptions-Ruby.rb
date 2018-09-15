@@ -1,8 +1,9 @@
 #!/usr/bin/ruby -w
 
 # Outputs an unsorted list of unique words found in variable, class, and method
-# names via reflection. This is used to seed Evergreen's Ruby spelling
+# names via reflection. This is used to generate Evergreen's Ruby spelling
 # exceptions.
+
 # The assumption is that the Ruby interpreter that's called is the Ruby
 # interpreter you're targeting, or is close enough that you don't care.
 
@@ -53,8 +54,7 @@ Kernel.global_variables.each() {
     end
 }
 
-# We don't bother sorting, because the calling code does that anyway.
-name_list = names.to_a()
+name_list = names.to_a().sort()
 # Drop anything too short to be considered a spelling mistake.
 name_list = name_list.delete_if() { |name| name.size() <= 3 }
 puts(name_list)
