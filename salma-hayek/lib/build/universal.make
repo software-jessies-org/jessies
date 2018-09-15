@@ -767,17 +767,12 @@ FILES_TO_INSTALL += $(CRT_SHARED_LIBRARIES)
 IS_SALMA_HAYEK = $(filter $(SALMA_HAYEK),$(PROJECT_ROOT))
 FILES_TO_INSTALL += $(if $(IS_SALMA_HAYEK),native/Headers/JAVA_MAJOR_VERSION.h)
 
-# Attempting to run 'tic -v1' on the Terminator terminfo file on FreeBSD yields
-# the error:
-#    "lib/terminfo/terminator.tic", line 8, terminal 'terminator': missing sgr string
-# I've been unable to determine what kind of black magic is required to get this
-# working correctly, so for now let's just ignore terminfo for FreeBSD.
-# Anyone using FreeBSD, just install a terminfo/termcap file copied from some
-# other architecture; one copied from Linux works fine on my BSD box.
-ifneq "$(TARGET_OS)" "FreeBSD"
+# We've had some issues in the past with cross-platform compatibility of
+# terminfo. The following two lines can be commented out (or, better, disabled
+# on a per-platform basis) if some incompatibility is found, at least until
+# such a time as the terminfo is fixed.
 BUILD_TARGETS += $(COMPILED_TERMINFO)
 FILES_TO_INSTALL += $(COMPILED_TERMINFO)
-endif
 
 SUBDIRECTORIES_TO_INSTALL += bin
 SUBDIRECTORIES_TO_INSTALL += doc
