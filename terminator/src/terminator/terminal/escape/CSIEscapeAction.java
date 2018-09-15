@@ -183,6 +183,13 @@ public class CSIEscapeAction implements TerminalAction {
                 case 47:
                     model.useAlternateBuffer(value);
                     break;
+                case 1000:
+                    // Old-style (broken for large windows) xterm mouse tracking.
+                    // Unfortunately, xterm ignores 1006 unless you send 1000 ---
+                    // even though vim doesn't think that should be necessary.
+                    // Let's not support the broken 1000 format, but making 1000
+                    // a no-op at least means no warnings in the logs about it.
+                    break;
                 case 1002:
                     model.setCellMotionMouseTracking(value);
                     break;
