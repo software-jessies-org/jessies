@@ -81,6 +81,16 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
             // Used to check whether a drag has actually moved to a new character cell.
             private Location lastLocation;
             
+            private Location mouseLocation(MouseEvent e) {
+                Rectangle viewRect = getViewport().getViewRect();
+                Point p = e.getPoint();
+                Dimension charUnitSize = getCharUnitSize();
+                Insets insets = getInsets();
+                int lineIndex = (p.y - insets.top - viewRect.y) / charUnitSize.height;
+                int charIndex = (p.x - insets.left - viewRect.x) / charUnitSize.width;
+                return new Location(lineIndex, charIndex);
+            }
+            
             @Override public void mouseClicked(MouseEvent e) {
                 if (model.isMouseTrackingEnabled()) {
                     // Nothing. Just press and release.
@@ -95,20 +105,20 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
             }
             @Override public void mousePressed(MouseEvent e) {
                 if (model.isMouseTrackingEnabled() && e.getButton() < 4) {
-                    terminalControl.sendSGR(e.getButton() - 1, viewToModel(e.getPoint(), true), 'M');
+                    terminalControl.sendSGR(e.getButton() - 1, mouseLocation(e), 'M');
                     e.consume();
                 }
             }
             @Override public void mouseReleased(MouseEvent e) {
                 if (model.isMouseTrackingEnabled() && e.getButton() < 4) {
                     lastLocation = null;
-                    terminalControl.sendSGR(e.getButton() - 1, viewToModel(e.getPoint(), true), 'm');
+                    terminalControl.sendSGR(e.getButton() - 1, mouseLocation(e), 'm');
                     e.consume();
                 }
             }
             @Override public void mouseDragged(MouseEvent e) {
                 if (model.isCellMotionMouseTrackingEnabled()) {
-                    Location l = viewToModel(e.getPoint(), true);
+                    Location l = mouseLocation(e);
                     if (!l.equals(lastLocation)) {
                         // No button changed, so getButton returns 0 and we need to work it out ourselves.
                         int button = 0;
@@ -122,8 +132,8 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
                 }
             }
             
-            @Override public void mouseMoved(MouseEvent event) {
-                Location location = viewToModel(event.getPoint());
+            @Override public void mouseMoved(MouseEvent e) {
+                Location location = mouseLocation(e);
                 if (location.equals(urlMouseLocation)) {
                     return;
                 }
@@ -145,7 +155,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
             
             @Override public void mouseWheelMoved(MouseWheelEvent e) {
                 if (model.isMouseTrackingEnabled()) {
-                    terminalControl.sendSGR(e.getWheelRotation() < 0 ? 64 : 65, viewToModel(e.getPoint(), true), 'M');
+                    terminalControl.sendSGR(e.getWheelRotation() < 0 ? 64 : 65, mouseLocation(e), 'M');
                     e.consume();
                 } else {
                     HorizontalScrollWheelListener.INSTANCE.mouseWheelMoved(e);
