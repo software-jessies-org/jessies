@@ -755,9 +755,6 @@ ALL_PER_DIRECTORY_TARGETS = $(error ALL_PER_DIRECTORY_TARGETS evaluated too earl
 
 BUILD_TARGETS += $(if $(JAVA_SOURCE_FILES),$(PROJECT_ROOT)/.generated/java.build-finished)
 BUILD_TARGETS += $(if $(REVISION_CONTROL_SYSTEM_DIRECTORY),.generated/build-revision.txt)
-TIC_SOURCE := $(wildcard lib/terminfo/*.tic)
-# We deliberately omit the intermediate directory.
-COMPILED_TERMINFO = $(patsubst lib/terminfo/%.tic,.generated/terminfo/%,$(TIC_SOURCE))
 BUILD_TARGETS += $(ALL_PER_DIRECTORY_TARGETS)
 BUILD_TARGETS += $(CRT_SHARED_LIBRARIES)
 
@@ -766,6 +763,21 @@ FILES_TO_INSTALL += .generated/build-revision.txt
 FILES_TO_INSTALL += $(CRT_SHARED_LIBRARIES)
 IS_SALMA_HAYEK = $(filter $(SALMA_HAYEK),$(PROJECT_ROOT))
 FILES_TO_INSTALL += $(if $(IS_SALMA_HAYEK),native/Headers/JAVA_MAJOR_VERSION.h)
+
+TIC_SOURCE := $(wildcard lib/terminfo/*.tic)
+# FreeBSD seems to prefer compiling tic in such a way that it outputs the hashed
+# database form of terminfo, while Linux and others generate the plain text
+# versions.
+# TODO: Instead of relying on some arbitrary assumptions about how operating
+# systems are configured, automatically figure out if 'terminfo.db' or the
+# text form has been created, and pick the right one. I'm going to leave that
+# as an exercise to someone who knows Makefile better than I.
+ifneq "$(TARGET_OS)" "FreeBSD"
+# We deliberately omit the intermediate directory.
+COMPILED_TERMINFO = $(patsubst lib/terminfo/%.tic,.generated/terminfo/%,$(TIC_SOURCE))
+else
+COMPILED_TERMINFO = .generated/terminfo.db
+endif
 
 # We've had some issues in the past with cross-platform compatibility of
 # terminfo. The following two lines can be commented out (or, better, disabled
@@ -864,10 +876,22 @@ ChangeLog:
 # With the mv, we both avoid having to cope with Mac OS's broken ncurses library,
 # which thinks that terminator's terminfo belongs in 74/ rather than t/,
 # and avoid having to work out the first letter of the terminal name.
+ifneq "$(TARGET_OS)" "FreeBSD"
 .generated/terminfo/%: lib/terminfo/%.tic
 	mkdir -p $(@D) && \
 	TERMINFO=$(@D) tic -v1 $< && \
 	mv $(@D)/*/$(@F) $@
+else
+# As mentioned above, FreeBSD likes to make a terminfo.db file, which is a
+# hashed binary database, rather than the directory structure preferred by
+# Linux and others.
+# As this is a compiled-in choice, not a run-time command line argument, this
+# is our best option currently (at least within the realms of my Makefile-fu)
+# to support all platforms.
+.generated/terminfo.db: lib/terminfo/*.tic
+	TERMINFO=$(@D) tic -v1 $< && \
+	mv $(@D).db $@
+endif
 
 # ----------------------------------------------------------------------------
 # Redistributables.
