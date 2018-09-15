@@ -36,7 +36,7 @@ public class EscapeParser {
         if (sequence.length() == 1) {
             seqRecognizer = SEQ_RECOGNIZERS.get(ch);
             if (seqRecognizer == null) {
-                Log.warn("Unable to find escape sequence end recognizer for start char \"" + ch + "\"");
+                Log.warn("No SequenceRecognizer for ESC '" + ch + "'");
             }
         }
         isComplete = (seqRecognizer == null) ? true : seqRecognizer.isAtEnd(sequence);
