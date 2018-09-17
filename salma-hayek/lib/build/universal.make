@@ -776,7 +776,11 @@ ifneq "$(TARGET_OS)" "FreeBSD"
 # We deliberately omit the intermediate directory.
 COMPILED_TERMINFO = $(patsubst lib/terminfo/%.tic,.generated/terminfo/%,$(TIC_SOURCE))
 else
-COMPILED_TERMINFO = .generated/terminfo.db
+# This may not be the best way to turn TIC_SOURCE into terminfo.db if there is
+# more than one tic file, as what we presumably want is a many-to-one mapping.
+# However, practically that's never going to happen: all our projects have
+# either 0 or 1 tic file.
+COMPILED_TERMINFO = $(patsubst lib/terminfo/%.tic,.generated/terminfo.db,$(TIC_SOURCE))
 endif
 
 # We've had some issues in the past with cross-platform compatibility of
