@@ -52,12 +52,14 @@ else
             # FIXME: Mac OS 10.5 should give us RubyCocoa. Until then, we need a separate helper executable.
             command = [ "#{salma_hayek}/.generated/#{target_directory()}/bin/NSRunAlertPanel", title, text ]
             system(*command)
-        elsif target_os() == "Linux"
+        elsif target_os() == "Linux" || target_os() == "FreeBSD"
             text = "#{title}\n\n#{message}#{instructions}"
             reported_okay = false
             
             # FIXME: this assumes that a KDE user doesn't have the GNOME zenity(1) installed. Which is probably true.
-            if File.exist?("/usr/bin/zenity")
+            # FIXME: would be nice to check zenity on $PATH, rather than hard-coding the
+            # expected locations on Linux and FreeBSD:
+            if File.exist?("/usr/bin/zenity") || File.exist?("/usr/local/bin/zenity")
                 # Pango will fail to parse something like "undefined local variable or method `logging' for #<Java:0xb7c827bc>":
                 # (zenity:31203): Gtk-WARNING **: Failed to set text from markup due to error parsing markup: Unknown tag 'Java:0xb7c827bc' on line 6 char 1
                 # HTML-escaping the #<> part seems to fix it.
@@ -85,6 +87,10 @@ else
             text = "#{message}#{instructions}"
             require "#{salma_hayek}/lib/User32"
             User32.MessageBox(0, text, title, 0)
+        else
+            # Fallback for all non-explicitly handled OSs.
+            text = "#{title}\n\n#{message}#{instructions}"
+            $stderr.puts(text)
         end
     end
     
