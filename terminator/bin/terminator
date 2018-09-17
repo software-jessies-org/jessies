@@ -48,35 +48,55 @@ class Terminator
         
         # We deliberately omit the intermediate directory.
         compiled_terminfo = "#{@terminator_home}/.generated/terminfo/terminator"
-        
-        # Make sure our terminfo is available system-wide, if possible.
-        
-        # tic(1) might put terminfo into /etc/terminfo/ but the FHS (and hence Debian) says:
-        # "/etc: Host-specific system configuration"
-        # /usr/share/terminfo/ is where the FHS says terminfo should be (though Debian puts architecture-specific terminfo in /lib/terminfo/).
-        # Mac OS doesn't have /etc/terminfo/.
-        # FIXME: if we ever offer a Solaris package, Blastwave's ncurses library looks in /opt/csw/share/terminfo/.
-        # FIXME: since our ".deb" file will be the right place to install system-wide on Debian-based systems, and Mac OS users won't be able to write outside their home directory, we should probably stop trying to install system-wide from here when we're building ".deb" packages.
-        system_wide_terminfo = "/usr/share/terminfo/"
-        if File.writable?(system_wide_terminfo)
-            # We know what kind of system we're on, so we can put the file in the right place and not look clueless.
-            prefix = (target_os() == "Darwin") ? "74" : "t"
-            install_terminfo_in(compiled_terminfo, File.join(system_wide_terminfo, prefix))
-        end
-        
-        # Make sure our terminfo is available for the current user.
+        compiled_terminfo_db = "#{@terminator_home}/.generated/terminfo.db"
         
         # Use the user-defined terminfo directory, or their ~/.terminfo otherwise.
         # We write here even if we can write to #{system_wide_terminfo} in case they can access their home directory from other machines where they can't install system-wide.
+        # user_terminfo_root will be a directory if the system uses the directory-based terminfo system.
+        # Otherwise, if we're relying on the Berkely DB format, '.db' is appended and it'll be a file.
         user_terminfo_root = ENV['TERMINFO']
         if user_terminfo_root == nil
             user_terminfo_root = "#{ENV['HOME']}/.terminfo"
         end
-        # Mac OS won't look where every other OS looks; presumably a %x instead of a %c somewhere.
-        # I think they fixed it at some point, but it seems broken in 10.4 where /usr/share/terminfo/ only contains %x directories.
-        # We always write both possibilities under ~/.terminfo or $TERMINFO for the benefit of people who use Mac OS and other Unixes.
-        install_terminfo_in(compiled_terminfo, File.join(user_terminfo_root, "t"))
-        install_terminfo_in(compiled_terminfo, File.join(user_terminfo_root, "74"))
+        
+        # Depending on how the system compiled tic(1), it will either create a 'terminfo/terminator'
+        # ascii file, or a 'terminfo.db' hashed database. Handle the two cases separately.
+        if File.exist?(compiled_terminfo)
+            # Make sure our terminfo is available system-wide, if possible.
+            
+            # tic(1) might put terminfo into /etc/terminfo/ but the FHS (and hence Debian) says:
+            # "/etc: Host-specific system configuration"
+            # /usr/share/terminfo/ is where the FHS says terminfo should be (though Debian puts architecture-specific terminfo in /lib/terminfo/).
+            # Mac OS doesn't have /etc/terminfo/.
+            # FIXME: if we ever offer a Solaris package, Blastwave's ncurses library looks in /opt/csw/share/terminfo/.
+            # FIXME: since our ".deb" file will be the right place to install system-wide on Debian-based systems, and Mac OS users won't be able to write outside their home directory, we should probably stop trying to install system-wide from here when we're building ".deb" packages.
+            system_wide_terminfo = "/usr/share/terminfo/"
+            if File.writable?(system_wide_terminfo)
+                # We know what kind of system we're on, so we can put the file in the right place and not look clueless.
+                prefix = (target_os() == "Darwin") ? "74" : "t"
+                install_terminfo_in(compiled_terminfo, File.join(system_wide_terminfo, prefix))
+            end
+            
+            # Make sure our terminfo is available for the current user.
+            
+            # Mac OS won't look where every other OS looks; presumably a %x instead of a %c somewhere.
+            # I think they fixed it at some point, but it seems broken in 10.4 where /usr/share/terminfo/ only contains %x directories.
+            # We always write both possibilities under ~/.terminfo or $TERMINFO for the benefit of people who use Mac OS and other Unixes.
+            install_terminfo_in(compiled_terminfo, File.join(user_terminfo_root, "t"))
+            install_terminfo_in(compiled_terminfo, File.join(user_terminfo_root, "74"))
+        end
+        
+        if File.exist?(compiled_terminfo_db)
+            # If we're using the DB form of terminfo (eg FreeBSD), we can't safely install the file, as that may
+            # overwrite any other terminfo things the user might have. Of course, they're likely only
+            # to care about Terminator, but you never know - let's be polite and not splatter everyone
+            # else.
+            # Oh, and on this kind of system we're not going to even go *near* the system-level DB.
+            user_terminfo_db = "#{user_terminfo_root}.db"
+            if !File.exist?(user_terminfo_db) || (File.mtime(user_terminfo_db) < File.mtime(compiled_terminfo_db))
+                show_alert("Terminfo.db needs installation", "There is a newer terminfo.db database for Terminator. Please install it into #{user_terminfo_db}.\nIf you have no user-specific terminfo entries other than Terminator, you can do this by running:\n\n cp #{compiled_terminfo_db} #{user_terminfo_db}\n\nTo make this message go away without taking action, run:\n\n touch #{user_terminfo_db}")
+            end
+        end
         
         selectShellIfNoDefault()
         
