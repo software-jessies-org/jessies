@@ -772,16 +772,10 @@ TIC_SOURCE := $(wildcard lib/terminfo/*.tic)
 # systems are configured, automatically figure out if 'terminfo.db' or the
 # text form has been created, and pick the right one. I'm going to leave that
 # as an exercise to someone who knows Makefile better than I.
-ifneq "$(TARGET_OS)" "FreeBSD"
 # We deliberately omit the intermediate directory.
-COMPILED_TERMINFO = $(patsubst lib/terminfo/%.tic,.generated/terminfo/%,$(TIC_SOURCE))
-else
-# This may not be the best way to turn TIC_SOURCE into terminfo.db if there is
-# more than one tic file, as what we presumably want is a many-to-one mapping.
-# However, practically that's never going to happen: all our projects have
-# either 0 or 1 tic file.
-COMPILED_TERMINFO = $(patsubst lib/terminfo/%.tic,.generated/terminfo.db,$(TIC_SOURCE))
-endif
+COMPILED_TERMINFO.$(TARGET_OS) = $(patsubst lib/terminfo/%.tic,.generated/terminfo/%,$(TIC_SOURCE))
+COMPILED_TERMINFO.FreeBSD = $(if $(TIC_SOURCE),.generated/terminfo.db)
+COMPILED_TERMINFO = $(COMPILED_TERMINFO.$(TARGET_OS))
 
 # We've had some issues in the past with cross-platform compatibility of
 # terminfo. The following two lines can be commented out (or, better, disabled
