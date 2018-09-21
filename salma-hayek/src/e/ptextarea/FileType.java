@@ -54,7 +54,8 @@ public class FileType {
     public static final FileType GO = new FileType("Go",
                  PGoIndenter.class,
                  PGoTextStyler.class,
-                 new String[] { ".go" });
+                 new String[] { ".go" })
+        .setLanguageDefinedIndentation("\t");
     
     public static final FileType JAVA = new FileType("Java",
                  PJavaIndenter.class,
@@ -120,6 +121,7 @@ public class FileType {
     private final Class<? extends PIndenter> indenterClass;
     private final Class<? extends PTextStyler> stylerClass;
     private final String[] extensions;
+    private String languageDefinedIndentation;
     
     private FileType(String name, Class<? extends PIndenter> defaultIndenterClass, Class<? extends PTextStyler> defaultStylerClass, String[] extensions) {
         synchronized (ALL_FILE_TYPES) {
@@ -144,11 +146,26 @@ public class FileType {
         }
     }
     
+    private FileType setLanguageDefinedIndentation(String indent) {
+        languageDefinedIndentation = indent;
+        return this;
+    }
+    
+    // Returns whether this language has a language-defined indentation level (eg go has \t).
+    public boolean hasLanguageDefinedIndentationLevel() {
+        return getLanguageDefinedIndentationLevel() != null;
+    }
+    
+    // Returns the language-defined indentation level if there is one, or null if there is not.
+    public String getLanguageDefinedIndentationLevel() {
+        return languageDefinedIndentation;
+    }
+    
     // Included only for backwards compatibility.  Use the new FileTypePreferences.
     public void configureTextArea(PTextArea textArea) {
         configureTextArea(textArea, preferencesFromFile(""));
     }
-        
+    
     public void configureTextArea(PTextArea textArea, Preferences preferences) {
         if (textArea.getFileType() == this) {
             return;

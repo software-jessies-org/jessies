@@ -3,6 +3,8 @@ package e.util;
 import java.util.*;
 import java.util.regex.*;
 
+import e.ptextarea.*;
+
 /**
  * Tries to guess the depth of indentation ("two spaces", "four spaces",
  * "single tab", et cetera) in use.
@@ -59,7 +61,11 @@ public class IndentationGuesser {
      * Returns the best guess at the indentation in use in the given content.
      * Uses the given "fallback" string if it can't find anything better.
      */
-    public static String guessIndentationFromFile(CharSequence chars, String fallback) {
+    public static String guessIndentationFromFile(String filename, CharSequence chars, String fallback) {
+        FileType type = FileType.guessFileType(filename, chars);
+        if (type.hasLanguageDefinedIndentationLevel()) {
+            return type.getLanguageDefinedIndentationLevel();
+        }
         Stopwatch.Timer timer = stopwatch.start();
         try {
             CharSequence previousIndent = "";
@@ -132,7 +138,7 @@ public class IndentationGuesser {
     
     public static void main(String[] args) {
         for (String filename : args) {
-            System.out.println(filename + ": \"" + guessIndentationFromFile(StringUtilities.readFile(filename), "    ") + "\"");
+            System.out.println(filename + ": \"" + guessIndentationFromFile(filename, StringUtilities.readFile(filename), "    ") + "\"");
         }
     }
 }

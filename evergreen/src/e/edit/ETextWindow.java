@@ -127,7 +127,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         // FIXME: can we fix IndentationGuesser?
         // FIXME: is this common enough a situation to warrant a public preference?
         if (Parameters.getBoolean("indentation.allowGuessing", true)) {
-            indentation = IndentationGuesser.guessIndentationFromFile(content, defaultIndentation);
+            indentation = IndentationGuesser.guessIndentationFromFile(filename, content, defaultIndentation);
         }
         textArea.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, indentation);
     }

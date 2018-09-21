@@ -46,7 +46,7 @@ public class PTextAreaDemo {
         FileType fileType = FileType.guessFileType(filename, content);
         fileType.configureTextArea(textArea);
         
-        textArea.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, IndentationGuesser.guessIndentationFromFile(content, "    "));
+        textArea.getTextBuffer().putProperty(PTextBuffer.INDENTATION_PROPERTY, IndentationGuesser.guessIndentationFromFile(filename, content, "    "));
         
         JScrollPane ui = new JScrollPane(textArea);
         ui.setRowHeaderView(new PLineNumberPanel(textArea));
