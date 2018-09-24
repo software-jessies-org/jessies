@@ -1541,3 +1541,53 @@ zeta
 zetaf
 zetal
 zetta
+# Pre-processor directives.
+elif
+endif
+ifdef
+ifndef
+pragma
+undef
+# Standard C++ library identifiers.
+deque
+ostream
+sstream
+streambuf
+# Standard functions from table 99 "Standard Functions" of ISO+IEC+14882-2003.
+ctime
+wprint
+# Standard headers from table 11 of ISO+IEC+14882-1998.
+deque
+iomanip
+iosfwd
+ostream
+sstream
+stdexcept
+streambuf
+typeinfo
+# Standard headers from table 12 of ISO+IEC+14882-1998.
+cassert
+cctype
+cerrno
+cfloat
+ciso646
+climits
+clocale
+cmath
+csetjmp
+csignal
+cstdarg
+cstddef
+cstdio
+cstdlib
+cstring
+ctime
+cwchar
+cwctype
+# Standard headers from C which are still in common use in C++.
+stdarg
+stddef
+stdint
+stdlib
+# C99's 6.4.2.2 "Predefined identifiers" offers "__func__", but our spelling checker splits words at punctuation, so we have to accept "func" everywhere or nowhere.
+func
