@@ -14,6 +14,9 @@ public abstract class PSimpleIndenter extends PIndenter {
     public final void fixIndentationOnLine(int lineIndex) {
         String originalIndentation = getCurrentIndentationOfLine(lineIndex);
         String replacementIndentation = calculateNewIndentation(lineIndex);
+        if (replacementIndentation == null) {
+            return;
+        }
         String originalLine = textArea.getLineText(lineIndex);
         String replacementLine = replacementIndentation + StringUtilities.trimTrailingWhitespace(originalLine.substring(originalIndentation.length()));
         //Log.warn("originalIndentation=@" + originalIndentation + "@; replacementIndentation=@" + replacementIndentation + "@");
@@ -35,6 +38,7 @@ public abstract class PSimpleIndenter extends PIndenter {
     /**
      * Returns the indentation which should be used for the given line number.
      * Override this in your subclass to define your indenter's policy.
+     * You may return null to indicate that the indentation of the line is already correct.
      */
     protected abstract String calculateNewIndentation(int lineNumber);
     
