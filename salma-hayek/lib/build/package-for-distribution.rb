@@ -378,12 +378,22 @@ if target_os() == "Linux"
             extra_depends = IO.readlines(extra_depends_filename).join(", ").gsub("\n", "")
             depends << ", " << extra_depends
         end
+
+        control.puts("Depends: #{depends}")
         
+        fields = []
         # Some programs, like Terminator, are able to "provide" an implementation of a virtual package.
-        provides_filename = "#{project_resource_directory}/lib/build/DEBIAN-control-Provides.txt"
-        if File.exist?(provides_filename)
-            control.puts("Provides: #{IO.readlines(provides_filename).join(", ").gsub("\n", "")}")
-        end
+        fields << "Provides"
+        # Some programs, like Evergreen, won't be able to install on versions of Debian earlier than Stretch
+        # if they insist on depending on ancillary programs, like clang-format, that they don't absolutely need.
+        fields << "Recommends"
+        fields.each() {
+            |field|
+            field_filename = "#{project_resource_directory}/lib/build/DEBIAN-control-#{field}.txt"
+            if File.exist?(field_filename)
+                control.puts("#{field}: #{IO.readlines(field_filename).join(", ").gsub("\n", "")}")
+            end
+        }
 
         # Pull our build dependencies from a file rather than hard-coding them here.
         # We get build-essential for free.
@@ -400,7 +410,6 @@ if target_os() == "Linux"
         # Build-Depends-Indep would probably then be more correct (and needed to side-step another warning).
         #control.puts("Build-Depends: #{build_depends}")
         
-        control.puts("Depends: #{depends}")
         # Although Replaces would remove the need for user intervention, it would be anti-social
         # both to the conflicting package and to anyone using the Scheme interpreter or pane-oriented terminal.
         # And Conflicts stop us from having the pane-oriented terminal installed too.
