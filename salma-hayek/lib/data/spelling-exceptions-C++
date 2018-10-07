@@ -1259,10 +1259,13 @@ stat
 state
 static
 status
+stdarg
+stddef
 stddev
 stderr
 stdexcept
 stdin
+stdint
 stdio
 stdlib
 stdout

@@ -18,6 +18,8 @@ identifiers = set()
 for man_page in os.listdir('%s/man/' % clone_location):
   identifiers.add(man_page)
 
+# Also pull out all the #include lines so that names of header files aren't
+# spelling mistakes.
 (matches, _) = subprocess.Popen(["grep", "-hr", "#include <",
                                  "%s/man" % clone_location],
                                 stdout=subprocess.PIPE).communicate()
@@ -28,8 +30,12 @@ for line in matches.splitlines():
     if m:
       identifier = m.group(1)
       identifiers.add(identifier)
+      # We can't easily identify C headers (`<chrono>`, isn't `<hrono.h>`), but
+      # we can trivially spot the "std" subset.
+      if identifier.startswith('cstd'):
+        identifiers.add(identifier[1:])
 
-# ...except that some things don't currently (2018-09) get a man page.
+# Some things don't currently (2018-09) get a man page.
 # std::atto/std::femto and friends are mentioned in std::ratio, but don't get
 # their own pages. So for now at least, let's use the cppreference index too.
 
