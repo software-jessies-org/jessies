@@ -2,6 +2,7 @@
 
 import os
 import re
+import subprocess
 import urllib2
 
 # We used to parse the cppreference.com index HTML directly, but that only
@@ -16,6 +17,17 @@ os.system('git clone https://github.com/jeaye/stdman.git %s' % clone_location)
 identifiers = set()
 for man_page in os.listdir('%s/man/' % clone_location):
   identifiers.add(man_page)
+
+(matches, _) = subprocess.Popen(["grep", "-hr", "#include <",
+                                 "%s/man" % clone_location],
+                                stdout=subprocess.PIPE).communicate()
+for line in matches.splitlines():
+  if 'boost' not in line:
+    r = re.compile('#include <([^>]*)>')
+    m = r.search(line)
+    if m:
+      identifier = m.group(1)
+      identifiers.add(identifier)
 
 # ...except that some things don't currently (2018-09) get a man page.
 # std::atto/std::femto and friends are mentioned in std::ratio, but don't get
@@ -39,7 +51,7 @@ for url in urls:
 # Python equivalent of Advisor.extractUniqueWords.
 words = set()
 for identifier in sorted(identifiers):
-  for ch in '~:,.<>()[]*+-_=&!"':
+  for ch in '~:,.<>()[]*+-_=&!"/':
     identifier = identifier.replace(ch, ' ')
   identifier = re.sub(r'([a-z])([A-Z])', '\g<1> \g<2>', identifier)
   identifier = identifier.lower()

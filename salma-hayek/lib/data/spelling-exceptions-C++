@@ -20,6 +20,7 @@ adopt
 advance
 after
 aggregate
+algorithm
 align
 alignas
 aligned
@@ -136,6 +137,7 @@ casinh
 casinhf
 casinhl
 casinl
+cassert
 cast
 catan
 catanf
@@ -156,6 +158,7 @@ ccosh
 ccoshf
 ccoshl
 ccosl
+cctype
 ceil
 ceil2
 ceilf
@@ -163,9 +166,12 @@ ceill
 cend
 centi
 cerr
+cerrno
 cexp
 cexpf
 cexpl
+cfenv
+cfloat
 char
 char16
 char32
@@ -175,12 +181,15 @@ chrono
 cimag
 cimagf
 cimagl
+cinttypes
 clamp
 class
 classic
 classname
 clear
 clearerr
+climits
+clocale
 clock
 clocks
 clog
@@ -188,6 +197,7 @@ clogf
 clogl
 close
 cmatch
+cmath
 cmplx
 cmplxf
 cmplxl
@@ -256,7 +266,9 @@ create
 cref
 cregex
 crend
+csetjmp
 cshift
+csignal
 csin
 csinf
 csinh
@@ -266,6 +278,12 @@ csinl
 csqrt
 csqrtf
 csqrtl
+cstdarg
+cstddef
+cstdint
+cstdio
+cstdlib
+cstring
 csub
 ctan
 ctanf
@@ -275,9 +293,12 @@ ctanhl
 ctanl
 ctime
 ctype
+cuchar
 curr
 current
 cvref
+cwchar
+cwctype
 data
 date
 deallocate
@@ -419,6 +440,7 @@ fast32
 fast64
 fast8
 fclose
+fcntl
 fdim
 fdimf
 fdiml
@@ -507,6 +529,7 @@ fstream
 ftell
 fun1
 function
+functional
 fundamental
 future
 fwide
@@ -610,6 +633,7 @@ invocation
 invoke
 iofbf
 iolbf
+iomanip
 ionbf
 iostate
 iostream
@@ -994,6 +1018,7 @@ projected
 promise
 propagate
 proximate
+pthread
 ptrdiff
 pubimbue
 pubseekoff
@@ -1217,18 +1242,22 @@ squared
 srand
 sregex
 sscanf
+sstream
 ssub
 stable
 stack
 standard
 start
+stat
 state
 static
 status
 stddev
 stderr
+stdexcept
 stdin
 stdio
+stdlib
 stdout
 steady
 stem
@@ -1364,6 +1393,8 @@ tuple
 twister
 type
 typeid
+typeindex
+typeinfo
 u16streampos
 u16string
 u32streampos
@@ -1394,6 +1425,7 @@ uniform
 uninitialized
 union
 unique
+unistd
 unitbuf
 unlock
 unordered
@@ -1412,6 +1444,7 @@ ushort
 ushrt
 utf16
 utf8
+utility
 valarray
 valf
 valid
@@ -1541,42 +1574,3 @@ zeta
 zetaf
 zetal
 zetta
-# Pre-processor directives.
-elif
-endif
-ifdef
-ifndef
-pragma
-undef
-# Standard headers from table 11 of ISO+IEC+14882-1998.
-iomanip
-iosfwd
-sstream
-stdexcept
-typeinfo
-# Standard headers from table 12 of ISO+IEC+14882-1998.
-cassert
-cctype
-cerrno
-cfloat
-ciso646
-climits
-clocale
-cmath
-csetjmp
-csignal
-cstdarg
-cstddef
-cstdio
-cstdlib
-cstring
-ctime
-cwchar
-cwctype
-# Standard headers from C which are still in common use in C++.
-stdarg
-stddef
-stdint
-stdlib
-# C99's 6.4.2.2 "Predefined identifiers" offers "__func__", but our spelling checker splits words at punctuation, so we have to accept "func" everywhere or nowhere.
-func
