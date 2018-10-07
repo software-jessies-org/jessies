@@ -1,5 +1,3 @@
-# Standard headers from table 11 of ISO+IEC+14882-1998.
-iosfwd
 # Standard headers from C which are still in common use in C++.
 stdarg
 stddef

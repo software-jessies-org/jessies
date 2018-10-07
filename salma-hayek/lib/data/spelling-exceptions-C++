@@ -530,6 +530,7 @@ fsetpos
 fstream
 ftell
 fun1
+func
 function
 functional
 fundamental
@@ -639,6 +640,7 @@ iofbf
 iolbf
 iomanip
 ionbf
+iosfwd
 iostate
 iostream
 iota

@@ -51,6 +51,13 @@ for url in urls:
 # There's no great source for the preprocessor, but it hasn't changed in my
 # lifetime, and there are only a few identifiers anyway. Hard-code them:
 identifiers.update(['elif', 'endif', 'ifdef', 'ifndef', 'pragma', 'undef'])
+# Our spelling checker splits words at punctuation (which is perhaps a bad
+# default given some of the weird identifiers in C++ and POSIX), but that
+# means we need to accept "func" everywhere to accept "__func__".
+identifiers.add('func')
+
+# For some reason, <iosfwd> is mentioned nowhere in the man pages.
+identifiers.add('iosfwd')
 
 # Python equivalent of Advisor.extractUniqueWords.
 words = set()
