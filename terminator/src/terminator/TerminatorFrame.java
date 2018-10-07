@@ -20,6 +20,8 @@ public class TerminatorFrame extends JFrame implements TerminalPaneHost {
     
     private final Color originalBackground = getBackground();
     
+    private double alpha = 1.0;
+    
     public TerminatorFrame(List<JTerminalPane> initialTerminalPanes) {
         super("Terminator");
         terminals = new ArrayList<JTerminalPane>(initialTerminalPanes);
@@ -384,7 +386,13 @@ public class TerminatorFrame extends JFrame implements TerminalPaneHost {
     }
     
     private void updateTransparency() {
-        GuiUtilities.setFrameAlpha(this, Terminator.getPreferences().getDouble(TerminatorPreferences.ALPHA));
+        double newAlpha = Terminator.getPreferences().getDouble(TerminatorPreferences.ALPHA);
+        // Avoid spamming those who don't use the feature with "Illegal reflective access" warnings.
+        if (newAlpha == alpha) {
+            return;
+        }
+        alpha = newAlpha;
+        GuiUtilities.setFrameAlpha(this, alpha);
     }
     
     public void optionsDidChange() {

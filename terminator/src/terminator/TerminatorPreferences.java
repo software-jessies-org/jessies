@@ -185,8 +185,6 @@ public class TerminatorPreferences extends Preferences {
                     put(key, ((double) slider.getValue())/slider.getMaximum());
                 }
             });
-            // Only enable the slider if the JVM seems likely to support setFrameAlpha.
-            slider.setEnabled(GuiUtilities.canSetFrameAlpha());
             formPanel.addRow(description + ":", slider);
         }
     }
