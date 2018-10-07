@@ -1555,7 +1555,6 @@ sstream
 streambuf
 # Standard functions from table 99 "Standard Functions" of ISO+IEC+14882-2003.
 ctime
-wprint
 # Standard headers from table 11 of ISO+IEC+14882-1998.
 deque
 iomanip
