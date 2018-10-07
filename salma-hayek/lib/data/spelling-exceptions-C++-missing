@@ -5,19 +5,11 @@ ifdef
 ifndef
 pragma
 undef
-# Standard C++ library identifiers.
-deque
-ostream
-sstream
-streambuf
 # Standard headers from table 11 of ISO+IEC+14882-1998.
-deque
 iomanip
 iosfwd
-ostream
 sstream
 stdexcept
-streambuf
 typeinfo
 # Standard headers from table 12 of ISO+IEC+14882-1998.
 cassert
