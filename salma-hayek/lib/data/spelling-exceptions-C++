@@ -357,6 +357,7 @@ edom
 egptr
 eilseq
 element
+elif
 ellint
 emit
 emplace
@@ -364,6 +365,7 @@ empty
 enable
 encoding
 endian
+endif
 endl
 ends
 engine
@@ -583,6 +585,8 @@ hypotf
 hypotl
 identity
 iec559
+ifdef
+ifndef
 ifstream
 ignore
 ilogb
@@ -967,6 +971,7 @@ positive
 powf
 powl
 pptr
+pragma
 precision
 predicate
 preferred
@@ -1415,6 +1420,7 @@ ulong
 unary
 uncaught
 undeclare
+undef
 underflow
 underlying
 unexpected

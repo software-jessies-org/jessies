@@ -48,6 +48,10 @@ for url in urls:
       identifier = re.sub('\(\)', '', identifier)
       identifiers.add(identifier)
 
+# There's no great source for the preprocessor, but it hasn't changed in my
+# lifetime, and there are only a few identifiers anyway. Hard-code them:
+identifiers.update(['elif', 'endif', 'ifdef', 'ifndef', 'pragma', 'undef'])
+
 # Python equivalent of Advisor.extractUniqueWords.
 words = set()
 for identifier in sorted(identifiers):
