@@ -504,16 +504,7 @@ public class GuiUtilities {
             }
             
             if (isMacOs()) {
-                if (System.getProperty("os.version").startsWith("10.4")) {
-                    Class<?> cWindowClass = Class.forName("apple.awt.CWindow");
-                    if (cWindowClass.isInstance(peer)) {
-                        // ((apple.awt.CWindow) peer).setAlpha(alpha);
-                        Method setAlphaMethod = cWindowClass.getMethod("setAlpha", float.class);
-                        setAlphaMethod.invoke(peer, (float) alpha);
-                    }
-                } else {
-                    frame.getRootPane().putClientProperty("Window.alpha", alpha);
-                }
+                frame.getRootPane().putClientProperty("Window.alpha", alpha);
             } else if (isWindows()) {
                 Log.warn("Sorry, we don't know how to create translucent windows on Windows, given that AWTUtilities.setWindowOpacity failed");
             } else {
