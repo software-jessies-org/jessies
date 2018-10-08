@@ -448,30 +448,6 @@ public class GuiUtilities {
         }
     }
     
-    /**
-     * Guesses whether setFrameAlpha is likely to work.
-     */
-    public static boolean canSetFrameAlpha() {
-        // setFrameAlpha works on any version of Mac OS we can still run on.
-        // setFrameAlpha may or may not work on any given Linux, and we've no good way of knowing.
-        // setFrameAlpha only works on Windows if you're running Java 6 "6u10" (it doesn't even work on Java 7 yet).
-        return isWindows() == false || getAwtUtilitiesSetWindowOpacity() != null;
-    }
-    
-    private static Method getAwtUtilitiesSetWindowOpacity() {
-        // When we require Java 6, we can move this inside setFrameAlpha (and remove the workarounds currently there).
-        // Until then, it's useful as a kind of "feature test" for setFrameAlpha on Windows (via canSetFrameAlpha).
-        try {
-            // This is only available on 6u10 and later (see Sun bug 6633275).
-            // com.sun.awt.AWTUtilities.setWindowOpacity(frame, alpha);
-            final Class<?> awtUtilitiesClass = Class.forName("com.sun.awt.AWTUtilities");
-            return awtUtilitiesClass.getMethod("setWindowOpacity", Window.class, float.class);
-        } catch (Exception ex) {
-            // No setWindowOpacity for you, then. Not unexpected.
-            return null;
-        }
-    }
-    
     public static void setTextAntiAliasing(Graphics2D g, boolean antiAlias) {
         if (!antiAlias) {
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
@@ -497,22 +473,20 @@ public class GuiUtilities {
      * http://elliotth.blogspot.com/2007/08/transparent-java-windows-on-x11.html
      */
     public static void setFrameAlpha(JFrame frame, double alpha) {
-        final Method setWindowOpacityMethod = getAwtUtilitiesSetWindowOpacity();
-        if (setWindowOpacityMethod != null) {
-            try {
-                setWindowOpacityMethod.invoke(null, (Window) frame, (float) alpha);
-                return;
-            } catch (Throwable th) {
-                Throwable cause = th.getCause();
-                if (cause != null && cause instanceof UnsupportedOperationException) {
-                    // We don't want to spam the log just because the system doesn't support transparency.
-                } else if (cause != null && cause instanceof IllegalComponentStateException) {
-                    // We don't want to spam the log just because the system is running Java 7 or later,
-                    // where decorated windows can't be made translucent according to
-                    // http://docs.oracle.com/javase/7/docs/api/java/awt/Window.html#setOpacity%28float%29.
-                } else {
-                    Log.warn("com.sun.awt.AWTUtilities.setWindowOpacity failed.", th);
-                }
+        try {
+            // This is only available on 6u10 and later (see Sun bug 6633275).
+            com.sun.awt.AWTUtilities.setWindowOpacity(frame, (float) alpha);
+            return;
+        } catch (Throwable th) {
+            Throwable cause = th.getCause();
+            if (cause != null && cause instanceof UnsupportedOperationException) {
+                // We don't want to spam the log just because the system doesn't support transparency.
+            } else if (th instanceof IllegalComponentStateException) {
+                // We don't want to spam the log just because the system is running Java 7 or later,
+                // where decorated windows can't be made translucent according to
+                // http://docs.oracle.com/javase/7/docs/api/java/awt/Window.html#setOpacity%28float%29.
+            } else {
+                Log.warn("com.sun.awt.AWTUtilities.setWindowOpacity failed.", th);
             }
         }
         
