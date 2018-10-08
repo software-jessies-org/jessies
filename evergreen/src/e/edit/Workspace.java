@@ -32,12 +32,15 @@ public class Workspace extends JPanel {
     
     private List<Evergreen.InitialFile> initialFiles = Collections.emptyList();
     
+    private boolean alreadyExposed;
+    
     public Workspace(String workspaceName, final String rootDirectory) {
         super(new BorderLayout());
         
+        setWorkspaceName(workspaceName);
+        
         initFileList();
         
-        setWorkspaceName(workspaceName);
         setRootDirectory(rootDirectory);
         setBuildTarget("");
         
@@ -66,6 +69,12 @@ public class Workspace extends JPanel {
     
     public WorkspaceFileList getFileList() {
         return fileList;
+    }
+    
+    public File getFileListCacheFile() {
+        // TODO: we should probably have a standard way of escaping characters for safe use in the paths.
+        String name = getWorkspaceName().replaceAll("[/\\\\]", " ");
+        return FileUtilities.fileFromString(Evergreen.getPreferenceFilename("cached-file-list-" + name));
     }
     
     public void dispose() {
@@ -491,5 +500,13 @@ public class Workspace extends JPanel {
             return;
         }
         environment.put(name, value);
+    }
+    
+    public void handlePossibleFirstExposure() {
+        if (alreadyExposed) return;
+        
+        alreadyExposed = true;
+        getFileList().updateFileList();
+        openRememberedFiles();
     }
 }

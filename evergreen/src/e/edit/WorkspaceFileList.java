@@ -10,19 +10,6 @@ import java.util.regex.*;
 import javax.swing.*;
 
 public class WorkspaceFileList {
-    private static int chooseThreadCount() {
-        // A thread pool for updating the file lists.
-        // One thread per workspace can cause a lot of load during startup, when all workspaces need updating at once.
-        // Indeed, some machines are unusable with more than one thread doing this.
-        // We don't know how to tell them from others that work fine.
-        if (Evergreen.getInstance().getPreferences().getBoolean(EvergreenPreferences.MINIMIZE_INDEXING_IO)) {
-            return 1;
-        }
-        return Runtime.getRuntime().availableProcessors();
-    }
-    
-    private static final ExecutorService fileListUpdateExecutorService = ThreadUtilities.newFixedThreadPool(chooseThreadCount(), "File List Updater");
-    
     private final Workspace workspace;
     private final ArrayList<Listener> listeners = new ArrayList<Listener>();
     
@@ -33,6 +20,13 @@ public class WorkspaceFileList {
     
     public WorkspaceFileList(Workspace workspace) {
         this.workspace = workspace;
+        try {
+            ArrayList<String> result = new ArrayList<String>();
+            result.addAll(Arrays.asList(StringUtilities.readLinesFromFile(workspace.getFileListCacheFile())));
+            fileList = result;
+        } catch (Exception ex) {
+            // Nothing we can do. Probably just didn't exist.
+        }
     }
     
     public void addFileListListener(Listener l) {
@@ -79,7 +73,7 @@ public class WorkspaceFileList {
     
     public void rootDidChange() {
         initFileAlterationMonitorForRoot(workspace.getRootDirectory());
-        updateFileList();
+        if (Evergreen.getInstance().isInitialized()) updateFileList();
     }
     
     /**
@@ -88,8 +82,7 @@ public class WorkspaceFileList {
      * already in progress will be queued behind the in-progress scan.
      */
     public synchronized void updateFileList() {
-        FileListUpdater fileListUpdater = new FileListUpdater();
-        fileListUpdateExecutorService.execute(fileListUpdater);
+        new FileListUpdater().execute();
     }
     
     /**
@@ -172,7 +165,10 @@ public class WorkspaceFileList {
             Evergreen.getInstance().showStatus("Scan of workspace \"" + workspace.getWorkspaceName() + "\" complete (" + result.size() + " files)");
             
             final long t1 = System.nanoTime();
-            Log.warn("Scan of workspace \"" + workspace.getWorkspaceName() + "\" took " + TimeUtilities.nsToString(t1 - t0) + "; found " + result.size() + " files.");
+            StringUtilities.writeFile(workspace.getFileListCacheFile(), result);
+            final long t2 = System.nanoTime();
+            
+            Log.warn("Scan of workspace \"" + workspace.getWorkspaceName() + "\" took " + TimeUtilities.nsToString(t1 - t0) + " (plus " + TimeUtilities.nsToString(t2 - t1) + " to update cache); found " + result.size() + " files.");
             return result;
         }
         

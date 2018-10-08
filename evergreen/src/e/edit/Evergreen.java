@@ -466,6 +466,8 @@ public class Evergreen {
             return;
         }
         
+        workspace.getFileListCacheFile().delete();
+        
         // Removing the workspace from the index stops its windows from being moved to another workspace.
         tabbedPane.remove(workspace);
         // Stealthily support merging of nested workspaces back into their parent.
@@ -778,20 +780,21 @@ public class Evergreen {
         return (startSignal.getCount() == 0);
     }
     
-    private void initRememberedFilesOpener() {
-        ChangeListener initialFileOpener = new ChangeListener() {
+    private void initTabbedPaneLazyInitializer() {
+        final ChangeListener firstExposureListener = new ChangeListener() {
             public void stateChanged(final ChangeEvent e) {
                 EventQueue.invokeLater(new Runnable() {
                     public void run() {
-                        getCurrentWorkspace().openRememberedFiles();
+                        getCurrentWorkspace().handlePossibleFirstExposure();
                     }
                 });
             }
         };
-        tabbedPane.addChangeListener(initialFileOpener);
+        tabbedPane.addChangeListener(firstExposureListener);
         // Bring the listener up to speed with the current situation.
-        // We couldn't add the listener in advance, because we want the tabbed pane on the display before we start listening.
-        initialFileOpener.stateChanged(null);
+        // We couldn't add the listener in advance, because we want the tabbed
+        // pane fully populated and on the display before we start listening.
+        firstExposureListener.stateChanged(null);
     }
     
     private void initMenuBar() {
@@ -857,10 +860,10 @@ public class Evergreen {
                     // If we didn't create any workspaces, give the user some help...
                     showAlert("Welcome to Evergreen!", "This looks like the first time you've used Evergreen. You'll need to create a workspace for each project you wish to work on.<p>Choose \"New Workspace...\" from the the \"Workspace\" menu.<p>You can create as many workspaces as you like, but you'll need at least one to be able to do anything.");
                 } else {
-                    initRememberedFilesOpener();
+                    initTabbedPaneLazyInitializer();
                 }
                 
-                Thread fileListUpdaterStarterThread = new Thread(new Runnable() {
+                Thread initializationDetectionThread = new Thread(new Runnable() {
                     public void run() {
                         final long sleepStartNs = System.nanoTime();
                         try {
@@ -881,8 +884,8 @@ public class Evergreen {
                         startSignal.countDown();
                     }
                 });
-                fileListUpdaterStarterThread.setPriority(Thread.MIN_PRIORITY);
-                fileListUpdaterStarterThread.start();
+                initializationDetectionThread.setPriority(Thread.MIN_PRIORITY);
+                initializationDetectionThread.start();
             }
         });
     }
