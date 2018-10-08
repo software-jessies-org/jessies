@@ -483,10 +483,12 @@ public class GuiUtilities {
             awtUtilitiesClass.getMethod("setWindowOpacity", Window.class, float.class).invoke(frame, (float) alpha);
             return;
         } catch (Throwable th) {
+            // Exceptions thrown by a method invoked via reflection are reported
+            // as the "cause" of an InvocationTargetException, so check that...
             Throwable cause = th.getCause();
             if (cause != null && cause instanceof UnsupportedOperationException) {
                 // We don't want to spam the log just because the system doesn't support transparency.
-            } else if (th instanceof IllegalComponentStateException) {
+            } else if (cause != null && cause instanceof IllegalComponentStateException) {
                 // We don't want to spam the log just because the system is running Java 7 or later,
                 // where decorated windows can't be made translucent according to
                 // http://docs.oracle.com/javase/7/docs/api/java/awt/Window.html#setOpacity%28float%29.
