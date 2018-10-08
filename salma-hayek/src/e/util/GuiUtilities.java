@@ -480,7 +480,7 @@ public class GuiUtilities {
             // We need to access this via reflection to avoid the warning
             // "AWTUtilities is internal proprietary API and may be removed in a future release".
             final Class<?> awtUtilitiesClass = Class.forName("com.sun.awt.AWTUtilities");
-            awtUtilitiesClass.getMethod("setWindowOpacity", Window.class, float.class).invoke(frame, (float) alpha);
+            awtUtilitiesClass.getMethod("setWindowOpacity", Window.class, float.class).invoke(null, frame, (float) alpha);
             return;
         } catch (Throwable th) {
             // Exceptions thrown by a method invoked via reflection are reported
