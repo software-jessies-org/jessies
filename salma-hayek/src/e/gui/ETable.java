@@ -50,11 +50,6 @@ public class ETable extends JTable {
         getTableHeader().setReorderingAllowed(false);
         
         if (GuiUtilities.isMacOs()) {
-            // Work around Apple 4352937 (fixed in 10.5).
-            if (System.getProperty("os.version").startsWith("10.4")) {
-                ((JLabel) getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.LEADING);
-            }
-            
             // Use an iTunes-style vertical-only "grid".
             setShowHorizontalLines(false);
             setShowVerticalLines(true);

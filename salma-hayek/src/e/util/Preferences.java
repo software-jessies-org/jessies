@@ -584,11 +584,7 @@ public abstract class Preferences extends PreferenceGetter {
             Insets margin = button.getMargin();
             margin.left = margin.right = margin.top = margin.bottom;
             button.setMargin(margin);
-            if (System.getProperty("os.version").startsWith("10.4")) {
-                button.putClientProperty("JButton.buttonType", "toolbar"); // Mac OS 10.4
-            } else {
-                button.putClientProperty("JButton.buttonType", "gradient"); // Mac OS 10.5
-            }
+            button.putClientProperty("JButton.buttonType", "gradient"); // Mac OS 10.5
             
             formPanel.addRow(description + ":", button);
         }
