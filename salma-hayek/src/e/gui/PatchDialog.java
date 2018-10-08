@@ -146,6 +146,7 @@ public class PatchDialog {
     }
     
     public static void showDiffInTextArea(PTextArea textArea, List<String> diffLines) {
+        textArea.setText(StringUtilities.join(diffLines, "\n") + "\n");
         final List<HighlightInfo> highlights = new ArrayList<HighlightInfo>();
         Color color = null;
         int lineNumber = 0; // Lines beginning with '?' don't count!
@@ -167,7 +168,6 @@ public class PatchDialog {
             } else {
                 color = null;
             }
-            textArea.append(line + "\n");
             if (color != null) {
                 final int lineStart = textArea.getLineStartOffset(lineNumber);
                 final int lineEnd = textArea.getLineEndOffsetBeforeTerminator(lineNumber) + 1;
