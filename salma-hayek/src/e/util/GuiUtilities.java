@@ -436,6 +436,8 @@ public class GuiUtilities {
      * 2.If you use the GNOME/the Java Desktop System's Alt-PrtScr screenshot tool, its default filename is "Screenshot-<WM_CLASS>".
      * There are probably more examples, but these are enough to warrant a solution.
      * Given that we know what our application calls itself, we can use reflection to override AWT's default guess.
+     * 
+     * See https://bugs.openjdk.java.net/browse/JDK-6528430.
      */
     private static void fixWmClass() {
         try {
