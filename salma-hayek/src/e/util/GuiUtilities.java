@@ -477,7 +477,10 @@ public class GuiUtilities {
     public static void setFrameAlpha(JFrame frame, double alpha) {
         try {
             // This is only available on 6u10 and later (see Sun bug 6633275).
-            com.sun.awt.AWTUtilities.setWindowOpacity(frame, (float) alpha);
+            // We need to access this via reflection to avoid the warning
+            // "AWTUtilities is internal proprietary API and may be removed in a future release".
+            final Class<?> awtUtilitiesClass = Class.forName("com.sun.awt.AWTUtilities");
+            awtUtilitiesClass.getMethod("setWindowOpacity", Window.class, float.class).invoke(frame, (float) alpha);
             return;
         } catch (Throwable th) {
             Throwable cause = th.getCause();
