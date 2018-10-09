@@ -472,58 +472,30 @@ public class GuiUtilities {
     
     /**
      * Sets the opacity (1.0 => fully opaque, 0.0 => fully transparent) of the given Frame.
-     * http://elliotth.blogspot.com/2007/08/transparent-java-windows-on-x11.html
      */
     public static void setFrameAlpha(JFrame frame, double alpha) {
-        try {
-            // This is only available on 6u10 and later (see Sun bug 6633275).
-            // We need to access this via reflection to avoid the warning
-            // "AWTUtilities is internal proprietary API and may be removed in a future release".
-            final Class<?> awtUtilitiesClass = Class.forName("com.sun.awt.AWTUtilities");
-            awtUtilitiesClass.getMethod("setWindowOpacity", Window.class, float.class).invoke(null, frame, (float) alpha);
+        if (frame.isUndecorated() == false) {
+            Log.warn("Sorry, Dave, decorated windows can't be made translucent according to");
+            Log.warn("http://docs.oracle.com/javase/7/docs/api/java/awt/Window.html#setOpacity%28float%29.");
+            Log.warn("Perhaps you'd like to override that but only for the duration of this call,");
+            Log.warn("otherwise you won't be able to move, resize or close your window.");
             return;
+        }
+        try {
+            // This is only available on Java 7 and later.
+            Window.class.getMethod("setOpacity", float.class).invoke(frame, (float) alpha);
+            return;
+        } catch (NoSuchMethodException ex) {
+            // We don't want to spam the log just because the system is running Java 6.
         } catch (Throwable th) {
             // Exceptions thrown by a method invoked via reflection are reported
             // as the "cause" of an InvocationTargetException, so check that...
             Throwable cause = th.getCause();
             if (cause != null && cause instanceof UnsupportedOperationException) {
                 // We don't want to spam the log just because the system doesn't support transparency.
-            } else if (cause != null && cause instanceof IllegalComponentStateException) {
-                // We don't want to spam the log just because the system is running Java 7 or later,
-                // where decorated windows can't be made translucent according to
-                // http://docs.oracle.com/javase/7/docs/api/java/awt/Window.html#setOpacity%28float%29.
             } else {
-                Log.warn("com.sun.awt.AWTUtilities.setWindowOpacity failed.", th);
+                Log.warn("Window.setOpacity failed.", th);
             }
-        }
-        
-        try {
-            Field peerField = Component.class.getDeclaredField("peer");
-            peerField.setAccessible(true);
-            Object peer = peerField.get(frame);
-            if (peer == null) {
-                return;
-            }
-            
-            if (isMacOs()) {
-                frame.getRootPane().putClientProperty("Window.alpha", alpha);
-            } else if (isWindows()) {
-                Log.warn("Sorry, we don't know how to create translucent windows on Windows, given that AWTUtilities.setWindowOpacity failed");
-            } else {
-                // long windowId = peer.getWindow();
-                Class<?> xWindowPeerClass = Class.forName("sun.awt.X11.XWindowPeer");
-                Method getWindowMethod = xWindowPeerClass.getMethod("getWindow");
-                long windowId = ((Long) getWindowMethod.invoke(peer, new Object[0])).longValue();
-                
-                long value = (int) (0xff * alpha) << 24;
-                // sun.awt.X11.XAtom.get("_NET_WM_WINDOW_OPACITY").setCard32Property(windowId, value);
-                Class<?> xAtomClass = Class.forName("sun.awt.X11.XAtom");
-                Method getMethod = xAtomClass.getMethod("get", String.class);
-                Method setCard32PropertyMethod = xAtomClass.getMethod("setCard32Property", long.class, long.class);
-                setCard32PropertyMethod.invoke(getMethod.invoke(null, "_NET_WM_WINDOW_OPACITY"), windowId, value);
-            }
-        } catch (Throwable th) {
-            Log.warn("Failed to apply frame alpha.", th);
         }
     }
     

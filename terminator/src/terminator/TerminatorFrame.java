@@ -20,7 +20,7 @@ public class TerminatorFrame extends JFrame implements TerminalPaneHost {
     
     private final Color originalBackground = getBackground();
     
-    private double alpha = 1.0;
+    private boolean settingAlpha = false;
     
     public TerminatorFrame(List<JTerminalPane> initialTerminalPanes) {
         super("Terminator");
@@ -384,15 +384,18 @@ public class TerminatorFrame extends JFrame implements TerminalPaneHost {
         super.addNotify();
         updateTransparency();
     }
+
+    // Why is it only undecorated windows that can be translucent?
+    @Override
+    public boolean isUndecorated() {
+        return settingAlpha;
+    }
     
     private void updateTransparency() {
-        double newAlpha = Terminator.getPreferences().getDouble(TerminatorPreferences.ALPHA);
-        // Avoid spamming those who don't use the feature with "Illegal reflective access" warnings.
-        if (newAlpha == alpha) {
-            return;
-        }
-        alpha = newAlpha;
+        double alpha = Terminator.getPreferences().getDouble(TerminatorPreferences.ALPHA);
+        settingAlpha = true;
         GuiUtilities.setFrameAlpha(this, alpha);
+        settingAlpha = false;
     }
     
     public void optionsDidChange() {
