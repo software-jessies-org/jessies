@@ -1,6 +1,8 @@
 package terminator.terminal.escape;
 
 import e.util.*;
+import java.awt.Color;
+import terminator.*;
 import terminator.model.*;
 import terminator.terminal.*;
 
@@ -12,9 +14,12 @@ import terminator.terminal.*;
  * FIXME: this is probably a mistake if we're planning on outputting the sequence in toString, or if we ever support other OSCs.
  */
 public class XTermEscapeAction implements TerminalAction {
+    private TerminalControl control;
     private String sequence;
     
-    public XTermEscapeAction(String sequence) {
+    public XTermEscapeAction(TerminalControl control, String sequence) {
+        this.control = control;
+        
         // Trim off the initial ']', and the terminating BEL character (if present).
         if (sequence.charAt(sequence.length() - 1) == '\007') {
             this.sequence = sequence.substring(1, sequence.length() - 1);
@@ -25,42 +30,44 @@ public class XTermEscapeAction implements TerminalAction {
 
     /**
      * Handles the special escape sequence from xterm, called OSC by ECMA.
-     * From rxvt:
+     * https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Operating-System-Commands
      *
      * XTerm escape sequences: ESC ] Ps;Pt BEL
-     *       0 = change iconName/title
-     *       1 = change iconName
-     *       2 = change title
-     *      46 = change log file (not implemented)
-     *      50 = change font
-     *
-     * rxvt extensions:
-     *      10 = menu
-     *      20 = bg pixmap
-     *      39 = change default fg color
-     *      49 = change default bg color
+     *       0 = change icon name and window title
+     *       2 = change window title
+     *      10 = get/set text foreground color
+     *      11 = get/set text background color
      */
     public void perform(TerminalModel model) {
-        if (isNewWindowTitle()) {
-            model.setWindowTitle(getNewWindowTitle());
-        } else {
-            Log.warn("Unsupported XTerm escape sequence \"" + StringUtilities.escapeForJava(sequence) + "\".");
+        int index = sequence.indexOf(';');
+        if (index != -1) {
+            int ps = Integer.parseInt(sequence.substring(0, index));
+            String pt = sequence.substring(index + 1);
+            switch (ps) {
+                case 0:
+                case 2:
+                    model.setWindowTitle(pt);
+                    return;
+                case 10:
+                case 11:
+                    // We currently only support getting the colors.
+                    if (pt.equals("?")) {
+                        String key = ps == 10 ? TerminatorPreferences.FOREGROUND_COLOR : TerminatorPreferences.BACKGROUND_COLOR;
+                        Color c = Terminator.getPreferences().getColor(key);
+                        String r = Integer.toHexString(c.getRed());
+                        String g = Integer.toHexString(c.getGreen());
+                        String b = Integer.toHexString(c.getBlue());
+                        // Experimentation with xterm suggests that it just duplicates the "true" 8 bits into the top 8 bits.
+                        control.sendUtf8String(Ascii.ESC + "]" + ps + ";rgb:" + r + r + "/" + g + g + "/" + b + b + Ascii.BEL);
+                        return;
+                    }
+                    break;
+            }
         }
-    }
-    
-    private boolean isNewWindowTitle() {
-        return (sequence.startsWith("2;") || sequence.startsWith("0;"));
-    }
-    
-    private String getNewWindowTitle() {
-        return sequence.substring(2);
+        Log.warn("Unsupported XTerm escape sequence \"" + StringUtilities.escapeForJava(sequence) + "\".");
     }
     
     @Override public String toString() {
-        if (isNewWindowTitle()) {
-            return "XTermEscapeAction[New window title:\"" + StringUtilities.escapeForJava(getNewWindowTitle()) + "\"]";
-        } else {
-            return "XTermEscapeAction[Unsupported:" + StringUtilities.escapeForJava(sequence) + "]";
-        }
+        return "XTermEscapeAction[" + StringUtilities.escapeForJava(sequence) + "]";
     }
 }

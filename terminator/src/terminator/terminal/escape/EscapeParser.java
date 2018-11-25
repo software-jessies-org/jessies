@@ -121,7 +121,7 @@ public class EscapeParser {
         }
         
         public TerminalAction getTerminalAction(TerminalControl terminalControl, String sequence) {
-            return new XTermEscapeAction(sequence);
+            return new XTermEscapeAction(terminalControl, sequence);
         }
     }
 }
