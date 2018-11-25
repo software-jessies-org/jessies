@@ -48,7 +48,7 @@ public class SingleCharEscapeAction implements TerminalAction {
                 model.setTabAtCursor();
                 break;
             case 'M':  // Move cursor up one line, scrolling if it reaches the top of scroll region.  Opposite of NL.
-                model.scrollDisplayUp();
+                model.scrollRegionUp();
                 break;
             case 'Z':
                 // An obsolete form of ESC [ c (send device attributes).

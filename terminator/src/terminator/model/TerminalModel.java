@@ -713,8 +713,8 @@ public class TerminalModel {
         lastScrollLineIndex = ((lastLine == -1) ? height : lastLine) - 1;
     }
     
-    /** Scrolls the display up by one line. */
-    public void scrollDisplayUp() {
+    /** Scrolls the scroll region up by one line. */
+    public void scrollRegionUp() {
         int addIndex = getFirstDisplayLine() + firstScrollLineIndex;
         int removeIndex = getFirstDisplayLine() + lastScrollLineIndex + 1;
         textLines.add(addIndex, new TextLine(Palettes.getBackgroundInk()));
