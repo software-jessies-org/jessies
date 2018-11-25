@@ -135,7 +135,7 @@ public class CSIEscapeAction implements TerminalAction {
     }
     
     private boolean clearTabs(TerminalModel model, String seq) {
-        int clearType = (seq.length() == 0) ? 0 : Integer.parseInt(seq);
+        int clearType = seq.isEmpty() ? 0 : Integer.parseInt(seq);
         if (clearType == 0) {
             // Clear horizontal tab at current cursor position.
             model.removeTabAtCursor();
@@ -151,7 +151,7 @@ public class CSIEscapeAction implements TerminalAction {
     }
     
     private boolean deleteLines(TerminalModel model, String seq) {
-        int count = (seq.length() == 0) ? 1 : Integer.parseInt(seq);
+        int count = seq.isEmpty() ? 1 : Integer.parseInt(seq);
         for (int i = 0; i < count; i++) {
             model.deleteLine();
         }
@@ -159,7 +159,7 @@ public class CSIEscapeAction implements TerminalAction {
     }
     
     private boolean insertLines(TerminalModel model, String seq) {
-        int count = (seq.length() == 0) ? 1 : Integer.parseInt(seq);
+        int count = seq.isEmpty() ? 1 : Integer.parseInt(seq);
         model.insertLines(count);
         return true;
     }
@@ -271,13 +271,13 @@ public class CSIEscapeAction implements TerminalAction {
     }
     
     private boolean deleteCharacters(TerminalModel model, String seq) {
-        int count = (seq.length() == 0) ? 1 : Integer.parseInt(seq);
+        int count = seq.isEmpty() ? 1 : Integer.parseInt(seq);
         model.deleteCharacters(count);
         return true;
     }
     
     private boolean killLineContents(TerminalModel model, String seq) {
-        int type = (seq.length() == 0) ? 0 : Integer.parseInt(seq);
+        int type = seq.isEmpty() ? 0 : Integer.parseInt(seq);
         boolean fromStart = (type >= 1);
         boolean toEnd = (type != 1);
         model.killHorizontally(fromStart, toEnd);
@@ -285,7 +285,7 @@ public class CSIEscapeAction implements TerminalAction {
     }
     
     private boolean eraseInPage(TerminalModel model, String seq) {
-        int type = (seq.length() == 0) ? 0 : Integer.parseInt(seq);
+        int type = seq.isEmpty() ? 0 : Integer.parseInt(seq);
         boolean fromTop = (type >= 1);
         boolean toBottom = (type != 1);
         model.eraseInPage(fromTop, toBottom);
@@ -315,7 +315,7 @@ public class CSIEscapeAction implements TerminalAction {
     }
     
     private boolean moveCursor(TerminalModel model, String countString, int xDirection, int yDirection) {
-        int count = (countString.length() == 0) ? 1 : Integer.parseInt(countString);
+        int count = countString.isEmpty() ? 1 : Integer.parseInt(countString);
         if (xDirection != 0) {
             model.moveCursorHorizontally(xDirection * count);
         }
@@ -346,7 +346,7 @@ public class CSIEscapeAction implements TerminalAction {
     // If there are no more chunks, returns 0.
     private int nextInt(Iterator<String> chunks) {
         final String chunk = chunks.hasNext() ? chunks.next() : "";
-        return (chunk.length() == 0) ? 0 : Integer.parseInt(chunk);
+        return chunk.isEmpty() ? 0 : Integer.parseInt(chunk);
     }
     
     private boolean processFontEscape(TerminalModel model, String sequence) {

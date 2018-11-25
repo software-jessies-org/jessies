@@ -49,7 +49,7 @@ public class TerminatorMenuItemProvider implements MenuItemProvider {
     }
     
     private void addSelectionInfoItems(Collection<Action> actions, String selectedText) {
-        if (selectedText.length() == 0) {
+        if (selectedText.isEmpty()) {
             return;
         }
         

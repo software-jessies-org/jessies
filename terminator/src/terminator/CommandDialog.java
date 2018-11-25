@@ -124,7 +124,7 @@ public class CommandDialog {
     public JTerminalPane askForCommandToRun() {
         while (form.show("Run")) {
             String command = commandField.getText().trim();
-            if (command.length() == 0) {
+            if (command.isEmpty()) {
                 command = (String) historyList.getSelectedValue();
             }
             synchronized (history) {

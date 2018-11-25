@@ -711,7 +711,7 @@ public class JTerminalPane extends JPanel {
         final int directChildPid = ptyProcess.getPid();
         final String processesUsingTty = ptyProcess.listProcessesUsingTty();
 
-        if (processesUsingTty.length() == 0) {
+        if (processesUsingTty.isEmpty()) {
             // There's nothing still running, so just close.
             return true;
         }

@@ -43,7 +43,7 @@ public class FindHighlighter {
         findStatusDisplay.setStatus("", false);
         
         // Is that all we're here for?
-        if (newRegularExpression.length() == 0) {
+        if (newRegularExpression.isEmpty()) {
             return;
         }
         

@@ -263,7 +263,7 @@ public class SelectionHighlighter implements ClipboardOwner, MouseListener, Mous
             return;
         }
         String newContents = getTabbedString();
-        if (newContents.length() == 0) {
+        if (newContents.isEmpty()) {
             // Copying the empty string to the clipboard is bizarre, and caused one user trouble (because we didn't cope with zero-length pastes).
             return;
         }

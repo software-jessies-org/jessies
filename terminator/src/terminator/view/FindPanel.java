@@ -115,7 +115,7 @@ public class FindPanel extends JPanel implements FindStatusDisplay {
     
     public void showFindPanel() {
         final String selection = terminalPane.getSelectionHighlighter().getTabbedString();
-        if (selection.length() > 0) {
+        if (!selection.isEmpty()) {
             findField.setText("(?-i)" + StringUtilities.regularExpressionFromLiteral(selection));
         }
         // The existing status text might be out of date (because the terminal's contents have changed more recently).
