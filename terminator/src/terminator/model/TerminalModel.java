@@ -713,12 +713,28 @@ public class TerminalModel {
         lastScrollLineIndex = ((lastLine == -1) ? height : lastLine) - 1;
     }
     
-    /** Scrolls the scroll region up by one line. */
+    /** Scrolls the scroll region up by one line. TODO: the sole caller's description differs! */
     public void scrollRegionUp() {
         int addIndex = getFirstDisplayLine() + firstScrollLineIndex;
         int removeIndex = getFirstDisplayLine() + lastScrollLineIndex + 1;
         textLines.add(addIndex, new TextLine(Palettes.getBackgroundInk()));
         textLines.remove(removeIndex);
+        lineIsDirty(addIndex);
+        linesChangedFrom(addIndex);
+        view.repaint();
+        checkInvariant();
+    }
+    
+    /** Scroll up/down by `count`, implementing CSI Ps S and CSI Ps T. */
+    public void scrollRegion(int count, boolean up) {
+        int top = getFirstDisplayLine() + firstScrollLineIndex;
+        int bottom = getFirstDisplayLine() + lastScrollLineIndex + 1;
+        int addIndex = up ? bottom : top;
+        int removeIndex = up ? top : bottom;
+        while (count-- > 0) {
+            textLines.add(addIndex, new TextLine(Palettes.getBackgroundInk()));
+            textLines.remove(removeIndex);
+        }
         lineIsDirty(addIndex);
         linesChangedFrom(addIndex);
         view.repaint();

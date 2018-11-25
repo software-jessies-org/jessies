@@ -96,6 +96,10 @@ public class CSIEscapeAction implements TerminalAction {
             return deleteLines(model, midSequence);
         case 'P':
             return deleteCharacters(model, midSequence);
+        case 'S':
+            return scrollRegion(model, midSequence, true);
+        case 'T':
+            return scrollRegion(model, midSequence, false);
         case 'g':
             return clearTabs(model, midSequence);
         case 'h':
@@ -161,6 +165,12 @@ public class CSIEscapeAction implements TerminalAction {
     private boolean insertLines(TerminalModel model, String seq) {
         int count = seq.isEmpty() ? 1 : Integer.parseInt(seq);
         model.insertLines(count);
+        return true;
+    }
+    
+    private boolean scrollRegion(TerminalModel model, String seq, boolean up) {
+        int count = seq.isEmpty() ? 1 : Integer.parseInt(seq);
+        model.scrollRegion(count, up);
         return true;
     }
     
