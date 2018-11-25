@@ -134,7 +134,7 @@ public class CSIEscapeAction implements TerminalAction {
         return false;
     }
     
-    public boolean clearTabs(TerminalModel model, String seq) {
+    private boolean clearTabs(TerminalModel model, String seq) {
         int clearType = (seq.length() == 0) ? 0 : Integer.parseInt(seq);
         if (clearType == 0) {
             // Clear horizontal tab at current cursor position.
@@ -150,7 +150,7 @@ public class CSIEscapeAction implements TerminalAction {
         }
     }
     
-    public boolean deleteLines(TerminalModel model, String seq) {
+    private boolean deleteLines(TerminalModel model, String seq) {
         int count = (seq.length() == 0) ? 1 : Integer.parseInt(seq);
         for (int i = 0; i < count; i++) {
             model.deleteLine();
@@ -158,7 +158,7 @@ public class CSIEscapeAction implements TerminalAction {
         return true;
     }
     
-    public boolean insertLines(TerminalModel model, String seq) {
+    private boolean insertLines(TerminalModel model, String seq) {
         int count = (seq.length() == 0) ? 1 : Integer.parseInt(seq);
         model.insertLines(count);
         return true;
@@ -247,7 +247,7 @@ public class CSIEscapeAction implements TerminalAction {
         return false;
     }
     
-    public boolean setScrollingRegion(TerminalModel model, String seq) {
+    private boolean setScrollingRegion(TerminalModel model, String seq) {
         int index = seq.indexOf(';');
         if (index == -1) {
             model.setScrollingRegion(-1, -1);
@@ -270,13 +270,13 @@ public class CSIEscapeAction implements TerminalAction {
         control.sendUtf8String(Ascii.ESC + "[?1;0c");
     }
     
-    public boolean deleteCharacters(TerminalModel model, String seq) {
+    private boolean deleteCharacters(TerminalModel model, String seq) {
         int count = (seq.length() == 0) ? 1 : Integer.parseInt(seq);
         model.deleteCharacters(count);
         return true;
     }
     
-    public boolean killLineContents(TerminalModel model, String seq) {
+    private boolean killLineContents(TerminalModel model, String seq) {
         int type = (seq.length() == 0) ? 0 : Integer.parseInt(seq);
         boolean fromStart = (type >= 1);
         boolean toEnd = (type != 1);
@@ -284,7 +284,7 @@ public class CSIEscapeAction implements TerminalAction {
         return true;
     }
     
-    public boolean eraseInPage(TerminalModel model, String seq) {
+    private boolean eraseInPage(TerminalModel model, String seq) {
         int type = (seq.length() == 0) ? 0 : Integer.parseInt(seq);
         boolean fromTop = (type >= 1);
         boolean toBottom = (type != 1);
@@ -292,17 +292,17 @@ public class CSIEscapeAction implements TerminalAction {
         return true;
     }
     
-    public boolean moveCursorRowTo(TerminalModel model, String seq) {
+    private boolean moveCursorRowTo(TerminalModel model, String seq) {
         model.setCursorPosition(-1, Integer.parseInt(seq));
         return true;
     }
     
-    public boolean moveCursorColumnTo(TerminalModel model, String seq) {
+    private boolean moveCursorColumnTo(TerminalModel model, String seq) {
         model.setCursorPosition(Integer.parseInt(seq), -1);
         return true;
     }
     
-    public boolean moveCursorTo(TerminalModel model, String seq) {
+    private boolean moveCursorTo(TerminalModel model, String seq) {
         int x = 1;
         int y = 1;
         int splitIndex = seq.indexOf(';');
@@ -314,7 +314,7 @@ public class CSIEscapeAction implements TerminalAction {
         return true;
     }
     
-    public boolean moveCursor(TerminalModel model, String countString, int xDirection, int yDirection) {
+    private boolean moveCursor(TerminalModel model, String countString, int xDirection, int yDirection) {
         int count = (countString.length() == 0) ? 1 : Integer.parseInt(countString);
         if (xDirection != 0) {
             model.moveCursorHorizontally(xDirection * count);
@@ -349,7 +349,7 @@ public class CSIEscapeAction implements TerminalAction {
         return (chunk.length() == 0) ? 0 : Integer.parseInt(chunk);
     }
     
-    public boolean processFontEscape(TerminalModel model, String sequence) {
+    private boolean processFontEscape(TerminalModel model, String sequence) {
         Style oldStyle = model.getStyle();
         // Grab the *raw* foreground and background colours. This preserves their 'null'ness in the
         // case that a style has no explicit fg/bg, and must use the current default. This is important
