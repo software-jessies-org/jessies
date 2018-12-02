@@ -144,10 +144,7 @@ SCRIPTS_WHICH_AFFECT_COMPILER_FLAGS += $(JDK_ROOT_SCRIPT)
 JDK_ROOT := $(call findMakeFriendlyEquivalentName,$(shell ruby $(JDK_ROOT_SCRIPT)))
 
 JDK_INCLUDE.$(TARGET_OS) = $(JDK_ROOT)/include
-MAC_SDK.$(TARGET_OS) =
-MAC_SDK.Darwin = $(shell xcodebuild -version $$(xcodebuild -showsdks | cut -f3 | grep osx | head -1) Path)
-MAC_SDK := $(MAC_SDK.$(TARGET_OS))
-JDK_INCLUDE.Darwin = $(JDK_ROOT)/Headers
+JDK_INCLUDE.Darwin = /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers/
 JDK_INCLUDE = $(JDK_INCLUDE.$(TARGET_OS))
 
 JDK_BIN_DIR.$(TARGET_OS) = bin
@@ -356,24 +353,19 @@ SHARED_LIBRARY_PREFIX = $(SHARED_LIBRARY_PREFIX.$(TARGET_OS))
 SHARED_LIBRARY_EXTENSION = $(SHARED_LIBRARY_EXTENSION.$(TARGET_OS))
 
 # ----------------------------------------------------------------------------
-# Extra flags to always build Universal Binaries on Mac OS.
-# http://developer.apple.com/documentation/Porting/Conceptual/PortingUnix/compiling/chapter_4_section_3.html
+# Extra flags for macOS.
 # ----------------------------------------------------------------------------
 
-# Xcode 4.6.3
-# Build version 4H1503
-XCODE_MAJOR_VERSION.$(TARGET_OS) =
-XCODE_MAJOR_VERSION.Darwin = $(shell xcodebuild -version | head -1 | cut -f2 -d" " | cut -f1 -d.)
-XCODE_MAJOR_VERSION := $(XCODE_MAJOR_VERSION.$(TARGET_OS))
-XCODE_SUPPORTS_POWERPC = $(filter 2 3,$(XCODE_MAJOR_VERSION))
-XCODE_ARCHES += $(if $(XCODE_SUPPORTS_POWERPC),ppc)
-XCODE_ARCHES += i386
-universal_binary_flags = -mmacosx-version-min=10.4 -isysroot $(MAC_SDK) $(foreach ARCH,$(XCODE_ARCHES),-arch $(ARCH))
-C_AND_CXX_FLAGS.Darwin += $(universal_binary_flags)
-LDFLAGS.Darwin += $(universal_binary_flags)
+# The only reason for the choice of 10.9 is that on macOS 10.14 I was told that
+# I shouldn't be using libc++ without setting that as my minimum, and that not
+# using libc++ is deprecated. In 2018, no one is still using macOS 10.14.
+C_AND_CXX_FLAGS.Darwin += -mmacosx-version-min=10.9
+C_AND_CXX_FLAGS.Darwin += -stdlib=libc++
+# We should probably rewrite the code to use newer APIs, but I'm just here to
+# get macOS compiling again, so I'm punting this until someone tells us that
+# the deprecated stuff has actually been removed.
+C_AND_CXX_FLAGS.Darwin += -Wno-error=deprecated-declarations
 LDFLAGS.Darwin += -lobjc
-# Mac OS 10.6 won't link PowerPC C++ without this.
-LDFLAGS.Darwin += -lstdc++
 LDFLAGS.Darwin += -framework Cocoa
 
 # ----------------------------------------------------------------------------
@@ -415,10 +407,7 @@ MINGW_COMPILER.amd64 = x86_64-w64-mingw32-g++
 MINGW_COMPILER = $(MINGW_COMPILER.$(TARGET_ARCHITECTURE))
 CXX.Cygwin = $(if $(COMPILING_MINGW),$(MINGW_COMPILER),$(DEFAULT_CXX))
 
-# Mac OS 10.6 ships with gcc 4.2.1 as the default but, until we want to drop 10.4, we need headers like /Developer/SDKs/MacOSX10.4u.sdk/usr/include/c++/4.0.0/sstream
-HAVE_MAC_OS_10_4_HEADERS := $(wildcard $(MAC_SDK)/usr/include/c++/4.0.0)
-# The compiler really is one sub-minor version ahead of the directory.
-CXX.Darwin = $(DEFAULT_CXX) $(if $(HAVE_MAC_OS_10_4_HEADERS),-V4.0.1)
+CXX.Darwin = $(DEFAULT_CXX)
 
 HAVE_MINGW_SOURCE := $(wildcard $(CURDIR)/native/Mingw)
 CRT_SHARED_LIBRARIES.Cygwin += $(if $(HAVE_MINGW_SOURCE),.generated/$(TARGET_DIRECTORY)/bin/libwinpthread-1.dll)
@@ -579,7 +568,7 @@ BOOT_JDK_ERROR = $(error $(BOOT_JDK_MESSAGE))
 # The *** does battle with filter-build-output.rb.
 BOOT_JDK_WARNING = $(warning *** $(BOOT_JDK_MESSAGE))
 # Feel free to downgrade the ERROR to WARNING in your local copy.
-BOOT_JDK_DIAGNOSTIC = $(BOOT_JDK_ERROR)
+BOOT_JDK_DIAGNOSTIC = $(BOOT_JDK_WARNING)
 JAVAC_FLAGS.javac += $(if $(ALTERNATE_BOOTCLASSPATH),-bootclasspath $(ALTERNATE_BOOTCLASSPATH),$(BOOT_JDK_DIAGNOSTIC))
 
 # ----------------------------------------------------------------------------
