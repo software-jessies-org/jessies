@@ -12,5 +12,5 @@ int main(int argCount, char* args[]) {
   [NSApplication sharedApplication];
   NSString* titleString = [NSString stringWithUTF8String:args[1]];
   NSString* messageString = [NSString stringWithUTF8String:args[2]];
-  return NSRunInformationalAlertPanel(titleString, messageString, 0, 0, 0);
+  return NSRunInformationalAlertPanel(titleString, @"%@", nil, nil, nil, messageString);
 }

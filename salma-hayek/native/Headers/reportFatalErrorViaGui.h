@@ -35,7 +35,7 @@ inline void reportFatalErrorViaGui(const std::string& programName, const std::st
 #elif defined(__APPLE__)
     ScopedAutoReleasePool pool;
     [NSApplication sharedApplication];
-    NSRunInformationalAlertPanel([NSString stringWithUTF8String:programName.c_str()], [NSString stringWithUTF8String:platformMessage.c_str()], nil, nil, nil);
+    NSRunInformationalAlertPanel([NSString stringWithUTF8String:programName.c_str()], @"%@", nil, nil, nil, [NSString stringWithUTF8String:platformMessage.c_str()]);
 #else
     (void)programName;
 #endif
