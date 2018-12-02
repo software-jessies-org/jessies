@@ -1,6 +1,5 @@
 package terminator;
 
-import com.apple.eawt.*;
 import e.util.*;
 import java.awt.*;
 import java.util.*;
@@ -35,6 +34,8 @@ public class Frames implements Iterable<TerminatorFrame> {
             // Move the window off-screen so that when we're forced to setVisible(true) it doesn't actually disturb the user.
             hiddenFrame.setLocation(new java.awt.Point(-100, -100));
             
+/* TODO: make this work again
+
             // The Dock menu needs a valid Component as a parent. The hidden frame
             // does not become valid until it has been made visible.
             hiddenFrame.setVisible(true);
@@ -47,6 +48,7 @@ public class Frames implements Iterable<TerminatorFrame> {
             } catch (Throwable th) {
                 Log.warn("failed to set dock menu", th);
             }
+*/
         }
     }
     

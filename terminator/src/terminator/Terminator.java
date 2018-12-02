@@ -1,6 +1,5 @@
 package terminator;
 
-import com.apple.eawt.*;
 import e.gui.*;
 import e.util.*;
 import java.awt.*;
@@ -56,6 +55,8 @@ public class Terminator {
             return;
         }
         
+/* TODO: make this work again
+
         Application.getApplication().addApplicationListener(new ApplicationAdapter() {
             @Override
             public void handleReOpenApplication(ApplicationEvent e) {
@@ -82,6 +83,7 @@ public class Terminator {
                 e.setHandled(frames.isEmpty());
             }
         });
+*/
     }
     
     private void initAboutBox() {

@@ -3,6 +3,7 @@ package e.util;
 import e.forms.*;
 import e.gui.*;
 import java.awt.*;
+import java.awt.desktop.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.List;
@@ -145,12 +146,9 @@ public abstract class Preferences extends PreferenceGetter {
     
     public void initPreferencesMenuItem(JMenu editMenu) {
         if (GuiUtilities.isMacOs()) {
-            com.apple.eawt.Application.getApplication().setEnabledPreferencesMenu(true);
-            com.apple.eawt.Application.getApplication().addApplicationListener(new com.apple.eawt.ApplicationAdapter() {
-                @Override
-                public void handlePreferences(com.apple.eawt.ApplicationEvent e) {
+            Desktop.getDesktop().setPreferencesHandler(new PreferencesHandler() {
+                @Override public void handlePreferences(PreferencesEvent e) {
                     showPreferencesDialog("Preferences");
-                    e.setHandled(true);
                 }
             });
         } else {

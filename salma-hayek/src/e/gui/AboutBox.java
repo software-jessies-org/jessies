@@ -1,9 +1,9 @@
 package e.gui;
 
-import com.apple.eawt.*;
 import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
+import java.awt.desktop.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
@@ -302,10 +302,9 @@ public class AboutBox {
     }
     
     private void initMacOsAboutMenu() {
-        Application.getApplication().addApplicationListener(new ApplicationAdapter() {
-            public void handleAbout(ApplicationEvent e) {
+        Desktop.getDesktop().setAboutHandler(new AboutHandler() {
+            @Override public void handleAbout(AboutEvent e) {
                 AboutBox.getSharedInstance().show();
-                e.setHandled(true);
             }
         });
     }

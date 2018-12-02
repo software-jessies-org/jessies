@@ -26,7 +26,7 @@ public class EvergreenMenuBar extends EMenuBar {
         }
 
         public void actionPerformed(ActionEvent e) {
-            Evergreen.getInstance().handleQuit(null);
+            Evergreen.getInstance().handleQuit();
         }
     }
 

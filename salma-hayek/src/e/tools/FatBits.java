@@ -1,6 +1,5 @@
 package e.tools;
 
-import com.apple.eawt.*;
 import e.gui.*;
 import e.util.*;
 import java.awt.*;
@@ -54,7 +53,6 @@ public class FatBits extends MainFrame {
         preferences.readFromDisk();
         
         initAboutBox();
-        initMacOsEventHandlers();
         
         initColorLabel();
         initPositionLabel();
@@ -73,19 +71,6 @@ public class FatBits extends MainFrame {
         aboutBox.addCopyright("Copyright (C) 2005-2016 software.jessies.org team.");
         aboutBox.addCopyright("All Rights Reserved.");
         aboutBox.setLicense(AboutBox.License.GPL_2_OR_LATER);
-    }
-    
-    private void initMacOsEventHandlers() {
-        if (GuiUtilities.isMacOs() == false) {
-            return;
-        }
-        
-        Application.getApplication().addApplicationListener(new ApplicationAdapter() {
-            @Override
-            public void handleQuit(ApplicationEvent e) {
-                e.setHandled(true);
-            }
-        });
     }
     
     private JPanel makeInfoPanel() {
