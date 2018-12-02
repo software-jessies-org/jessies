@@ -460,7 +460,6 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
             public void provideMenuItems(MouseEvent e, Collection<Action> actions) {
                 final List<ExternalToolAction> tools = ExternalTools.getPopUpTools();
                 actions.add(new OpenQuicklyAction());
-                actions.add(new OpenImportAction());
                 actions.add(new FindInFilesAction());
                 actions.add(new RevertToSavedAction());
                 actions.add(null);
