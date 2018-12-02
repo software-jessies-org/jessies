@@ -3,7 +3,6 @@ package e.util;
 import e.forms.*;
 import e.gui.*;
 import java.awt.*;
-import java.awt.desktop.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.List;
@@ -145,13 +144,16 @@ public abstract class Preferences extends PreferenceGetter {
     }
     
     public void initPreferencesMenuItem(JMenu editMenu) {
+/* TODO: proxy this
         if (GuiUtilities.isMacOs()) {
             Desktop.getDesktop().setPreferencesHandler(new PreferencesHandler() {
                 @Override public void handlePreferences(PreferencesEvent e) {
                     showPreferencesDialog("Preferences");
                 }
             });
-        } else {
+        } else
+*/
+        {
             editMenu.addSeparator();
             editMenu.add(makeShowPreferencesAction());
         }

@@ -3,7 +3,6 @@ package e.gui;
 import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
-import java.awt.desktop.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
@@ -302,11 +301,13 @@ public class AboutBox {
     }
     
     private void initMacOsAboutMenu() {
+/* TODO: proxy this
         Desktop.getDesktop().setAboutHandler(new AboutHandler() {
             @Override public void handleAbout(AboutEvent e) {
                 AboutBox.getSharedInstance().show();
             }
         });
+*/
     }
     
     private void initIcon() {

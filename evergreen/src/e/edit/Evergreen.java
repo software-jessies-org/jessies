@@ -4,7 +4,6 @@ import e.gui.*;
 import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
-import java.awt.desktop.*;
 import java.awt.event.*;
 import java.io.*;
 import java.net.*;
@@ -16,7 +15,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import org.w3c.dom.*;
 
-public class Evergreen implements QuitHandler {
+public class Evergreen {
     private static Evergreen instance;
     
     private JFrame frame;
@@ -523,9 +522,11 @@ public class Evergreen implements QuitHandler {
         JFrameUtilities.setFrameIcon(frame);
     }
     
+/* TODO: proxy this
     public void handleQuitRequestWith(QuitEvent e, QuitResponse response) {
         handleQuit();
     }
+*/
 
     /**
      * Attempts to quit. All the workspaces are asked if it's safe for them to be
@@ -746,7 +747,9 @@ public class Evergreen implements QuitHandler {
         if (GuiUtilities.isMacOs() == false) {
             return;
         }
+/* TODO: proxy this
         Desktop.getDesktop().setQuitHandler(this);
+*/
     }
     
     private void initAboutBox() {
