@@ -297,17 +297,21 @@ public class AboutBox {
         if (GuiUtilities.isMacOs() == false) {
             return;
         }
-        initMacOsAboutMenu();
-    }
-    
-    private void initMacOsAboutMenu() {
-/* TODO: proxy this
-        Desktop.getDesktop().setAboutHandler(new AboutHandler() {
-            @Override public void handleAbout(AboutEvent e) {
-                AboutBox.getSharedInstance().show();
-            }
-        });
-*/
+        try {
+            // TODO: write this directly when we require Java >= 9.
+            Class<?> handlerClass = Class.forName("java.awt.desktop.AboutHandler");
+            Object proxy = java.lang.reflect.Proxy.newProxyInstance(getClass().getClassLoader(),
+                                                                    new Class[] { handlerClass },
+                                                                    (__1, method, __3) -> {
+                                                                        if (method.getName().equals("handleAbout")) {
+                                                                            AboutBox.getSharedInstance().show();
+                                                                        }
+                                                                        return Void.TYPE;
+                                                                    }
+            );
+            Desktop.class.getDeclaredMethod("setAboutHandler", handlerClass).invoke(Desktop.getDesktop(), proxy);
+        } catch (ReflectiveOperationException ignored) {
+        }
     }
     
     private void initIcon() {
