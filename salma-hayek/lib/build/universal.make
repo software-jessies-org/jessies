@@ -556,14 +556,8 @@ ALTERNATE_BOOTCLASSPATH := $(wildcard $(ALTERNATE_BOOTCLASSPATH))
 BOOT_JDK_MESSAGE += $(NEWLINE)
 BOOT_JDK_MESSAGE += You need to install a package that will give you a Java $(JAVA_MAJOR_VERSION) JDK, so we can use its rt.jar.
 BOOT_JDK_MESSAGE += $(NEWLINE)
-BOOT_JDK_MESSAGE += Do not fix the generics warnings, because that makes us depend on Java 7.
-BOOT_JDK_MESSAGE += $(NEWLINE)
-BOOT_JDK_MESSAGE += That would require changing JAVA_MAJOR_VERSION in the eponymous header.
-BOOT_JDK_MESSAGE += $(NEWLINE)
-BOOT_JDK_MESSAGE += More seriously, it would permanently break our ability to do Mac builds on Snow Leopard.
-BOOT_JDK_MESSAGE += $(NEWLINE)
 # Something else adds the trailing period.
-BOOT_JDK_MESSAGE += Yes, I know it's 2018
+BOOT_JDK_MESSAGE += You could reapply the commits from Phil to fix the generics warnings now that JAVA_MAJOR_VERSION >= 7
 BOOT_JDK_ERROR = $(error $(BOOT_JDK_MESSAGE))
 # The *** does battle with filter-build-output.rb.
 BOOT_JDK_WARNING = $(warning *** $(BOOT_JDK_MESSAGE))
