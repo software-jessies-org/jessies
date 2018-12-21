@@ -551,7 +551,8 @@ BOOT_JDK.FreeBSD = /usr/local/openjdk${JAVA_MAJOR_VERSION}
 # := deferred to ALTERNATE_BOOTCLASSPATH
 BOOT_JDK.Cygwin = $(call findMakeFriendlyEquivalentName,$(shell ruby -e 'require "$(JDK_ROOT_SCRIPT)"; puts(findBootJdkFromRegistry())'))
 
-BOOT_JDK.Darwin = /Library/Java/JavaVirtualMachines/jdk1.8.0_191.jdk/Contents/Home
+# := deferred to ALTERNATE_BOOTCLASSPATH
+BOOT_JDK.Darwin = $(shell /usr/libexec/java_home -v 1.$(JAVA_MAJOR_VERSION))
 
 BOOT_JDK = $(BOOT_JDK.$(TARGET_OS))
 ALTERNATE_BOOTCLASSPATH ?= $(BOOT_JDK)/jre/lib/rt.jar
