@@ -529,10 +529,10 @@ JAVAC_FLAGS.javac += -Xlint:all -Xlint:-serial
 JAVA_MAJOR_VERSION := $(shell ruby -e 'require "$(JDK_ROOT_SCRIPT)"; puts(JAVA_MAJOR_VERSION)')
 
 # We should also ensure that we build class files that can be used on the current Java release, regardless of where we build.
-JAVAC_FLAGS.javac += -target 1.$(JAVA_MAJOR_VERSION)
+JAVAC_FLAGS.javac += -target $(JAVA_MAJOR_VERSION)
 
 # Ensure we give a clear error if the user attempts to use anything older.
-JAVAC_FLAGS.javac += -source 1.$(JAVA_MAJOR_VERSION)
+JAVAC_FLAGS.javac += -source $(JAVA_MAJOR_VERSION)
 
 # Multi-arch from Wheezy and up
 BOOT_JDK_ALTERNATIVES += /usr/lib/jvm/java-$(JAVA_MAJOR_VERSION)-openjdk-amd64
