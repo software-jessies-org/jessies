@@ -17,8 +17,8 @@ public class FindAndReplaceAction extends ETextAction {
     private JTextField patternField = new JTextField(40);
     private JTextField replacementField = new JTextField(40);
     private ELabel statusLabel = new ELabel();
-    private JList matchList;
-    private JList replacementsList;
+    private JList<DisplayableMatch> matchList;
+    private JList<DisplayableMatch> replacementsList;
     private JScrollPane matchPane;
     private JScrollPane replacementsPane;
     
@@ -53,19 +53,18 @@ public class FindAndReplaceAction extends ETextAction {
     }
     
     private void initLists() {
-        this.matchList = new JList();
+        this.matchList = new JList<DisplayableMatch>();
         matchList.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
                     int index = matchList.locationToIndex(e.getPoint());
-                    DisplayableMatch match = (DisplayableMatch) matchList.getModel().getElementAt(index);
-                    match.doubleClick();
+                    matchList.getModel().getElementAt(index).doubleClick();
                 }
             }
         });
         matchList.setCellRenderer(new DisplayableMatchRenderer());
         
-        this.replacementsList = new JList();
+        this.replacementsList = new JList<DisplayableMatch>();
         replacementsList.setCellRenderer(new DisplayableMatchRenderer());
         
         // Make both lists scrollable...
@@ -157,17 +156,16 @@ public class FindAndReplaceAction extends ETextAction {
             super(true);
         }
 
-        @Override public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+        @Override public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            DisplayableMatch match = (DisplayableMatch) value;
             
             // If there were captured groups, set the tool tip.
             // (If not, avoid setting an empty tool tip, because that's not the same as no tool tip, and looks rather silly.)
-            FindAndReplaceAction.DisplayableMatch match = (FindAndReplaceAction.DisplayableMatch) value;
             String toolTip = match.getToolTipText();
             if (toolTip.length() > 0) {
                 setToolTipText(toolTip);
             }
-            
             return this;
         }
     }
@@ -280,26 +278,26 @@ public class FindAndReplaceAction extends ETextAction {
     
     private static final int MAX_DISPLAYED_MATCH_COUNT = 1000;
     
-    public class MatchFinder extends SwingWorker<DefaultListModel, Object> {
+    public class MatchFinder extends SwingWorker<DefaultListModel<DisplayableMatch>, Object> {
         private String regex;
         private String replacement;
         
-        private DefaultListModel matchModel;
-        private DefaultListModel replacementsModel;
+        private DefaultListModel<DisplayableMatch> matchModel;
+        private DefaultListModel<DisplayableMatch> replacementsModel;
         
         private PatternSyntaxException patternSyntaxError;
         private IndexOutOfBoundsException replacementSyntaxError;
         private boolean aborted = false;
         
         public MatchFinder(String pattern, String replacement) {
-            this.matchModel = new DefaultListModel();
-            this.replacementsModel = new DefaultListModel();
+            this.matchModel = new DefaultListModel<DisplayableMatch>();
+            this.replacementsModel = new DefaultListModel<DisplayableMatch>();
             this.regex = pattern;
             this.replacement = StringUtilities.unescapeJava(replacement);
         }
         
         @Override
-        protected DefaultListModel doInBackground() {
+            protected DefaultListModel<DisplayableMatch> doInBackground() {
             if (regex.length() == 0) {
                 return matchModel;
             }
