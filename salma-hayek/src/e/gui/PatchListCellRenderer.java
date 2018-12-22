@@ -16,9 +16,8 @@ public class PatchListCellRenderer extends EListCellRenderer {
     /**
      * Renders lines from a context diff patch in colors inspired by code2html.
      */
-    public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean isFocused) {
-        super.getListCellRendererComponent(list, value, index, isSelected, isFocused);
-        String line = (String) value;
+    public Component getListCellRendererComponent(JList<String> list, String line, int index, boolean isSelected, boolean isFocused) {
+        super.getListCellRendererComponent(list, line, index, isSelected, isFocused);
         if (isSelected) {
             // Leave the colors alone so you can still see when a +++, ---, or @@ line is selected.
         } else if (line.startsWith("+")) {
