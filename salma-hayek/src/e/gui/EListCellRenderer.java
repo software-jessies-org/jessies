@@ -10,14 +10,14 @@ import e.util.*;
  * and the tab character. We also offer the ability to render alternate
  * lines with different background colors.
  */
-public class EListCellRenderer extends DefaultListCellRenderer {
+public class EListCellRenderer<T> extends DefaultListCellRenderer {
     private boolean alternateLineColor;
 
     public EListCellRenderer(boolean alternateLineColor) {
         this.alternateLineColor = alternateLineColor;
     }
     
-    public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+    @Override public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
         super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
         // Work around a couple of JLabel problems.
@@ -41,6 +41,14 @@ public class EListCellRenderer extends DefaultListCellRenderer {
         
         setEnabled(list.isEnabled());
         
+        @SuppressWarnings("unchecked") JList<T> typedList = (JList<T>) list;
+        @SuppressWarnings("unchecked") T typedValue = (T) value;
+        doCustomization(typedList, typedValue, index, isSelected, cellHasFocus);
+        
         return this;
+    }
+    
+    public void doCustomization(JList<T> list, T value, int index, boolean isSelected, boolean cellHasFocus) {
+        // For subclassing.
     }
 }

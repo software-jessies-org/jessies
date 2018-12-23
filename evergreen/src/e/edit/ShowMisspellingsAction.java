@@ -40,7 +40,7 @@ public class ShowMisspellingsAction extends PTextAction {
         
         final JList<String> list = new JList<String>(listItems);
         list.setPrototypeCellValue("this would be quite a long misspelling");
-        list.setCellRenderer(new EListCellRenderer(true));
+        list.setCellRenderer(new EListCellRenderer<String>(true));
         ComponentUtilities.bindDoubleClickAndEnter(list, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 ETextWindow textWindow = (ETextWindow) SwingUtilities.getAncestorOfClass(ETextWindow.class, textArea);

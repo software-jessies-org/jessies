@@ -151,22 +151,18 @@ public class FindAndReplaceAction extends ETextAction {
         return pattern.matcher(oldText).replaceAll(replacementPattern);
     }
 
-    public static class DisplayableMatchRenderer extends EListCellRenderer {
+    public static class DisplayableMatchRenderer extends EListCellRenderer<DisplayableMatch> {
         public DisplayableMatchRenderer() {
             super(true);
         }
 
-        @Override public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            DisplayableMatch match = (DisplayableMatch) value;
-            
+        @Override public void doCustomization(JList<DisplayableMatch> list, DisplayableMatch match, int index, boolean isSelected, boolean cellHasFocus) {
             // If there were captured groups, set the tool tip.
             // (If not, avoid setting an empty tool tip, because that's not the same as no tool tip, and looks rather silly.)
             String toolTip = match.getToolTipText();
             if (toolTip.length() > 0) {
                 setToolTipText(toolTip);
             }
-            return this;
         }
     }
 

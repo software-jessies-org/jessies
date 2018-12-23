@@ -43,7 +43,7 @@ public class CommandDialog {
     @SuppressWarnings("deprecation") // getSelectedValueList requires Java 7.
     private void initHistoryList() {
         historyList = new JList<String>();
-        historyList.setCellRenderer(new EListCellRenderer(true));
+        historyList.setCellRenderer(new EListCellRenderer<String>(true));
         
         // If the user double-clicks on a historical command, or hits enter while the list has focus, run the command without further ado.
         ComponentUtilities.bindDoubleClickAndEnter(historyList, new ActionListener() {
