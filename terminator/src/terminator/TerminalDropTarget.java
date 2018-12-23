@@ -73,7 +73,7 @@ public class TerminalDropTarget extends DropTargetAdapter {
     
     // Sun 4899516: we need to translate a URI list (represented as a String) manually.
     private List<String> translateUriStringToFileList(String uriList) {
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         for (String uri : uriList.split("\r\n")) {
             if (uri.startsWith("#")) {
                 continue;

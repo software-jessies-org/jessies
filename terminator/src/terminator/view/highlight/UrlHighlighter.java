@@ -31,7 +31,7 @@ public class UrlHighlighter {
     
     private void addMatches(Pattern pattern, final TerminalView view, final int firstLineIndex) {
         final TerminalModel model = view.getModel();
-        ArrayList<Range> matches = new ArrayList<Range>();
+        ArrayList<Range> matches = new ArrayList<>();
         for (int i = model.getLineCount() - 1; i >= firstLineIndex; i--) {
             String text = model.getTextLine(i).getString();
             Matcher matcher = pattern.matcher(text);

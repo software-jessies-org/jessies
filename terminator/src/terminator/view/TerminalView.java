@@ -46,8 +46,8 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
     // 1. Lines with matches/URLs are very rare, so we shouldn't waste space on lines with no matches.
     // 2. We should use List<Range> rather than Range[].
     // 3. Using null instead of an empty array or list is gross (but any fix for #1 probably fixes this).
-    private final ArrayList<Range[]> urlMatches = new ArrayList<Range[]>();
-    private final ArrayList<Range[]> findMatches = new ArrayList<Range[]>();
+    private final ArrayList<Range[]> urlMatches = new ArrayList<>();
+    private final ArrayList<Range[]> findMatches = new ArrayList<>();
     
     // If non-null, the row of this is urlMouseLocation.getLineIndex()
     private Range urlUnderMouse = null;
@@ -187,7 +187,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
         if (PatternUtilities.ERROR_PATTERN.matcher(url).matches()) {
             JTerminalPane terminalPane = (JTerminalPane) SwingUtilities.getAncestorOfClass(JTerminalPane.class, this);
             String title = terminalPane.getTerminalName();
-            ArrayList<String> lines = new ArrayList<String>();
+            ArrayList<String> lines = new ArrayList<>();
             String cmd = Terminator.getPreferences().getString(TerminatorPreferences.ERROR_LINK_CMD);
             if (ProcessUtilities.backQuote(null, new String[] {cmd, url, title}, lines, lines) != 0) {
                 SimpleDialog.showAlert(this, "External command " + cmd + " failed:", StringUtilities.join(lines, "\n"));

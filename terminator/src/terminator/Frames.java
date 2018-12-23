@@ -13,7 +13,7 @@ import javax.swing.*;
  * and its menu is used for the screen menu bar.
  */
 public class Frames implements Iterable<TerminatorFrame> {
-    private ArrayList<TerminatorFrame> list = new ArrayList<TerminatorFrame>();
+    private ArrayList<TerminatorFrame> list = new ArrayList<>();
     private JFrame hiddenFrame; // Mac OS X only.
     
     private static final Action[] DOCK_MENU_ACTIONS = new Action[] {
@@ -116,7 +116,7 @@ public class Frames implements Iterable<TerminatorFrame> {
      * You might think you could use our iterator() with Collections.list(), but you'd be wrong, because it uses Enumeration instead.
      */
     public ArrayList<TerminatorFrame> toArrayList() {
-        ArrayList<TerminatorFrame> result = new ArrayList<TerminatorFrame>();
+        ArrayList<TerminatorFrame> result = new ArrayList<>();
         result.addAll(list);
         return result;
     }

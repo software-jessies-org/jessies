@@ -12,14 +12,14 @@ public class TerminalModel {
     private TerminalView view;
     private int width;
     private int height;
-    private ArrayList<TextLine> textLines = new ArrayList<TextLine>();
+    private ArrayList<TextLine> textLines = new ArrayList<>();
     private Style currentStyle = Style.getDefaultStyle();
     private int firstScrollLineIndex;
     private int lastScrollLineIndex;
     private Location cursorPosition;
     private int lastValidStartIndex = 0;
     private boolean insertMode = false;
-    private ArrayList<Integer> tabPositions = new ArrayList<Integer>();
+    private ArrayList<Integer> tabPositions = new ArrayList<>();
     private int maxLineWidth = width;
     private int flushes = 0;
     
@@ -128,7 +128,7 @@ public class TerminalModel {
         // multiple physical lines, and the cursor may not be on the
         // first of those lines. Ideally we should keep all pertinent
         // lines. Unfortunately, I can't see how we'd know.
-        ArrayList<TextLine> retainedLines = new ArrayList<TextLine>(textLines.subList(cursorPosition.getLineIndex(), textLines.size()));
+        ArrayList<TextLine> retainedLines = new ArrayList<>(textLines.subList(cursorPosition.getLineIndex(), textLines.size()));
         
         // Revert to just the right number of empty lines to fill the
         // current window size.

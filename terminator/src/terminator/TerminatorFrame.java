@@ -295,7 +295,7 @@ public class TerminatorFrame extends JFrame implements TerminalPaneHost {
     
     public void handleWindowCloseRequestFromUser() {
         // We can't iterate over "terminals" directly because we're causing terminals to close and be removed from the list.
-        ArrayList<JTerminalPane> copyOfTerminals = new ArrayList<JTerminalPane>(terminals);
+        ArrayList<JTerminalPane> copyOfTerminals = new ArrayList<>(terminals);
         for (JTerminalPane terminal : copyOfTerminals) {
             if (tabbedPane != null) {
                 tabbedPane.setSelectedComponent(terminal);
