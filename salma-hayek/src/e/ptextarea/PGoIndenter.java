@@ -67,7 +67,7 @@ public class PGoIndenter extends PSimpleIndenter {
                 // happen to be part of a ML string.
                 return charSeq.charAt(0) != '`';
             }
-            ArrayList<PLineSegment> reversed = new ArrayList<PLineSegment>(ls);
+            ArrayList<PLineSegment> reversed = new ArrayList<>(ls);
             Collections.reverse(reversed);
             for (int i = 0; i < reversed.size(); i++) {
                 PLineSegment seg = reversed.get(i);
@@ -99,7 +99,7 @@ public class PGoIndenter extends PSimpleIndenter {
             return null;
         }
         // Start by going back to the earliest previous line which has content, but no indent, caching all interesting lines.
-        ArrayList<String> prevLines = new ArrayList<String>();  // Avoid fetching the same thing and checking for ML strings over and over again.
+        ArrayList<String> prevLines = new ArrayList<>();  // Avoid fetching the same thing and checking for ML strings over and over again.
         for (int startIndex = lineIndex - 1; startIndex >= 0; --startIndex) {
             // We use the line segments (which have been through the styler) so we can detect when we're in strings
             // or comments, and just remove all that stuff. This will make our job easier later, as we won't need to
@@ -122,7 +122,7 @@ public class PGoIndenter extends PSimpleIndenter {
         // Now prevLines contains the pre-processed code, all comments and strings elided, which goes back from the
         // line before the one to be indented, to the latest earlier line which starts without indent. This will be
         // a func definition, or (var|import|const) \( beginning.
-        Stack<Indent> indents = new Stack<Indent>();
+        Stack<Indent> indents = new Stack<>();
         // We appended to prevLines, walking backwards through the file, so we need to process the last one first.
         // Very biblical.
         String indent = "";

@@ -7,7 +7,7 @@ import javax.swing.Timer;
 
 public class TimerUtilities {
     public static List<Timer> getQueuedSwingTimers() {
-        ArrayList<Timer> result = new ArrayList<Timer>();
+        ArrayList<Timer> result = new ArrayList<>();
         try {
             Class<?> timerQueueClass = Class.forName("javax.swing.TimerQueue");
             Method sharedInstanceMethod = timerQueueClass.getDeclaredMethod("sharedInstance");

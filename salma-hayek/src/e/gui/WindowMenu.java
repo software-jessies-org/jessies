@@ -26,7 +26,7 @@ public class WindowMenu {
     private final WindowEventListener windowEventListener = new WindowEventListener();
     private final WindowTitleListener windowTitleListener = new WindowTitleListener();
     
-    private final ArrayList<Frame> windows = new ArrayList<Frame>();
+    private final ArrayList<Frame> windows = new ArrayList<>();
     
     private WindowMenu() {
     }

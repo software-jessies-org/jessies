@@ -45,9 +45,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     private boolean canShowRightHandMargin = false;
     private int rightHandMarginColumn = NO_MARGIN;
     
-    private ArrayList<PCaretListener> caretListeners = new ArrayList<PCaretListener>();
-    private ArrayList<PFindListener> findListeners = new ArrayList<PFindListener>();
-    private TreeMap<Integer, List<PLineSegment>> segmentCache = new TreeMap<Integer, List<PLineSegment>>();
+    private ArrayList<PCaretListener> caretListeners = new ArrayList<>();
+    private ArrayList<PFindListener> findListeners = new ArrayList<>();
+    private TreeMap<Integer, List<PLineSegment>> segmentCache = new TreeMap<>();
     
     private UnaryFunctor<String, String> pastedTextReformatter = new UnaryFunctor<String, String>() {
         public String evaluate(String s) {
@@ -676,7 +676,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         getLock().getWriteLock();
         try {
             List<PHighlight> removeList = highlights.getNamedHighlightsOverlapping(highlighterName, beginOffset, endOffset);
-            IdentityHashMap<PAnchor, Object> deadAnchors = new IdentityHashMap<PAnchor, Object>();
+            IdentityHashMap<PAnchor, Object> deadAnchors = new IdentityHashMap<>();
             for (PHighlight highlight : removeList) {
                 highlight.collectAnchors(deadAnchors);
                 highlights.remove(highlight);
@@ -799,7 +799,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         int lineIndex = splitLine.getLineIndex();
         List<PLineSegment> segments = getLineSegments(lineIndex);
         int index = 0;
-        ArrayList<PLineSegment> result = new ArrayList<PLineSegment>();
+        ArrayList<PLineSegment> result = new ArrayList<>();
         int start = splitLine.getOffset();
         int end = start + splitLine.getLength();
         
@@ -875,7 +875,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     }
     
     private List<PLineSegment> applyStyleApplicator(StyleApplicator styleApplicator, String line, List<PLineSegment> inputSegments) {
-        List<PLineSegment> result = new ArrayList<PLineSegment>();
+        List<PLineSegment> result = new ArrayList<>();
         for (PLineSegment segment : inputSegments) {
             if (styleApplicator.canApplyStylingTo(segment.getStyle())) {
                 result.addAll(styleApplicator.applyStylingTo(line, segment));

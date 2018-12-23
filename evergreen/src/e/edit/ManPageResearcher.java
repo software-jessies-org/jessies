@@ -12,7 +12,7 @@ import e.util.*;
 public class ManPageResearcher implements WorkspaceResearcher {
     // A set of unique man page names, so we can quickly determine whether we have a suitable page.
     // This also lets us avoid accidentally returning man pages we're trying to ignore.
-    private static final Set<String> uniqueManPageNames = new TreeSet<String>();
+    private static final Set<String> uniqueManPageNames = new TreeSet<>();
 
     /**
      * Initializes the set of known man pages.
@@ -43,7 +43,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
         }
 
         // Prime the spelling checker with all the unique words we found.
-        final Set<String> uniqueWords = new TreeSet<String>();
+        final Set<String> uniqueWords = new TreeSet<>();
         Advisor.extractUniqueWords(uniqueManPageNames, uniqueWords);
         SpellingChecker.getSharedSpellingCheckerInstance().addSpellingExceptionsFor(FileType.C_PLUS_PLUS, uniqueWords);
 
@@ -52,7 +52,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
     }
 
     private static List<File> findManPageDirectories() {
-        ArrayList<File> manPaths = new ArrayList<File>();
+        ArrayList<File> manPaths = new ArrayList<>();
         Pattern manPathPattern = Pattern.compile("^(?:MANDATORY_)?MANPATH\\s+(.*)$");
         String[] configurationPossibilities = new String[] { "/usr/share/misc/man.conf", "/etc/manpath.config" };
         for (String configurationPossibility : configurationPossibilities) {
@@ -84,7 +84,7 @@ public class ManPageResearcher implements WorkspaceResearcher {
     // FIXME: we're relying on unmaintained code (rman) here, and should really look at doing something better.
     // If nothing else, we should pull this out into a helper script. We're not gaining anything by writing this in Java.
     public String formatManPage(String page, String section) {
-        ArrayList<String> commands = new ArrayList<String>();
+        ArrayList<String> commands = new ArrayList<>();
         String polyglotMan = findPolyglotMan();
         if (polyglotMan == null) {
             // If we're on a system without rman(1), at least display something.
@@ -92,8 +92,8 @@ public class ManPageResearcher implements WorkspaceResearcher {
         } else {
             polyglotMan = "'" + polyglotMan + "' -f HTML -r 'man:%s(%s)'";
 
-            ArrayList<String> lines = new ArrayList<String>();
-            ArrayList<String> errors = new ArrayList<String>();
+            ArrayList<String> lines = new ArrayList<>();
+            ArrayList<String> errors = new ArrayList<>();
             int status = ProcessUtilities.backQuote(null, ProcessUtilities.makeShellCommandArray("man -a -S " + section + " -w " + page), lines, errors);
             if (status != 0) {
                 return "";
@@ -113,8 +113,8 @@ public class ManPageResearcher implements WorkspaceResearcher {
             }
         }
 
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         for (String command : commands) {
             // FIXME: should we do anything if status is non-zero?
             int status = ProcessUtilities.backQuote(null, ProcessUtilities.makeShellCommandArray(command), lines, errors);

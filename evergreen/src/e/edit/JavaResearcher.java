@@ -15,7 +15,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     private static final String NEWLINE = "<br>" + INDENT;
     private static final String COMMA = ",&nbsp;";
     
-    private static final Set<String> uniqueIdentifiers = new TreeSet<String>();
+    private static final Set<String> uniqueIdentifiers = new TreeSet<>();
     
     private static String[] javaDocSummary = new String[0];
     
@@ -61,7 +61,7 @@ public class JavaResearcher implements WorkspaceResearcher {
         }
         
         // Prime the spelling checker with all the unique words we found.
-        final Set<String> uniqueWords = new TreeSet<String>();
+        final Set<String> uniqueWords = new TreeSet<>();
         Advisor.extractUniqueWords(uniqueIdentifiers, uniqueWords);
         SpellingChecker.getSharedSpellingCheckerInstance().addSpellingExceptionsFor(FileType.JAVA, uniqueWords);
         
@@ -91,7 +91,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     }
     
     public synchronized List<String> listIdentifiersStartingWith(String prefix) {
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         for (String identifier : uniqueIdentifiers) {
             if (identifier.startsWith(prefix)) {
                 result.add(identifier);
@@ -313,7 +313,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     
     private String makeMethodLinks(Method[] methods) {
         Arrays.sort(methods, new MemberNameComparator());
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
         for (Method method : methods) {
             list.add(makeMethodLink(method));
         }
@@ -434,7 +434,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     }
     
     private List<Field> collectNonPrivateFields(Class<?> c) {
-        ArrayList<Field> result = new ArrayList<Field>();
+        ArrayList<Field> result = new ArrayList<>();
         for (Field field : c.getFields()) {
             if (Modifier.isPrivate(field.getModifiers()) == false) {
                 result.add(field);
@@ -444,7 +444,7 @@ public class JavaResearcher implements WorkspaceResearcher {
     }
     
     private List<Method> collectStaticMethods(Class<?> c) {
-        ArrayList<Method> result = new ArrayList<Method>();
+        ArrayList<Method> result = new ArrayList<>();
         for (Method method : c.getMethods()) {
             int modifiers = method.getModifiers();
             if (Modifier.isPrivate(modifiers) == false && Modifier.isStatic(modifiers)) {

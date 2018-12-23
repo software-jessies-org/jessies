@@ -40,8 +40,8 @@ public class GoToTagAction extends ETextAction {
         final String findTagsExecutable = Parameters.getString("tags.findTagsTool", defaultFindTagsExecutable);
         // FIXME: we could usefully check for a "tags" file, and maybe even offer to generate a usable one, but we'd need some kind of override in case a custom tool doesn't use a file.
         // FIXME: if Evergreen knew how to regenerate the tags, we could perhaps link it to "rescan".
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(FileUtilities.fileFromString(workspaceRoot), new String[] { findTagsExecutable, tagName }, lines, errors);
         if (status == 1 || errors.size() > 0) {
             Evergreen.getInstance().showAlert("Unable to go to tag", findTagsExecutable + " failed. Error output:\n" + StringUtilities.join(errors, "\n"));
@@ -50,7 +50,7 @@ public class GoToTagAction extends ETextAction {
         
         // Pull the addresses out of the matches.
         // We assume the output is in a form similar to http://code.google.com/p/google-gtags/ so people can use that or the default script we supply.
-        ArrayList<String> addresses = new ArrayList<String>();
+        ArrayList<String> addresses = new ArrayList<>();
         final Pattern pattern = Pattern.compile("^([^\t]+:\\d+)");
         for (String line: lines) {
             Matcher matcher = pattern.matcher(line);
@@ -64,11 +64,11 @@ public class GoToTagAction extends ETextAction {
         } else if (addresses.size() == 1) {
             Evergreen.getInstance().openFile(workspaceRoot + File.separator + addresses.get(0));
         } else {
-            final JList list = new JList(addresses.toArray(new String[addresses.size()]));
-            list.setCellRenderer(new EListCellRenderer(true));
+            final JList<String> list = new JList<>(addresses.toArray(new String[addresses.size()]));
+            list.setCellRenderer(new EListCellRenderer<String>(true));
             ComponentUtilities.bindDoubleClickAndEnter(list, new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    final String address = (String) list.getSelectedValue();
+                    final String address = list.getSelectedValue();
                     Evergreen.getInstance().openFile(workspaceRoot + File.separator + address);
                 }
             });

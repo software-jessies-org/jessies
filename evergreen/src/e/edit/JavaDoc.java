@@ -19,13 +19,13 @@ public class JavaDoc {
     public static final String SUN_JAVA_DOC_LOCATION = "http://java.sun.com/javase/6/docs/api/";
     
     /** Holds the name of every package we know of. */
-    private static ArrayList<String> packageNames = new ArrayList<String>();
+    private static ArrayList<String> packageNames = new ArrayList<>();
     
     /** Places to look for JavaDoc. */
-    private static ArrayList<String> javaDocLocations = new ArrayList<String>();
+    private static ArrayList<String> javaDocLocations = new ArrayList<>();
     
     /** Cached JavaDoc locations for classes we've already seen. */
-    private static HashMap<String, String> docLinks = new HashMap<String, String>();
+    private static HashMap<String, String> docLinks = new HashMap<>();
     
     /** Tells us if the text around the caret is a genuine classname or not. */
     private static URLClassLoader classLoader;
@@ -49,7 +49,7 @@ public class JavaDoc {
         /**
         * Find all the packages specified by the "java.advisor.classpath" property.
         */
-        ArrayList<URL> urls = new ArrayList<URL>();
+        ArrayList<URL> urls = new ArrayList<>();
         for (String classPathItem : Parameters.getListOfSemicolonSeparatedElements("java.advisor.classpath")) {
             if (classPathItem.length() > 0) {
                 File classpath = FileUtilities.fileFromString(classPathItem);
@@ -177,7 +177,7 @@ public class JavaDoc {
      */
     public static List<String> findSourceFilenames(String dottedClassName) {
         String suffix = "\\b" + Pattern.quote(dottedClassName.replace('.', File.separatorChar)) + "\\.java$";
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for (Workspace workspace : Evergreen.getInstance().getWorkspaces()) {
             for (String leafName : workspace.getFileList().getListOfFilesMatching(suffix)) {
                 result.add(workspace.prependRootDirectory(leafName));
@@ -277,7 +277,7 @@ public class JavaDoc {
     * Returns all classes whose name matches the supplied string.
     */
     public static Collection<Class<?>> getClasses(String className) {
-        ArrayList<Class<?>> classes = new ArrayList<Class<?>>();
+        ArrayList<Class<?>> classes = new ArrayList<>();
         for (String packageName : packageNames) {
             String soughtClass = packageName + ((packageName.length() > 0) ? "." : "") + className;
             try {

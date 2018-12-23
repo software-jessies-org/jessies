@@ -17,7 +17,7 @@ public class Launcher {
         String className = arguments[1];
         Class<?> appClass = Class.forName(className);
         final Launchable app = (Launchable) appClass.getDeclaredConstructor().newInstance();
-        final ArrayList<String> appArguments = new ArrayList<String>();
+        final ArrayList<String> appArguments = new ArrayList<>();
         for (int i = 2; i < arguments.length; ++i) {
             appArguments.add(arguments[i]);
         }

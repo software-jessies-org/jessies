@@ -33,7 +33,7 @@ public class ShowUiDefaults {
             return;
         }
         
-        ArrayList<String> list = new ArrayList<String>();
+        ArrayList<String> list = new ArrayList<>();
         UIDefaults defaults = UIManager.getLookAndFeelDefaults();
         for (Enumeration<Object> e = defaults.keys(); e.hasMoreElements();) {
             Object key = e.nextElement();

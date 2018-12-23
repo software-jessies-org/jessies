@@ -5,7 +5,7 @@ import java.util.*;
 public class PReverseSegmentIterator implements Iterator<PLineSegment> {
     private PTextArea textArea;
     private int lineIndex;
-    private LinkedList<PLineSegment> segmentBuffer = new LinkedList<PLineSegment>();
+    private LinkedList<PLineSegment> segmentBuffer = new LinkedList<>();
     
     /**
      * Creates a new PReverseSegmentIterator which will iterate backwards over the unwrapped segments,

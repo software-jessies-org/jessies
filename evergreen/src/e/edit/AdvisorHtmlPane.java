@@ -50,8 +50,8 @@ public class AdvisorHtmlPane extends JComponent implements HyperlinkListener {
     private final ForwardAction FORWARD_ACTION = new ForwardAction();
     
     private JTextPane textPane;
-    private ArrayList<Advice> history = new ArrayList<Advice>();
-    private ArrayList<Advice> future = new ArrayList<Advice>();
+    private ArrayList<Advice> history = new ArrayList<>();
+    private ArrayList<Advice> future = new ArrayList<>();
     private EStatusBar statusBar;
     
     static {

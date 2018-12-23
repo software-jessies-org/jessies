@@ -14,7 +14,7 @@ public class JListCopyAction extends AbstractAction {
     /**
      * Fixes the ActionMap for the given JList.
      */
-    public static void fixCopyFor(JList list) {
+    public static void fixCopyFor(JList<?> list) {
         list.getActionMap().put("copy", new JListCopyAction());
     }
     
@@ -23,17 +23,14 @@ public class JListCopyAction extends AbstractAction {
     }
     
     public void actionPerformed(ActionEvent e) {
-        copyListSelectionToClipboard((JList) e.getSource());
+        copyListSelectionToClipboard((JList<?>) e.getSource());
     }
     
-    @SuppressWarnings("deprecation") // getSelectedValueList requires Java 7.
-    private void copyListSelectionToClipboard(JList list) {
+    private void copyListSelectionToClipboard(JList<?> list) {
         // Make a StringSelection corresponding to the selected lines.
         StringBuilder buffer = new StringBuilder();
-        Object[] selectedLines = list.getSelectedValues();
-        for (int i = 0; i < selectedLines.length; ++i) {
-            String line = selectedLines[i].toString();
-            buffer.append(line);
+        for (Object line : list.getSelectedValuesList()) {
+            buffer.append(line.toString());
             buffer.append('\n');
         }
         StringSelection selection = new StringSelection(buffer.toString());

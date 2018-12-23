@@ -24,7 +24,7 @@ public class RegularExpressionStyleApplicator implements StyleApplicator {
     }
     
     public List<PLineSegment> applyStylingTo(String line, PLineSegment segment) {
-        ArrayList<PLineSegment> result = new ArrayList<PLineSegment>();
+        ArrayList<PLineSegment> result = new ArrayList<>();
         Matcher matcher = pattern.matcher(segment.getCharSequence());
         int normalStart = 0;
         int offset = segment.getOffset();

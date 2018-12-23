@@ -34,7 +34,7 @@ import e.util.*;
  */
 
 public class PLock {
-    private Map<Thread, Integer> readLocks = new HashMap<Thread, Integer>();
+    private Map<Thread, Integer> readLocks = new HashMap<>();
     private Thread writeLock = null;
     private int writeLockCount = 0;
     

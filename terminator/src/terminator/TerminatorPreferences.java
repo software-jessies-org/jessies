@@ -100,7 +100,7 @@ public class TerminatorPreferences extends Preferences {
     // Offer various preset color combinations.
     // Note that these get fossilized into the user's preferences; updating values here doesn't affect users who've already clicked the button.
     @Override protected void willAddRows(List<FormPanel> formPanels) {
-        ArrayList<JButton> buttons = new ArrayList<JButton>();
+        ArrayList<JButton> buttons = new ArrayList<>();
         buttons.add(makePresetButton("White on Blue", VERY_DARK_BLUE, NEAR_WHITE, Color.GREEN, SELECTION_BLUE));
         buttons.add(makePresetButton("Green on Black", Color.BLACK, NEAR_GREEN, Color.GREEN, SELECTION_BLUE));
         buttons.add(makePresetButton("White on Black", Color.BLACK, NEAR_WHITE, Color.GREEN, Color.DARK_GRAY));
@@ -199,7 +199,7 @@ public class TerminatorPreferences extends Preferences {
         }
         
         public void addRow(FormPanel formPanel, final String key, final String description) {
-            final JComboBox choices = new JComboBox();
+            final JComboBox<String> choices = new JComboBox<>();
             for (String paletteName : Palettes.names()) {
                 choices.addItem(paletteName);
             }

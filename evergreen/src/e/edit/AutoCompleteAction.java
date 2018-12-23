@@ -60,7 +60,7 @@ public class AutoCompleteAction extends ETextAction {
         }
         
         String[] completions = completionsList.toArray(new String[completionsList.size()]);
-        final JList completionsUi = new JList(completions);
+        final JList<String> completionsUi = new JList<>(completions);
         completionsUi.addFocusListener(new FocusAdapter() {
             public void focusLost(FocusEvent e) {
                 hideCompletionsWindow();
@@ -69,7 +69,7 @@ public class AutoCompleteAction extends ETextAction {
         completionsUi.addKeyListener(new KeyAdapter() {
             public void keyTyped(KeyEvent e) {
                 if (e.getKeyChar() == '\n') {
-                    textArea.replaceRange((String) completionsUi.getSelectedValue(), startPosition, endPosition);
+                    textArea.replaceRange(completionsUi.getSelectedValue(), startPosition, endPosition);
                     hideCompletionsWindow();
                     textArea.requestFocus();
                     e.consume();
@@ -86,7 +86,7 @@ public class AutoCompleteAction extends ETextAction {
         completionsUi.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 int index = completionsUi.locationToIndex(e.getPoint());
-                textArea.replaceRange((String) completionsUi.getModel().getElementAt(index), startPosition, endPosition);
+                textArea.replaceRange(completionsUi.getModel().getElementAt(index), startPosition, endPosition);
                 hideCompletionsWindow();
                 textArea.requestFocus();
                 e.consume();

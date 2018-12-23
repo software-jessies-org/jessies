@@ -66,7 +66,7 @@ public class TerminatorOpener implements Runnable {
     }
     
     private List<JTerminalPane> getInitialTerminals() {
-        ArrayList<JTerminalPane> result = new ArrayList<JTerminalPane>();
+        ArrayList<JTerminalPane> result = new ArrayList<>();
         String name = null;
         String workingDirectory = null;
         for (int i = 0; i < arguments.size(); ++i) {

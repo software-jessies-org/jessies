@@ -12,7 +12,7 @@ import javax.swing.*;
 public class Advisor extends JPanel {
     private static Advisor instance;
 
-    private static final ArrayList<WorkspaceResearcher> researchers = new ArrayList<WorkspaceResearcher>();
+    private static final ArrayList<WorkspaceResearcher> researchers = new ArrayList<>();
 
     /** The advice window. */
     private AdvisorHtmlPane advicePane = new AdvisorHtmlPane();
@@ -58,7 +58,7 @@ public class Advisor extends JPanel {
 
     private static void initResearchersInParallel() {
         synchronized (researchers) {
-            final ConcurrentLinkedQueue<WorkspaceResearcher> newResearchers = new ConcurrentLinkedQueue<WorkspaceResearcher>();
+            final ConcurrentLinkedQueue<WorkspaceResearcher> newResearchers = new ConcurrentLinkedQueue<>();
 
             // Run all the researchers' initialization code in parallel.
             final ExecutorService executor = ThreadUtilities.newFixedThreadPool(8, "initResearchersOnBackgroundThread");
@@ -248,8 +248,8 @@ public class Advisor extends JPanel {
     }
 
     public static String findToolOnPath(String tool) {
-        ArrayList<String> availableTools = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> availableTools = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(null, new String[] { "which", tool }, availableTools, errors);
         if (status != 0 || availableTools.size() == 0) {
             return null;

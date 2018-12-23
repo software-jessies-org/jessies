@@ -70,7 +70,7 @@ public final class Assert {
      */
     public static void matches(final Pattern pattern, final String text, final String... expectedMatches) {
         final List<String> expected = Arrays.asList(expectedMatches);
-        final List<String> actual = new ArrayList<String>();
+        final List<String> actual = new ArrayList<>();
         final Matcher matcher = pattern.matcher(text);
         while (matcher.find()) {
             actual.add(matcher.group(1));

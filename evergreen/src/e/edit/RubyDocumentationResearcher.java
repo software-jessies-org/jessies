@@ -10,8 +10,8 @@ public class RubyDocumentationResearcher implements WorkspaceResearcher {
         if (ri == null) {
             return "";
         }
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(null, ProcessUtilities.makeShellCommandArray(ri + " -T -f rdoc " + string + " | rdoc --pipe"), lines, errors);
         
         String className = string;

@@ -45,7 +45,7 @@ public class Log {
     private static ArrayList<String> banners = initBanners();
     
     private static ArrayList<String> initBanners() {
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         result.add(getJavaVersion());
         result.add(getOsVersion());
         String launcherOsVersion = System.getProperty("e.util.Log.launcherOsVersion");

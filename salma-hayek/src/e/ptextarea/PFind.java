@@ -34,7 +34,7 @@ public class PFind {
         private JTextField findField = new JTextField(40);
         private PTextArea textArea;
         
-        private List<PTextAction> actions = new ArrayList<PTextAction>();
+        private List<PTextAction> actions = new ArrayList<>();
         
         public FindAction() {
             super("_Find...", "F", false);

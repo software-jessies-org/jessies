@@ -13,7 +13,7 @@ import e.util.*;
  * needs to be shown.
  */
 public class EPopupMenu {
-    private ArrayList<MenuItemProvider> providers = new ArrayList<MenuItemProvider>();
+    private ArrayList<MenuItemProvider> providers = new ArrayList<>();
     private Component componentWithMenu;
     
     private void attachPopupMenuTo(Component c) {
@@ -143,11 +143,11 @@ public class EPopupMenu {
     }
     
     private void showPopupMenu(MouseEvent e) {
-        List<Action> menuItems = new ArrayList<Action>();
+        List<Action> menuItems = new ArrayList<>();
         
         for (MenuItemProvider provider : providers) {
             // Collect this provider's items.
-            List<Action> newItems = new ArrayList<Action>();
+            List<Action> newItems = new ArrayList<>();
             provider.provideMenuItems(e, newItems);
             
             // Did it have anything to add?

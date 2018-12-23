@@ -13,7 +13,7 @@ import java.util.*;
  */
 public class TerminatorServer {
     public void parseCommandLine(PrintWriter out, String line) {
-        List<String> arguments = new ArrayList<String>();
+        ArrayList<String> arguments = new ArrayList<>();
         String[] encodedArguments = line.split(" ");
         for (String encodedArgument : encodedArguments) {
             String argument = StringUtilities.urlDecode(encodedArgument);

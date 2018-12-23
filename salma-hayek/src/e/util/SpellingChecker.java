@@ -117,12 +117,12 @@ public class SpellingChecker {
     
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
-    private static final HashMap<FileType, InheritingSet> SPELLING_EXCEPTIONS_MAP = new HashMap<FileType, InheritingSet>();
+    private static final HashMap<FileType, InheritingSet> SPELLING_EXCEPTIONS_MAP = new HashMap<>();
     
     // A set of strings whose 'contains' method delegates to its parent on failure.
     // This allows each FileType-specific set to delegate to a FileType-independent general purpose set.
     static class InheritingSet {
-        private final HashSet<String> set = new HashSet<String>();
+        private final HashSet<String> set = new HashSet<>();
         private final InheritingSet parent;
         
         InheritingSet(InheritingSet parent) {
@@ -228,7 +228,7 @@ public class SpellingChecker {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
     public synchronized String[] getSuggestionsFor(String misspelledWord) {
-        ArrayList<String> suggestions = new ArrayList<String>();
+        ArrayList<String> suggestions = new ArrayList<>();
         boolean isMisspelled = isMisspelledWordAccordingToIspell(misspelledWord, suggestions);
         if (isMisspelled == false) {
             return new String[0];
@@ -342,7 +342,7 @@ public class SpellingChecker {
         if (matcher.find() == false) {
             return false; // We don't understand what ispell's said, so let's not assume anything.
         }
-        List<String> suggestions = new ArrayList<String>();
+        List<String> suggestions = new ArrayList<>();
         fillCollectionWithSuggestions(response, suggestions);
         for (String suggestion : suggestions) {
             if (suggestion.equalsIgnoreCase(word)) {

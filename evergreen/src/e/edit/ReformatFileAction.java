@@ -60,8 +60,8 @@ public class ReformatFileAction extends ETextAction {
         
         int position = textArea.getSelectionStart();
         String input = textArea.getText();
-        ArrayList<String> output = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> output = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(null, new String[] { "clang-format", "--assume-filename=" + FileUtilities.translateFilenameForShellUse(textWindow.getFilename()), "--fallback-style=Chromium", "--style=file", "--cursor=" + position}, input, output, errors);
         if (!errors.isEmpty()) {
             return "clang-format failed: " + StringUtilities.join(errors, "\n");

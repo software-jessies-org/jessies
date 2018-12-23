@@ -67,7 +67,7 @@ public class CheckForLintAction extends ETextAction {
         command += " \"" + FileUtilities.fileFromString(filename).toString() + "\"";
         
         // Collect stdout and stderr into the same list, so we don't have to worry about which commands output where.
-        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
         int status = ProcessUtilities.backQuote(null, ProcessUtilities.makeShellCommandArray(command), lines, lines);
         
         if (fileType == FileType.XML) {

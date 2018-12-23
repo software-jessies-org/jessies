@@ -9,7 +9,7 @@ import java.util.*;
  */
 class PAnchorSet implements PTextListener {
     // This list is sorted so we can binarySearch it.
-    private ArrayList<PAnchor> anchors = new ArrayList<PAnchor>();
+    private ArrayList<PAnchor> anchors = new ArrayList<>();
     
     synchronized void add(PAnchor anchor) {
         int index = getFirstAnchorIndex(anchor.getIndex());
@@ -118,7 +118,7 @@ class PAnchorSet implements PTextListener {
         int removeCount = countAnchorsInRegion(firstAnchorIndex, event.getOffset(), deletionLength);
         // Copy the to-be-removed PAnchor instances to safety, then remove them from "anchors".
         List<PAnchor> unsafeAnchorsToRemove = anchors.subList(firstAnchorIndex, firstAnchorIndex + removeCount);
-        List<PAnchor> anchorsToRemove = new ArrayList<PAnchor>(unsafeAnchorsToRemove);
+        List<PAnchor> anchorsToRemove = new ArrayList<>(unsafeAnchorsToRemove);
         unsafeAnchorsToRemove.clear();
         // Note that the sub-class of PAnchor in PHighlight relies upon this delete
         // call in order to properly destroy itself when one of its extremes is

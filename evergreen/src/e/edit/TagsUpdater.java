@@ -213,7 +213,7 @@ public class TagsUpdater {
 
         private DefaultMutableTreeNode root;
         private DefaultTreeModel treeModel;
-        private Map<String, DefaultMutableTreeNode> branches = new HashMap<String, DefaultMutableTreeNode>();
+        private Map<String, DefaultMutableTreeNode> branches = new HashMap<>();
 
         public TreeModelBuilder(int serialNumber) {
             this.serialNumber = serialNumber;
@@ -366,7 +366,7 @@ public class TagsUpdater {
     }
 
     private static class BranchNode extends DefaultMutableTreeNode {
-        private ArrayList<String> kidSortKeys = new ArrayList<String>();
+        private ArrayList<String> kidSortKeys = new ArrayList<>();
 
         public BranchNode(Object userObject) {
             super(userObject);

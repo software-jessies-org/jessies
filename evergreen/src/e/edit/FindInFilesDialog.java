@@ -165,7 +165,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         private String fileRegex;
         private String errorMessage;
         
-        private HashMap<String, DefaultMutableTreeNode> pathMap = new HashMap<String, DefaultMutableTreeNode>();
+        private HashMap<String, DefaultMutableTreeNode> pathMap = new HashMap<>();
         
         private int sequenceNumber;
         
@@ -348,7 +348,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                     }
                     
                     if (regex.length() != 0) {
-                        ArrayList<String> matches = new ArrayList<String>();
+                        ArrayList<String> matches = new ArrayList<>();
                         boolean wasText = fileSearcher.searchFile(file, matches);
                         if (wasText == false) {
                             // FIXME: should we do the grep(1) thing of "binary file <x> matches"?

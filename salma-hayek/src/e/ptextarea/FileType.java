@@ -5,7 +5,7 @@ import java.util.*;
 import java.util.regex.*;
 
 public class FileType {
-    private static final Map<String, FileType> ALL_FILE_TYPES = new HashMap<String, FileType>();
+    private static final Map<String, FileType> ALL_FILE_TYPES = new HashMap<>();
     
     /**
      * Call this function, preferably once, to initialize the preferences for each filetype, and load them from a file.
@@ -200,7 +200,7 @@ public class FileType {
     }
     
     public static Set<String> getAllFileTypeNames() {
-        TreeSet<String> allFileTypeNames = new TreeSet<String>();
+        TreeSet<String> allFileTypeNames = new TreeSet<>();
         for (FileType fileType : ALL_FILE_TYPES.values()) {
             allFileTypeNames.add(fileType.getName());
         }
@@ -384,7 +384,7 @@ public class FileType {
     // We're happy with empty lines.
     // We don't actually need strings; subsequences are fine.
     private static List<CharSequence> splitLines(CharSequence content, int limit) {
-        final ArrayList<CharSequence> result = new ArrayList<CharSequence>();
+        final ArrayList<CharSequence> result = new ArrayList<>();
         final int length = content.length();
         int lastSplitOffset = 0;
         for (int i = 0; i < length; ++i) {

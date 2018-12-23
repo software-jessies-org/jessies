@@ -12,8 +12,8 @@ public class PerlDocumentationResearcher implements WorkspaceResearcher {
             return "";
         }
         
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         File tmp = new File(System.getProperty("java.io.tmpdir"));
         int status = ProcessUtilities.backQuote(tmp, ProcessUtilities.makeShellCommandArray(perldoc + " -u -f " + string + " | pod2html"), lines, errors);
         String result = StringUtilities.join(lines, "\n");

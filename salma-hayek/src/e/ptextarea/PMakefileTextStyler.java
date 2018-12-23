@@ -88,7 +88,7 @@ public class PMakefileTextStyler extends PAbstractLanguageStyler {
     }
     
     public String[] getKeywords() {
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         result.addAll(Arrays.asList(DIRECTIVES));
         result.addAll(Arrays.asList(FUNCTIONS));
         return result.toArray(new String[result.size()]);

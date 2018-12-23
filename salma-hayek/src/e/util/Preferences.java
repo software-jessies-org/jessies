@@ -44,19 +44,19 @@ public abstract class Preferences extends PreferenceGetter {
     }
     
     // Mutable at any time.
-    private HashMap<String, Object> preferences = new HashMap<String, Object>();
+    private HashMap<String, Object> preferences = new HashMap<>();
     // Immutable after initialization.
-    private final HashMap<String, Object> defaults = new HashMap<String, Object>();
+    private final HashMap<String, Object> defaults = new HashMap<>();
     
-    private final HashMap<String, String> descriptions = new HashMap<String, String>();
-    private final ArrayList<KeyAndTab> keysInUiOrder = new ArrayList<KeyAndTab>();
+    private final HashMap<String, String> descriptions = new HashMap<>();
+    private final ArrayList<KeyAndTab> keysInUiOrder = new ArrayList<>();
     
-    private final ArrayList<String> tabTitles = new ArrayList<String>();
+    private final ArrayList<String> tabTitles = new ArrayList<>();
     
-    private final HashMap<Class<?>, PreferencesHelper> helpers = new HashMap<Class<?>, PreferencesHelper>();
-    private final HashMap<String, JComponent> customUis = new HashMap<String, JComponent>();
+    private final HashMap<Class<?>, PreferencesHelper> helpers = new HashMap<>();
+    private final HashMap<String, JComponent> customUis = new HashMap<>();
     
-    private final ArrayList<Listener> listeners = new ArrayList<Listener>();
+    private final ArrayList<Listener> listeners = new ArrayList<>();
     
     // Non-null if the preferences dialog is currently showing.
     private FormBuilder form;
@@ -154,7 +154,7 @@ public abstract class Preferences extends PreferenceGetter {
             // TODO: write this directly when we require Java >= 9.
             Class<?> handlerClass = Class.forName("java.awt.desktop.PreferencesHandler");
             Object proxy = java.lang.reflect.Proxy.newProxyInstance(getClass().getClassLoader(),
-                                                                    new Class[] { handlerClass },
+                                                                    new Class<?>[] { handlerClass },
                                                                     (__1, method, __3) -> {
                                                                         if (method.getName().equals("handlePreferences")) {
                                                                             showPreferencesDialog("Preferences");
@@ -259,7 +259,7 @@ public abstract class Preferences extends PreferenceGetter {
         });
         
         // Restore the preferences if the user hits "Cancel".
-        final HashMap<String, Object> initialPreferences = new HashMap<String, Object>(preferences);
+        final HashMap<String, Object> initialPreferences = new HashMap<>(preferences);
         form.getFormDialog().setCancelRunnable(new Runnable() {
             public void run() {
                 preferences = initialPreferences;
@@ -467,9 +467,9 @@ public abstract class Preferences extends PreferenceGetter {
         }
         
         public void addRow(FormPanel formPanel, final String key, final String description) {
-            final JComboBox fontNameComboBox = makeFontNameComboBox(key);
-            final JComboBox fontStyleComboBox = makeFontStyleComboBox(key);
-            final JComboBox fontSizeComboBox = makeFontSizeComboBox(key);
+            final JComboBox<String> fontNameComboBox = makeFontNameComboBox(key);
+            final JComboBox<String> fontStyleComboBox = makeFontStyleComboBox(key);
+            final JComboBox<Integer> fontSizeComboBox = makeFontSizeComboBox(key);
             
             // updateComboBoxFont (below) sets the combo box font so that when you choose a font you can see a preview.
             // Ensure that when the font name or font size changes, we call updateComboBoxFont.
@@ -491,9 +491,9 @@ public abstract class Preferences extends PreferenceGetter {
             // You can do it if you're determined, by caching images at install-time like MS Word.
             // A better choice on our budget would probably be writing our own JFontChooser along the lines of the GTK+ font chooser (which includes a preview).
             // In the meantime, this renderer ensures that we don't use the currently selected font to mislead, but use the default combo box pop-up font instead.
-            final ListCellRenderer defaultRenderer = fontNameComboBox.getRenderer();
-            fontNameComboBox.setRenderer(new ListCellRenderer() {
-                public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+            final ListCellRenderer<? super String> defaultRenderer = fontNameComboBox.getRenderer();
+            fontNameComboBox.setRenderer(new ListCellRenderer<String>() {
+                public Component getListCellRendererComponent(JList<? extends String> list, String value, int index, boolean isSelected, boolean cellHasFocus) {
                     Component result = defaultRenderer.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                     if (index != -1) {
                         result.setFont(UIManager.getFont("List.font"));
@@ -511,8 +511,8 @@ public abstract class Preferences extends PreferenceGetter {
             formPanel.addRow(description + ":", fontChooser);
         }
         
-        private JComboBox makeFontNameComboBox(String key) {
-            JComboBox fontNameComboBox = new JComboBox();
+        private JComboBox<String> makeFontNameComboBox(String key) {
+            JComboBox<String> fontNameComboBox = new JComboBox<>();
             // FIXME: filter out unsuitable fonts. "Zapf Dingbats", for example.
             // FIXME: pull monospaced fonts to the top of the list?
             // FIXME: if the current setting is a monospaced font, only allow other monospaced fonts?
@@ -524,19 +524,19 @@ public abstract class Preferences extends PreferenceGetter {
             return fontNameComboBox;
         }
         
-        private JComboBox makeFontStyleComboBox(String key) {
-            JComboBox fontStyleComboBox = new JComboBox(new String[] { "Plain", "Bold", "Italic", "Bold Italic" });
+        private JComboBox<String> makeFontStyleComboBox(String key) {
+            JComboBox<String> fontStyleComboBox = new JComboBox<>(new String[] { "Plain", "Bold", "Italic", "Bold Italic" });
             fontStyleComboBox.setSelectedItem(fontStyleToString(getFont(key).getStyle()));
             return fontStyleComboBox;
         }
         
-        private JComboBox makeFontSizeComboBox(String key) {
-            JComboBox fontSizeComboBox = new JComboBox(new Integer[] { 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 18, 20, 22, 24, 26, 28, 32, 36, 40, 48, 56, 64, 72 });
+        private JComboBox<Integer> makeFontSizeComboBox(String key) {
+            JComboBox<Integer> fontSizeComboBox = new JComboBox<>(new Integer[] { 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 18, 20, 22, 24, 26, 28, 32, 36, 40, 48, 56, 64, 72 });
             fontSizeComboBox.setSelectedItem(getFont(key).getSize());
             return fontSizeComboBox;
         }
         
-        private void updateComboBoxFont(String key, JComboBox fontNameComboBox) {
+        private void updateComboBoxFont(String key, JComboBox<String> fontNameComboBox) {
             fontNameComboBox.setFont(getFont(key).deriveFont(fontNameComboBox.getFont().getSize2D()));
         }
     }

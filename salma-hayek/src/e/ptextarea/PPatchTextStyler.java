@@ -15,7 +15,7 @@ public class PPatchTextStyler extends PAbstractTextStyler {
     @Override public List<PLineSegment> getTextSegments(int line) {
         int start = textArea.getLineStartOffset(line);
         int end = textArea.getLineEndOffsetBeforeTerminator(line);
-        List<PLineSegment> result = new ArrayList<PLineSegment>();
+        List<PLineSegment> result = new ArrayList<>();
         String lineText = textArea.getLineText(line);
         PStyle style = PStyle.NORMAL;
         if (lineText.startsWith("#")) {

@@ -38,7 +38,7 @@ public class HungAwtExit implements HungAwtExitMBean {
     
     public String[] getDisplayableFrames() {
         final Frame[] frames = Frame.getFrames();
-        final ArrayList<String> result = new ArrayList<String>();
+        final ArrayList<String> result = new ArrayList<>();
         int displayableFrameCount = 0;
         for (Frame frame : frames) {
             if (frame.isDisplayable()) {
@@ -52,7 +52,7 @@ public class HungAwtExit implements HungAwtExitMBean {
     
     public String[] getSwingTimers() {
         final List<Timer> timers = TimerUtilities.getQueuedSwingTimers();
-        final ArrayList<String> result = new ArrayList<String>();
+        final ArrayList<String> result = new ArrayList<>();
         for (Timer timer : timers) {
             result.add(TimerUtilities.toString(timer));
         }

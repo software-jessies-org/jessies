@@ -61,8 +61,8 @@ public class AboutBox {
     private License license = License.UNKNOWN;
     private ImageIcon icon;
     private String webSiteAddress;
-    private ArrayList<String> versionLines = new ArrayList<String>();
-    private ArrayList<String> copyrightLines = new ArrayList<String>();
+    private ArrayList<String> versionLines = new ArrayList<>();
+    private ArrayList<String> copyrightLines = new ArrayList<>();
     
     private String packageVersion = "unknown";
     private String projectRevision = "unknown";
@@ -301,7 +301,7 @@ public class AboutBox {
             // TODO: write this directly when we require Java >= 9.
             Class<?> handlerClass = Class.forName("java.awt.desktop.AboutHandler");
             Object proxy = java.lang.reflect.Proxy.newProxyInstance(getClass().getClassLoader(),
-                                                                    new Class[] { handlerClass },
+                                                                    new Class<?>[] { handlerClass },
                                                                     (__1, method, __3) -> {
                                                                         if (method.getName().equals("handleAbout")) {
                                                                             AboutBox.getSharedInstance().show();

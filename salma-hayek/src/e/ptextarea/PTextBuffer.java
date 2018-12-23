@@ -51,10 +51,10 @@ public class PTextBuffer implements CharSequence {
     private char[] text = new char[0];
     private int gapPosition;
     private int gapLength;
-    private ArrayList<PTextListener> textListeners = new ArrayList<PTextListener>();
+    private ArrayList<PTextListener> textListeners = new ArrayList<>();
     private PAnchorSet anchorSet = new PAnchorSet();
     private Undoer undoBuffer = new Undoer();
-    private HashMap<String, Object> properties = new HashMap<String, Object>();
+    private HashMap<String, Object> properties = new HashMap<>();
     private PLock lock = new PLock();
     
     public PTextBuffer() {
@@ -513,7 +513,7 @@ public class PTextBuffer implements CharSequence {
         // edit easily recognizable.
         private static final int NOT_COMPOUND = -1;
         
-        private ArrayList<ChangeListener> changeListeners = new ArrayList<ChangeListener>();
+        private ArrayList<ChangeListener> changeListeners = new ArrayList<>();
         
         public Undoer() {
             resetUndoBuffer();

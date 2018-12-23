@@ -18,7 +18,7 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
         String linkTemplate;
     }
     
-    private static final ArrayList<SiteLocalScriptEntry> siteLocalScriptEntries = new ArrayList<SiteLocalScriptEntry>();
+    private static final ArrayList<SiteLocalScriptEntry> siteLocalScriptEntries = new ArrayList<>();
     // FIXME: it would be slightly useful in Evergreen to be able to run this early, off the EDT.
     static {
         // Try to run the site-local script.
@@ -32,7 +32,7 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
         // echo -nE "\b(D([1-2]\d{4}))\b" ; echo -ne "\t" ; echo -E "http://woggle/%s"
         //
         final String scriptName = "echo-local-bug-database-patterns";
-        ArrayList<String> siteLocalScriptLines = new ArrayList<String>();
+        ArrayList<String> siteLocalScriptLines = new ArrayList<>();
         String[] command = ProcessUtilities.makeShellCommandArray(scriptName);
         ProcessUtilities.backQuote(null, command, siteLocalScriptLines, new ArrayList<String>());
         for (String line : siteLocalScriptLines) {

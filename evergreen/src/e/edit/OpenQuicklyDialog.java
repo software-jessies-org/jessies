@@ -16,7 +16,7 @@ import javax.swing.*;
  */
 public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
     private JTextField filenameField = new JTextField(40);
-    private JList matchList;
+    private JList<String> matchList;
     private ELabel status = new ELabel();
     private JButton rescanButton;
     
@@ -33,7 +33,7 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
     
     private class MatchFinder extends SwingWorker<Object, Object> {
         private String regularExpression;
-        private DefaultListModel model;
+        private DefaultListModel<String> model;
         private boolean statusGood;
         private String statusText;
         
@@ -43,7 +43,7 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
         
         @Override
         protected Object doInBackground() {
-            model = new DefaultListModel();
+            model = new DefaultListModel<String>();
             statusGood = true;
             try {
                 final long t0 = System.nanoTime();
@@ -85,7 +85,7 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
     }
     
     private void openFileAtIndex(int index) {
-        String filename = (String) matchList.getModel().getElementAt(index);
+        String filename = matchList.getModel().getElementAt(index);
         Evergreen.getInstance().openFile(workspace.prependRootDirectory(filename));
         
         // Now we've opened a new file, that's where focus should go when we're dismissed.
@@ -101,7 +101,7 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
     }
     
     private void initMatchList() {
-        matchList = new JList();
+        matchList = new JList<String>();
         matchList.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
@@ -110,7 +110,7 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
                 }
             }
         });
-        matchList.setCellRenderer(new EListCellRenderer(true));
+        matchList.setCellRenderer(new EListCellRenderer<String>(true));
         matchList.setFont(ChangeFontAction.getConfiguredFont());
         ComponentUtilities.divertPageScrollingFromTo(filenameField, matchList);
     }
@@ -167,7 +167,7 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
      * Provides some visual feedback that we're rescanning.
      */
     private synchronized void switchToFakeList() {
-        DefaultListModel model = new DefaultListModel();
+        DefaultListModel<String> model = new DefaultListModel<>();
         model.addElement("Rescan in progress...");
         matchList.setModel(model);
         matchList.setEnabled(false);

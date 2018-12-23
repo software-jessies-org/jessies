@@ -272,7 +272,7 @@ public class FileUtilities {
             return scriptName;
         }
         if (OS.isMacOs()) {
-            ArrayList<String> bundleLocations = new ArrayList<String>();
+            ArrayList<String> bundleLocations = new ArrayList<>();
             String[] command = ProcessUtilities.makeShellCommandArray(FileUtilities.findSupportBinary("LSFindApplicationForInfo") + " " + bundleId);
             int status = ProcessUtilities.backQuote(null, command, bundleLocations, new ArrayList<String>());
             if (status == 0 && bundleLocations.size() == 1) {
@@ -486,8 +486,8 @@ public class FileUtilities {
      * Should there ever be a useful Cygwin JVM, we will be back here.
      */
     private static String translateWithCygpath(String translationSwitch, String filename) {
-        ArrayList<String> translatedForm = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> translatedForm = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(null, new String[] { "cygpath", translationSwitch, filename }, translatedForm, errors);
         if (status != 0 || translatedForm.size() != 1) {
             return filename;

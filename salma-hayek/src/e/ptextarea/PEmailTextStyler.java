@@ -45,7 +45,7 @@ public class PEmailTextStyler extends PAbstractTextStyler {
     public List<PLineSegment> getTextSegments(int lineIndex) {
         String line = textArea.getLineContents(lineIndex).toString();
         int lineStartOffset = textArea.getLineStartOffset(lineIndex);
-        List<PLineSegment> result = new ArrayList<PLineSegment>();
+        List<PLineSegment> result = new ArrayList<>();
         PStyle style = PStyle.NORMAL;
         int quoteLevel = getQuoteLevel(lineIndex, line);
         if (quoteLevel > 0) {

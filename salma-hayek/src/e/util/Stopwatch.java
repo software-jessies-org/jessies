@@ -18,7 +18,7 @@ import java.util.*;
  *     }
  */
 public class Stopwatch {
-    private static final Map<String, Stopwatch> stopwatches = new HashMap<String, Stopwatch>();
+    private static final Map<String, Stopwatch> stopwatches = new HashMap<>();
     
     private String name;
     private int sampleCount = 0;

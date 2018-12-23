@@ -36,7 +36,7 @@ public class TerminalControl {
     private static BufferedReader stepModeReader;
     
     private JTerminalPane pane;
-    private List<ChangeListener> changeListeners = new ArrayList<ChangeListener>();
+    private List<ChangeListener> changeListeners = new ArrayList<>();
     private TerminalModel model;
     private PtyProcess ptyProcess;
     private boolean processIsRunning;
@@ -60,7 +60,7 @@ public class TerminalControl {
     private EscapeParser escapeParser;
     
     // Buffer of TerminalActions to perform.
-    private ArrayList<TerminalAction> terminalActions = new ArrayList<TerminalAction>();
+    private ArrayList<TerminalAction> terminalActions = new ArrayList<>();
     // Semaphore to prevent us from overrunning the EDT.
     private Semaphore flowControl = new Semaphore(30);
     
@@ -99,7 +99,7 @@ public class TerminalControl {
     }
     
     public static ArrayList<String> getDefaultShell() {
-        ArrayList<String> command = new ArrayList<String>();
+        ArrayList<String> command = new ArrayList<>();
         command.add(TERMINATOR_DEFAULT_SHELL);
         return command;
     }

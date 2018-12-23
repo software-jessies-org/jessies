@@ -68,7 +68,7 @@ public class FilenameChooserField extends JPanel {
         
         // Disable the tab key's usual cycle-focus-forward behavior.
         // Control-tab is already bound as a back-up anyway, so we don't need to do that ourselves.
-        final Set<AWTKeyStroke> forwardTraversalKeys = new HashSet<AWTKeyStroke>(pathnameField.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
+        final Set<AWTKeyStroke> forwardTraversalKeys = new HashSet<>(pathnameField.getFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS));
         forwardTraversalKeys.remove(KeyStroke.getKeyStroke(KeyEvent.VK_TAB, 0));
         pathnameField.setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, forwardTraversalKeys);
         
@@ -112,7 +112,7 @@ public class FilenameChooserField extends JPanel {
             
             // Collect the directory's children that start with the expected prefix, and aren't Unix hidden files.
             final String[] children = directory.list();
-            final TreeSet<String> candidates = new TreeSet<String>();
+            final TreeSet<String> candidates = new TreeSet<>();
             for (String child : children) {
                 if (child.startsWith(expectedCompletionPrefix) && !child.startsWith(".")) {
                     candidates.add(child);

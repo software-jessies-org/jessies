@@ -11,7 +11,7 @@ import javax.swing.*;
 
 public class WorkspaceFileList {
     private final Workspace workspace;
-    private final ArrayList<Listener> listeners = new ArrayList<Listener>();
+    private final ArrayList<Listener> listeners = new ArrayList<>();
     
     private FileIgnorer fileIgnorer;
     private ArrayList<String> fileList;
@@ -21,7 +21,7 @@ public class WorkspaceFileList {
     public WorkspaceFileList(Workspace workspace) {
         this.workspace = workspace;
         try {
-            ArrayList<String> result = new ArrayList<String>();
+            ArrayList<String> result = new ArrayList<>();
             result.addAll(Arrays.asList(StringUtilities.readLinesFromFile(workspace.getFileListCacheFile())));
             fileList = result;
         } catch (Exception ex) {
@@ -90,7 +90,7 @@ public class WorkspaceFileList {
      */
     public List<String> getListOfFilesMatching(String regularExpression) {
         Pattern pattern = PatternUtilities.smartCaseCompile(regularExpression);
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         List<String> allFiles = fileList;
         if (allFiles == null) {
             return result;
@@ -157,7 +157,7 @@ public class WorkspaceFileList {
             updateFileIgnorer();
             
             List<File> files = new FileFinder().filesUnder(workspaceRoot, fileIgnorer);
-            ArrayList<String> result = new ArrayList<String>(files.size());
+            ArrayList<String> result = new ArrayList<>(files.size());
             for (File file : files) {
                 result.add(file.toString().substring(prefixCharsToSkip));
             }

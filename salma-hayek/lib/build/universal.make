@@ -525,17 +525,14 @@ JAVAC_FLAGS.javac += -g
 # Turn on warnings.
 JAVAC_FLAGS.javac += -deprecation
 JAVAC_FLAGS.javac += -Xlint:all -Xlint:-serial
-# We're going to keep targeting Java 6 as long as we're supporting the Mac,
-# so all ignore the warnings we can't currently fix...
-JAVAC_FLAGS.javac += -Xlint:-options,-unchecked,-rawtypes
 
 JAVA_MAJOR_VERSION := $(shell ruby -e 'require "$(JDK_ROOT_SCRIPT)"; puts(JAVA_MAJOR_VERSION)')
 
 # We should also ensure that we build class files that can be used on the current Java release, regardless of where we build.
-JAVAC_FLAGS.javac += -target 1.$(JAVA_MAJOR_VERSION)
+JAVAC_FLAGS.javac += -target $(JAVA_MAJOR_VERSION)
 
 # Ensure we give a clear error if the user attempts to use anything older.
-JAVAC_FLAGS.javac += -source 1.$(JAVA_MAJOR_VERSION)
+JAVAC_FLAGS.javac += -source $(JAVA_MAJOR_VERSION)
 
 # Multi-arch from Wheezy and up
 BOOT_JDK_ALTERNATIVES += /usr/lib/jvm/java-$(JAVA_MAJOR_VERSION)-openjdk-amd64
@@ -559,9 +556,6 @@ ALTERNATE_BOOTCLASSPATH ?= $(BOOT_JDK)/jre/lib/rt.jar
 ALTERNATE_BOOTCLASSPATH := $(wildcard $(ALTERNATE_BOOTCLASSPATH))
 BOOT_JDK_MESSAGE += $(NEWLINE)
 BOOT_JDK_MESSAGE += You need to install a package that will give you a Java $(JAVA_MAJOR_VERSION) JDK, so we can use its rt.jar.
-BOOT_JDK_MESSAGE += $(NEWLINE)
-# Something else adds the trailing period.
-BOOT_JDK_MESSAGE += You could reapply the commits from Phil to fix the generics warnings now that JAVA_MAJOR_VERSION >= 7
 BOOT_JDK_ERROR = $(error $(BOOT_JDK_MESSAGE))
 # The *** does battle with filter-build-output.rb.
 BOOT_JDK_WARNING = $(warning *** $(BOOT_JDK_MESSAGE))

@@ -186,7 +186,7 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
     }
 
     public Collection<String> listMisspellings() {
-        TreeSet<String> result = new TreeSet<String>();
+        TreeSet<String> result = new TreeSet<>();
         for (PHighlight highlight : component.getNamedHighlights(HIGHLIGHTER_NAME)) {
             final int start = highlight.getStartIndex();
             final int end = highlight.getEndIndex();

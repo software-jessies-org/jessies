@@ -17,11 +17,11 @@ import java.io.*;
  */
 public class Parameters {
     private static final String MONITOR_NAME = "configuration";
-    private static ArrayList<File> files = new ArrayList<File>();
+    private static ArrayList<File> files = new ArrayList<>();
     private static FileAlterationMonitor fileAlterationMonitor;
     
-    private static HashMap<String, String> map = new HashMap<String, String>();
-    private static ArrayList<Preferences.Listener> listeners = new ArrayList<Preferences.Listener>();
+    private static HashMap<String, String> map = new HashMap<>();
+    private static ArrayList<Preferences.Listener> listeners = new ArrayList<>();
     
     private Parameters() { /* Not instantiable. */ }
     
@@ -62,7 +62,7 @@ public class Parameters {
     
     private static class Loader {
         private FileAlterationMonitor fileAlterationMonitor = new FileAlterationMonitor(MONITOR_NAME);
-        private HashMap<String, String> map = new HashMap<String, String>();
+        private HashMap<String, String> map = new HashMap<>();
         
         private void load(Iterable<File> files) {
             for (File file : files) {
@@ -133,7 +133,7 @@ public class Parameters {
      * Returns a (copy of a) subset of this map containing only those entries whose keys start with 'prefix'.
      */
     public static synchronized Map<String, String> getStrings(String prefix) {
-        final Map<String, String> result = new HashMap<String, String>();
+        final Map<String, String> result = new HashMap<>();
         for (Map.Entry<String, String> entry : map.entrySet()) {
             if (entry.getKey().startsWith(prefix)) {
                 result.put(entry.getKey(), entry.getValue());

@@ -130,7 +130,7 @@ public class Palettes {
         new Color(0xffffff),
     };
     
-    private static final HashMap<String, Color[]> palettes = new HashMap<String, Color[]>();
+    private static final HashMap<String, Color[]> palettes = new HashMap<>();
     static {
         palettes.put("ANSI", ANSI_COLORS);
         palettes.put("Linux", LINUX_COLORS);
@@ -172,7 +172,7 @@ public class Palettes {
     }
     
     public static List<String> names() {
-        ArrayList<String> result = new ArrayList<String>(palettes.keySet());
+        ArrayList<String> result = new ArrayList<>(palettes.keySet());
         Collections.sort(result);
         return Collections.unmodifiableList(result);
     }

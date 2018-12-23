@@ -69,7 +69,7 @@ public class IndentationGuesser {
         Stopwatch.Timer timer = stopwatch.start();
         try {
             CharSequence previousIndent = "";
-            Bag<CharSequence> indentations = new Bag<CharSequence>(new Comparator<CharSequence>() {
+            Bag<CharSequence> indentations = new Bag<>(new Comparator<CharSequence>() {
                 public int compare(CharSequence s1, CharSequence s2) {
                     final int s1Length = s1.length();
                     final int s2Length = s2.length();

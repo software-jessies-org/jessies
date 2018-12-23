@@ -76,7 +76,7 @@ import org.jessies.test.*;
  *  the GNU "Standards for Command Line Interfaces" (http://www.gnu.org/prep/standards/standards.html#Command_002dLine-Interfaces)
  */
 public class OptionParser {
-    private static final HashMap<Class<?>, Handler> handlers = new HashMap<Class<?>, Handler>();
+    private static final HashMap<Class<?>, Handler> handlers = new HashMap<>();
     static {
         handlers.put(boolean.class, new BooleanHandler());
         handlers.put(double.class, new DoubleHandler());
@@ -104,7 +104,7 @@ public class OptionParser {
     }
     
     private List<String> parseOptions(Iterator<String> args) {
-        final List<String> leftovers = new ArrayList<String>();
+        final List<String> leftovers = new ArrayList<>();
         
         // Scan 'args'.
         while (args.hasNext()) {
@@ -200,7 +200,7 @@ public class OptionParser {
     
     // Cache the available options and report any problems with the options themselves right away.
     private HashMap<String, Field> makeOptionMap() {
-        final HashMap<String, Field> optionMap = new HashMap<String, Field>();
+        final HashMap<String, Field> optionMap = new HashMap<>();
         final Class<?> optionClass = optionSource.getClass();
         for (Field field : optionClass.getDeclaredFields()) {
             if (field.isAnnotationPresent(Option.class)) {

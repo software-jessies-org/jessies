@@ -12,7 +12,7 @@ import javax.swing.text.JTextComponent;
 public class FormPanel extends JPanel {
     private int nextRow = 0;
 
-    private ArrayList<JTextComponent> textComponents = new ArrayList<JTextComponent>();
+    private ArrayList<JTextComponent> textComponents = new ArrayList<>();
     
     public FormPanel() {
         setLayout(new GridBagLayout());

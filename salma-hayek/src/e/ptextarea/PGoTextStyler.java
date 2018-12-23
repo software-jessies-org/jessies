@@ -22,7 +22,7 @@ public class PGoTextStyler extends PAbstractTextStyler {
     }
 
     public void initStyleApplicators() {
-        Set<String> keywords = new HashSet<String>();
+        Set<String> keywords = new HashSet<>();
         keywords.addAll(Arrays.asList(getKeywords()));
         textArea.addStyleApplicator(new KeywordStyleApplicator(textArea, keywords, "\\b(\\w+)\\b"));
     }
