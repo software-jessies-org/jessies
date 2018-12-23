@@ -9,8 +9,8 @@ import java.util.*;
  * The intent is that no instance should have to deal with files on different file systems. The unresponsiveness of any one file system will not harm monitoring of any other file system, nor will it cause excessive numbers of threads to be created as the timer fires: all access to that file system will be blocked until the first hung call completes.
  */
 public class FileAlterationMonitor {
-    private ArrayList<FileDetails> files = new ArrayList<FileDetails>();
-    private ArrayList<Listener> listeners = new ArrayList<Listener>();
+    private ArrayList<FileDetails> files = new ArrayList<>();
+    private ArrayList<Listener> listeners = new ArrayList<>();
     private Timer timer;
     
     /**

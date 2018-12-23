@@ -18,7 +18,7 @@ public class PLineList implements PTextListener {
     private ArrayList<Line> lines;
     private int lastValidLineIndex;
     
-    private final ArrayList<PLineListener> listeners = new ArrayList<PLineListener>();
+    private final ArrayList<PLineListener> listeners = new ArrayList<>();
     
     public PLineList(PTextBuffer text) {
         this.text = text;

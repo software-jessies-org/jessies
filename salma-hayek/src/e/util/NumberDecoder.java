@@ -188,7 +188,7 @@ public class NumberDecoder {
         if (valid == false) {
             return Collections.emptyList();
         }
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         result.add(toString(radix, number) + ":");
         for (int possibleBase : OUTPUT_BASES) {
             if (possibleBase != radix) {

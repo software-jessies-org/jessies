@@ -117,7 +117,7 @@ public class DebugMenu {
         }
 
         private Map<String, String> getSystemProperties() {
-            HashMap<String, String> result = new HashMap<String, String>();
+            HashMap<String, String> result = new HashMap<>();
             Properties properties = System.getProperties();
             Enumeration<?> propertyNames = properties.propertyNames();
             while (propertyNames.hasMoreElements()) {
@@ -165,7 +165,7 @@ public class DebugMenu {
 
         private String getFramesAsString() {
             // What do Dialog, Frame, and Window all have in common? Window.
-            ArrayList<Window> windows = new ArrayList<Window>();
+            ArrayList<Window> windows = new ArrayList<>();
             windows.addAll(Arrays.asList(Window.getWindows()));
 
             int nonDisplayableCount = 0;
@@ -255,7 +255,7 @@ public class DebugMenu {
         }
 
         private String getUiDefaultsAsString() {
-            ArrayList<String> list = new ArrayList<String>();
+            ArrayList<String> list = new ArrayList<>();
             UIDefaults defaults = UIManager.getLookAndFeelDefaults();
             for (Enumeration<Object> e = defaults.keys(); e.hasMoreElements();) {
                 Object key = e.nextElement();
@@ -313,7 +313,7 @@ public class DebugMenu {
             String[] command = new String[] {
                 "jmap", "-histo:live", Integer.toString(ProcessUtilities.getVmProcessId())
             };
-            ArrayList<String> lines = new ArrayList<String>();
+            ArrayList<String> lines = new ArrayList<>();
             ProcessUtilities.backQuote(null, command, lines, lines);
             return StringUtilities.join(lines, "\n");
         }

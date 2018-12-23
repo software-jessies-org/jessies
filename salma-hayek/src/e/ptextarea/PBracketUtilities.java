@@ -99,7 +99,7 @@ public class PBracketUtilities {
         if (isBracket(bracket) == false) {
             return -1;
         }
-        Stack<Character> bracketStack = new Stack<Character>();
+        Stack<Character> bracketStack = new Stack<>();
         bracketStack.push(bracket);
         while (chars.hasNext()) {
             char ch = chars.next();

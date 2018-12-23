@@ -124,7 +124,7 @@ public class TestRunner {
     }
     
     private List<String> findClassNames(List<String> directoryNames) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for (String directoryName : directoryNames) {
             File directory = new File(directoryName);
             if (directory.isDirectory()) {

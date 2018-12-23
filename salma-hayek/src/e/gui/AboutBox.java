@@ -61,8 +61,8 @@ public class AboutBox {
     private License license = License.UNKNOWN;
     private ImageIcon icon;
     private String webSiteAddress;
-    private ArrayList<String> versionLines = new ArrayList<String>();
-    private ArrayList<String> copyrightLines = new ArrayList<String>();
+    private ArrayList<String> versionLines = new ArrayList<>();
+    private ArrayList<String> copyrightLines = new ArrayList<>();
     
     private String packageVersion = "unknown";
     private String projectRevision = "unknown";

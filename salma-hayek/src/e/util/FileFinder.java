@@ -68,7 +68,7 @@ public class FileFinder {
         if (filter == null) {
             filter = new DefaultFilter();
         }
-        final ArrayList<File> files = new ArrayList<File>();
+        final ArrayList<File> files = new ArrayList<>();
         findFilesInDirectory(files, root, filter);
         return files;
     }

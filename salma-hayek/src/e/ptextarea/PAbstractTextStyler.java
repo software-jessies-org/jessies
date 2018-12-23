@@ -16,7 +16,7 @@ public abstract class PAbstractTextStyler implements PTextStyler {
     }
     
     protected class TextSegmentListBuilder {
-        private ArrayList<PLineSegment> list = new ArrayList<PLineSegment>();
+        private ArrayList<PLineSegment> list = new ArrayList<>();
         private int lineStartOffset;
         private int start = 0;
         

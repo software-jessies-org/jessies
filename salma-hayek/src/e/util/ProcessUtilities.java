@@ -41,7 +41,7 @@ public class ProcessUtilities {
         // We won't recurse indefinitely because we won't be able to open "cygpath", even if run in Cygwin's bin directory, because the file is "cygpath.exe".
         String windowsShell = FileUtilities.fileFromString(cygwinShell).toString();
         String flag = matcher.group(2);
-        List<String> arguments = new ArrayList<String>();
+        List<String> arguments = new ArrayList<>();
         arguments.add(windowsShell);
         if (flag != null) {
             arguments.add(flag);
@@ -277,7 +277,7 @@ public class ProcessUtilities {
         if (shell == null) {
             shell = "bash";
         }
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         // Try to put the command in its own process group, so it's easier to kill it and its children.
         File setsidBinary = FileUtilities.findSupportBinary("setsid");
         if (setsidBinary != null) {
@@ -367,8 +367,8 @@ public class ProcessUtilities {
             }
         }
         // Mac OS has no /proc but comes with lsof.
-        ArrayList<String> output = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> output = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = backQuote(null, new String[] { "lsof", "-a", "-p", Integer.toString(pid), "-d", "cwd", "-F0n" }, output, errors);
         if (status != 0) {
             return null;

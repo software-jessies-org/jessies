@@ -358,7 +358,7 @@ public class GuiUtilities {
                 SimpleDialog.showDetails(null, "Cannot open URL " + url, WEB_BROWSER_HELP_TEXT);
                 return;
             }
-            ArrayList<String> lines = new ArrayList<String>();
+            ArrayList<String> lines = new ArrayList<>();
             if (ProcessUtilities.backQuote(null, new String[] {openUrl, url}, lines, lines) != 0) {
                 SimpleDialog.showAlert(null, "JESSIES_WEB_BROWSER command " + openUrl + " failed:", StringUtilities.join(lines, "\n"));
             }

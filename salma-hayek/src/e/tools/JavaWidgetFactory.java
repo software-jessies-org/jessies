@@ -25,8 +25,8 @@ public class JavaWidgetFactory extends JPanel {
     
     private JComponent makeWestPane() {
         String[] items = { "ComboBoxEntry" };
-        JComboBox<String> comboBox1 = new JComboBox<String>(items);
-        JComboBox<String> comboBox2 = new JComboBox<String>(items);
+        JComboBox<String> comboBox1 = new JComboBox<>(items);
+        JComboBox<String> comboBox2 = new JComboBox<>(items);
         comboBox2.setEnabled(false);
         
         JTextField textField1 = new JTextField("GtkEntry");
@@ -131,9 +131,9 @@ public class JavaWidgetFactory extends JPanel {
         toggleButton2.setEnabled(false);
         
         String[] items = { "ComboBox" };
-        JComboBox<String> comboBox1 = new JComboBox<String>(items);
+        JComboBox<String> comboBox1 = new JComboBox<>(items);
         comboBox1.setEditable(false);
-        JComboBox<String> comboBox2 = new JComboBox<String>(items);
+        JComboBox<String> comboBox2 = new JComboBox<>(items);
         comboBox2.setEditable(false);
         comboBox2.setEnabled(false);
         

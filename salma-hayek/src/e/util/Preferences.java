@@ -44,19 +44,19 @@ public abstract class Preferences extends PreferenceGetter {
     }
     
     // Mutable at any time.
-    private HashMap<String, Object> preferences = new HashMap<String, Object>();
+    private HashMap<String, Object> preferences = new HashMap<>();
     // Immutable after initialization.
-    private final HashMap<String, Object> defaults = new HashMap<String, Object>();
+    private final HashMap<String, Object> defaults = new HashMap<>();
     
-    private final HashMap<String, String> descriptions = new HashMap<String, String>();
-    private final ArrayList<KeyAndTab> keysInUiOrder = new ArrayList<KeyAndTab>();
+    private final HashMap<String, String> descriptions = new HashMap<>();
+    private final ArrayList<KeyAndTab> keysInUiOrder = new ArrayList<>();
     
-    private final ArrayList<String> tabTitles = new ArrayList<String>();
+    private final ArrayList<String> tabTitles = new ArrayList<>();
     
-    private final HashMap<Class<?>, PreferencesHelper> helpers = new HashMap<Class<?>, PreferencesHelper>();
-    private final HashMap<String, JComponent> customUis = new HashMap<String, JComponent>();
+    private final HashMap<Class<?>, PreferencesHelper> helpers = new HashMap<>();
+    private final HashMap<String, JComponent> customUis = new HashMap<>();
     
-    private final ArrayList<Listener> listeners = new ArrayList<Listener>();
+    private final ArrayList<Listener> listeners = new ArrayList<>();
     
     // Non-null if the preferences dialog is currently showing.
     private FormBuilder form;
@@ -259,7 +259,7 @@ public abstract class Preferences extends PreferenceGetter {
         });
         
         // Restore the preferences if the user hits "Cancel".
-        final HashMap<String, Object> initialPreferences = new HashMap<String, Object>(preferences);
+        final HashMap<String, Object> initialPreferences = new HashMap<>(preferences);
         form.getFormDialog().setCancelRunnable(new Runnable() {
             public void run() {
                 preferences = initialPreferences;
@@ -512,7 +512,7 @@ public abstract class Preferences extends PreferenceGetter {
         }
         
         private JComboBox<String> makeFontNameComboBox(String key) {
-            JComboBox<String> fontNameComboBox = new JComboBox<String>();
+            JComboBox<String> fontNameComboBox = new JComboBox<>();
             // FIXME: filter out unsuitable fonts. "Zapf Dingbats", for example.
             // FIXME: pull monospaced fonts to the top of the list?
             // FIXME: if the current setting is a monospaced font, only allow other monospaced fonts?
@@ -525,13 +525,13 @@ public abstract class Preferences extends PreferenceGetter {
         }
         
         private JComboBox<String> makeFontStyleComboBox(String key) {
-            JComboBox<String> fontStyleComboBox = new JComboBox<String>(new String[] { "Plain", "Bold", "Italic", "Bold Italic" });
+            JComboBox<String> fontStyleComboBox = new JComboBox<>(new String[] { "Plain", "Bold", "Italic", "Bold Italic" });
             fontStyleComboBox.setSelectedItem(fontStyleToString(getFont(key).getStyle()));
             return fontStyleComboBox;
         }
         
         private JComboBox<Integer> makeFontSizeComboBox(String key) {
-            JComboBox<Integer> fontSizeComboBox = new JComboBox<Integer>(new Integer[] { 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 18, 20, 22, 24, 26, 28, 32, 36, 40, 48, 56, 64, 72 });
+            JComboBox<Integer> fontSizeComboBox = new JComboBox<>(new Integer[] { 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 18, 20, 22, 24, 26, 28, 32, 36, 40, 48, 56, 64, 72 });
             fontSizeComboBox.setSelectedItem(getFont(key).getSize());
             return fontSizeComboBox;
         }

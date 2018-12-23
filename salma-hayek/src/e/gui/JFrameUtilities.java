@@ -30,7 +30,7 @@ public class JFrameUtilities {
 
     private static final KeyStroke ESC = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0, false);
 
-    private static HashMap<String, Rectangle> dialogGeometries = new HashMap<String, Rectangle>();
+    private static HashMap<String, Rectangle> dialogGeometries = new HashMap<>();
 
     public static void setFrameIcon(JFrame frame) {
         frame.setIconImage(FRAME_ICON);

@@ -14,7 +14,7 @@ public class PPlainTextStyler extends PAbstractTextStyler {
     @Override public List<PLineSegment> getTextSegments(int line) {
         int start = textArea.getLineStartOffset(line);
         int end = textArea.getLineEndOffsetBeforeTerminator(line);
-        List<PLineSegment> result = new ArrayList<PLineSegment>();
+        List<PLineSegment> result = new ArrayList<>();
         result.add(new PTextSegment(textArea, start, end, PStyle.NORMAL));
         return result;
     }

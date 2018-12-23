@@ -86,7 +86,7 @@ public final class InAppServer {
     }
     
     private boolean invokeMethod(String line, PrintWriter out, Method method, String[] fields) throws IllegalAccessException, InvocationTargetException {
-        ArrayList<Object> methodArguments = new ArrayList<Object>();
+        ArrayList<Object> methodArguments = new ArrayList<>();
         
         Class<?>[] parameterTypes = method.getParameterTypes();
         if (parameterTypes.length == 2 && parameterTypes[0] == PrintWriter.class && parameterTypes[1] == String.class) {

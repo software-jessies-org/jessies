@@ -113,8 +113,8 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
     }
 
     public LinkedList<String> extractPreviousStatements(int lineIndex) {
-        LinkedList<String> result = new LinkedList<String>();
-        Stack<Character> brackets = new Stack<Character>();
+        LinkedList<String> result = new LinkedList<>();
+        Stack<Character> brackets = new Stack<>();
         boolean terminate = false;
         int semicolonsSeen = 0;
         for (int i = lineIndex - 1; i >= 0 && !terminate; i--) {
@@ -219,7 +219,7 @@ public abstract class PCFamilyIndenter extends PSimpleIndenter {
         if (previousStatements.isEmpty()) {
             return "";
         }
-        Stack<Indent> indentLevels = new Stack<Indent>();
+        Stack<Indent> indentLevels = new Stack<>();
         String defaultIndentation = PIndenter.indentationOf(previousStatements.getFirst());
         for (String line: previousStatements) {
             // We assume that each line in previousStatements is indented correctly, so we just record in our

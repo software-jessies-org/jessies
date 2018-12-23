@@ -145,7 +145,7 @@ public class FatBits extends MainFrame {
                 updatePosition(getPointerLocation());
             }
         });
-        Hashtable<Integer, JComponent> labels = new Hashtable<Integer, JComponent>();
+        Hashtable<Integer, JComponent> labels = new Hashtable<>();
         for (int i = scaleSlider.getMinimum(); i <= scaleSlider.getMaximum(); ++i) {
             labels.put(i, new ELabel(Integer.toString(1 << i) + "x"));
         }

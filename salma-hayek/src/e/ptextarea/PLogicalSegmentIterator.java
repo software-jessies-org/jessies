@@ -5,7 +5,7 @@ import java.util.*;
 public class PLogicalSegmentIterator implements Iterator<PLineSegment> {
     private PTextArea textArea;
     private int lineIndex;
-    private LinkedList<PLineSegment> segmentBuffer = new LinkedList<PLineSegment>();
+    private LinkedList<PLineSegment> segmentBuffer = new LinkedList<>();
     
     /**
      * Creates a new PLogicalSegmentIterator which will iterate over the unwrapped segments,

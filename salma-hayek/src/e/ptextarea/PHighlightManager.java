@@ -3,7 +3,7 @@ package e.ptextarea;
 import java.util.*;
 
 public class PHighlightManager {
-    private final Map<String, HighlightSet> highlighterSets = new LinkedHashMap<String, HighlightSet>();
+    private final Map<String, HighlightSet> highlighterSets = new LinkedHashMap<>();
     
     public synchronized int countHighlightsOfType(String highlighterName) {
         HighlightSet set = highlighterSets.get(highlighterName);
@@ -29,7 +29,7 @@ public class PHighlightManager {
      * Returns all highlighters overlapping the range [beginOffset, endOffset).
      */
     public synchronized List<PHighlight> getHighlightsOverlapping(int beginOffset, int endOffset) {
-        List<PHighlight> result = new ArrayList<PHighlight>();
+        List<PHighlight> result = new ArrayList<>();
         for (HighlightSet set : highlighterSets.values()) {
             result.addAll(set.getHighlightsOverlapping(beginOffset, endOffset));
         }
@@ -57,7 +57,7 @@ public class PHighlightManager {
     }
     
     private static class HighlightSet {
-        private TreeSet<PHighlight> highlights = new TreeSet<PHighlight>();
+        private TreeSet<PHighlight> highlights = new TreeSet<>();
         
         private void add(PHighlight highlight) {
             highlights.add(highlight);
@@ -95,7 +95,7 @@ public class PHighlightManager {
             
             // Now we have the start, and the end too, so we can simply grab the subset between these two extremes (inclusive of firstItem) and return as a list.
             SortedSet<PHighlight> highlightsInRange = highlights.subSet(firstItem, new ProbeHighlight(endOffset));
-            List<PHighlight> result = new ArrayList<PHighlight>(highlightsInRange);
+            List<PHighlight> result = new ArrayList<>(highlightsInRange);
             return result;
         }
     }

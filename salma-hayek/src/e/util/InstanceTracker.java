@@ -12,7 +12,7 @@ import java.util.*;
 public class InstanceTracker {
     // Really, this is a map from Class<x> to ArrayList<WeakReference<x>>, where x is not a compile-time constant.
     // I don't think there's any way to express that, so we say WeakReference<?> to silence javac's raw-type warnings.
-    private static final HashMap<Class<?>, ArrayList<WeakReference<?>>> CLASS_TO_INSTANCES_MAP = new HashMap<Class<?>, ArrayList<WeakReference<?>>>();
+    private static final HashMap<Class<?>, ArrayList<WeakReference<?>>> CLASS_TO_INSTANCES_MAP = new HashMap<>();
     private static final boolean DEBUG = false;
     
     public static synchronized <T> void addInstance(T instance) {
@@ -37,7 +37,7 @@ public class InstanceTracker {
     }
     
     public static synchronized <T> List<T> getInstancesOfClass(Class<T> klass) {
-        ArrayList<T> result = new ArrayList<T>();
+        ArrayList<T> result = new ArrayList<>();
         List<WeakReference<?>> weakReferences = instancesOfClass(klass);
         if (DEBUG) {
             System.err.println("Weak references: " + weakReferences.size());

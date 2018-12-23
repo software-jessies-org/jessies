@@ -82,7 +82,7 @@ public final class CollectionUtilities {
         return (Comparator<T>) NATURAL_ORDER_COMPARATOR;
     }
     
-    private static final Comparator<Object> NATURAL_ORDER_COMPARATOR = new NaturalOrderComparator<Object>();
+    private static final Comparator<Object> NATURAL_ORDER_COMPARATOR = new NaturalOrderComparator<>();
     
     private static final class NaturalOrderComparator<T> implements Comparator<T> {
         public int compare(T lhs, T rhs) {

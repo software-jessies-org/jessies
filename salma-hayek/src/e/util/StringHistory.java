@@ -74,7 +74,7 @@ public class StringHistory {
      */
     public List<String> getStringsMatching(String regularExpression) {
         Pattern pattern = PatternUtilities.smartCaseCompile(regularExpression);
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         for (String candidate : history) {
             Matcher matcher = pattern.matcher(candidate);
             if (matcher.find()) {

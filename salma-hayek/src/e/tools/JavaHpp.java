@@ -11,7 +11,7 @@ import java.util.*;
  * Produces C++ for implementing native methods, as javah(1) produces C.
  */
 public class JavaHpp {
-    private List<URL> classpath = new ArrayList<URL>();
+    private List<URL> classpath = new ArrayList<>();
     
     public JavaHpp(String[] arguments) throws Exception {
         for (int i = 0; i < arguments.length; ++i) {
@@ -151,7 +151,7 @@ public class JavaHpp {
     }
     
     private List<Method> extractNativeMethods(Method[] methods) {
-        List<Method> nativeMethods = new ArrayList<Method>();
+        List<Method> nativeMethods = new ArrayList<>();
         for (Method method : methods) {
             if ((method.getModifiers() & Modifier.NATIVE) != 0) {
                 nativeMethods.add(method);

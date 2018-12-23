@@ -41,8 +41,8 @@ public class PatchDialog {
         } else {
             command = new String[] { "diff", "-N", "-u", "-b", "-B", "-L", from.label(), from.filename(), "-L", to.label(), to.filename() };
         }
-        final ArrayList<String> lines = new ArrayList<String>();
-        final ArrayList<String> errors = new ArrayList<String>();
+        final ArrayList<String> lines = new ArrayList<>();
+        final ArrayList<String> errors = new ArrayList<>();
         final int status = ProcessUtilities.backQuote(null, command, lines, errors);
         // Output on stderr is not expected, and worth showing to the user.
         if (lines.isEmpty()) {
@@ -73,7 +73,7 @@ public class PatchDialog {
     private static List<String> makeUnifiedDiff(List<String> rawDiff) {
         final int CONTEXT_LINES = 3;
         
-        final List<String> result = new ArrayList<String>();
+        final List<String> result = new ArrayList<>();
         
         int hunkCredit = 0;
         int minusLineNumber = 1;
@@ -117,8 +117,8 @@ public class PatchDialog {
         String patch = StringUtilities.join(lines, "\n") + "\n";
         File patchFile = FileUtilities.createTemporaryFile("e.gui.PatchDialog-patch", ".tmp", "patch file", patch);
         String[] command = new String[] { FileUtilities.findSupportScript("annotate-patch.rb"), patchFile.toString() };
-        ArrayList<String> newLines = new ArrayList<String>();
-        ArrayList<String> newErrors = new ArrayList<String>();
+        ArrayList<String> newLines = new ArrayList<>();
+        ArrayList<String> newErrors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(null, command, newLines, newErrors);
         patchFile.delete();
         return (status == 0) ? newLines : lines;
@@ -147,7 +147,7 @@ public class PatchDialog {
     
     public static void showDiffInTextArea(PTextArea textArea, List<String> diffLines) {
         textArea.setText(StringUtilities.join(diffLines, "\n") + "\n");
-        final List<HighlightInfo> highlights = new ArrayList<HighlightInfo>();
+        final List<HighlightInfo> highlights = new ArrayList<>();
         Color color = null;
         int lineNumber = 0; // Lines beginning with '?' don't count!
         for (String line : diffLines) {
