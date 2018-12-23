@@ -20,8 +20,8 @@ public class PythonDocumentationResearcher implements WorkspaceResearcher {
     public String research(String string) {
         String pydocScript = Evergreen.getResourceFilename("lib", "scripts", "epydoc.py");
         
-        ArrayList<String> lines = new ArrayList<String>();
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
         int status = ProcessUtilities.backQuote(null, new String[] { pydocScript, string }, lines, errors);
         if (status == 1) {
             return "";

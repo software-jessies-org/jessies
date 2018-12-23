@@ -43,7 +43,7 @@ public class EColumn extends JPanel {
     }
     
     public Collection<ETextWindow> getTextWindows() {
-        ArrayList<ETextWindow> result = new ArrayList<ETextWindow>();
+        ArrayList<ETextWindow> result = new ArrayList<>();
         for (Component c : getComponents()) {
             if (c instanceof ETextWindow) {
                 result.add((ETextWindow) c);

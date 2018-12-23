@@ -48,7 +48,7 @@ public class TagReader {
         File tagsFile = File.createTempFile("e.edit.TagReader-tags-", ".tags");
         tagsFile.deleteOnExit();
         
-        ArrayList<String> command = new ArrayList<String>();
+        ArrayList<String> command = new ArrayList<>();
         command.add(chooseCtagsBinary());
         command.add("--c++-types=+p");
         command.add("-n");
@@ -63,7 +63,7 @@ public class TagReader {
         command.add(tagsFile.getAbsolutePath());
         command.add(file.getAbsolutePath());
         
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<>();
         ProcessUtilities.backQuote(tagsFile.getParentFile(), command.toArray(new String[command.size()]), errors, errors);
         // We're not actually expecting anything on stdout or stderr from ctags.
         // All the more reason to output anything it has to say!

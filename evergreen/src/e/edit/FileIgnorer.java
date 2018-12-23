@@ -75,7 +75,7 @@ public class FileIgnorer implements FileFinder.Filter {
     }
     
     private ArrayList<String> makeIgnoredExtensions() {
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         result.addAll(Arrays.asList(Evergreen.getInstance().getPreferences().getString(EvergreenPreferences.UNINTERESTING_EXTENSIONS).split(";")));
         appendLinesFromScriptOutput(result, "echo-local-extensions-evergreen-should-not-index");
         return result;
@@ -86,7 +86,7 @@ public class FileIgnorer implements FileFinder.Filter {
     }
     
     private Pattern makeUninterestingDirectoryPattern() {
-        ArrayList<String> patterns = new ArrayList<String>();
+        ArrayList<String> patterns = new ArrayList<>();
         
         // Start with the default ignored directory patterns.
         // autotools directories:
@@ -116,7 +116,7 @@ public class FileIgnorer implements FileFinder.Filter {
         }
         
         String[] command = ProcessUtilities.makeShellCommandArray(scriptName);
-        ArrayList<String> errors = new ArrayList<String>();
+        ArrayList<String> errors = new ArrayList<>();
         // Try to run any site-local script.
         ProcessUtilities.backQuote(rootDirectory, command, lines, errors);
     }

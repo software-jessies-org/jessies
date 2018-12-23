@@ -35,7 +35,7 @@ public class Evergreen {
     private InitialState initialState = new InitialState();
     
     private class InitialState {
-        private ArrayList<InitialWorkspace> initialWorkspaces = new ArrayList<InitialWorkspace>();
+        private ArrayList<InitialWorkspace> initialWorkspaces = new ArrayList<>();
         private boolean showTagsPanel = true;
         private boolean tagsPanelOnLeft = false;
         private int tagsPanelSplitPaneDividerLocation = -1;
@@ -87,7 +87,7 @@ public class Evergreen {
     
     private static class InitialWorkspace {
         Element xmlWorkspace;
-        private List<InitialFile> initialFiles = new ArrayList<InitialFile>();
+        private List<InitialFile> initialFiles = new ArrayList<>();
         
         private InitialWorkspace(Element xmlWorkspace) {
             this.xmlWorkspace = xmlWorkspace;
@@ -319,7 +319,7 @@ public class Evergreen {
     
     /** Returns an array of all the workspaces. */
     public Collection<Workspace> getWorkspaces() {
-        ArrayList<Workspace> result = new ArrayList<Workspace>();
+        ArrayList<Workspace> result = new ArrayList<>();
         for (int i = 0; i < tabbedPane.getTabCount(); ++i) {
             result.add((Workspace) tabbedPane.getComponentAt(i));
         }
@@ -535,8 +535,8 @@ public class Evergreen {
     public void handleQuit() {
         boolean isSafeToQuit = true;
         
-        ArrayList<String> dirtyFileNames = new ArrayList<String>();
-        ArrayList<Workspace> dirtyWorkspaces = new ArrayList<Workspace>();
+        ArrayList<String> dirtyFileNames = new ArrayList<>();
+        ArrayList<Workspace> dirtyWorkspaces = new ArrayList<>();
         for (Workspace workspace : getWorkspaces()) {
             Collection<ETextWindow> dirtyWindows = workspace.getDirtyTextWindows();
             for (ETextWindow dirtyWindow : dirtyWindows) {

@@ -16,7 +16,7 @@ public class SaveMonitor {
     private SaveMonitor() {
     }
     
-    private ArrayList<SaveMonitor.Listener> saveListeners = new ArrayList<SaveMonitor.Listener>();
+    private ArrayList<SaveMonitor.Listener> saveListeners = new ArrayList<>();
     
     /**
      * Adds a listener to be notified when any file is saved.

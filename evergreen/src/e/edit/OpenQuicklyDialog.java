@@ -167,7 +167,7 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
      * Provides some visual feedback that we're rescanning.
      */
     private synchronized void switchToFakeList() {
-        DefaultListModel<String> model = new DefaultListModel<String>();
+        DefaultListModel<String> model = new DefaultListModel<>();
         model.addElement("Rescan in progress...");
         matchList.setModel(model);
         matchList.setEnabled(false);

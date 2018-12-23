@@ -89,7 +89,7 @@ public class NewFileAction extends AbstractAction {
         String defaultBoilerplateGenerator = Evergreen.getResourceFilename("lib", "scripts", "evergreen-boilerplate-generator");
         String boilerplateGenerator = Parameters.getString("boilerplateGenerator", defaultBoilerplateGenerator);
         
-        ArrayList<String> lines = new ArrayList<String>();
+        ArrayList<String> lines = new ArrayList<>();
         int status = ProcessUtilities.backQuote(null, new String[] { boilerplateGenerator, file.toString() }, lines, lines);
         
         String result = StringUtilities.writeFile(file, lines);

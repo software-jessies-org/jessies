@@ -13,8 +13,8 @@ import javax.swing.*;
 public class Workspace extends JPanel {
     private EColumn leftColumn = new EColumn();
     
-    private ArrayList<EErrorsWindow> errorsWindows = new ArrayList<EErrorsWindow>();
-    private HashMap<String, EErrorsWindow> errorsWindowsByCmd = new HashMap<String, EErrorsWindow>();
+    private ArrayList<EErrorsWindow> errorsWindows = new ArrayList<>();
+    private HashMap<String, EErrorsWindow> errorsWindowsByCmd = new HashMap<>();
 
     private String workspaceName;
     private String rootDirectory;
@@ -162,7 +162,7 @@ public class Workspace extends JPanel {
     
     /** Returns an array of this workspace's dirty text windows. */
     public Collection<ETextWindow> getDirtyTextWindows() {
-        ArrayList<ETextWindow> dirtyTextWindows = new ArrayList<ETextWindow>();
+        ArrayList<ETextWindow> dirtyTextWindows = new ArrayList<>();
         for (ETextWindow textWindow : leftColumn.getTextWindows()) {
             if (textWindow.isDirty()) {
                 dirtyTextWindows.add(textWindow);
@@ -463,7 +463,7 @@ public class Workspace extends JPanel {
     }
     
     public ShellCommand makeShellCommand(ETextWindow textWindow, String directory, String command, ToolInputDisposition inputDisposition, ToolOutputDisposition outputDisposition) {
-        final Map<String, String> environment = new TreeMap<String, String>();
+        final Map<String, String> environment = new TreeMap<>();
         environment.put("EVERGREEN_CURRENT_DIRECTORY", FileUtilities.translateFilenameForShellUse(directory));
         environment.put("EVERGREEN_LAUNCHER", Evergreen.getResourceFilename("bin", "evergreen"));
         environment.put("EVERGREEN_WORKSPACE_ROOT", FileUtilities.translateFilenameForShellUse(getRootDirectory()));

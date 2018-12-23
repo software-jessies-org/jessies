@@ -15,7 +15,7 @@ import javax.swing.*;
  */
 public class ExternalTools {
     private static final String MONITOR_NAME = "external tools";
-    private static final List<Listener> listeners = new ArrayList<Listener>();
+    private static final ArrayList<Listener> listeners = new ArrayList<>();
     
     private static FileAlterationMonitor fileAlterationMonitor;
     private static List<ExternalToolAction> allTools;
@@ -90,15 +90,15 @@ public class ExternalTools {
     }
     
     private static void rescanToolConfiguration() {
-        final List<File> toolsDirectories = new ArrayList<File>();
+        final List<File> toolsDirectories = new ArrayList<>();
         toolsDirectories.add(FileUtilities.fileFromString(Evergreen.getResourceFilename("lib", "data", "tools")));
         toolsDirectories.add(FileUtilities.fileFromString("/usr/lib/software.jessies.org/evergreen/tools/"));
         toolsDirectories.add(FileUtilities.fileFromString("/usr/local/software.jessies.org/evergreen/tools/"));
         toolsDirectories.add(FileUtilities.fileFromString(Evergreen.getPreferenceFilename("tools")));
         
         final FileAlterationMonitor newFileAlterationMonitor = new FileAlterationMonitor(MONITOR_NAME);
-        final List<ExternalToolAction> newAllTools = new ArrayList<ExternalToolAction>();
-        final List<ExternalToolAction> newPopUpTools = new ArrayList<ExternalToolAction>();
+        final List<ExternalToolAction> newAllTools = new ArrayList<>();
+        final List<ExternalToolAction> newPopUpTools = new ArrayList<>();
         
         // FIXME: every change of directory should probably add a separator automatically. (including within a toolsDirectory?)
         for (File toolsDirectory : toolsDirectories) {

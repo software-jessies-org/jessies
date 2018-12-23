@@ -38,7 +38,7 @@ public class ShowMisspellingsAction extends PTextAction {
             listItems[i] = word + " (" + count + ")";
         }
         
-        final JList<String> list = new JList<String>(listItems);
+        final JList<String> list = new JList<>(listItems);
         list.setPrototypeCellValue("this would be quite a long misspelling");
         list.setCellRenderer(new EListCellRenderer<String>(true));
         ComponentUtilities.bindDoubleClickAndEnter(list, new ActionListener() {

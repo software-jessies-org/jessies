@@ -60,7 +60,7 @@ public class AutoCompleteAction extends ETextAction {
         }
         
         String[] completions = completionsList.toArray(new String[completionsList.size()]);
-        final JList<String> completionsUi = new JList<String>(completions);
+        final JList<String> completionsUi = new JList<>(completions);
         completionsUi.addFocusListener(new FocusAdapter() {
             public void focusLost(FocusEvent e) {
                 hideCompletionsWindow();
