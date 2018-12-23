@@ -549,13 +549,14 @@ BOOT_JDK.FreeBSD = /usr/local/openjdk${JAVA_MAJOR_VERSION}
 BOOT_JDK.Cygwin = $(call findMakeFriendlyEquivalentName,$(shell ruby -e 'require "$(JDK_ROOT_SCRIPT)"; puts(findBootJdkFromRegistry())'))
 
 # := deferred to ALTERNATE_BOOTCLASSPATH
-BOOT_JDK.Darwin = $(shell /usr/libexec/java_home -v $(patsubst 8,1.8,$(JAVA_MAJOR_VERSION))
+BOOT_JDK.Darwin = $(shell /usr/libexec/java_home -v $(patsubst 8,1.8,$(JAVA_MAJOR_VERSION)))
 
 BOOT_JDK = $(BOOT_JDK.$(TARGET_OS))
 ALTERNATE_BOOTCLASSPATH ?= $(BOOT_JDK)/jre/lib/rt.jar
 ALTERNATE_BOOTCLASSPATH := $(wildcard $(ALTERNATE_BOOTCLASSPATH))
 BOOT_JDK_MESSAGE += $(NEWLINE)
-BOOT_JDK_MESSAGE += You need to install a package that will give you a Java $(JAVA_MAJOR_VERSION) JDK, so we can use its rt.jar.
+# Something else adds the trailing period.
+BOOT_JDK_MESSAGE += You need to install a package that will give you a Java $(JAVA_MAJOR_VERSION) JDK, so we can use its rt.jar
 BOOT_JDK_ERROR = $(error $(BOOT_JDK_MESSAGE))
 # The *** does battle with filter-build-output.rb.
 BOOT_JDK_WARNING = $(warning *** $(BOOT_JDK_MESSAGE))
