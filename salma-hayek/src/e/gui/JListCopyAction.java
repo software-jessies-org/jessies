@@ -22,7 +22,6 @@ public class JListCopyAction extends AbstractAction {
         super("copy");
     }
     
-    @SuppressWarnings("unchecked")
     public void actionPerformed(ActionEvent e) {
         copyListSelectionToClipboard((JList<?>) e.getSource());
     }
