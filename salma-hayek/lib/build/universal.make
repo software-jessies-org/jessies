@@ -586,19 +586,6 @@ JAVAC_FLAGS.ecj += -target 1.$(JAVA_MAJOR_VERSION)
 JAVAC_FLAGS.ecj += -source 1.$(JAVA_MAJOR_VERSION)
 
 # ----------------------------------------------------------------------------
-# Set GCJ flags.
-# ----------------------------------------------------------------------------
-
-JAVAC_FLAGS.gcj += -Wall -Wdeprecated
-JAVAC_FLAGS.gcj += -Wno-indirect-static
-JAVAC_FLAGS.gcj += -Wno-serial
-JAVAC_FLAGS.gcj += -combine
-JAVAC_FLAGS.gcj += -encoding UTF-8
-JAVAC_FLAGS.gcj += -fjni
-JAVAC_FLAGS.gcj += --main=$(GCJ_MAIN_CLASS)
-JAVAC_FLAGS.gcj += -o $(MACHINE_PROJECT_NAME)
-
-# ----------------------------------------------------------------------------
 
 # javac(1) warns if you build source containing characters unrepresentable
 # in your locale. Although we all use UTF-8 locales, we can't guarantee that
@@ -1090,10 +1077,6 @@ test: build
 	@echo "-- Running unit tests..."
 	# Beware of passing absolute Cygwin paths to Java.
 	$(SCRIPT_PATH)/org.jessies.TestRunner .generated/classes
-
-.PHONY: gcj
-gcj:
-	rm -rf .generated/classes/ && JAVA_COMPILER=/usr/bin/gcj make && rm -rf .generated && make && sudo mv $(MACHINE_PROJECT_NAME) /usr/bin
 
 .PHONY: findbugs
 findbugs: build
