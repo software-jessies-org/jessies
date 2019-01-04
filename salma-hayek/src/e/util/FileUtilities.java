@@ -192,8 +192,8 @@ public class FileUtilities {
                 }
             }
             isTextFile = (byteCount == -1 || zeroByteCount == 0);
-        } catch (Exception ex) {
-            ex = ex;
+        } catch (Exception ignored) {
+            // Nothing better we can do here...
         }
         return isTextFile;
     }

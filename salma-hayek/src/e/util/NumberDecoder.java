@@ -65,8 +65,7 @@ public class NumberDecoder {
                 result = Long.valueOf(constant, radix);
                 number = result.longValue();
                 valid = true;
-            } catch (NumberFormatException ex2) {
-                ex2 = ex2;
+            } catch (NumberFormatException ignored) {
             }
         }
     }

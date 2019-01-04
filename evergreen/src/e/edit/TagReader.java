@@ -129,9 +129,8 @@ public class TagReader {
                 if (reader != null) {
                     reader.close();
                 }
-            } catch (IOException ex) {
+            } catch (IOException ignored) {
                 // What can we do? Nothing.
-                ex = ex;
             }
         }
     }

@@ -220,8 +220,8 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                 executor.shutdown();
                 try {
                     executor.awaitTermination(3600, TimeUnit.SECONDS);
-                } catch (InterruptedException ex) {
-                    ex = ex; // Fine; we're still finished.
+                } catch (InterruptedException ignored) {
+                    // Fine; we're still finished.
                 }
                 
                 endTimeNs = System.nanoTime();
@@ -382,10 +382,9 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                             publish(pathNode);
                         }
                     }
-                } catch (FileNotFoundException ex) {
+                } catch (FileNotFoundException ignored) {
                     // This special case is worthwhile if your workspace's index is out of date.
                     // A common case is when the index contains generated files that may be removed during a build.
-                    ex = ex;
                 } catch (Throwable th) {
                     Log.warn("FileSearchRunnable.call caught something", th);
                 }

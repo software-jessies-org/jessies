@@ -282,21 +282,19 @@ public class JavaDoc {
             String soughtClass = packageName + ((packageName.length() > 0) ? "." : "") + className;
             try {
                 classes.add(Class.forName(soughtClass, false, classLoader));
-            } catch (ClassNotFoundException ex) {
+            } catch (ClassNotFoundException ignored) {
                 /*
                  * Ignore: just means that we haven't yet found the class
                  * we're looking for. We are just guessing its location,
                  * after all.
                  */
-                ex = ex;
-            } catch (NoClassDefFoundError ex) {
+            } catch (NoClassDefFoundError ignored) {
                 /*
                  * Ignore: occurs when the text next to the caret is a real class
                  * name followed by a dot, but the text is in the wrong case. E.g.:
                  * positioning the caret just beyond " javadoc. " will cause
                  * java.lang.NoClassDefFoundError: e/edit/javadoc (wrong name: e/edit/JavaDoc)
                  */
-                ex = ex;
             }
         }
         return classes;

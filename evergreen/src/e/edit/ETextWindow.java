@@ -577,8 +577,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         if (st.hasMoreTokens()) {
             try {
                 offset = emacsWalk(chars, offset, Integer.parseInt(st.nextToken()));
-            } catch (NumberFormatException ex) {
-                ex = ex;
+            } catch (NumberFormatException ignored) {
             }
         }
         offset = Math.min(offset, maxOffset);
@@ -592,16 +591,14 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         if (st.hasMoreTokens()) {
             try {
                 endOffset = textArea.getLineStartOffset(Integer.parseInt(st.nextToken()) - 1);
-            } catch (NumberFormatException ex) {
-                ex = ex;
+            } catch (NumberFormatException ignored) {
             }
         }
         if (st.hasMoreTokens()) {
             try {
                 // emacs end offsets seem to include the character following.
                 endOffset = emacsWalk(chars, endOffset, Integer.parseInt(st.nextToken())) + 1;
-            } catch (NumberFormatException ex) {
-                ex = ex;
+            } catch (NumberFormatException ignored) {
             }
         }
         textArea.centerOnNewSelection(offset, endOffset);

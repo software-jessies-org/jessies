@@ -27,8 +27,7 @@ public class ProcessUtilities {
             } finally {
                 in.close();
             }
-        } catch (Exception ex) {
-            ex = ex;
+        } catch (Exception ignored) {
             return command;
         }
         String line = new String(buffer, 0, charactersRead);
@@ -343,8 +342,7 @@ public class ProcessUtilities {
             if (directory.canRead()) {
                 return directory.toString();
             }
-        } catch (IOException ex) {
-            ex = ex;
+        } catch (IOException ignored) {
         }
         return null;
     }

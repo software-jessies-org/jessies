@@ -270,9 +270,8 @@ public class Evergreen {
              * This also cleans paths like a/b/../c/d.
              */
             filename = FileUtilities.fileFromString(filename).getCanonicalPath();
-        } catch (IOException ex) {
+        } catch (IOException ignored) {
             /* Harmless. */
-            ex = ex;
         }
         filename = normalizeWorkspacePrefix(filename);
         filename = FileUtilities.getUserFriendlyName(filename);
