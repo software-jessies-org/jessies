@@ -4,7 +4,6 @@ import e.gui.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
-import java.lang.reflect.*;
 import java.net.URI;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;

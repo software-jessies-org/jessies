@@ -1,7 +1,5 @@
 package e.util;
 
-import java.awt.*;
-
 /**
  * Wraps a Preferences object, and provides an interface to get hold of preferences from it, but with each
  * key prefixed with a given string.

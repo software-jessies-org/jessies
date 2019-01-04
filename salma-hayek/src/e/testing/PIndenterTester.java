@@ -1,7 +1,6 @@
 package e.testing;
 
 import java.io.*;
-import java.util.*;
 import javax.swing.*;
 
 import e.ptextarea.*;

@@ -1,6 +1,5 @@
 package e.gui;
 
-import java.awt.*;
 import javax.swing.*;
 
 public class PatchListCellRenderer extends EListCellRenderer<String> {

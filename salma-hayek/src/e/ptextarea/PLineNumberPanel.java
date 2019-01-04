@@ -3,7 +3,6 @@ package e.ptextarea;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.*;
 import javax.swing.*;
 
 /**

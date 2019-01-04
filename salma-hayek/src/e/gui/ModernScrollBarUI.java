@@ -2,7 +2,6 @@ package e.gui;
 
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.border.*;
 import javax.swing.plaf.basic.*;
 
 public class ModernScrollBarUI extends BasicScrollBarUI {
