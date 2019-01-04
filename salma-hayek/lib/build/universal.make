@@ -495,12 +495,15 @@ VERSION_STRING := $(shell $(MAKE_VERSION_FILE_COMMAND) | tail -1)
 makeGuid = $(shell $(BUILD_SCRIPT_PATH)/uuid.rb)
 
 # ----------------------------------------------------------------------------
-# Choose a Java compiler.
+# Supply a default Java compiler if the user didn't set JAVA_COMPILER.
+# Currently both javac and ecj are supported.
 # ----------------------------------------------------------------------------
 
-JAVA_COMPILER ?= $(JDK_BIN)/javac
-ifeq "$(wildcard $(JAVA_COMPILER)$(EXE_SUFFIX))" ""
-  JAVA_COMPILER := $(error Unable to find $(JAVA_COMPILER) --- do you only have a JRE installed or did you explicitly supply a non-absolute path?)
+ifeq "$(JAVA_COMPILER)" ""
+  JAVA_COMPILER := $(JDK_BIN)/javac
+  ifeq "$(wildcard $(JAVA_COMPILER)$(EXE_SUFFIX))" ""
+    JAVA_COMPILER := $(error Unable to find $(JAVA_COMPILER) --- do you only have a JRE installed or did you explicitly supply a non-absolute path?)
+  endif
 endif
 
 # ----------------------------------------------------------------------------
@@ -572,19 +575,16 @@ JAVAC_FLAGS.ecj += -d .generated/classes/
 JAVAC_FLAGS.ecj += -sourcepath src/
 JAVAC_FLAGS.ecj += -g
 JAVAC_FLAGS.ecj += -Xemacs
-JAVAC_FLAGS.ecj += -referenceInfo
 
 # Turn on warnings.
 JAVAC_FLAGS.ecj += -deprecation
-JAVAC_FLAGS.ecj += -warn:+allDeprecation,conditionAssign,dep-ann,enumSwitch,fallthrough,finalBound,noEffectAssign,null,nullDereference,over-ann,pkgDefaultMethod,raw,semicolon,unused,uselessTypeCheck,varargsCast
 JAVAC_FLAGS.ecj += -warn:-serial
-JAVAC_FLAGS.ecj += -proceedOnError
 
 # We should also ensure that we build class files that can be used on the current Java release, regardless of where we build.
-JAVAC_FLAGS.ecj += -target 1.$(JAVA_MAJOR_VERSION)
+JAVAC_FLAGS.ecj += -target $(JAVA_MAJOR_VERSION)
 
 # Ensure we give a clear error if the user attempts to use anything older.
-JAVAC_FLAGS.ecj += -source 1.$(JAVA_MAJOR_VERSION)
+JAVAC_FLAGS.ecj += -source $(JAVA_MAJOR_VERSION)
 
 # ----------------------------------------------------------------------------
 
