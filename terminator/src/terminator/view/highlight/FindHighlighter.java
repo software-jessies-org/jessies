@@ -1,8 +1,6 @@
 package terminator.view.highlight;
 
 import e.util.*;
-import java.awt.*;
-import java.awt.event.*;
 import java.util.concurrent.*;
 import java.util.regex.*;
 import java.util.ArrayList;

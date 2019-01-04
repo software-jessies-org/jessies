@@ -5,7 +5,6 @@ import java.awt.datatransfer.*;
 import java.awt.event.*;
 import java.awt.image.*;
 import java.util.*;
-import java.util.List;
 import javax.swing.*;
 import e.gui.*;
 import e.util.*;

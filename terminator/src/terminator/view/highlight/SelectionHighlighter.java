@@ -5,7 +5,6 @@ import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
 import javax.swing.*;
-import terminator.*;
 import terminator.model.*;
 import terminator.view.*;
 

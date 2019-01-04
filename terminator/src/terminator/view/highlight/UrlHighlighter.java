@@ -1,17 +1,12 @@
 package terminator.view.highlight;
 
-import e.gui.SimpleDialog;
 import e.util.PatternUtilities;
 import e.util.Range;
-import java.awt.Cursor;
-import java.awt.event.MouseEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.ArrayList;
 import terminator.Terminator;
 import terminator.TerminatorPreferences;
-import terminator.model.Location;
-import terminator.model.Style;
 import terminator.model.TerminalModel;
 import terminator.view.TerminalView;
 

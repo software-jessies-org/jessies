@@ -7,7 +7,6 @@ import java.awt.event.*;
 import javax.swing.*;
 import terminator.model.*;
 import terminator.view.*;
-import terminator.view.highlight.*;
 
 /**
  * Provides a menu bar for Mac OS, and acts as a source of Action instances for
