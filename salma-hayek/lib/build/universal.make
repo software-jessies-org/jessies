@@ -499,11 +499,9 @@ makeGuid = $(shell $(BUILD_SCRIPT_PATH)/uuid.rb)
 # Currently both javac and ecj are supported.
 # ----------------------------------------------------------------------------
 
-ifeq "$(JAVA_COMPILER)" ""
-  JAVA_COMPILER := $(JDK_BIN)/javac
-  ifeq "$(wildcard $(JAVA_COMPILER)$(EXE_SUFFIX))" ""
-    JAVA_COMPILER := $(error Unable to find $(JAVA_COMPILER) --- do you only have a JRE installed or did you explicitly supply a non-absolute path?)
-  endif
+JAVA_COMPILER ?= $(JDK_BIN)/javac
+ifeq "$(shell which $(JAVA_COMPILER)$(EXE_SUFFIX))" ""
+    JAVA_COMPILER := $(error Unable to find Java compiler "$(JAVA_COMPILER)")
 endif
 
 # ----------------------------------------------------------------------------
