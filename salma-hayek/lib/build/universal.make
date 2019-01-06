@@ -495,14 +495,11 @@ VERSION_STRING := $(shell $(MAKE_VERSION_FILE_COMMAND) | tail -1)
 makeGuid = $(shell $(BUILD_SCRIPT_PATH)/uuid.rb)
 
 # ----------------------------------------------------------------------------
-# Supply a default Java compiler if the user didn't set JAVA_COMPILER.
-# Currently both javac and ecj are supported.
+# Choose the javac that's in the JDK we found if the user didn't manually
+# set JAVA_COMPILER. Currently both javac and ecj are supported.
 # ----------------------------------------------------------------------------
 
 JAVA_COMPILER ?= $(JDK_BIN)/javac
-ifeq "$(shell which $(JAVA_COMPILER)$(EXE_SUFFIX))" ""
-    JAVA_COMPILER := $(error Unable to find Java compiler "$(JAVA_COMPILER)")
-endif
 
 # ----------------------------------------------------------------------------
 # Set up the classpath.
