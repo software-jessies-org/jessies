@@ -1,6 +1,5 @@
 #include <ctype.h>
 #include <errno.h>
-#include <error.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <stdio.h>
@@ -17,6 +16,8 @@
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>
 #include <X11/Xutil.h>
+
+#include "log.h"
 
 // The display.
 static Display* g_display;
@@ -52,9 +53,7 @@ static std::string display_string;
 
 static char* xstrdup(const char* p) {
   char* s = strdup(p);
-  if (s == 0) {
-    error(1, errno, "strdup failed");
-  }
+  LOGF_IF(!s) << "strdup failed: " << Log::Errno(errno);
   return s;
 }
 
@@ -153,14 +152,15 @@ static void DoCommand(XEvent* ev) {
       switch (fork()) {
         case 0:
           execl(sh, sh, "-c", command[button], nullptr);
-          error(1, errno, "exec \"%s -c %s\" failed", sh, command[button]);
+          LOGF() << "exec \"" << sh << " -c " << command[button]
+                 << "\" failed: " << Log::Errno(errno);
         case -1:
-          error(1, errno, "fork failed");
+          LOGF() << "fork failed: " << Log::Errno(errno);
         default:
           _exit(EXIT_SUCCESS);
       }
     case -1:  // Error.
-      error(0, errno, "fork failed");
+      LOGE() << "fork failed: " << Log::Errno(errno);
       break;
     default:
       wait(0);
@@ -197,8 +197,8 @@ static int ErrorHandler(Display* d, XErrorEvent* e) {
   char req[80];
   XGetErrorDatabaseText(d, "XRequest", number, number, req, sizeof(req));
 
-  error(0, 0, "protocol request %s on resource %#lx failed: %s", req,
-        e->resourceid, msg);
+  LOGE() << "protocol request " << req << " on resource " << std::hex
+         << e->resourceid << " failed: " << msg;
   return 0;
 }
 
@@ -252,9 +252,7 @@ static void GetResources() {
 int main(int argc, char* argv[]) {
   // Open a connection to the X server.
   g_display = XOpenDisplay("");
-  if (g_display == nullptr) {
-    error(1, 0, "can't open display");
-  }
+  LOGF_IF(!g_display) << "can't open display";
 
   GetResources();
 
@@ -272,13 +270,11 @@ int main(int argc, char* argv[]) {
   // Get font.
   g_font = XftFontOpenName(g_display, screen, g_font_name.c_str());
   if (g_font == nullptr) {
-    error(0, 0, "couldn't find font %s; falling back", g_font_name.c_str());
+    LOGE() << "couldn't find font " << g_font_name << "; trying default";
     g_font = XftFontOpenName(g_display, 0, "fixed");
-    if (g_font == nullptr) {
-      error(1, 0, "can't find a font");
-    }
+    LOGF_IF(g_font == nullptr) << "can't find a font";
   }
-
+  
   window_width = 100;  // Arbitrary: ephemeral.
   window_height = 2 * (g_font->ascent + g_font->descent);
 

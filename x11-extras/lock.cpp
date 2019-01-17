@@ -1,6 +1,5 @@
 #include <ctype.h>
 #include <errno.h>
-#include <error.h>
 #include <pwd.h>
 #include <signal.h>
 #include <stdio.h>
@@ -19,6 +18,8 @@
 #include <X11/Xresource.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
+
+#include "log.h"
 
 #ifdef __linux__
 #include <fcntl.h>
@@ -181,9 +182,8 @@ static int ErrorHandler(Display* d, XErrorEvent* e) {
   char req[80];
   XGetErrorDatabaseText(d, "XRequest", number, number, req, sizeof(req));
 
-  error(1, 0, "protocol request %s on resource %#lx failed: %s\n", req,
-        e->resourceid, msg);
-
+  LOGE() << "protocol request " << req << " on resource " << std::hex
+         << e->resourceid << " failed: " << msg;
   return 0;
 }
 
@@ -273,9 +273,8 @@ static void InitScreens() {
 int main(int argc, char* argv[]) {
   // Open a connection to the X server.
   dpy = XOpenDisplay("");
-  if (dpy == 0)
-    error(1, 0, "can't open display");
-
+  LOGF_IF(!dpy) << "can't open display";
+  
   GetResources();
 
   // Set up an error handler.
@@ -290,8 +289,7 @@ int main(int argc, char* argv[]) {
   font = XLoadQueryFont(dpy, g_font_name.c_str());
   if (font == 0)
     font = XLoadQueryFont(dpy, "fixed");
-  if (font == 0)
-    error(1, 0, "can't find a font");
+  LOGF_IF(font == 0) << "can't find a font";
 
   InitScreens();
 

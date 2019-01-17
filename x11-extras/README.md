@@ -129,7 +129,8 @@ improvements.
 `window` lets you read and write some of the attributes of
 X windows.
 
-`wselect` shows a cursor and allows you to select a window.
+`wselect` shows a cursor and allows you to select a window. It then prints
+that window's ID in hex.
 
 The documentation gives examples of how to use these tools to do cool
 stuff under X without having to do any X programming yourself.

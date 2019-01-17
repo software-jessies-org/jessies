@@ -1,4 +1,3 @@
-#include <error.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -8,6 +7,8 @@
 #include <X11/Xos.h>
 #include <X11/Xutil.h>
 #include <X11/cursorfont.h>
+
+#include "log.h"
 
 #define MASK (ButtonPressMask | ButtonReleaseMask)
 
@@ -82,13 +83,11 @@ static Window get_window_id(Display* dpy, int screen, int button) {
   root = RootWindow(dpy, screen);
 
   cursor = XCreateFontCursor(dpy, XC_draped_box);
-  if (cursor == None) {
-    error(1, 0, "unable to create selection cursor");
-  }
+  LOGF_IF(cursor == None) << "unable to create selection cursor";
 
   if (XGrabPointer(dpy, root, False, MASK, GrabModeSync, GrabModeAsync, None,
                    cursor, CurrentTime) != GrabSuccess) {
-    error(1, 0, "unable to grab cursor");
+    LOGF() << "unable to grab cursor";
   }
 
   while (retwin == None || pressed != 0) {
@@ -125,9 +124,7 @@ static Window get_window_id(Display* dpy, int screen, int button) {
 
 extern int main(int argc, char* argv[]) {
   Display* display = XOpenDisplay("");
-  if (display == nullptr) {
-    error(1, 0, "can't open display");
-  }
+  LOGF_IF(!display) << "can't open display";
 
   Window id = get_window_id(display, DefaultScreen(display), 1);
   if (id == None) {

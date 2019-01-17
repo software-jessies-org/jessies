@@ -1,5 +1,4 @@
 #include <ctype.h>
-#include <error.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,6 +13,8 @@
 #include <X11/Xft/Xft.h>
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>
+
+#include "log.h"
 
 #define NullEvent -1
 
@@ -86,14 +87,15 @@ static void Execute(MenuItem* item) {
       switch (fork()) {
         case 0:
           execl(sh, sh, "-c", item->command, (char*)NULL);
-          error(1, errno, "exec \"%s -c %s\" failed", sh, item->command);
+          LOGF() << "exec \"" << sh << " -c " << item->command
+                 << "\" failed: " << Log::Errno(errno);
         case -1:
-          error(1, errno, "fork failed");
+          LOGF() << "fork failed: " << Log::Errno(errno);
         default:
           _exit(EXIT_SUCCESS);
       }
     case -1:  // Error.
-      error(0, errno, "fork failed");
+      LOGE() << "fork failed: " << Log::Errno(errno);
       break;
     default:
       wait(0);
@@ -238,8 +240,8 @@ int ErrorHandler(Display* d, XErrorEvent* e) {
   char req[80];
   XGetErrorDatabaseText(d, "XRequest", number, number, req, sizeof(req));
 
-  error(0, 0, "protocol request %s on resource %#lx failed: %s", req,
-        e->resourceid, msg);
+  LOGE() << "protocol request " << req << " on resource " << std::hex
+         << e->resourceid << " failed: " << msg;
   return 0;
 }
 
@@ -322,14 +324,12 @@ int main(int argc, char* argv[]) {
   sa.sa_handler = RestartSelf;
   sigaddset(&(sa.sa_mask), SIGHUP);
   if (sigaction(SIGHUP, &sa, NULL)) {
-    error(1, errno, "SIGHUP sigaction failed");
+    LOGF() << "SIGHUP sigaction failed: " << Log::Errno(errno);
   }
 
   // Open a connection to the X server.
   dpy = XOpenDisplay("");
-  if (dpy == 0) {
-    error(1, 0, "can't open display");
-  }
+  LOGF_IF(!dpy) << "can't open display";
 
   GetResources();
 
@@ -347,11 +347,9 @@ int main(int argc, char* argv[]) {
   // Get font.
   g_font = XftFontOpenName(dpy, screen, g_font_name.c_str());
   if (g_font == nullptr) {
-    error(0, 0, "couldn't find font %s; falling back", g_font_name.c_str());
+    LOGE() << "couldn't find font " << g_font_name << "; trying default";
     g_font = XftFontOpenName(dpy, 0, "fixed");
-    if (g_font == nullptr) {
-      error(1, 0, "can't find a font");
-    }
+    LOGF_IF(g_font == nullptr) << "can't find a font";
   }
 
   // Create the window.

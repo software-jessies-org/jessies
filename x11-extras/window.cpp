@@ -1,5 +1,4 @@
 #include <errno.h>
-#include <error.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,6 +12,8 @@
 #include <X11/Xlib.h>
 #include <X11/Xos.h>
 #include <X11/Xutil.h>
+
+#include "log.h"
 
 struct ReasonDesc {
   const char* name;
@@ -32,7 +33,7 @@ static Window wind(char* p) {
   errno = 0;
   long l = strtol(p, &endp, 0);
   if (p == endp || errno != 0 || *endp != '\0') {
-    error(1, 0, "%s is not a valid window id", p);
+    LOGF() << p << " is not a valid window id";
   }
   return (Window)l;
 }
@@ -151,7 +152,7 @@ static void getWindowProperty(Window window,
                               Bool delete_afterwards) {
   Atom prop = XInternAtom(dpy, name, True);
   if (prop == None) {
-    error(0, 0, "no such property '%s'", name);
+    LOGE() << "no such property '" << name << "'";
     return;
   }
 
@@ -164,7 +165,7 @@ static void getWindowProperty(Window window,
                                   delete_afterwards, AnyPropertyType, &realType,
                                   &format, &n, &extra, (unsigned char**)&value);
   if (status != Success || value == 0 || *value == 0 || n == 0) {
-    error(0, 0, "couldn't read property on window %lx", window);
+    LOGE() << "couldn't read property on window " << std::hex << window;
     return;
   }
 
@@ -182,7 +183,7 @@ static void SetProperty(char* argv[]) {
 
   prop = XInternAtom(dpy, name, True);
   if (prop == None) {
-    error(0, 0, "no such property '%s'\n", name);
+    LOGE() << "no such property '" << name << "'";
     return;
   }
 
@@ -257,7 +258,7 @@ static ReasonDesc reasons[] = {
 };
 
 static int handler(Display* disp, XErrorEvent* err) {
-  error(1, 0, "no window with id %#lx", err->resourceid);
+  LOGF() << "no window with id " << std::hex << err->resourceid;
   return 0;
 }
 
@@ -271,9 +272,7 @@ static void usage() {
 
 extern int main(int argc, char* argv[]) {
   dpy = XOpenDisplay("");
-  if (dpy == nullptr) {
-    error(1, 0, "can't open display");
-  }
+  LOGF_IF(!dpy) << "can't open display";
 
   XSetErrorHandler(handler);
 
@@ -282,8 +281,8 @@ extern int main(int argc, char* argv[]) {
          p < reasons + sizeof reasons / sizeof reasons[0]; p++) {
       if (strcmp(p->name, argv[1]) == 0) {
         if (argc - 2 != p->nargs) {
-          error(1, 0, "the %s option requires %d argument%s", argv[1], p->nargs,
-                p->nargs > 1 ? "s" : "");
+          LOGF() << "the " << argv[1] << " option requires " << p->nargs
+                 << " argument" << (p->nargs == 1 ? "" : "s");
         }
         p->fn(argv + 2);
         XSync(dpy, True);
