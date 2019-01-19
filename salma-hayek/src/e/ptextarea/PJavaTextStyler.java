@@ -119,14 +119,6 @@ public class PJavaTextStyler extends PAbstractLanguageStyler {
         }
     }
     
-    private boolean isValidOctalDigit(char ch) {
-        return (ch >= '0' && ch <= '7');
-    }
-    
-    private boolean isValidHexDigit(char ch) {
-        return ((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F'));
-    }
-    
     @Override protected boolean isStartOfCommentToEndOfLine(String line, int atIndex) {
         return line.startsWith("//", atIndex);
     }

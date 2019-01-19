@@ -159,7 +159,8 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
                     }
                     lastStart = i;
                     i += multiLineCommentStart().length();
-                } else if (isQuote(line.charAt(i))) {
+                } else if (isQuote(line.charAt(i)) && !(i > 0 && isValidHexDigit(line.charAt(i - 1)))) {
+                    // This should apply to character literal '0' but not numeric literal 1'000'000...
                     if (lastStart < i) {
                         builder.addStyledSegment(i, PStyle.NORMAL);
                     }
@@ -192,6 +193,14 @@ public abstract class PAbstractLanguageStyler extends PAbstractTextStyler {
             builder.addStyledSegment(line.length(), comment ? PStyle.COMMENT : PStyle.NORMAL);
         }
         return builder.getSegmentList();
+    }
+    
+    protected static boolean isValidOctalDigit(char ch) {
+        return (ch >= '0' && ch <= '7');
+    }
+    
+    protected static boolean isValidHexDigit(char ch) {
+        return ((ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F'));
     }
     
     private int getBackslashBeforeCount(String string, int index) {
