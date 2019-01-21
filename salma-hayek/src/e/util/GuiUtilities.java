@@ -41,8 +41,13 @@ public class GuiUtilities {
     private GuiUtilities() {
     }
     
+    // getMenuShortcutKeyMaskEx requires Java 10, so for macOS where the
+    // difference between -Ex and non-Ex breaks shortcuts like C-left and C-up,
+    // and which is the only "unusual" platform anyway, hard-code the -Ex value
+    // that we need. (Reported by Tanel Poder.)
+    // All of this can be replaced by just getMenuShortcutKeyMaskEx() >= Java 10.
     @SuppressWarnings("deprecation") // getMenuShortcutKeyMaskEx requires Java 10.
-    private static final int defaultKeyStrokeModifier = Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
+    private static final int defaultKeyStrokeModifier = GuiUtilities.isMacOs() ? InputEvent.META_DOWN_MASK : Toolkit.getDefaultToolkit().getMenuShortcutKeyMask();
     
     /**
      * An invisible cursor, useful if you want to hide the cursor when the
