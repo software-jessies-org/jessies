@@ -142,7 +142,11 @@ public class WindowMenu {
             
             addSeparator();
             for (int i = 0; i < customItems.length; ++i) {
-                add(customItems[i]);
+                if (customItems[i] == null) {
+                    addSeparator();
+                } else {
+                    add(customItems[i]);
+                }
             }
         }
         
