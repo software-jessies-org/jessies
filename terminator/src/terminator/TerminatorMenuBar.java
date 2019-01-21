@@ -15,19 +15,18 @@ import terminator.view.*;
 public class TerminatorMenuBar extends EMenuBar {
     private static int defaultKeyStrokeModifiers = GuiUtilities.getDefaultKeyStrokeModifier();
     
-    private Action[] customWindowMenuItems = new Action[] {
-        new MoveTabAction(+1),
-        new MoveTabAction(-1),
-        new CycleTabAction(+1),
-        new CycleTabAction(-1)
-    };
-    
     public TerminatorMenuBar() {
         add(makeFileMenu());
         add(makeEditMenu());
         add(makeViewMenu());
         if (GuiUtilities.isMacOs()) {
-            add(WindowMenu.getSharedInstance().makeJMenu(customWindowMenuItems));
+            add(WindowMenu.getSharedInstance().makeJMenu(new Action[] {
+                new CycleTabAction(-1),
+                new CycleTabAction(+1),
+                null,
+                new MoveTabAction(+1),
+                new MoveTabAction(-1),
+            }));
         } else {
             add(makeTabsMenu());
         }
@@ -94,9 +93,10 @@ public class TerminatorMenuBar extends EMenuBar {
     private JMenu makeTabsMenu() {
         final JMenu menu = GuiUtilities.makeMenu("Tabs", 'b');
         menu.add(new DetachTabAction());
-        for (Action action : customWindowMenuItems) {
-            menu.add(action);
-        }
+        menu.add(new MoveTabAction(+1));
+        menu.add(new MoveTabAction(-1));
+        menu.add(new CycleTabAction(+1));
+        menu.add(new CycleTabAction(-1));
         return menu;
     }
     
@@ -624,13 +624,15 @@ public class TerminatorMenuBar extends EMenuBar {
         private int delta;
         
         public CycleTabAction(int delta) {
-            super(delta < 0 ? "Select Previous Tab" : "Select Next Tab");
+            // Apple says "Show Next/Previous Tab", xfce just "Next/Previous Tab".
+            // We used to say "Select Next/Previous Tab", but that sounds odd.
+            super(delta < 0 ? "Show Previous Tab" : "Show Next Tab");
             this.delta = delta;
             
             // The choice of keystrokes has gone back and forth a lot.
             
             // Originally, Phil wanted alt left/right, but his implementation didn't work, and we needed a proper Action we could put on the "Window" menu for Mac OS.
-            // I wanted command { and command }, like Safari.
+            // enh wanted command { and command }, like Safari.
             // Sun bug 6350813 prevents us from doing that directly, but we tried command-shift [ and command-shift ].
             // Elias Naur explained that not only does that look wrong (even though it feels right on English keyboards), it doesn't work at all on Danish keyboards.
             
@@ -657,6 +659,9 @@ public class TerminatorMenuBar extends EMenuBar {
                 // Given the above, why keep advertising these?
                 // 1. We have no manual documenting the alternatives.
                 // 2. For hands like enh's, these are easier to type.
+                // In the years since this decision was made, enh switched to
+                // the tab key anyway. Also, Apple's Terminal added tabs and
+                // uses (and publicizes) the tab key (which we've followed).
                 putValue(ACCELERATOR_KEY, TerminatorMenuBar.makeKeyStroke(delta < 0 ? "LEFT" : "RIGHT"));
             }
         }
@@ -673,8 +678,8 @@ public class TerminatorMenuBar extends EMenuBar {
             super(delta < 0 ? "Move Tab Left" : "Move Tab Right");
             this.delta = delta;
             
-            // Apple's Terminal doesn't yet support tabs.
             // Firefox only supports drag and drop; there's no keyboard tab movement.
+            // Likewise for Apple's Terminal.
             // gnome-terminal uses control-shift page up/page down.
             // konsole uses control-shift left/right.
             // We support those in our KeyEvent-handling code, but they're secret.
