@@ -5,6 +5,7 @@ import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.lang.reflect.*;
 import java.net.*;
 import java.util.*;
 import java.util.List;
@@ -55,23 +56,32 @@ public class Terminator {
             return;
         }
         
+        try {
+            // TODO: write this directly when we require Java >= 9.
+            // (Note that we need two classes here because the proxy must have
+            // the type of the *subinterface* or it will never be called, but
+            // we have to look up the method via the *superinterface*.)
+            Class<?> appReopenedListenerClass = Class.forName("java.awt.desktop.AppReopenedListener");
+            Object proxy = java.lang.reflect.Proxy.newProxyInstance(getClass().getClassLoader(),
+                                                                    new Class<?>[] { appReopenedListenerClass },
+                                                                    (__1, method, __3) -> {
+                                                                        if (method.getName().equals("appReopened")) {
+                                                                            if (frames.isEmpty()) {
+                                                                                openFrame(JTerminalPane.newShell());
+                                                                            }
+                                                                        }
+                                                                        return Void.TYPE;
+                                                                    }
+                                                                );
+            Class<?> systemEventListenerClass = Class.forName("java.awt.desktop.SystemEventListener");
+            Method appAppEventListenerMethod = Desktop.class.getDeclaredMethod("addAppEventListener", systemEventListenerClass);
+            appAppEventListenerMethod.invoke(Desktop.getDesktop(), proxy);
+        } catch (ReflectiveOperationException th) {
+            Log.warn("failed to set SystemEventListener for appReopened", th);
+        }
+        
 /* TODO: make this work again
 
-        Application.getApplication().addApplicationListener(new ApplicationAdapter() {
-            @Override
-            public void handleReOpenApplication(ApplicationEvent e) {
-                if (frames.isEmpty()) {
-                    openFrame(JTerminalPane.newShell());
-                }
-                e.setHandled(true);
-            }
-            
-            @Override
-            public void handleOpenFile(ApplicationEvent e) {
-                SimpleDialog.showAlert(null, "Received 'open file' AppleEvent", e.toString());
-                Log.warn("open file " + e.toString());
-            }
-            
             @Override
             public void handleQuit(ApplicationEvent e) {
                 // We can't iterate over "frames" directly because we're causing frames to close and be removed from the list.
