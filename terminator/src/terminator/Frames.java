@@ -2,6 +2,7 @@ package terminator;
 
 import e.util.*;
 import java.awt.*;
+import java.lang.reflect.*;
 import java.util.*;
 import javax.swing.*;
 
@@ -9,8 +10,10 @@ import javax.swing.*;
  * Ensures that, on Mac OS, we always have our menu bar visible, even
  * when there are no terminal windows open. We use a dummy window with
  * a copy of the menu bar attached. When no other window has the focus,
- * but the application is focused, this hidden window gets the focus,
- * and its menu is used for the screen menu bar.
+ * but the application is focused, this hidden window gets the focus.
+ *
+ * Most of this class should be made obsolete by Desktop.setDefaultMenuBar
+ * in Java 9...
  */
 public class Frames implements Iterable<TerminatorFrame> {
     private ArrayList<TerminatorFrame> list = new ArrayList<>();
@@ -26,6 +29,7 @@ public class Frames implements Iterable<TerminatorFrame> {
     
     private synchronized void initHiddenFrameAndDockMenu() {
         if (hiddenFrame == null) {
+            // TODO: replace this with Desktop.setDefaultMenuBar when we require Java >= 9.
             String name = "Mac OS Hidden Frame";
             hiddenFrame = new JFrame(name);
             hiddenFrame.setName(name);
@@ -34,21 +38,16 @@ public class Frames implements Iterable<TerminatorFrame> {
             // Move the window off-screen so that when we're forced to setVisible(true) it doesn't actually disturb the user.
             hiddenFrame.setLocation(new java.awt.Point(-100, -100));
             
-/* TODO: make this work again
-
-            // The Dock menu needs a valid Component as a parent. The hidden frame
-            // does not become valid until it has been made visible.
-            hiddenFrame.setVisible(true);
             PopupMenu dockMenu = new PopupMenu("Dock Menu");
             addActions(dockMenu, DOCK_MENU_ACTIONS);
-            hiddenFrame.add(dockMenu);
             try {
-                java.lang.reflect.Method setDockMenuMethod = Application.class.getDeclaredMethod("setDockMenu", PopupMenu.class);
-                setDockMenuMethod.invoke(Application.getApplication(), dockMenu);
+                Class<?> taskbarClass = Class.forName("java.awt.Taskbar");
+                Method getTaskbarMethod = taskbarClass.getDeclaredMethod("getTaskbar");
+                Method setMenuMethod = taskbarClass.getDeclaredMethod("setMenu", PopupMenu.class);
+                setMenuMethod.invoke(getTaskbarMethod.invoke(null), dockMenu);
             } catch (Throwable th) {
                 Log.warn("failed to set dock menu", th);
             }
-*/
         }
     }
     
