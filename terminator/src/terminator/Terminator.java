@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
 import java.lang.reflect.*;
+import java.lang.reflect.Proxy;
 import java.net.*;
 import java.util.*;
 import java.util.List;
@@ -62,17 +63,16 @@ public class Terminator {
             // the type of the *subinterface* or it will never be called, but
             // we have to look up the method via the *superinterface*.)
             Class<?> appReopenedListenerClass = Class.forName("java.awt.desktop.AppReopenedListener");
-            Object proxy = java.lang.reflect.Proxy.newProxyInstance(getClass().getClassLoader(),
-                                                                    new Class<?>[] { appReopenedListenerClass },
-                                                                    (__1, method, __3) -> {
-                                                                        if (method.getName().equals("appReopened")) {
-                                                                            if (frames.isEmpty()) {
-                                                                                openFrame(JTerminalPane.newShell());
-                                                                            }
-                                                                        }
-                                                                        return Void.TYPE;
-                                                                    }
-                                                                );
+            Object proxy = Proxy.newProxyInstance(getClass().getClassLoader(),
+                                                  new Class<?>[] { appReopenedListenerClass },
+                                                  (__1, method, __3) -> {
+                                                      if (method.getName().equals("appReopened")) {
+                                                          if (frames.isEmpty()) {
+                                                              openFrame(JTerminalPane.newShell());
+                                                          }
+                                                      }
+                                                      return Void.TYPE;
+                                                  });
             Class<?> systemEventListenerClass = Class.forName("java.awt.desktop.SystemEventListener");
             Method appAppEventListenerMethod = Desktop.class.getDeclaredMethod("addAppEventListener", systemEventListenerClass);
             appAppEventListenerMethod.invoke(Desktop.getDesktop(), proxy);
@@ -80,20 +80,16 @@ public class Terminator {
             Log.warn("failed to set SystemEventListener for appReopened", th);
         }
         
-/* TODO: make this work again
-
-            @Override
-            public void handleQuit(ApplicationEvent e) {
-                // We can't iterate over "frames" directly because we're causing frames to close and be removed from the list.
-                for (TerminatorFrame frame : frames.toArrayList()) {
-                    frame.handleWindowCloseRequestFromUser();
-                }
-                
-                // If there are windows still open, the user changed their mind; otherwise quit.
-                e.setHandled(frames.isEmpty());
-            }
-        });
-*/
+        GuiUtilities.setQuitHandler(this::handleQuit);
+    }
+    
+    private boolean handleQuit() {
+        // We can't iterate over "frames" directly because we're causing frames to close and be removed from the list.
+        for (TerminatorFrame frame : frames.toArrayList()) {
+            frame.handleWindowCloseRequestFromUser();
+        }
+        // If there are windows still open, the user changed their mind; otherwise quit.
+        return frames.isEmpty();
     }
     
     private void initAboutBox() {

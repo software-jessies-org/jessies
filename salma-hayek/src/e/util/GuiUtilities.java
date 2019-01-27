@@ -4,6 +4,7 @@ import e.gui.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
+import java.lang.reflect.*;
 import java.net.URI;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
@@ -446,7 +447,7 @@ public class GuiUtilities {
     private static void fixWmClass() {
         try {
             Toolkit xToolkit = Toolkit.getDefaultToolkit();
-            java.lang.reflect.Field awtAppClassNameField = xToolkit.getClass().getDeclaredField("awtAppClassName");
+            Field awtAppClassNameField = xToolkit.getClass().getDeclaredField("awtAppClassName");
             awtAppClassNameField.setAccessible(true);
             awtAppClassNameField.set(xToolkit, Log.getApplicationName());
         } catch (Throwable th) {
@@ -582,6 +583,27 @@ public class GuiUtilities {
             done.await();
         } catch (InterruptedException ex) {
             Log.warn("InterruptedException while waiting for window to be closed", ex);
+        }
+    }
+    
+    // The quitHandlerLambda should return true to quit, false to cancel the quit.
+    public static void setQuitHandler(java.util.function.BooleanSupplier quitHandlerLambda) {
+        try {
+            // TODO: write this directly when we require Java >= 9.
+            Class<?> handlerClass = Class.forName("java.awt.desktop.QuitHandler");
+            Object proxy = Proxy.newProxyInstance(ClassLoader.getSystemClassLoader(),
+                                                  new Class<?>[] { handlerClass },
+                                                      (__1, method, args) -> {
+                                                          if (method.getName().equals("handleQuitRequestWith")) {
+                                                              boolean shouldQuit = quitHandlerLambda.getAsBoolean();
+                                                              Class<?> c = Class.forName("java.awt.desktop.QuitResponse");
+                                                              Method m = c.getDeclaredMethod(shouldQuit ? "performQuit" : "cancelQuit");
+                                                              m.invoke(args[1]);
+                                                          }
+                                                          return Void.TYPE;
+                                                      });
+            Desktop.class.getDeclaredMethod("setQuitHandler", handlerClass).invoke(Desktop.getDesktop(), proxy);
+        } catch (ReflectiveOperationException ignored) {
         }
     }
 }

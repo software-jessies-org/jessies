@@ -521,17 +521,15 @@ public class Evergreen {
         JFrameUtilities.setFrameIcon(frame);
     }
     
-/* TODO: proxy this
-    public void handleQuitRequestWith(QuitEvent e, QuitResponse response) {
-        handleQuit();
-    }
-*/
-
     /**
      * Attempts to quit. All the workspaces are asked if it's safe for them to be
      * closed. Only if all workspaces agree that it's safe will we actually quit.
      */
-    public void handleQuit() {
+    public void doQuit() {
+        if (handleQuit()) System.exit(0);
+    }
+    
+    public boolean handleQuit() {
         boolean isSafeToQuit = true;
         
         ArrayList<String> dirtyFileNames = new ArrayList<>();
@@ -558,12 +556,12 @@ public class Evergreen {
                 firstDirtyWindow.requestFocusInWindow();
             }
             showAlert("You have files with unsaved changes", "There are unsaved files:<p>" + StringUtilities.join(dirtyFileNames, "<br>") + "<p>Please deal with them and try again.");
-            return;
+            return false;
         }
         
         // We're definitely going to quit now...
         rememberState();
-        System.exit(0);
+        return true;
     }
 
     /**
@@ -688,7 +686,7 @@ public class Evergreen {
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
-                handleQuit();
+                doQuit();
             }
         });
     }
@@ -746,9 +744,7 @@ public class Evergreen {
         if (GuiUtilities.isMacOs() == false) {
             return;
         }
-/* TODO: proxy this
-        Desktop.getDesktop().setQuitHandler(this);
-*/
+        GuiUtilities.setQuitHandler(this::handleQuit);
     }
     
     private void initAboutBox() {
