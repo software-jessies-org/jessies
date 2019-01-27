@@ -1,3 +1,4 @@
+// TODO: macOS support only works <= Java 6, popping up a dialog talking about unsupported legacy Java; remove?
 #ifdef __APPLE__
 #include <pthread.h>
 #include <sys/stat.h>

@@ -66,9 +66,6 @@ PTextArea
 General stuff
 -------------
 
-* Here's a really cool auto-update system (for Cocoa) that it would be nice to imitate: 
-  http://www.andymatuschak.org/articles/2006/01/09/introducing-sparkle-easy-self-updates-for-all
-
 * Mac OS equivalent of GnomeStockIcon:
 
 	The other sticking point is that images loaded by Java will simply be  
