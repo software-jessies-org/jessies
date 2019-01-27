@@ -4,6 +4,7 @@ import e.forms.*;
 import e.gui.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.List;
 import java.util.regex.*;
@@ -153,15 +154,14 @@ public abstract class Preferences extends PreferenceGetter {
         try {
             // TODO: write this directly when we require Java >= 9.
             Class<?> handlerClass = Class.forName("java.awt.desktop.PreferencesHandler");
-            Object proxy = java.lang.reflect.Proxy.newProxyInstance(getClass().getClassLoader(),
-                                                                    new Class<?>[] { handlerClass },
-                                                                    (__1, method, __3) -> {
-                                                                        if (method.getName().equals("handlePreferences")) {
-                                                                            showPreferencesDialog("Preferences");
-                                                                        }
-                                                                        return Void.TYPE;
-                                                                    }
-            );
+            Object proxy = Proxy.newProxyInstance(getClass().getClassLoader(),
+                                                  new Class<?>[] { handlerClass },
+                                                  (__1, method, __3) -> {
+                                                      if (method.getName().equals("handlePreferences")) {
+                                                          showPreferencesDialog("Preferences");
+                                                      }
+                                                      return Void.TYPE;
+                                                  });
             Desktop.class.getDeclaredMethod("setPreferencesHandler", handlerClass).invoke(Desktop.getDesktop(), proxy);
         } catch (ReflectiveOperationException ignored) {
         }
