@@ -1019,7 +1019,9 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
                 g.drawLine(x, strikeY, x + textWidth, strikeY);
             }
             
-            // TODO: Style.DIM
+            if ((attributes & Style.DIM) != 0) foreground = foreground.darker();
+            if ((attributes & Style.BOLD) != 0) foreground = foreground.brighter();
+            
             // TODO: Style.BLINK (probably not!)
             
             Font previousFont = null;
