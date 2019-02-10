@@ -986,11 +986,11 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
     /**
      * Paints the text. Returns how many pixels wide the text was.
      */
-    private int paintStyledText(Graphics2D g, FontMetrics metrics, String text, Style style, int x, int y, boolean url, boolean find) {
+    private int paintStyledText(Graphics2D g, FontMetrics metrics, String text, Style style, int x, int y, boolean url, boolean isFind) {
         Stopwatch.Timer timer = paintStyledTextStopwatch.start();
         try {
-            Color foreground = find ? Color.BLACK : style.getForeground();
-            Color background = find ? Color.YELLOW : style.getBackground();
+            Color foreground = isFind ? Color.BLACK : style.getForeground();
+            Color background = isFind ? Color.YELLOW : style.getBackground();
             int attributes = style.getAttributes();
             
             if ((attributes & Style.REVERSE) != 0) {
