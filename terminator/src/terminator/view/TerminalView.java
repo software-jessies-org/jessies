@@ -991,11 +991,16 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
         try {
             Color foreground = find ? Color.BLACK : style.getForeground();
             Color background = find ? Color.YELLOW : style.getBackground();
+            int attributes = style.getAttributes();
             
-            if (style.isReverseVideo()) {
+            if ((attributes & Style.REVERSE) != 0) {
                 Color oldForeground = foreground;
                 foreground = background;
                 background = oldForeground;
+            }
+            
+            if ((attributes & Style.HIDDEN) != 0) {
+                foreground = background;
             }
             
             int textWidth = metrics.stringWidth(text);
@@ -1004,13 +1009,23 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
                 int backgroundWidth = textWidth;
                 g.fillRect(x, y - metrics.getMaxAscent() - metrics.getLeading(), backgroundWidth, metrics.getHeight());
             }
-            if (url || style.isUnderlined()) {
+            if (url || (attributes & Style.UNDERLINE) != 0) {
                 g.setColor(new Color(foreground.getRed(), foreground.getGreen(), foreground.getBlue(), 128));
                 g.drawLine(x, y + 1, x + textWidth, y + 1);
             }
+            if ((attributes & Style.STRIKETHROUGH) != 0) {
+                g.setColor(new Color(foreground.getRed(), foreground.getGreen(), foreground.getBlue()));
+                int strikeY = y - (metrics.getMaxAscent() + metrics.getLeading()) / 2;
+                g.drawLine(x, strikeY, x + textWidth, strikeY);
+            }
+            
+            // TODO: Style.DIM
+            // TODO: Style.ITALIC
+            // TODO: Style.BLINK (probably not!)
+            
             g.setColor(foreground);
             g.drawString(text, x, y);
-            if (style.isBold()) {
+            if ((attributes & Style.BOLD) != 0) {
                 // A font doesn't necessarily have a bold.
                 // Mac OS X's "Monaco" font is an example.
                 // The trouble is, you can't tell from the Font you get back from deriveFont.

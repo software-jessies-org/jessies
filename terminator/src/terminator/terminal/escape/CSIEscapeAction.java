@@ -13,6 +13,8 @@ and then are sometimes followed by a '?' character, then optionally a list of nu
 separated by ';' characters, followed by the final character which tells us what to do with
 all that stuff.
 
+https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h2-Functions-using-CSI-_-ordered-by-the-final-character_s_
+
 @author Phil Norman
 */
 
@@ -366,9 +368,7 @@ public class CSIEscapeAction implements TerminalAction {
         // for when someone changes the fg/bg colours in the preferences panel.
         Palettes.Ink foreground = oldStyle.getRawForeground();
         Palettes.Ink background = oldStyle.getRawBackground();
-        boolean isBold = oldStyle.isBold();
-        boolean isReverseVideo = oldStyle.isReverseVideo();
-        boolean isUnderlined = oldStyle.isUnderlined();
+        int attributes = oldStyle.getAttributes();
         Iterator<String> chunks = Arrays.asList(sequence.split(";")).iterator();
         while (chunks.hasNext()) {
             final int attribute = nextInt(chunks);
@@ -377,48 +377,33 @@ public class CSIEscapeAction implements TerminalAction {
                 // Clear all attributes.
                 foreground = null;
                 background = null;
-                isBold = false;
-                isReverseVideo = false;
-                isUnderlined = false;
+                attributes = 0;
                 break;
-            case 1:
-                isBold = true;
-                break;
-            case 2:
-                // ECMA-048 says "faint, decreased intensity or second colour".
-                // gnome-terminal implements this as grey.
-                // xterm does nothing.
-                break;
-            case 4:
-                isUnderlined = true;
-                break;
-            case 5:
-                // Blink on. Unsupported.
-                break;
-            case 7:
-                isReverseVideo = true;
-                break;
+            case 1: attributes |= Style.BOLD; break;
+            case 2: attributes |= Style.DIM; break;
+            case 3: attributes |= Style.ITALIC; break;
+            case 4: attributes |= Style.UNDERLINE; break;
+            case 5: attributes |= Style.BLINK; break;
+            case 7: attributes |= Style.REVERSE; break;
+            case 8: attributes |= Style.HIDDEN; break;
+            case 9: attributes |= Style.STRIKETHROUGH; break;
             case 21:
                 // The xwsh man page suggests this should disable bold.
                 // ECMA-048 says it turns on double-underlining.
                 // xterm does nothing.
                 // gnome-terminal treats this the same as 22.
+                attributes &= ~(Style.BOLD | Style.DIM);
                 break;
             case 22:
-                // ECMA-048 says "normal colour or normal intensity (neither bold nor faint)".
-                // xterm clears the bold flag.
-                // gnome-terminal clears the bold and half-intensity flags.
-                isBold = false;
+                // Normal: neither BOLD nor DIM.
+                attributes &= ~(Style.BOLD | Style.DIM);
                 break;
-            case 24:
-                isUnderlined = false;
-                break;
-            case 25:
-                // Blink off. Unsupported.
-                break;
-            case 27:
-                isReverseVideo = false;
-                break;
+            case 23: attributes &= ~Style.ITALIC; break;
+            case 24: attributes &= ~Style.UNDERLINE; break;
+            case 25: attributes &= ~Style.BLINK; break;
+            case 27: attributes &= ~Style.REVERSE; break;
+            case 28: attributes &= ~Style.HIDDEN; break;
+            case 29: attributes &= ~Style.STRIKETHROUGH; break;
             case 30:
             case 31:
             case 32:
@@ -503,7 +488,7 @@ public class CSIEscapeAction implements TerminalAction {
                 break;
             }
         }
-        model.setStyle(Style.makeStyle(foreground, background, isBold, isUnderlined, isReverseVideo));
+        model.setStyle(Style.makeStyle(foreground, background, attributes));
         return true;
     }
 }
