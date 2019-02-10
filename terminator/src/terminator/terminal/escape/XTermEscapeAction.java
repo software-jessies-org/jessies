@@ -37,6 +37,9 @@ public class XTermEscapeAction implements TerminalAction {
      *       2 = change window title
      *      10 = get/set text foreground color
      *      11 = get/set text background color
+     * 
+     * libvte supports arbitrary hyperlinks.
+     * See https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda.
      */
     public void perform(TerminalModel model) {
         int index = sequence.indexOf(';');

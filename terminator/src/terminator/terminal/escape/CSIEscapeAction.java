@@ -391,7 +391,8 @@ public class CSIEscapeAction implements TerminalAction {
                 // The xwsh man page suggests this should disable bold.
                 // ECMA-048 says it turns on double-underlining.
                 // xterm does nothing.
-                // gnome-terminal treats this the same as 22.
+                // libvte 0.52 implements this, along with double and wavy variants of CSI 4 m:
+                // https://askubuntu.com/questions/528928/how-to-do-underline-bold-italic-strikethrough-color-background-and-size-i
                 attributes &= ~(Style.BOLD | Style.DIM);
                 break;
             case 22:
