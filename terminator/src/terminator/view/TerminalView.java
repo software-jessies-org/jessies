@@ -1015,7 +1015,7 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
             }
             if ((attributes & Style.STRIKETHROUGH) != 0) {
                 g.setColor(new Color(foreground.getRed(), foreground.getGreen(), foreground.getBlue()));
-                int strikeY = y - (metrics.getMaxAscent() + metrics.getLeading()) / 2;
+                int strikeY = y - (metrics.getMaxAscent() / 3) - metrics.getLeading();
                 g.drawLine(x, strikeY, x + textWidth, strikeY);
             }
             
