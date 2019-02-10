@@ -8,11 +8,16 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <map>
 #include <string>
+#include <vector>
 
+#include <X11/Xatom.h>
 #include <X11/Xft/Xft.h>
 #include <X11/Xlib.h>
 #include <X11/Xresource.h>
+
+#include <X11/extensions/Xrandr.h>
 
 #include "log.h"
 
@@ -319,6 +324,114 @@ static void ReadMenu() {
   fclose(fp);
 }
 
+static void setWindowProperty(Window window,
+                              const char* name,
+                              unsigned long* val,
+                              int len) {
+  Atom prop = XInternAtom(dpy, name, true);
+  if (prop == None) {
+    LOGE() << "no such property '" << name << "'";
+    return;
+  }
+  XChangeProperty(dpy, window, prop, XA_CARDINAL, 32, PropModeReplace,
+                  (unsigned char*)val, len);
+}
+
+static void setStruts(Window window, int x, int y, int width, int height) {
+  unsigned long val[12] = {};
+  // _NET_WM_STRUT provides left, right, top, bottom. As our window only appears
+  // at the top, we only set top to the height of the window.
+  val[2] = height;  // top
+  setWindowProperty(window, "_NET_WM_STRUT", val, 4);
+  // _NET_WM_STRUT_PARTIAL starts the same as _NET_WM_STRUT, and then has a
+  // pair of 'start' and 'end' values per screen edge. The ones we're interested
+  // in are top_start_x and top_end_x, which are at indices 8 and 9.
+  val[8] = x;          // top_start_x
+  val[9] = x + width;  // top_end_x
+  setWindowProperty(window, "_NET_WM_STRUT_PARTIAL", val, 4);
+}
+
+// XFreer collects pointers that need to be freed using XFree, and then deletes
+// them all when it is itself destroyed.
+// It is safe to use it with null pointers (it won't call XFree for them).
+class XFreer {
+ public:
+  XFreer() = default;
+  ~XFreer() {
+    for (void* v : victims_) {
+      XFree(v);
+    }
+  }
+
+  template <typename T>
+  T Later(T t) {
+    add((void*) t);
+    return t;
+  }
+
+ private:
+  void add(void* v) {
+    if (v) {
+      victims_.push_back(v);
+    }
+  }
+  
+  std::vector<void*> victims_;
+};
+
+static void setSizeFromXRandR() {
+  XFreer xfree;
+  XRRScreenResources* res =
+      xfree.Later(XRRGetScreenResourcesCurrent(dpy, DefaultRootWindow(dpy)));
+  if (!res) {
+    LOGE() << "Failed to get XRRScreenResources";
+    return;
+  }
+  if (!res->ncrtc) {
+    LOGE() << "Empty list of CRTs";
+    return;
+  }
+  // Ignore any CRT with mode==0.
+  // We always want to be displayed at the top of the topmost screen. So go
+  // through the screens, and collect together all X ranges with ymin==0.
+  std::map<int, int> x_ranges;
+  for (int i = 0; i < res->ncrtc; i++) {
+    XRRCrtcInfo* crt = xfree.Later(XRRGetCrtcInfo(dpy, res, res->crtcs[i]));
+    if (!crt->mode) {
+      continue;
+    }
+    if (crt->y != 0) {
+      continue;
+    }
+    x_ranges[crt->x] = crt->x + crt->width;
+  }
+  // Probably we just want the leftmost stretch of screen width, but we'll
+  // stitch multiple screens together if we can.
+  // Another possible choice would be to find the widest area.
+  if (x_ranges.empty()) {
+    LOGE() << "Xrandr reported no screen space at y=0";
+    return;
+  }
+  int min = x_ranges.begin()->first;
+  int max = 0;
+  for (int v = x_ranges[min]; v; v = x_ranges[v]) {
+    max = v;
+  }
+  display_width = max - min;
+  XMoveResizeWindow(dpy, window, min, 0, display_width, window_height);
+}
+
+static void rrScreenChangeNotify(XEvent* ev) {
+  XRRScreenChangeNotifyEvent* rrev = (XRRScreenChangeNotifyEvent*)ev;
+  static long lastSerial;
+  if (rrev->serial == lastSerial) {
+    LOGI() << "Dropping duplicate event for serial " << std::hex << lastSerial;
+    return;  // Drop duplicate message (we get lots of these).
+  }
+  lastSerial = rrev->serial;
+  setSizeFromXRandR();
+}
+
 int main(int argc, char* argv[]) {
   struct sigaction sa = {};
   sa.sa_handler = RestartSelf;
@@ -368,6 +481,10 @@ int main(int argc, char* argv[]) {
       InputOutput, CopyFromParent,
       CWOverrideRedirect | CWBackPixel | CWBorderPixel | CWEventMask, &attr);
 
+  // Set struts on the window, so the window manager knows where not to place
+  // other windows.
+  setStruts(window, 0, 0, display_width, window_height);
+
   // Create the objects needed to render text in the window.
   g_font_draw = XftDrawCreate(dpy, window, DefaultVisual(dpy, screen),
                               DefaultColormap(dpy, screen));
@@ -384,6 +501,14 @@ int main(int argc, char* argv[]) {
   // Create the menu items.
   ReadMenu();
 
+  // Do we need to support XRandR?
+  int rr_event_base, rr_error_base;
+  bool have_rr = XRRQueryExtension(dpy, &rr_event_base, &rr_error_base);
+  if (have_rr) {
+    XRRSelectInput(dpy, root, RRScreenChangeNotifyMask);
+    setSizeFromXRandR();
+  }
+
   // Bring up the window.
   XMapRaised(dpy, window);
 
@@ -394,6 +519,10 @@ int main(int argc, char* argv[]) {
   while (!forceRestart) {
     XEvent ev;
     getEvent(&ev);
+    if (ev.type == rr_event_base + RRScreenChangeNotify) {
+      rrScreenChangeNotify(&ev);
+      continue;
+    }
     switch (ev.type) {
       case NullEvent:
         DoNullEvent(&ev);
