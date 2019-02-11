@@ -41,6 +41,8 @@ public class CSIEscapeAction implements TerminalAction {
         case 'c': return "Device attributes request";
         case 'D': return "Cursor left";
         case 'd': return "Move cursor to row";
+        case 'E': return "Cursor next line";
+        case 'F': return "Cursor preceding line";
         case 'G':
         case '`': return "Move cursor column to";
         case 'f':
@@ -82,6 +84,9 @@ public class CSIEscapeAction implements TerminalAction {
             return moveCursor(model, midSequence, -1, 0);
         case 'd':
             return moveCursorRowTo(model, midSequence);
+        case 'E':
+        case 'F':
+            return movePrevNextLine(model, midSequence, lastChar);
         case 'G':
         case '`':
             return moveCursorColumnTo(model, midSequence);
@@ -301,6 +306,14 @@ public class CSIEscapeAction implements TerminalAction {
         boolean fromTop = (type >= 1);
         boolean toBottom = (type != 1);
         model.eraseInPage(fromTop, toBottom);
+        return true;
+    }
+    
+    private boolean movePrevNextLine(TerminalModel model, String seq, char eOrF) {
+        int count = seq.isEmpty() ? 1 : Integer.parseInt(seq);
+        int line = model.getCursorPosition().getLineIndex();
+        line += ((eOrF == 'E') ? 1 : -1) * count;
+        model.setCursorPosition(1, line + 1);
         return true;
     }
     
