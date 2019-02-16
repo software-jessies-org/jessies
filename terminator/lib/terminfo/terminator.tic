@@ -78,7 +78,7 @@ terminator|Terminator no line wrap,
     tbc=\E[3g,
     vpa=\E[%i%p1%dd,
     sgr=\E[0%?%p1%p6%|%t;1%;%?%p2%t;4%;%?%p1%p3%|%t;7%;%;m%?%p9%t\E(0%e\E(B%;,
-    sgr0=\E[m\E(B, smcup=\E7\E[?47h, smir=\E[4h,
+    sgr0=\E[m\E(B, smcup=\E7\E[?47h,
 # We actually offer 24-bit color like konsole, but this is what xterm-256color says.
     colors#256,
     pairs#32767,
