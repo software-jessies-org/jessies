@@ -210,6 +210,10 @@ public class Palettes {
             if (colorSetting != null) return Terminator.getPreferences().getColor(colorSetting);
             return getColor(index);
         }
+        
+        @Override public String toString() {
+            return "Ink[" + get() + "]";
+        }
     }
     
     public static Ink getInk(int index) {
