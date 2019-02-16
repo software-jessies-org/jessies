@@ -292,7 +292,6 @@ RFEs
   We could probably move towards this by responding to xterm's capabilities
   as well as those rxvt ones that we currently advertise.
   If we can support both sets, then we can advertise xterm's and deprecate rxvt's.
-  TERM=xterm less ~/.profile and see that the window doesn't clear for an example.
 
 * Simon Pamies [s.pamies@banality.de] isn't the only user to have suggested
   some way of saving a file which can be loaded to start a new Terminator window
