@@ -326,16 +326,6 @@ RFEs
   the process clicked?  Or the full commandline of the process?  Throw
   it at Activity Monitor?  :)
 
-* Transparency.
-  I've looked in to transparency on Windows, and it's not realistic until there's support in Java.
-  People have tried JNI and no-one claims to have it working well enough that I think we could use it.
-
-  Linux users are starting to have compositing X11 servers, but it's still too broken for us to adopt.
-  Everything is too flaky for use, but Java applications are particularly unusable at the moment.
-  Also, I haven't seen any developer documentation about how we should use this stuff.
-
-  There are three approaches on Mac OS (not counting JNI), each with their own advantages and disadvantages.
-
 * Ability to restart a command that terminates. If I get kicked off a TELNET
   session in Bash, I can hit up-arrow return. If, though, I'd devoted a tab
   to telnet(1), I have to create a new tab. It might be nice to add a little
