@@ -336,15 +336,6 @@ RFEs
 
   There are three approaches on Mac OS (not counting JNI), each with their own advantages and disadvantages.
 
-* Mouse events. I only know of Vim and Midnight Commander that actually use
-  this stuff. Midnight Commander has hard-coded checks for various terminal
-  emulators and no way for the user to override it, so even if we did support
-  the same XTerm sequences, mc(1) wouldn't use them.
-  I don't know about Vim; going on past experience, it probably has a
-  hard-coded list but a setting for the user to override it with.
-  The only program I'd be likely to use mouse support in would be whiptail(1),
-  but it doesn't have mouse support at all.
-
 * Ability to restart a command that terminates. If I get kicked off a TELNET
   session in Bash, I can hit up-arrow return. If, though, I'd devoted a tab
   to telnet(1), I have to create a new tab. It might be nice to add a little
