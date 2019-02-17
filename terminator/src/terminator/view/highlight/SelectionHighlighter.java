@@ -83,7 +83,11 @@ public class SelectionHighlighter implements ClipboardOwner, MouseListener, Mous
             return;
         }
         dragHandler = getDragHandlerForClick(e);
-        mouseDragged(e);
+        // Match brackets if this is a double click and we can...
+        if (e.getClickCount() != 2 || !matchBrackets(loc)) {
+            // ...otherwise defer to the drag handler.
+            mouseDragged(e);
+        }
 
         view.repaint();
     }
@@ -189,8 +193,36 @@ public class SelectionHighlighter implements ClipboardOwner, MouseListener, Mous
             // It's also useful to copy grep-style file:line "addresses" for eg Evergreen.
             // mydarus wanted double-click to select "Slot" from:
             // Equipment=1,Subrack=1,Slot=3,PlugInUnit=1,ExchangeTerminal=1,E1PhysPathTerm=pp1
+            // We've also historically cared about being able to select only the
+            // words or only the numbers in something like "offset=1234,length=5678".
+            // An IPv4 address like "netmask 255.255.255.0" or
+            // IPv6 like "inet6 fe80::2677:3ff:fe20:4b30" should just work too.
             return " <>(){}[]`'\",=".indexOf(ch) == -1;
         }
+    }
+    
+    private boolean matchBrackets(Location l) {
+        final int lineNumber = l.getLineIndex();
+        final int p0 = l.getCharOffset();
+        String line = view.getModel().getDisplayTextLine(lineNumber).getString();
+        if (p0 >= line.length()) {
+            return false;
+        }
+        
+        char opener = line.charAt(p0);
+        int which = "(<[{".indexOf(opener);
+        if (which == -1) return false;
+        char closer = ")>]}".charAt(which);
+        
+        int p1 = p0 + 1;
+        for (; p1 < line.length(); ++p1) {
+            if (line.charAt(p1) == closer) {
+                // TODO: should the brackets be included in the selection?
+                setHighlight(new Location(lineNumber, p0 + 1), new Location(lineNumber, p1));
+                return true;
+            }
+        }
+        return false;
     }
     
     public class TripleClickDragHandler implements DragHandler {
