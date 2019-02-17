@@ -215,7 +215,8 @@ public class TextLine {
         Arrays.fill(pad, ' ');
         int oldTextLength = text.length();
         text += new String(pad);
-        insertStyleData(oldTextLength, count, Style.getDefaultStyle());
+        // Even an empty line can have a background color; make sure we use it.
+        insertStyleData(oldTextLength, count, Style.makeStyle(null, background, 0));
     }
     
     private void overwriteStyleData(int offset, int count, Style value) {
