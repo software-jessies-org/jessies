@@ -388,6 +388,10 @@ class Java
     end
     
     add_property("e.util.Log.applicationName", @app_name)
+    
+    # Terminator becomes unreasonably unresponsive for ten minutes with 40 million lines of output
+    # if we leave the JVM to its defaults in 32 GiB of RAM with Java 1.8.0_171.
+    args << "-Xmx1g"
 
     if target_os() == "Darwin"
       args << "-Xdock:name=#{@app_name}"
