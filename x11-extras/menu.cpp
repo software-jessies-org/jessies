@@ -337,7 +337,15 @@ static void setWindowProperty(Window window,
                   (unsigned char*)val, len);
 }
 
-static void setStruts(Window window, int x, int y, int width, int height) {
+static void setWindowProps(Window window, int x, int y, int width, int height) {
+  // _NET_WM_WINDOW_TYPE describes that this is a kind of dock or panel window,
+  // that should probably be kept on top, but that the window manager certainly
+  // shouldn't decorate with frame, title bar etc.
+  Atom typeAtom = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE", 0);
+  Atom typeDockAtom = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_DOCK", 0);
+  XChangeProperty(dpy, window, typeAtom, XA_ATOM, 32, PropModeReplace,
+                  (unsigned char*)&typeDockAtom, 1);
+
   unsigned long val[12] = {};
   // _NET_WM_STRUT provides left, right, top, bottom. As our window only appears
   // at the top, we only set top to the height of the window.
@@ -365,7 +373,7 @@ class XFreer {
 
   template <typename T>
   T Later(T t) {
-    add((void*) t);
+    add((void*)t);
     return t;
   }
 
@@ -375,7 +383,7 @@ class XFreer {
       victims_.push_back(v);
     }
   }
-  
+
   std::vector<void*> victims_;
 };
 
@@ -469,7 +477,7 @@ int main(int argc, char* argv[]) {
   window_height = 1.2 * (g_font->ascent + g_font->descent);
   root = DefaultRootWindow(dpy);
   XSetWindowAttributes attr;
-  attr.override_redirect = True;
+  attr.override_redirect = False;
   attr.background_pixel = white;
   attr.border_pixel = black;
   attr.event_mask = ExposureMask | VisibilityChangeMask | ButtonMotionMask |
@@ -483,7 +491,7 @@ int main(int argc, char* argv[]) {
 
   // Set struts on the window, so the window manager knows where not to place
   // other windows.
-  setStruts(window, 0, 0, display_width, window_height);
+  setWindowProps(window, 0, 0, display_width, window_height);
 
   // Create the objects needed to render text in the window.
   g_font_draw = XftDrawCreate(dpy, window, DefaultVisual(dpy, screen),
