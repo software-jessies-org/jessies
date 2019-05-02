@@ -44,18 +44,28 @@ public class PatchDialog {
         final ArrayList<String> lines = new ArrayList<>();
         final ArrayList<String> errors = new ArrayList<>();
         final int status = ProcessUtilities.backQuote(null, command, lines, errors);
-        // Output on stderr is not expected, and worth showing to the user.
-        if (lines.isEmpty()) {
-            lines.addAll(errors);
-        }
         // POSIX says:
         //   0 => no differences were found.
         //   1 => differences were found.
         //  >1 => an error occurred.
+        // However, we're potentially running our own script called ediff.py. If that doesn't work
+        // for some system reason (eg its #! isn't working because python isn't installed or is in the
+        // wrong place), then we're going to potentially get a return code of 1, but nothing on stdout.
+        // In that case, we need to print out the stderr contents so the user sees an error message,
+        // rather than a blank dialog.
+        if (status == 1 && lines.size() == 0) {
+            lines.add("differ failed: probable script setup error (does /usr/bin/python exist?)");
+            lines.addAll(errors);
+            return lines;
+        }
+        System.err.println("Status=" + status + "; error lines " + errors.size());
         if (status == 0) {
             lines.add("(No non-whitespace differences.)");
         } else if (status > 1) {
             lines.add("diff(1) failed.");
+            lines.addAll(errors);
+            // Return errors straight away without doing anything to them.
+            return lines;
         }
         
         // Clean up any temporary files.
