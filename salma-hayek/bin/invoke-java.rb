@@ -396,8 +396,8 @@ class Java
     # swing.plaf.metal.controlFont=Roboto-16,swing.plaf.metal.userFont=Roboto-16
     # ...to make text a reasonable, and readable, size. You may need to adjust
     # the font name as appropriate.
-    # For some fonts/sizes you may also want to try adding:
-    # awt.useSystemAAFontSettings=GASP
+    # To enable anti-aliased text, also add:
+    # awt.useSystemAAFontSettings=on
     # ...which seems to allow anti-aliasing at smaller font sizes.
     envprops = ENV["JESSIES_JAVA_PROPERTIES"]
     if envprops
