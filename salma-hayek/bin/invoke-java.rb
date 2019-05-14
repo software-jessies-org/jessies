@@ -388,14 +388,26 @@ class Java
     end
     
     add_property("e.util.Log.applicationName", @app_name)
-    # The following lines make text rendering on plain X11 look a bit nicer.
-    # However, we really need some sensible way of letting the user configure
-    # this stuff. Maybe environment variables, or (if present) some simple
-    # key=value pair config text file? TBD.
-    # add_property("swing.plaf.metal.controlFont", "Roboto-15")
-    # add_property("swing.plaf.metal.userFont", "Roboto-15")
-    # add_property("awt.useSystemAAFontSettings", "gasp")
-
+    # If the user has set an environment variable called JESSIES_JAVA_PROPERTIES
+    # we interpret it as a comma-separated sequence of property=value pairs,
+    # and set them. This allows users using plain old X11 sessions, without
+    # gnome or similar, to configure their fonts to look nice. For example,
+    # set the env variable to
+    # swing.plaf.metal.controlFont=Roboto-16,swing.plaf.metal.userFont=Roboto-16
+    # ...to make text a reasonable, and readable, size. You may need to adjust
+    # the font name as appropriate.
+    # For some fonts/sizes you may also want to try adding:
+    # awt.useSystemAAFontSettings=GASP
+    # ...which seems to allow anti-aliasing at smaller font sizes.
+    envprops = ENV["JESSIES_JAVA_PROPERTIES"]
+    if envprops
+      for ep in envprops.split(',')
+        kv = ep.split('=')
+        if kv.length == 2
+          add_property(kv[0], kv[1])
+        end
+      end
+    end
     
     # Terminator becomes unreasonably unresponsive for ten minutes with 40 million lines of output
     # if we leave the JVM to its defaults in 32 GiB of RAM with Java 1.8.0_171.
