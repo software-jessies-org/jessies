@@ -388,9 +388,13 @@ class Java
     end
     
     add_property("e.util.Log.applicationName", @app_name)
-    add_property("swing.plaf.metal.controlFont", "Roboto-15")
-    add_property("swing.plaf.metal.userFont", "Roboto-15")
-    add_property("awt.useSystemAAFontSettings", "gasp")
+    # The following lines make text rendering on plain X11 look a bit nicer.
+    # However, we really need some sensible way of letting the user configure
+    # this stuff. Maybe environment variables, or (if present) some simple
+    # key=value pair config text file? TBD.
+    # add_property("swing.plaf.metal.controlFont", "Roboto-15")
+    # add_property("swing.plaf.metal.userFont", "Roboto-15")
+    # add_property("awt.useSystemAAFontSettings", "gasp")
 
     
     # Terminator becomes unreasonably unresponsive for ten minutes with 40 million lines of output
