@@ -118,7 +118,7 @@ public class TerminatorPreferences extends Preferences {
     
     private JButton makePresetButton(String name, final Color background, final Color foreground, final Color cursor, final Color selection) {
         // FIXME: ideally, we'd update the button image when the user changes the anti-aliasing preference.
-        JButton button = new JButton(new ImageIcon(makePresetButtonImage(name, background, foreground)));
+        JButton button = new JButton(new PresetIcon(name, background, foreground));
         button.putClientProperty("JButton.buttonType", "gradient"); // Mac OS 10.5
         button.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -131,39 +131,54 @@ public class TerminatorPreferences extends Preferences {
         return button;
     }
     
-    private BufferedImage makePresetButtonImage(String name, Color background, Color foreground) {
-        // Make a representative image for the button.
-        BufferedImage image = makeEmptyPresetButtonImage();
-        Graphics2D g = image.createGraphics();
-        GuiUtilities.setTextAntiAliasing(g, Terminator.getPreferences().getBoolean(TerminatorPreferences.ANTI_ALIAS));
-        g.setFont(getFont(TerminatorPreferences.FONT));
-        g.setColor(background);
-        g.fillRect(0, 0, image.getWidth(), image.getHeight());
-        g.setColor(background.darker());
-        g.drawRect(0, 0, image.getWidth() - 1, image.getHeight() - 1);
-        g.setColor(foreground);
-        Rectangle2D stringBounds = g.getFontMetrics().getStringBounds(name, g);
-        final int x = (image.getWidth() - (int) stringBounds.getWidth()) / 2;
-        int y = (image.getHeight() - (int) stringBounds.getHeight()) / 2 + g.getFontMetrics().getAscent();
-        y = (int) (y / 1.1);
-        g.drawString(name, x, y);
-        g.dispose();
-        return image;
+    class PresetIcon implements Icon {
+        private String name;
+        private Color bg;
+        private Color fg;
+        private int height;
+        private int width;
+        
+        public PresetIcon(String name, Color background, Color foreground) {
+            this.name = name;
+            this.bg = background;
+            this.fg = foreground;
+            
+            // This seems ugly and awkward, but I can't think of a simpler way to get a suitably-sized BufferedImage to work with, without hard-coding dimensions.
+            // We want all images to be the same width, so we use a constant string rather than the button text.
+            BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
+            Graphics2D g = image.createGraphics();
+            g.setFont(getFont(TerminatorPreferences.FONT));
+            FontMetrics metrics = g.getFontMetrics();
+            this.height = (int) (1.4* metrics.getHeight());
+            this.width = (int) (metrics.getStringBounds("XXXXXXXXXXXXXXXX", g).getWidth() * 1.2);
+            g.dispose();
+        }
+        
+        @Override public int getIconWidth() {
+            return width;
+        }
+        
+        @Override public int getIconHeight() {
+            return height;
+        }
+        
+        @Override public void paintIcon(Component c, Graphics og, int ox, int oy) {
+            Graphics2D g = (Graphics2D) og;
+            GuiUtilities.setTextAntiAliasing(g, Terminator.getPreferences().getBoolean(TerminatorPreferences.ANTI_ALIAS));
+            g.setFont(getFont(TerminatorPreferences.FONT));
+            g.setColor(bg);
+            g.fillRect(ox, oy, getIconWidth(), getIconHeight());
+            g.setColor(bg.darker());
+            g.drawRect(ox, oy, getIconWidth() - 1, getIconHeight() - 1);
+            g.setColor(fg);
+            Rectangle2D stringBounds = g.getFontMetrics().getStringBounds(name, g);
+            final int x = (getIconWidth() - (int) stringBounds.getWidth()) / 2;
+            int y = (getIconHeight() - (int) stringBounds.getHeight()) / 2 + g.getFontMetrics().getAscent();
+            y = (int) (y / 1.1);
+            g.drawString(name, ox + x, oy + y);
+        }
     }
-    
-    private BufferedImage makeEmptyPresetButtonImage() {
-        // This seems ugly and awkward, but I can't think of a simpler way to get a suitably-sized BufferedImage to work with, without hard-coding dimensions.
-        // We want all images to be the same width, so we use a constant string rather than the button text.
-        BufferedImage image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = image.createGraphics();
-        g.setFont(getFont(TerminatorPreferences.FONT));
-        FontMetrics metrics = g.getFontMetrics();
-        final int height = (int) (1.4* metrics.getHeight());
-        final int width = (int) (metrics.getStringBounds("XXXXXXXXXXXXXXXX", g).getWidth() * 1.2);
-        g.dispose();
-        return new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-    }
-    
+
     public double getDouble(String key) {
         return (Double) get(key);
     }
