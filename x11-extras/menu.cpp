@@ -346,6 +346,17 @@ static void setWindowProps(Window window, int x, int y, int width, int height) {
   XChangeProperty(dpy, window, typeAtom, XA_ATOM, 32, PropModeReplace,
                   (unsigned char*)&typeDockAtom, 1);
 
+  // We're setting struts to try to keep other windows out of our way, but if
+  // the user really wants to move a window over us, we should err on the side
+  // of discretion, and not get in their way. After all, we reside at the top
+  // of the screen, so forcing ourselves on top (which is the usual default
+  // for 'dock' windows) is more likely to get in the way of the user's ability
+  // to move a window out of the way.
+  Atom stateAtom = XInternAtom(dpy, "_NET_WM_STATE", 0);
+  Atom stateBelowAtom = XInternAtom(dpy, "_NET_WM_STATE_BELOW", 0);
+  XChangeProperty(dpy, window, stateAtom, XA_ATOM, 32, PropModeReplace,
+                  (unsigned char*)&stateBelowAtom, 1);
+
   unsigned long val[12] = {};
   // _NET_WM_STRUT provides left, right, top, bottom. As our window only appears
   // at the top, we only set top to the height of the window.
