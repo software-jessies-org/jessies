@@ -502,12 +502,23 @@ public abstract class Preferences extends PreferenceGetter {
                 }
             });
             
-            // Stick the combo boxes (font name, style, and size) together.
-            JPanel fontChooser = new JPanel();
-            fontChooser.setLayout(new BoxLayout(fontChooser, BoxLayout.LINE_AXIS));
-            fontChooser.add(fontNameComboBox);
-            fontChooser.add(fontStyleComboBox);
-            fontChooser.add(fontSizeComboBox);
+            // Stick the combo boxes (font name, style, and size) together. The
+            // GridBagLayout ensures that all the extra space goes to the font
+            // name. This is most noticeable in Evergreen where there are two
+            // font choosers next to each other, which otherwise don't line up.
+            JPanel fontChooser = new JPanel(new GridBagLayout());
+            GridBagConstraints c = new GridBagConstraints();
+            c.fill = GridBagConstraints.BOTH;
+            c.weightx = 1.0;
+            c.gridx = 0;
+            fontChooser.add(fontNameComboBox, c);
+            c.fill = GridBagConstraints.VERTICAL;
+            c.weightx = 0.0;
+            c.gridx = 1;
+            fontChooser.add(fontStyleComboBox, c);
+            c.gridx = 2;
+            fontChooser.add(fontSizeComboBox, c);
+            
             formPanel.addRow(description + ":", fontChooser);
         }
         
