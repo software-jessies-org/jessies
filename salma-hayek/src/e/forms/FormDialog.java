@@ -204,10 +204,14 @@ public class FormDialog {
     private JTabbedPane makeTabbedPaneForFormPanels(List<FormPanel> formPanels) {
         JTabbedPane tabbedPane = new JTabbedPane();
         for (int i = 0; i < formPanels.size(); ++i) {
-            // Give each panel a border to push it away from the side of the tabbed pane.
-            // We usual spacing will end up between the outside of the tabbed pane and the edge of the window/button panel.
-            FormPanel panel = formPanels.get(i);
-            panel.setBorder(BorderFactory.createEmptyBorder(0, 10, 16, 10));
+            // Give each panel a border to push it away from the sides of the tabbed pane.
+            // Our usual spacing will end up between the outside of the tabbed pane and the edge
+            // of the window/button panel. We also use an intermediate BorderLayout so that our
+            // content is top-aligned within the tab and any free space goes to the bottom.
+            // This is especially noticeable in Terminator's Preferences dialog.
+            JPanel panel = new JPanel(new BorderLayout());
+            panel.add(formPanels.get(i), BorderLayout.NORTH);
+            panel.setBorder(BorderFactory.createEmptyBorder(8, 10, 16, 10));
             
             tabbedPane.add(builder.tabTitles.get(i), panel);
         }
