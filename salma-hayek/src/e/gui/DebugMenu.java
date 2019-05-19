@@ -145,6 +145,7 @@ public class DebugMenu {
                 UIManager.setLookAndFeel(lafClassName);
                 for (Frame frame : Frame.getFrames()) {
                     SwingUtilities.updateComponentTreeUI(frame);
+                    frame.pack();
                 }
             } catch (Exception ex) {
                 SimpleDialog.showDetails(null, "Failed to change LAF", ex);
