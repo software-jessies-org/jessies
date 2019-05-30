@@ -3,6 +3,7 @@ package e.tools;
 import e.gui.*;
 import e.util.*;
 import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.*;
 
@@ -12,10 +13,11 @@ import javax.swing.table.*;
  */
 // FIXME: we're missing various vertical JSeparators because, seemingly, although you can ask for a VERTICAL JSeparator, they're always horizontal?
 public class JavaWidgetFactory extends JPanel {
+    private JButton defaultButton;
+    
     public JavaWidgetFactory() {
         setBorder(makeEmptyBorder());
         setLayout(new BorderLayout());
-        // FIXME: menu
         // FIXME: toolbar
         add(makeWestPane(), BorderLayout.WEST);
         add(makeCenterPane(), BorderLayout.CENTER);
@@ -24,13 +26,13 @@ public class JavaWidgetFactory extends JPanel {
     }
     
     private JComponent makeWestPane() {
-        String[] items = { "ComboBoxEntry" };
+        String[] items = { "editable JComboBox" };
         JComboBox<String> comboBox1 = new JComboBox<>(items);
         JComboBox<String> comboBox2 = new JComboBox<>(items);
         comboBox2.setEnabled(false);
         
-        JTextField textField1 = new JTextField("GtkEntry");
-        JTextField textField2 = new JTextField("GtkEntry");
+        JTextField textField1 = new JTextField("JTextField");
+        JTextField textField2 = new JTextField("JTextField");
         textField2.setEnabled(false);
         
         JSpinner spinner1 = new JSpinner(new SpinnerNumberModel(1, 0, 100, 1));
@@ -72,12 +74,12 @@ public class JavaWidgetFactory extends JPanel {
     private JComponent makeCheckBoxPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-        JCheckBox checkBox1 = new JCheckBox("checkbutton1");
-        JCheckBox checkBox2 = new JCheckBox("checkbutton2");
+        JCheckBox checkBox1 = new JCheckBox("JCheckBox");
+        JCheckBox checkBox2 = new JCheckBox("JCheckBox2");
         checkBox2.setSelected(true);
-        JCheckBox checkBox3 = new JCheckBox("checkbutton3");
+        JCheckBox checkBox3 = new JCheckBox("JCheckBox3");
         checkBox3.setEnabled(false);
-        JCheckBox checkBox4 = new JCheckBox("checkbutton4");
+        JCheckBox checkBox4 = new JCheckBox("JCheckBox4");
         checkBox4.setEnabled(false);
         checkBox4.setSelected(true);
         panel.add(checkBox1);
@@ -88,12 +90,12 @@ public class JavaWidgetFactory extends JPanel {
     }
     
     private JComponent makeRadioButtonPanel() {
-        JRadioButton radioButton1 = new JRadioButton("radiobutton1");
-        JRadioButton radioButton2 = new JRadioButton("radiobutton2");
+        JRadioButton radioButton1 = new JRadioButton("JRadioButton1");
+        JRadioButton radioButton2 = new JRadioButton("JRadioButton2");
         radioButton2.setSelected(true);
-        JRadioButton radioButton3 = new JRadioButton("radiobutton3");
+        JRadioButton radioButton3 = new JRadioButton("JRadioButton3");
         radioButton3.setEnabled(false);
-        JRadioButton radioButton4 = new JRadioButton("radiobutton4");
+        JRadioButton radioButton4 = new JRadioButton("JRadioButton4");
         radioButton4.setEnabled(false);
         radioButton4.setSelected(true);
         
@@ -121,16 +123,17 @@ public class JavaWidgetFactory extends JPanel {
     }
     
     private JComponent makeButtonPanel() {
-        JButton button1 = new JButton("button1");
-        JButton button2 = new JButton("button2");
+        this.defaultButton = new JButton("Default JButton");
+        JButton button1 = new JButton("JButton1");
+        JButton button2 = new JButton("JButton2");
         button2.setEnabled(false);
         
         // FIXME: how do you use JToggleButton? this doesn't seem to work right.
-        JToggleButton toggleButton1 = new JToggleButton("togglebutton1", true);
-        JToggleButton toggleButton2 = new JToggleButton("togglebutton2");
+        JToggleButton toggleButton1 = new JToggleButton("JToggleButton1", true);
+        JToggleButton toggleButton2 = new JToggleButton("JToggleButton2");
         toggleButton2.setEnabled(false);
         
-        String[] items = { "ComboBox" };
+        String[] items = { "JComboBox" };
         JComboBox<String> comboBox1 = new JComboBox<>(items);
         comboBox1.setEditable(false);
         JComboBox<String> comboBox2 = new JComboBox<>(items);
@@ -144,6 +147,7 @@ public class JavaWidgetFactory extends JPanel {
         c.insets = new Insets(3, 0, 0, 0);
         c.fill = GridBagConstraints.HORIZONTAL;
         c.gridy = GridBagConstraints.RELATIVE;
+        c.gridx = 0; panel.add(defaultButton, c);
         c.gridx = 0; panel.add(button1, c);
         c.gridx = 0; panel.add(button2, c);
         c.gridx = 0; panel.add(Box.createVerticalStrut(4), c);
@@ -183,11 +187,11 @@ public class JavaWidgetFactory extends JPanel {
             }
             
             public int getRowCount() {
-                return 0;
+                return 100;
             }
             
             public Object getValueAt(int y, int x) {
-                return "data";
+                return "" + (char)('A'+x) + (y+1);
             }
             
             public String getColumnName(int i) {
@@ -228,12 +232,51 @@ public class JavaWidgetFactory extends JPanel {
         return tabbedPane;
     }
     
+    private static class BogusAction extends AbstractAction {
+        public BogusAction(String name, String key, boolean shifted) {
+            GuiUtilities.configureAction(this, name, GuiUtilities.makeKeyStroke(key, shifted));
+            GnomeStockIcon.configureAction(this);
+        }
+        
+        public void actionPerformed(ActionEvent e) {
+        }
+    }
+    
+    private static class MenuBar extends JMenuBar {
+        public MenuBar() {
+            add(makeFileMenu());
+            add(makeEditMenu());
+            add(new HelpMenu().makeJMenu());
+        }
+        
+        private JMenu makeFileMenu() {
+            JMenu menu = GuiUtilities.makeMenu("File", 'F');
+            menu.add(new BogusAction("_Quit", "Q", false));
+            return menu;
+        }
+        
+        private JMenu makeEditMenu() {
+            JMenu menu = GuiUtilities.makeMenu("Edit", 'E');
+            menu.add(new BogusAction("_Undo", "Z", false));
+            menu.add(new BogusAction("_Redo", "Z", true));
+            menu.addSeparator();
+            menu.add(new BogusAction("Cu_t", "X", false));
+            menu.add(new BogusAction("_Copy", "C", false));
+            menu.add(new BogusAction("_Paste", "V", false));
+            return menu;
+        }
+    }
+    
     public static void main(String[] args) {
         EventQueue.invokeLater(new Runnable() {
             public void run() {
                 e.util.GuiUtilities.initLookAndFeel();
+                
+                JavaWidgetFactory content = new JavaWidgetFactory();
                 MainFrame frame = new MainFrame("Java Widget Factory");
-                frame.setContentPane(new JavaWidgetFactory());
+                frame.setContentPane(content);
+                frame.setJMenuBar(new MenuBar());
+                frame.getRootPane().setDefaultButton(content.defaultButton);
                 frame.pack();
                 frame.setVisible(true);
             }
