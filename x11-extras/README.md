@@ -78,6 +78,13 @@ working well enough that I have little inclination to polish it. If you
 want to see improvement, you should prod me.  Those who don't live in
 prodding distance could consider sending me mail.
 
+## gummiband - More advanced replacement for 'menu'.
+
+`gummiband` essentially does what `menu` does, except that it's a lot more
+flexible. It supports simple drop-down menus, and status indicators such as
+battery level, wifi hotspot or whatever. See its man page for details
+(man ./gummiband.man).
+
 ## x11-reaper - Simple X Session Manager
 
 ```

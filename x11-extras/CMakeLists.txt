@@ -11,6 +11,7 @@ include_directories(${X11_INCLUDE_DIR} ${FREETYPE_INCLUDE_DIRS} ${X11_Xrandr_INC
 link_libraries(${X11_LIBRARIES} ${X11_Xft_LIB} ${FREETYPE_LIBRARIES} ${X11_Xrandr_LIB})
 
 add_executable(clock clock.cpp)
+add_executable(gummiband gummiband.cpp)
 #add_executable(lock lock.cpp)
 add_executable(menu menu.cpp)
 add_executable(speckeysd speckeysd.cpp)

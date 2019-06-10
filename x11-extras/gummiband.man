@@ -1,0 +1,168 @@
+.\" gummiband, a program launcher for X11
+.\" Phil Norman, 2019
+.\" 
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License
+.\" as published by the Free Software Foundation; either version 2
+.\" of the License, or (at your option) any later version.
+.\" 
+.\" This program is distributed in the hope that it will be useful,
+.\" but WITHOUT ANY WARRANTY; without even the implied warranty of
+.\" MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+.\" GNU General Public License for more details.
+.\" 
+.\" You should have received a copy of the GNU General Public License
+.\" along with this program; if not, write to the Free Software
+.\" Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+.\" 
+.TH gummiband 1
+
+.SH NAME
+gummiband \- Simple launcher for the X Window System
+
+.SH SYNTAX
+\fBgummiband
+
+.SH DESCRIPTION
+\fIGummiband\fP is a program launcher for the X Window System. It can be
+configured to show machine status (eg battery %, or the time), and to provide
+launch buttons (eg a button to run xterm). It provides simple drop-down menus
+(eg a button can show the current wifi access point, and clicking on the button
+opens a menu allowing a different access point to be selected).
+.PP
+All dynamic content should be provided by shell scripts, which Gummiband will
+run according to its configuration.
+.PP
+Gummiband is based loosely on the 'menu' program by Elliott Hughes.
+
+.SH CONFIGURATION
+The configuration file (\fI.gummiband\fP) consists of a sequence of key=value
+pairs, plus arbitrary ignored blank lines and comments. Comments are denoted
+by a '#' character at the start of the line.
+.PP
+Each item on the gummiband begins with a 'name=' line, after which all further
+key=value pairs modify that item, until the next 'name=' identifier. The value
+of the 'name' can either be a fixed string, or a program whose output should be
+used.
+.PP
+The following are the valid key types:
+.TP 12
+.B name
+The name to display inside the button, or if the value starts with 'exec ', the
+program to run, whose output should be shown in the button.
+
+.TP 12
+.B updatesecs
+How many seconds between updates of the name. Only to be used when the name=
+begins with 'exec '. Value must be at least 1. If not present, or set to a
+negative number, the name will be evaluated only once.
+
+.TP 12
+.B click
+The program to run when the user clicks on the button. Should start with
+'exec '. Cannot be used in a menu.
+
+.TP 12
+.B position
+If set to \fIright\fP, the item will be added to the right-hand side of the
+menu; if set to \fIleft\fP, or left unset, the item will be added to the left.
+Items added to the left are added in left-to-right order; those added to the
+right area added right-to-left.
+
+.TP 12
+.B menuitems
+Comma-separated list of items to propagate in the drop-down menu available from
+this item, or, if the value starts with 'exec ', the name of the program whose
+output should be used to define the drop-down content. If a program is used,
+it will be executed when the drop-down menu is opened.
+
+.TP 12
+.B menuclick
+Program to run when the user clicks on an item in the drop-down menu. This
+string must include the text \fI<item>\fP, which will be substituted with the
+string clicked on. Note that if menu items may contain spaces, you should
+include quotes around \fI<item>\fP.
+
+.SH EXAMPLES
+The following entry denotes a simple button for launching xterm, on the left
+side of the panel.
+.nf
+
+    name=XTerm
+    click=exec /usr/local/bin/xterm
+
+.fi
+A clock on the right-hand side, which updates itself every second:
+.nf
+
+    name=exec date +"%Y-%m-%d %H:%M:%S"
+    position=right
+    updatesecs=1
+
+.fi
+If I have a 'wifi' script which can list available wifi networks, show the
+current status, and switch wifi networks, I could expose it like this:
+.nf
+
+    name=exec wifi status
+    updatesecs=10
+    position=right
+    menuitems=exec wifi list_networks
+    menuclick=exec wifi pick_network "<item>"
+
+.fi
+Simple toggle menu to switch between front and back headphone sockets:
+.nf
+
+    name=exec $HOME/bin/audio-out status
+    position=right
+    updatesecs=1
+    menuitems=front,back
+    menuclick=exec $HOME/bin/audio-out <item>
+
+.fi
+Pure status display, which runs a script to get the current battery status
+every 30s, but has no click action:
+.nf
+
+    name=exec $HOME/bin/battery-status
+    position=right
+    updatesecs=30
+
+.fi
+Hopefully the above examples should give a reasonable indication as to what's
+possible.
+
+
+.SH RESOURCES
+\fIGummiband\fP understands the following X resources:
+.TP 14
+.B font
+name of the font used (default: 'roboto-16')
+.TP 14
+.B background
+window background colour (default: 'white')
+.TP 14
+.B foreground
+window foreground colour (default: 'black')
+.TP 14
+.B selBackground
+background colour of currently-pointed-at actionable button (default: pale blue)
+.TP 14
+.B selForeground
+foreground colour of currently-pointed-at actionable button (default: black)
+
+.SH "SEE ALSO"
+.PP
+X(7)
+
+.SH FILES
+.PP
+.TP 12
+.B .gummiband
+Gummiband's configuration file. This defines all buttons and notifications to
+be displayed by Gummiband. See \fBCONFIGURATION\fP and \fBEXAMPLES\fP. Note that
+gummiband always looks for its config file in the current directory.
+
+.SH AUTHORS
+Phil Norman <philnorm@gmail.com>
