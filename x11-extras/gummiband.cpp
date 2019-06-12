@@ -100,6 +100,20 @@ using namespace std;
 
 // The connection to the X server.
 static Display* dpy;
+// display_xmin can be non-zero, if we'rd using xrandr and the highest screen
+// is offset from the X=0 line. This happens, for example, if I have my laptop
+// connected to an external screen, in the following configuration (note - the
+// '=' signs shows where gummiband's window is positioned):
+//
+//   display_xmin
+//    |
+// <----->
+//        +==========+
+//        |          |
+// +------|          |
+// |      |          |
+// |______|__________|
+static int display_xmin;
 static int display_width;
 
 static Window window;           // Main window.
@@ -496,6 +510,14 @@ class DropDownMenuAction : public Action {
     if (x + width > display_width) {
       x = display_width - width;
     }
+    // So far, x is relative to gummiband's main window coordinates, but those
+    // migth be offset, for example if we have multiple screens and the highest
+    // (the one with Y=0) as an min X location greater than 0. See the comment
+    // on the definition of 'display_xmin' above for a diagram.
+    // Opening a window has to happen relative to 0, 0 in the overall display
+    // coordinates. So we must apply the display_xmin so it appears at the right
+    // location.
+    x += display_xmin;
     XMoveResizeWindow(dpy, dropdown_window, x, y + Y_OFFSET, width, height);
     XMapRaised(dpy, dropdown_window);
     dropdown = new DropDown(width, items, command_);
@@ -957,6 +979,7 @@ static void SetSizeFromXRandR() {
   for (int v = x_ranges[min]; v; v = x_ranges[v]) {
     max = v;
   }
+  display_xmin = min;
   display_width = max - min;
   XMoveResizeWindow(dpy, window, min, Y_OFFSET, display_width, window_height);
 }
@@ -1008,6 +1031,7 @@ int main(int argc, char* argv[]) {
 
   // Find the screen's dimensions.
   int screen = DefaultScreen(dpy);
+  display_xmin = 0;
   display_width = DisplayWidth(dpy, screen);
 
   // Set up an error handler.
