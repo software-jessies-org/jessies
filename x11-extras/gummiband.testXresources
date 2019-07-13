@@ -1,0 +1,9 @@
+! This is a test .Xresources file for gummiband. The colours aren't very nice;
+! the aim here is not to look pretty, but to check that the Xresources parsing
+! is working.
+! To enable these resources, run:
+! xrdb -merge ./.testXresources
+gummiband*foreground: LightGoldenrod
+gummiband*background: NavyBlue
+gummiband*selForeground: white
+gummiband*selBackground: DarkSlateBlue
