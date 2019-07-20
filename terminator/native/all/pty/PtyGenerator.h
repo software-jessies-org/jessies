@@ -216,6 +216,17 @@ private:
         signal(SIGCHLD, SIG_DFL);
         
         execvp(executable.c_str(), argv);
+        // XTerm (and just about everything else) tries again if the initial
+        // exec fails and there was only a single argument, in case the user
+        // accidentally munged all their arguments into one argument.
+        // This seems deeply unfortunate, but it does make Geany work out of the
+        // box (see https://github.com/software-jessies-org/jessies/issues/31),
+        // and other terminal emulators do this too.
+        if (argv[1] == nullptr) {
+            const char* shell = getenv("SHELL");
+            if (shell == nullptr) shell = "/bin/sh";
+            execlp(shell, shell, "-c", argv[0], nullptr);
+        }
         throw unix_exception("Can't execute \"" + executable + "\"");
     }
     
