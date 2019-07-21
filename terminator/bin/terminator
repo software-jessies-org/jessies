@@ -30,8 +30,8 @@ class Terminator
         end
         # Make sure we have a directory for Terminator's private files and another for the logs.
         log_directory = File.join(dot_directory, "logs")
-        make_directory(dot_directory, true)
-        make_directory(log_directory, false)
+        make_safe_directory(dot_directory)
+        make_safe_directory(log_directory)
         options_pathname = File.join(dot_directory, "options")
         
         server_port_file_stem = File.join(dot_directory, "terminator-server-port")
@@ -117,19 +117,17 @@ class Terminator
         invoker.launch()
     end
     
-    def make_directory(pathname, make_safe)
+    def make_safe_directory(pathname)
         directory_exists = false
-        directory_safe = ! make_safe
+        directory_safe = false
         begin
             if test(?d, pathname) == false
                 FileUtils.rm_f(pathname)
                 Dir.mkdir(pathname)
             end
             directory_exists = true
-            if make_safe
-                if File.stat(pathname).mode != 0700
-                    FileUtils.chmod(0700, pathname)
-                end
+            if File.stat(pathname).mode != 0700
+                FileUtils.chmod(0700, pathname)
             end
             directory_safe = true
         rescue SystemCallError => ex
