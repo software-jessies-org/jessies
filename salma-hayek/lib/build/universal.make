@@ -188,6 +188,7 @@ NATIVE_OS_DIRECTORIES += $(NATIVE_OS_DIRECTORIES.$(TARGET_OS))
 EXTRA_INCLUDE_PATH += $(SALMA_HAYEK)/native/Headers
 
 CFLAGS += -std=c99
+CXXFLAGS += -std=c++11
 
 # A rather unconvincing and error-laden post from a guy who works on the JVM
 # suggests that the JVM may have trouble generating stack traces through native
