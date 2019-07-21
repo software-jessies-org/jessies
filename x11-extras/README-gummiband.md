@@ -11,6 +11,13 @@ Gummiband is based loosely on the 'menu' program by Elliott Hughes.
 
 ![Gummiband in action](gummiband.png)
 
+In the above screenshot, Gummiband is the white bar along the top of the screen,
+while the Terminator terminal window is displaying the .gummiband configuration
+file which produces the shown set of buttons. In the screenshot, I've clicked
+on '[Rear Audio]', so the corresponding drop-down menu is showing which audio
+outputs I can select between. Clicking on the 'front' item will run the program
+`$HOME/bin/audio-socket front`.
+
 See the Gummiband man page for more information on how to configure and use
 the program.
 
