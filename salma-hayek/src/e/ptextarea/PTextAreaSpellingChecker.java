@@ -2,6 +2,7 @@ package e.ptextarea;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.*;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
@@ -326,13 +327,23 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
     public static class UnderlineHighlight extends PColoredHighlight {
         // Mac OS uses a dashed underline; MS Windows a wavy one.
         private static final boolean DASHED = GuiUtilities.isMacOs();
+        private static final Color COLOR = new Color(255, 0, 0, 160);
         
-        // On Linux, painting with an alpha color is *really* slow, so use an
-        // approximate pink if we're not on Mac OS.
-        private static final Color COLOR = DASHED ? new Color(255, 0, 0, 160) : new Color(255, 102, 102);
+        // Trying to draw a wiggly line on Linux is horribly slow, alpha blended or not.
+        // Therefore we use a buffered painter which pre-generates an alpha-blended image
+        // containing an anti-aliased wavy line. This results in approximately a 370x
+        // speed improvement on my tests.
+        // This was particularly noticable when using a large monitor, with lots of spelling
+        // mistakes and the 'find' feature in Evergreen active. Typing would cause a full
+        // repaint of the screen, and if the number of wiggly lines was too high, this could easily
+        // take several seconds per keypress.
+        private BufferedWavyLinePainter linePainter;
         
         public UnderlineHighlight(PTextArea textArea, int startIndex, int endIndex) {
             super(textArea, startIndex, endIndex, COLOR);
+            if (!DASHED) {
+                linePainter = new BufferedWavyLinePainter(COLOR);
+            }
         }
         
         protected boolean paintsToEndOfLine() {
@@ -344,7 +355,7 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
             if (DASHED) {
                 paintDashedLine(g, r);
             } else {
-                paintWavyHorizontalLine(g, r.x, r.x + r.width, r.y + r.height - 1);
+                linePainter.paint(g, r.x, r.y + r.height - 3, r.width);
             }
         }
         
@@ -373,21 +384,66 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
                 g.drawLine(x, baseline - 1, endX, baseline - 1);
             }
         }
+    }
+    
+    // This is abstracted out just so it can be more easily tested (see main function below).
+    private static class BufferedWavyLinePainter {
+        private BufferedImage img;
+        private static final int IMG_WIDTH = 100;
+        private static final int IMG_HEIGHT = 3;
         
-        private void paintWavyHorizontalLine(Graphics2D g, int x1, int x2, int y) {
-            Object originalHint = g.getRenderingHint(RenderingHints.KEY_ANTIALIASING);
+        public BufferedWavyLinePainter(Color color) {
+            img = new BufferedImage(IMG_WIDTH, IMG_HEIGHT, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = img.createGraphics();
+            g.setBackground(new Color(0, 0, 0, 0));
+            g.clearRect(0, 0, IMG_WIDTH, IMG_HEIGHT);
+            g.setColor(color);
             g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            
-            final int startX = Math.min(x1, x2);
-            final int endX = Math.max(x1, x2);
-            final int baselineY = y - 1;
-            int yOff = 1;
-            for (int x = startX; x < endX; x += 2) {
-                g.drawLine(x, baselineY + yOff, Math.min(endX, x + 2), baselineY - yOff);
-                yOff = -yOff;
+            int y = 2;
+            for (int x = 0; x < IMG_WIDTH; x += 2) {
+                g.drawLine(x, y, x + 2, 2 - y);
+                y = 2 - y;
             }
-            
-            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, originalHint);
         }
+        
+        private void paint(Graphics2D unclippedG, int xMin, int yMin, int width) {
+            Graphics2D g = (Graphics2D) unclippedG.create(xMin, yMin, width, 3);
+            for (int x = 0; x < width; x += IMG_WIDTH) {
+                g.drawImage(img, x, 0, null);
+            }
+        }
+    }
+    
+    // The main program here is only to allow speed testing of the wiggly line drawing.
+    // Click on the wiggly lines to force a complete redraw, and print-out of timing info.
+    public static void main(String[] args) {
+        JFrame frame = new JFrame("Wiggly Line Speed Tester");
+        JPanel ui = new JPanel(new BorderLayout());
+        final BufferedWavyLinePainter painter = new BufferedWavyLinePainter(new Color(255, 102, 102));
+        JComponent waverUI = new JComponent() {
+            public void paintComponent(Graphics oldGraphics) {
+                Graphics2D g = (Graphics2D)oldGraphics;
+                Dimension sz = getSize();
+                final long startNanos = System.nanoTime();
+                for (int y = 10; y < sz.height - 10; y += 10) {
+                    painter.paint(g, 10, y, sz.width - 20);
+                }
+                final long taken = System.nanoTime() - startNanos;
+                System.err.println("Paint (" + sz.width + " x " + sz.height + ") took " + taken + " nanoseconds");
+            }
+        };
+        waverUI.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                waverUI.repaint();
+            }
+        });
+        ui.add(waverUI, BorderLayout.CENTER);
+        frame.setContentPane(ui);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
+        frame.setSize(new Dimension(1000, 800));
+        JFrameUtilities.constrainToScreen(frame);
+        JFrameUtilities.setFrameIcon(frame);
+        frame.setVisible(true);
     }
 }
