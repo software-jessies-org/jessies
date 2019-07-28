@@ -117,7 +117,11 @@ LOCAL_LDFLAGS += $(if $(BUILDING_MINGW),$(MINGW_FLAGS.$(MINGW_COMPILER)))
 # Post linking changes.
 # ----------------------------------------------------------------------------
 
+# If you keep finding 'update-login-record.core' files lying around, you may be
+# running an OS which requires that binary to be setuid root. In that case, add
+# another line for your operating system here:
 NEEDS_SETUID.Linux = $(shell grep -w pututxline $(SOURCES))
+NEEDS_SETUID.FreeBSD = $(NEEDS_SETUID.Linux)
 NEEDS_SETUID := $(NEEDS_SETUID.$(TARGET_OS))
 LOCAL_LDFLAGS += $(if $(NEEDS_SETUID),&& echo "-- Giving $(notdir $(EXECUTABLES)) setuid root permissions..." && sudo chown root: $(EXECUTABLES) && sudo chmod u+s$(COMMA)a+rx $(EXECUTABLES))
 
