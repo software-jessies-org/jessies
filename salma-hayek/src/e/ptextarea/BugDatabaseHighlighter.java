@@ -92,7 +92,9 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
     }
     
     private String urlForMatcher(Matcher matcher) {
-        return urlTemplate.replaceAll("%s", matcher.group(2));
+        String seed = matcher.group(2);
+        String replacement = StringUtilities.urlEncode(seed).replaceAll("\\+", "%20");
+        return urlTemplate.replaceAll("%s", replacement);
     }
     
     @Override
