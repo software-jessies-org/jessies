@@ -3,8 +3,6 @@
 # Work around HDS's firewall's newfound denial of ssh access with:
 # http://stackoverflow.com/a/8081292/18096
 
-# Download the last JDK 6, so we can find a BOOT_JDK.
-
 # cron-config
 # Install as service, run as yourself (otherwise today exim crashes into /var/log/cron.log), don't set CYGWIN.
 # This requires your Windows password, which, despite the prompts, it seems you can't really update with passwd -R.
