@@ -63,7 +63,6 @@
 
 # See the note in salma-hayek/lib/build/drive.rb about "invalid_grant".
 
-export ALTERNATE_BOOTCLASSPATH=$(cygpath --mixed --short-name $HOME/rt.jar)
 NIGHTLY_BUILD_SCRIPT=~/jessies/work/salma-hayek/bin/nightly-build.rb
 NIGHTLY_BUILD_TREE=~/jessies/nightlies/
 export http_proxy=http://http.corp.hds.com:8080
