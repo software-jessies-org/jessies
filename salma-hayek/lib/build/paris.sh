@@ -36,5 +36,8 @@ gzip -9 < Packages > Packages.gz
 apt-ftparchive release . > Release
 # This has to run as martind@bluearc.com to sign with the right key.
 # The key was exported with gpg --export --armor, then imported by piping that to sudo apt-get add -.
+# After a move from Jessie to Buster, I needed:
+# gpg2 --import ~/.gnupg/secring.gpg
+# H/T https://superuser.com/a/1112703/17633
 gpg -sba - - < Release > Release.gpg
 #scp Packages Packages.gz Release Release.gpg software@jessies.org:~/downloads/debian/
