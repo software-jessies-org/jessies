@@ -34,6 +34,7 @@ $VERBOSE = $PREVIOUS_VERBOSE
 module Google
   class APIClient
     module ENV
+      self.send(:remove_const, :OS_VERSION)
       # Apply the key part of:
       # https://github.com/googleapis/google-api-ruby-client/pull/648/commits/ee8c922dbf9cef79284d4b83d16d4d73008a6e8f
       # ... to avoid:
