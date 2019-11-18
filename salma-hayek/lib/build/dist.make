@@ -93,8 +93,8 @@ native-dist: $(addprefix google-drive-upload.,$(PUBLISHABLE_INSTALLERS))
 
 # We mustn't overwrite a file on the server whose md5sum is in Packages file or Debian's tools complain mightily.
 # If you want to upload a new installer, then please check-in first, so the version number changes.
-.PHONY: upload.%
-$(addprefix upload.,$(PUBLISHABLE_INSTALLERS)): upload.%: %
+.PHONY: software.jessies.org-upload.%
+$(addprefix software.jessies.org-upload.,$(PUBLISHABLE_INSTALLERS)): software.jessies.org-upload.%: %
 	@echo "-- Testing for $(<F) on the server..." && \
 	ssh $(DIST_SSH_USER_AND_HOST) mkdir -p $(DIST_DIRECTORY)  '&&' test -f $(DIST_DIRECTORY)/$(<F) && { \
 		echo Leaving $(<F) alone...; \
@@ -106,7 +106,7 @@ $(addprefix upload.,$(PUBLISHABLE_INSTALLERS)): upload.%: %
 
 # I like the idea of keeping several versions on the server but we're going to have a hard time
 # linking to the one we expect people to use unless we create a symlink.
-$(addprefix symlink-latest.,$(PUBLISHABLE_INSTALLERS)): symlink-latest.%: upload.%
+$(addprefix symlink-latest.,$(PUBLISHABLE_INSTALLERS)): symlink-latest.%: software.jessies.org-upload.%
 .PHONY: symlink-latest.%
 $(addprefix symlink-latest.,$(PUBLISHABLE_INSTALLERS)): symlink-latest.%: %
 	@echo "-- Symlinking the latest $(LATEST_INSTALLER_LINK)..."
