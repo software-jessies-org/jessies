@@ -31,6 +31,18 @@ require 'logger'
 
 $VERBOSE = $PREVIOUS_VERBOSE
 
+module Google
+  class APIClient
+    module ENV
+      # Apply the key part of:
+      # https://github.com/googleapis/google-api-ruby-client/pull/648/commits/ee8c922dbf9cef79284d4b83d16d4d73008a6e8f
+      # ... to avoid:
+      # /usr/lib/ruby/2.5.0/net/http/header.rb:23:in `block in initialize_http_header': header ("User-Agent") field value ("Ruby Drive sample/1.0.0 google-api-ruby-client/0.8.7 Linux/4.19.0-6-amd64\n (gzip)") cannot include CR/LF (ArgumentError)
+      OS_VERSION = `uname -sr`.chomp().sub(' ', '/')
+    end
+  end
+end
+
 API_VERSION = 'v2'
 CACHED_API_FILE = "drive-#{API_VERSION}.cache"
 CREDENTIAL_STORE_FILE = "#{$0}-oauth2.json"
