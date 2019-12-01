@@ -98,5 +98,6 @@ public class InfoDialog {
         final TerminalLogWriter terminalLogWriter = terminal.getControl().getTerminalLogWriter();
         logFilename.setText(terminalLogWriter.getInfo());
         suspendLogging.setSelected(terminalLogWriter.isSuspended());
+        suspendLogging.setEnabled(Terminator.getPreferences().getBoolean(TerminatorPreferences.LOG_TERMINAL_ACTIVITY));
     }
 }
