@@ -97,9 +97,14 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
     
     private String urlForMatcher(Matcher matcher) {
         String seed = matcher.group(2);
-        String section = matcher.group(3);
-        String suffix = section == null ? "" : "#" + urlEncode(section);
-        String replacement = urlEncode(seed) + suffix;
+        String replacement = urlEncode(seed);
+        try {
+            String section = matcher.group(3);
+            if (section != null) {
+                replacement += "#" + urlEncode(section);
+            }
+        } catch (IndexOutOfBoundsException ex) {
+        }
         return urlTemplate.replaceAll("%s", replacement);
     }
     
