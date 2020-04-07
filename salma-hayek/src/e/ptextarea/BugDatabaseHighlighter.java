@@ -90,10 +90,16 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
         // In source, though, we should restrict ourselves to COMMENT text.
         return (style == PStyle.COMMENT);
     }
+
+    private String urlEncode(final String st) {
+        return StringUtilities.urlEncode(st).replaceAll("\\+", "%20");
+    }
     
     private String urlForMatcher(Matcher matcher) {
         String seed = matcher.group(2);
-        String replacement = StringUtilities.urlEncode(seed).replaceAll("\\+", "%20");
+        String section = matcher.group(3);
+        String suffix = section == null ? "" : "#" + urlEncode(section);
+        String replacement = urlEncode(seed) + suffix;
         return urlTemplate.replaceAll("%s", replacement);
     }
     
