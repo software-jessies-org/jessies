@@ -106,7 +106,12 @@ public class FileType {
                  PRubyIndenter.class,
                  PRubyTextStyler.class,
                  new String[] { ".rb" });
-        
+    
+    public static final FileType RUST = new FileType("Rust",
+                 PCppIndenter.class,
+                 PRustTextStyler.class,
+                 new String[] { ".rs" });
+    
     public static final FileType VHDL = new FileType("VHDL",
                  PNoOpIndenter.class,
                  PVhdlTextStyler.class,

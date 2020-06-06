@@ -31,11 +31,14 @@ public class ReformatFileAction extends ETextAction {
     public static String reformat(ETextWindow textWindow) {
         PTextArea textArea = textWindow.getTextArea();
         
-        // TODO: gofmt for GO
         // TODO: yapf (https://github.com/google/yapf) for PYTHON
         
         final FileType fileType = textArea.getFileType();
-        if (fileType != FileType.C_PLUS_PLUS && fileType != FileType.JAVA && fileType != FileType.JAVA_SCRIPT && fileType != FileType.PROTO) {
+        if (fileType == FileType.RUST) {
+            return reformatPipe(textArea, "rustfmt");
+        } else if (fileType == FileType.GO) {
+            return reformatPipe(textArea, "gofmt");
+        } else if (fileType != FileType.C_PLUS_PLUS && fileType != FileType.JAVA && fileType != FileType.JAVA_SCRIPT && fileType != FileType.PROTO) {
             return "Don't know how to reformat " + fileType.getName() + " files.";
         }
         
@@ -83,6 +86,31 @@ public class ReformatFileAction extends ETextAction {
         int newPosition = Integer.parseInt(m.group(1));
         textArea.setText(newText);
         textArea.select(newPosition, newPosition);
+        return null;
+    }
+    
+    // reformatPipe pipes the contents of textArea through the formatCommand, and if formatCommand exits
+    // successfully replaces the contents of textArea with its stdout.
+    // On failure, the textArea's contents is unchanged, and an error message is returned.
+    // It is assumed that formatCommand will accept unformatted code on stdin, and produce its formatted
+    // output on stdout. This is the case for 'gofmt' and 'rustfmt', which is nice of them.
+    public static String reformatPipe(PTextArea textArea, String formatCommand) {
+        String input = textArea.getText();
+        ArrayList<String> output = new ArrayList<>();
+        ArrayList<String> errors = new ArrayList<>();
+        int status = ProcessUtilities.backQuote(null, new String[] {formatCommand}, input, output, errors);
+        if (!errors.isEmpty()) {
+            return formatCommand + " failed: " + StringUtilities.join(errors, "\n");
+        } else if (status != 0) {
+            return formatCommand + " returned " + status + " but no error message.";
+        }
+        String newText = StringUtilities.join(output, "\n") + "\n";
+        if (newText.equals(input)) {
+            return null;
+        }
+        // We make no attempt to change the caret location to keep it in the same logical location,
+        // but we don't have to because PTextArea's "guessTargetCaretPos" takes care of that for us.
+        textArea.setText(newText);
         return null;
     }
 }
