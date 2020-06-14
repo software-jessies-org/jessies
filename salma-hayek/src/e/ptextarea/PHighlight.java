@@ -108,7 +108,11 @@ public abstract class PHighlight implements Comparable<PHighlight> {
     }
     
     @Override public boolean equals(Object obj) {
-        return (obj instanceof PHighlight) && (((PHighlight) obj).getStartIndex() == getStartIndex());
+        if (obj instanceof PHighlight) {
+            PHighlight other = (PHighlight) obj;
+            return other.getStartIndex() == getStartIndex() && other.getEndIndex() == getEndIndex();
+        }
+        return false;
     }
     
     public int compareTo(PHighlight other) {

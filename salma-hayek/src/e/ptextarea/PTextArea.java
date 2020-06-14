@@ -1559,30 +1559,79 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         }
     }
     
+    // Return value is total match count.
     private int findAllMatchesWithWriteLockAlreadyHeld(String regularExpression, BirdView birdView) {
-        removeHighlights(PFind.MatchHighlight.HIGHLIGHTER_NAME);
-        if (birdView != null) {
-            birdView.clearMatchingLines();
-        }
-        
         // Anything to search for?
         if (regularExpression == null || regularExpression.length() == 0) {
+            removeHighlights(PFind.MatchHighlight.HIGHLIGHTER_NAME);
+            if (birdView != null) {
+                birdView.clearMatchingLines();
+            }
             return 0;
         }
         
-        // Find all the matches.
+        List<PHighlight> old = getHighlightManager().getNamedHighlightsOverlapping(PFind.MatchHighlight.HIGHLIGHTER_NAME, 0, getTextBuffer().length());
+        
+        // Find all the matches, and update the set of highlights in the text area.
+        // We used to do this the brute-force way, by dropping all highlights and repopulating,
+        // but that's really very slow, particularly when the display area is large, as in involves
+        // repainting the entire text window.
+        // We could further improve the speed by only checking the area which was modified for changes
+        // in the regexp matches, rather than running regexp across the whole file. My timings suggest
+        // it takes around 1-6ms to update highlights when the regexp is "void" in this file. This
+        // seems to be OK, but in other cases it may not be. I guess for now it's not worthwhile.
         if (birdView != null) {
             birdView.setValueIsAdjusting(true);
         }
         try {
+            // To correctly update the birdview, we need to know which lines used to be highlighted
+            // but aren't any more. We can't just remove the matched line when we drop an old highlight,
+            // as there may be other highlights on the same line.
+            HashSet<Integer> birdViewKeepLines = new HashSet<Integer>();
+            HashSet<Integer> birdViewDeleteLines = new HashSet<Integer>();
+            ListIterator<PHighlight> oldIt = old.listIterator();
+            PHighlight oldHighlight = null;
             int matchCount = 0;
             Matcher matcher = PatternUtilities.smartCaseCompile(regularExpression).matcher(getTextBuffer());
             while (matcher.find()) {
-                if (birdView != null) {
-                    birdView.addMatchingLine(getLineOfOffset(matcher.end()));
-                }
-                addHighlight(new PFind.MatchHighlight(this, matcher.start(), matcher.end()));
                 ++matchCount;
+                boolean done = false;
+                PHighlight highlight = new PFind.MatchHighlight(this, matcher.start(), matcher.end());
+                while (oldHighlight != null || (oldHighlight == null && oldIt.hasNext())) {
+                    if (oldHighlight == null) {
+                        oldHighlight = oldIt.next();
+                    }
+                    if (oldHighlight.getStartIndex() >= highlight.getStartIndex()) {
+                        // The new highlight is indeed new, so we break out to go deal with it.
+                        // The oldHighlight is later on in the file, so we'll keep it around
+                        // for later processing.
+                        break;
+                    }
+                    // This oldHighlight needs to be removed, as it's no longer valid.
+                    removeHighlight(oldHighlight);
+                    birdViewDeleteLines.add(getLineOfOffset(oldHighlight.getEndIndex()));
+                    oldHighlight = null;
+                }
+                int highlightLine = getLineOfOffset(matcher.end());
+                birdViewKeepLines.add(highlightLine);
+                if (!highlight.equals(oldHighlight)) {
+                    if (birdView != null) {
+                        birdView.addMatchingLine(highlightLine);
+                    }
+                    addHighlight(highlight);
+                } else {
+                    // We've dealt with this old highlight, as it's the same as the new one, so
+                    // drop it so that next time around the loop, we fetch the next one.
+                    oldHighlight = null;
+                }
+            }
+            // Clear up lines in the birdview that have had highlights removed, but none kept or added.
+            if (birdView != null) {
+                for (Integer line : birdViewDeleteLines) {
+                    if (!birdViewKeepLines.contains(line)) {
+                        birdView.removeMatchingLine(line);
+                    }
+                }
             }
             return matchCount;
         } finally {
