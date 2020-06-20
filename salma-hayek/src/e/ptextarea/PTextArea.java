@@ -1615,6 +1615,13 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
                 int highlightLine = getLineOfOffset(matcher.end());
                 birdViewKeepLines.add(highlightLine);
                 if (!highlight.equals(oldHighlight)) {
+                    if (oldHighlight != null && oldHighlight.getStartIndex() == highlight.getStartIndex()) {
+                        // Old highlight starts at the same position, but ends elsewhere. This can happen while we're
+                        // writing the find string. In this case we must remove the old highlight and add the new one.
+                        removeHighlight(oldHighlight);
+                        oldHighlight = null;
+                        // No need to ask for the removal from birdview here, as the new highlight will be at the same position.
+                    }
                     if (birdView != null) {
                         birdView.addMatchingLine(highlightLine);
                     }
@@ -1624,6 +1631,16 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
                     // drop it so that next time around the loop, we fetch the next one.
                     oldHighlight = null;
                 }
+            }
+            // If we've finished with the matches, we must check if there are old highlights still, which appear
+            // after the last new highlight. They must all be removed.
+            while (oldHighlight != null || oldIt.hasNext()) {
+                if (oldHighlight == null) {
+                    oldHighlight = oldIt.next();
+                }
+                removeHighlight(oldHighlight);
+                birdViewDeleteLines.add(getLineOfOffset(oldHighlight.getEndIndex()));
+                oldHighlight = null;
             }
             // Clear up lines in the birdview that have had highlights removed, but none kept or added.
             if (birdView != null) {
