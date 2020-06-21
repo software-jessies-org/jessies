@@ -4,6 +4,23 @@ import e.util.*;
 import java.util.*;
 import java.util.regex.*;
 
+/*
+A quick summary of the class hierarchy of the PIndenter family:
+
+  PIndenter                      Base class.
+    PNoOpIndenter                Bare bones  - does nothing special.
+    PSimpleIndenter              Does some language-specific stuff it shouldn't be doing (eg java comments).
+      PGenericIndenter           Provides implementation for regexp-based indentation.
+        PBashIndenter            Regexp-based indentation for bash
+        PRubyIndenter
+      PCFamilyIndenter
+        PCppIndenter             Handles C++, proto, rust (rust just because we have nothing better)
+        PJavaIndenter
+        PPerlIndenter
+      PGoIndenter
+      PPythonIndenter
+*/
+
 /**
  * Defines the interface provided by every indenter.
  */
@@ -68,16 +85,25 @@ public abstract class PIndenter {
      */
     public abstract void fixIndentationOnLine(int lineIndex);
     
-    // FIXME: this is a hack for the benefit of PNewlineInserter, which does its own indentation fixing when inserting matching brackets, rather than deferring to the indenter. (Why is that the case?)
-    public boolean isInNeedOfClosingSemicolon(String line) {
-        return false;
+    /**
+     * Does whatever needs doing when the user hits Return. The basic action of the PIndenter is to
+     * insert a newline, and copy the indentation string from the last non-blank line.
+     * This handles the undo buffer compound editing support - override the insertNewlineImpl to do clever stuff.
+     */
+    public final void insertNewline(boolean fixIndentation) {
+        textArea.getTextBuffer().getUndoBuffer().startCompoundEdit();
+        try {
+            insertNewlineImpl(fixIndentation);
+        } finally {
+            textArea.getTextBuffer().getUndoBuffer().finishCompoundEdit();
+        }
     }
     
-    /**
-     * Returns true if this indenter isn't capable of fixing the current line, and is only usable for computing auto-indent (i.e. indentation for the next line).
-     */
-    public boolean canOnlyAutoIndent() {
-        return false;
+    // Inserts a newline (and does whatever indentation fixing).
+    // This is always called with the undo buffer in compound edit mode.
+    public void insertNewlineImpl(boolean fixIndentation) {
+        int startLineIndex = textArea.getLineOfOffset(textArea.getSelectionStart());
+        textArea.replaceSelection("\n" + textArea.getIndenter().getCurrentIndentationOfLine(startLineIndex));
     }
     
     /**

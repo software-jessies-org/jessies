@@ -149,7 +149,7 @@ public class PKeyHandler implements KeyListener {
             }
             textArea.replaceSelection(textArea.getIndentationString());
         } else if (textArea.isEditable() && key == KeyEvent.VK_ENTER) {
-            new PNewlineInserter(textArea).insertNewline(event.isShiftDown() == false);
+            textArea.getIndenter().insertNewline(event.isShiftDown() == false);
         } else if (isStartOfTextKey(event)) {
             moveCaret(extendingSelection, 0);
         } else if (isEndOfTextKey(event)) {
