@@ -94,6 +94,68 @@ public class PGoIndenter extends PSimpleIndenter {
         return false; // Start of file can't be in a multi-line string.
     }
     
+    private class Insert {
+        private String before;
+        private String after;
+        public Insert(String before) {
+            this(before, "");
+        }
+        public Insert(String before, String after) {
+            this.before = before;
+            this.after = after;
+        }
+        public void doInsert() {
+            int fixLine = textArea.getLineOfOffset(textArea.getSelectionStart());
+            final int newCaretPos = textArea.getSelectionStart() + before.length();
+            String totalInsert = before + after;
+            textArea.replaceSelection(totalInsert);
+            textArea.select(newCaretPos, newCaretPos);
+        }
+    }
+    
+    @Override public void insertNewlineImpl(boolean fixIndentation) {
+        Insert insert = getNewlineInsertion();
+        insert.doInsert();
+    }
+    
+    private Insert getNewlineInsertion() {
+        final int startPosition = textArea.getSelectionStart();
+        final int lineIndex = textArea.getLineOfOffset(startPosition);
+        final int charOffset = startPosition - textArea.getLineStartOffset(lineIndex);
+        List<PLineSegment> ls = textArea.getLineSegments(lineIndex);
+        
+        boolean pastIndentation = false;
+        StringBuffer currentIndent = new StringBuffer();
+        for (PLineSegment seg : ls) {
+            if (seg.getOffset() >= startPosition) {  // char indices in scope of whole text buffer.
+                break;
+            }
+            CharSequence cs = seg.getCharSequence();
+            if (!pastIndentation && isEntirelyWhitespace(cs)) {
+                currentIndent.append(cs);
+                continue;
+            }
+            // Interpret and modify the pastIndentation flag here, so we have a clear variable describing
+            // whether we're at the first non-indentation location.
+            final boolean firstNonIndentSegment = !pastIndentation;
+            pastIndentation = true;
+            // If the first segment that isn't indentation is a one-line comment, then continue that.
+            if (firstNonIndentSegment && (seg.getStyle() == PStyle.COMMENT) && cs.toString().startsWith("//")) {
+                return new Insert("\n" + currentIndent.toString() + "// ");
+            }
+        }
+        return new Insert("\n" + currentIndent.toString());
+    }
+    
+    private boolean isEntirelyWhitespace(CharSequence cs) {
+        for (int i = 0; i < cs.length(); i++) {
+            if (!Character.isWhitespace(cs.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+        
     @Override public String calculateNewIndentation(int lineIndex) {
         if (isInMultiLineString(lineIndex)) {
             return null;
