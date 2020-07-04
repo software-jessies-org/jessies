@@ -159,12 +159,15 @@ public class PatchDialog {
         textArea.setText(StringUtilities.join(diffLines, "\n") + "\n");
         final List<HighlightInfo> highlights = new ArrayList<>();
         Color color = null;
-        int lineNumber = 0; // Lines beginning with '?' don't count!
+        int lineNumber = 0;
         for (String line : diffLines) {
             if (line.startsWith("?")) {
                 // A '?' line always follows a '+' or '-' line, so choose the dark color corresponding to the last color we used.
                 highlightDifferencesInLine(highlights, textArea, (color == LIGHT_GREEN) ? DARK_GREEN : DARK_RED, lineNumber - 1, line);
-                continue;
+                // Reset the colour so that we don't highlight the ? line in red. As it's between the
+                // red and the green line, it's kind of independent in itself, so it probably shouldn't be
+                // coloured. Another option would be to colour it in orange.
+                color = null;
             } else if (line.startsWith("+++")) {
                 color = DARK_GREEN;
             } else if (line.startsWith("+")) {
