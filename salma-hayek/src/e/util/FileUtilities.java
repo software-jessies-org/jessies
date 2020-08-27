@@ -152,22 +152,6 @@ public class FileUtilities {
     }
     
     /**
-     * Tests whether filename is a symbolic link.
-     * 
-     * FIXME: all of this should be replaced when Java 7 is in widespread use,
-     * and we can use the new JSR-203 functionality.
-     */
-    public static boolean isSymbolicLink(String filename) {
-        final Stat stat = new Stat();
-        final int result = Posix.lstat(filename, stat);
-        return result == 0 && stat.isSymbolicLink();
-    }
-    
-    public static boolean isSymbolicLink(File file) {
-        return isSymbolicLink(file.toString());
-    }
-    
-    /**
      * Tests whether the given file contains ASCII text. This is done by
      * reading the first 512 bytes and ensuring that they are all
      * ASCII characters of the kind you'd expect to find in source files.
