@@ -1,7 +1,10 @@
 package e.edit;
 
 import e.util.*;
+import org.jessies.os.Stat;
 import java.awt.*;
+import java.nio.file.*;
+import java.nio.file.attribute.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
@@ -14,6 +17,9 @@ public class WorkspaceFileList {
     
     private FileIgnorer fileIgnorer;
     private ArrayList<String> fileList;
+     
+    // How deep to allow us to go into the filesystem tree when scanning for files.
+    private static final int MAX_DIR_DEPTH = 40;
     
     private FileAlterationMonitor fileAlterationMonitor;
     
@@ -155,10 +161,43 @@ public class WorkspaceFileList {
             // We should reload the file ignorer's configuration when we rescan.
             updateFileIgnorer();
             
-            List<File> files = new FileFinder().filesUnder(workspaceRoot, fileIgnorer);
-            ArrayList<String> result = new ArrayList<>(files.size());
-            for (File file : files) {
-                result.add(file.toString().substring(prefixCharsToSkip));
+            ArrayList<String> result = new ArrayList<>();
+            try {
+                // TODO: In calls to fileIgnorer here, we send an empty Stat. This means that, if
+                // the file or dir is actually accessed via a symlink, the fileIgnorer is not told.
+                // We may wish to revisit this, particularly for directories, as it makes little sense
+                // to index the contents of a dir twice. On the other hand, who would do such a thing?
+                // Is filtering that out really useful?
+                // Some investigation will be needed to determine how to check for symlinks, as using
+                // 'FOLLOW_LINKS', we end up with the BasicFileAttributes of the linked-to thing, and
+                // there's no obvious way of knowing whether we got there via a link or not.
+                // Think about this.
+                Files.walkFileTree(workspaceRoot.toPath(), EnumSet.of(FileVisitOption.FOLLOW_LINKS), MAX_DIR_DEPTH, new SimpleFileVisitor<Path>() {
+                    @Override
+                    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+                        if (fileIgnorer.enterDirectory(dir.toFile(), new Stat())) {
+                            return FileVisitResult.CONTINUE;
+                        }
+                        return FileVisitResult.SKIP_SUBTREE;
+                    }
+                    
+                    @Override
+                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                        if (fileIgnorer.acceptFile(file.toFile(), new Stat())) {
+                            result.add(file.toString().substring(prefixCharsToSkip));
+                        }
+                        return FileVisitResult.CONTINUE;
+                    }
+                    
+                    @Override
+                    public FileVisitResult visitFileFailed(Path file, IOException ex) {
+                        // Stuff can be deleted under our feet.
+                        // This is not an error, just something we cope with and continue.
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
             }
             
             Evergreen.getInstance().showStatus("Scan of workspace \"" + workspace.getWorkspaceName() + "\" complete (" + result.size() + " files)");
