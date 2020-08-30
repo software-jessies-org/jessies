@@ -6,6 +6,7 @@ import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.nio.file.*;
 import java.net.*;
 import java.util.*; 
 import java.util.List;
@@ -263,13 +264,7 @@ public class Evergreen {
         }
         
         try {
-            /*
-             * Open the file a symbolic link points to, and not the link itself.
-             * This ensures that, even on case-insensitive file systems, we always use the same case.
-             * That, in turn, ensures that we won't open a second viewer on the same file.
-             * This also cleans paths like a/b/../c/d.
-             */
-            filename = FileUtilities.fileFromString(filename).getCanonicalPath();
+            filename = resolvePath(filename).toString();
         } catch (IOException ignored) {
             /* Harmless. */
         }
@@ -314,6 +309,51 @@ public class Evergreen {
         
         // Add an appropriate viewer for the filename to the chosen workspace.
         return workspace.addViewerForFile(filename, address, file.y);
+    }
+    
+    /**
+     * Returns the resolved path, according to the following rules:
+     * 1: If this is a symlink directly to a file, then use the canonical name. Always.
+     * 2: If one of the parent dirs is a symlink to somewhere within our workspace, resolve it.
+     * 3: If one of the parent dirs is a symlink outside the workspace, don't resolve.
+     * The rationale here is to try to avoid opening duplicate views on the same file, but
+     * if we've set up the workspace with symlinks into some larger tree, resolving everything
+     * makes the files look like their outside the tree, and opening the "find in files" does not
+     * properly populate the 'directory to search in'. In such a situation, it's helpful to
+     * maintain the illusion that we're looking at a single coherent location on disk.
+     */
+    private Path resolvePath(String filename) throws IOException {
+        // Resolve ~, but then convert to an absolute path to get rid of any /../ and other weirdness.
+        Path path = FileUtilities.pathFrom(filename).toAbsolutePath();
+        // toRealPath follows symlinks by default.
+        Path realPath = path.toRealPath();
+        // Now we have path and realPath, the latter of which is the actual path name with symlinks resolvedf.
+        // Of course, if they're identical, we can just return either without bothering to do anything else.
+        if (path.equals(realPath)) {
+            return path;
+        }
+        if (Files.isSymbolicLink(path)) {
+            // This is a symlink to a file, so always return the resolved name, so we don't end up overwriting
+            // the symlink instead of the file it points to.
+            return realPath;
+        }
+        Path workspacePath = getBestWorkspaceForFilename(path.toString(), getCurrentWorkspace()).getCanonicalRootPath();
+        // By this point, we're dealing with a filename which has a symlink somewhere up its path.
+        if (realPath.startsWith(workspacePath)) {
+            // The actual file is in the same workspace, so use the resolved name so that multiple paths
+            // within the same workspace to one file will only open one view of the file.
+            return realPath;
+        }
+        // This is a filename existing outside of the workspace, but which is reached via a symlink,
+        // probably but not necessarily linked from within the workspace to outside of it.
+        // We assume the user has done this deliberately, for example using symlinks to create a
+        // limited 'view' of a larger repository, but wants Evergreen to pretend the files are
+        // actually within the workspace location itself.
+        // Of course, this does leave the door open to people setting up two symlinks to the same directory
+        // outside the workspace, and thus being able to open several views on the same file.
+        // But if they do that, they'll just have to cope with the consequences. Or maybe they
+        // actually want to, so they can see two parts of the file at once.
+        return path;
     }
     
     /** Returns an array of all the workspaces. */

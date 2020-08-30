@@ -2,6 +2,7 @@ package e.util;
 
 import java.io.*;
 import java.nio.channels.*;
+import java.nio.file.*;
 import java.security.*;
 import java.util.*;
 import java.util.regex.*;
@@ -28,7 +29,12 @@ public class FileUtilities {
     public static File fileFromParentAndString(String parent, String filename) {
         return fileFromString(FileUtilities.parseUserFriendlyName(parent) + File.separator + filename);
     }
-
+    
+    /** Returns a new Path for the given filename (and optional extra parts), coping with "~/". */
+    public static Path pathFrom(String first, String... more) {
+        return FileSystems.getDefault().getPath(FileUtilities.parseUserFriendlyName(first), more);
+    }
+    
     /**
      * Converts paths of the form ~/src to /Users/elliotth/src (or
      * whatever the user's home directory is). Also copes with the

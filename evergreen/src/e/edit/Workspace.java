@@ -6,6 +6,7 @@ import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
@@ -149,6 +150,11 @@ public class Workspace extends JPanel {
         // We cache this because it's called when deciding on a workspace for a newly-opened file.
         // We don't want the UI to lock up because an unrelated workspace's NFS mount is temporarily unresponsive.
         return canonicalRootDirectory;
+    }
+    
+    /** Returns the OS-canonical root directory, but as an NIO Path. */
+    public Path getCanonicalRootPath() {
+        return FileSystems.getDefault().getPath(canonicalRootDirectory);
     }
     
     /** Tests whether this workspace is empty. A workspace is still considered empty if all it contains is an errors window. */
