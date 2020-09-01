@@ -2,6 +2,7 @@ package e.util;
 
 import java.io.*;
 import java.nio.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.regex.*;
 import org.jessies.test.*;
@@ -30,6 +31,11 @@ public class StringUtilities {
     /** Reads the entire contents of the given File into a String. Throws a RuntimeException on failure. */
     public static String readFile(File file) {
         return new String(readFileAsCharArray(file));
+    }
+    
+    /** Reads the entire contents of the given File into a String. Throws a RuntimeException on failure. */
+    public static String readFile(Path path) {
+        return new String(readFileAsCharArray(path.toFile()));
     }
     
     private static char[] readFileAsCharArray(File file) {

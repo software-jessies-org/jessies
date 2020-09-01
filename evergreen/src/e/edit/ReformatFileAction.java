@@ -3,7 +3,7 @@ package e.edit;
 import e.ptextarea.*;
 import e.util.*;
 import java.awt.event.*;
-import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.regex.*;
 
@@ -45,10 +45,10 @@ public class ReformatFileAction extends ETextAction {
         // TODO: explicitly check for a clang-format binary?
         
         // Check for a .clang-format file in one of the parent directories.
-        File f = textWindow.getFile();
+        Path p = textWindow.getPath();
         boolean foundClangFormat = false;
-        while ((f = f.getParentFile()) != null) {
-            if (new File(f, ".clang-format").exists()) {
+        while ((p = p.getParent()) != null) {
+            if (Files.exists(Paths.get(p.toString(), ".clang-format"))) {
                 foundClangFormat = true;
                 break;
             }

@@ -32,7 +32,7 @@ public class FileUtilities {
     
     /** Returns a new Path for the given filename (and optional extra parts), coping with "~/". */
     public static Path pathFrom(String first, String... more) {
-        return FileSystems.getDefault().getPath(FileUtilities.parseUserFriendlyName(first), more);
+        return Paths.get(FileUtilities.parseUserFriendlyName(first), more);
     }
     
     /**
@@ -94,6 +94,10 @@ public class FileUtilities {
     
     public static String getUserFriendlyName(File file) {
         return getUserFriendlyName(file.getAbsolutePath());
+    }
+    
+    public static String getUserFriendlyName(Path path) {
+        return getUserFriendlyName(path.toAbsolutePath().toString());
     }
     
     /**
@@ -347,6 +351,14 @@ public class FileUtilities {
     
     public static String getLastModifiedTime(File file) {
         return TimeUtilities.toIsoString(new Date(file.lastModified()));
+    }
+    
+    public static String getLastModifiedTime(Path path) {
+        try {
+            return TimeUtilities.toIsoString(new Date(Files.getLastModifiedTime(path).toMillis()));
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
     
     public static void copyFile(File source, File destination) {

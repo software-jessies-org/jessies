@@ -154,7 +154,7 @@ public class Workspace extends JPanel {
     
     /** Returns the OS-canonical root directory, but as an NIO Path. */
     public Path getCanonicalRootPath() {
-        return FileSystems.getDefault().getPath(canonicalRootDirectory);
+        return Paths.get(canonicalRootDirectory);
     }
     
     /** Tests whether this workspace is empty. A workspace is still considered empty if all it contains is an errors window. */

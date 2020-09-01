@@ -6,6 +6,8 @@ import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.nio.file.*;
+import java.nio.file.attribute.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.List;
@@ -21,7 +23,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     private static final ExecutorService WATERMARK_UPDATE_EXECUTOR = ThreadUtilities.newSingleThreadExecutor("Watermark Updater");
     
     private final String filename;
-    private final File file;
+    private final Path path;
     private final PTextArea textArea;
     private final PLineNumberPanel lineNumbers;
     private final JScrollPane scrollPane;
@@ -30,7 +32,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     private final BirdView birdView;
     private final TagsUpdater tagsUpdater;
     
-    private long lastModifiedTime;
+    private FileTime lastModifiedTime;
     
     // Each text window has its own current regular expression for finds, which may be null if there's no currently active search in that window.
     private String currentRegularExpression;
@@ -59,7 +61,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     public ETextWindow(String filename) {
         super(filename);
         this.filename = filename;
-        this.file = FileUtilities.fileFromString(filename);
+        this.path = FileUtilities.pathFrom(filename);
         this.textArea = new PTextArea();
         initTextArea();
         initTextAreaPopupMenu();
@@ -252,8 +254,8 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         return birdView;
     }
     
-    public File getFile() {
-        return file;
+    public Path getPath() {
+        return path;
     }
     
     public String getFilename() {
@@ -327,8 +329,8 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
             }
             
             private void updateFileState() {
-                if (file.exists()) {
-                    if (file.canWrite() == false) {
+                if (Files.exists(path)) {
+                    if (Files.isWritable(path) == false) {
                         nonSeriousMessage = "(read-only)";
                     }
                     if (isOutOfDateWithRespectToDisk()) {
@@ -344,8 +346,8 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     
     private void fillWithContent() {
         try {
-            lastModifiedTime = file.lastModified();
-            textArea.getTextBuffer().readFromFile(file);
+            lastModifiedTime = Files.getLastModifiedTime(path);
+            textArea.getTextBuffer().readFromFile(path.toFile());
             
             configureForGuessedFileType();
             updateWatermarkAndTitleBar();
@@ -355,8 +357,8 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
             getTitleBar().repaint();
         } catch (Throwable th) {
             Log.warn("in ContentLoader exception handler", th);
-            Evergreen.getInstance().showAlert("Couldn't open file \"" + FileUtilities.getUserFriendlyName(file) + "\"", th.getMessage());
-            throw new RuntimeException("can't open " + FileUtilities.getUserFriendlyName(file));
+            Evergreen.getInstance().showAlert("Couldn't open file \"" + FileUtilities.getUserFriendlyName(path) + "\"", th.getMessage());
+            throw new RuntimeException("can't open " + FileUtilities.getUserFriendlyName(path));
         }
     }
     
@@ -396,7 +398,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     }
     
     private boolean showPatchAndAskForConfirmation(String verb, String question, boolean fromDiskToMemory) {
-        final Diffable disk = new Diffable("disk at " + FileUtilities.getLastModifiedTime(file), file);
+        final Diffable disk = new Diffable("disk at " + FileUtilities.getLastModifiedTime(path), path.toFile());
         disk.setFileType(textArea.getFileType());
         final Diffable memory = new Diffable("memory", textArea.getTextBuffer().toString());
         memory.setFileType(textArea.getFileType());
@@ -410,19 +412,19 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     }
     
     public boolean canRevertToSaved() {
-        return file.exists() && (isDirty() || isOutOfDateWithRespectToDisk());
+        return Files.exists(path) && (isDirty() || isOutOfDateWithRespectToDisk());
     }
     
     public void revertToSaved() {
-        if (file.exists() == false) {
+        if (Files.exists(path) == false) {
             Evergreen.getInstance().showAlert("Can't revert to saved", "\"" + getFilename() + "\" does not exist.");
             return;
         }
-        if (isDirty() == false && file.exists() && isOutOfDateWithRespectToDisk() == false) {
+        if (isDirty() == false && Files.exists(path) && isOutOfDateWithRespectToDisk() == false) {
             Evergreen.getInstance().showAlert("Can't revert to saved", "\"" + getFilename() + "\" is the same on disk as in the editor.");
             return;
         }
-        if (showPatchAndAskForConfirmation("Revert to Saved", "Revert to on-disk version of \"" + file.getName() + "\"? (Equivalent to applying the following patch.)", true)) {
+        if (showPatchAndAskForConfirmation("Revert to Saved", "Revert to on-disk version of \"" + path.getFileName() + "\"? (Equivalent to applying the following patch.)", true)) {
             uncheckedRevertToSaved();
         }
     }
@@ -447,7 +449,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     @Override
     public void closeWindow() {
         if (isDirty()) {
-            if (showPatchAndAskForConfirmation("Discard Changes", "Discard changes to \"" + file.getName() + "\"? (Equivalent to applying the following patch.)", true) == false) {
+            if (showPatchAndAskForConfirmation("Discard Changes", "Discard changes to \"" + path.getFileName() + "\"? (Equivalent to applying the following patch.)", true) == false) {
                 return;
             }
         }
@@ -482,9 +484,9 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
      */
     public String getCounterpartFilename() {
         // Work out what the counterpart would be called.
-        String basename = file.getName().replaceAll("\\.[^.]+$", "");
+        String basename = path.getFileName().toString().replaceAll("\\.[^.]+$", "");
         
-        String parent = file.getParent();
+        String parent = path.getParent().toString();
         if (filename.endsWith(".cpp") || filename.endsWith(".cc") || filename.endsWith(".c")) {
             if (FileUtilities.exists(parent, basename + ".hpp")) {
                 return basename + ".hpp";
@@ -608,23 +610,22 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     * Returns the name of the context for this window. In this case, the directory the file's in.
     */
     public String getContext() {
-        return FileUtilities.getUserFriendlyName(file.getParent());
+        return FileUtilities.getUserFriendlyName(path.getParent());
     }
     
     private boolean isOutOfDateWithRespectToDisk() {
-        // If the time stamp on disk is the same as it was when we last read
-        // or wrote the file, assume it hasn't changed.
-        if (file.lastModified() == lastModifiedTime) {
-            return false;
-        }
-        
-        // If the on-disk content is the same as what we have in memory, then
-        // the fact that the time stamp is different isn't significant.
         try {
+            // If the time stamp on disk is the same as it was when we last read
+            // or wrote the file, assume it hasn't changed.
+            if (Files.getLastModifiedTime(path).equals(lastModifiedTime)) {
+                return false;
+            }
+            // If the on-disk content is the same as what we have in memory, then
+            // the fact that the time stamp is different isn't significant.
             String currentContentInMemory = textArea.getText();
-            String currentContentOnDisk = StringUtilities.readFile(file);
+            String currentContentOnDisk = StringUtilities.readFile(path);
             if (currentContentInMemory.equals(currentContentOnDisk)) {
-                lastModifiedTime = file.lastModified();
+                lastModifiedTime = Files.getLastModifiedTime(path);
                 return false;
             }
         } catch (Exception ex) {
@@ -648,8 +649,8 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         // If the file already exists, check it hasn't changed while we've been editing it.
         try {
             editor.showStatus("Preparing to save " + filename + "...");
-            if (file.exists() && isOutOfDateWithRespectToDisk()) {
-                if (showPatchAndAskForConfirmation("Overwrite", "Overwrite the currently saved version of \"" + file.getName() + "\"? (Equivalent to applying the following patch.)", false) == false) {
+            if (Files.exists(path) && isOutOfDateWithRespectToDisk()) {
+                if (showPatchAndAskForConfirmation("Overwrite", "Overwrite the currently saved version of \"" + path.getFileName() + "\"? (Equivalent to applying the following patch.)", false) == false) {
                     return false;
                 }
             }
@@ -659,8 +660,8 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         
         // Try to save a backup copy first. Ideally, we should do this from
         // a timer and always have a recent backup around.
-        File backupFile = FileUtilities.fileFromString(this.filename + ".bak");
-        if (file.exists()) {
+        Path backupFile = FileUtilities.pathFrom(this.filename + ".bak");
+        if (Files.exists(path)) {
             try {
                 editor.showStatus("Saving backup copy of " + filename + "...");
                 writeToFile(backupFile);
@@ -676,12 +677,12 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
             editor.showStatus("Saving " + filename + "...");
             // The file may be a symbolic link on a CIFS server.
             // In this case, it's important that we write into the original file rather than creating a new one.
-            writeToFile(file);
+            writeToFile(path);
             buffer.getUndoBuffer().setCurrentStateClean();
             getTitleBar().repaint();
             editor.showStatus("Saved " + filename);
-            backupFile.delete();
-            this.lastModifiedTime = file.lastModified();
+            Files.delete(backupFile);
+            this.lastModifiedTime = Files.getLastModifiedTime(path);
             configureForGuessedFileType();
             updateWatermarkAndTitleBar();
             tagsUpdater.updateTags();
@@ -695,7 +696,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         return false;
     }
     
-    private void writeToFile(File file) {
+    private void writeToFile(Path path) {
         if (getFileType() != FileType.PLAIN_TEXT) {
             if (Evergreen.getInstance().getPreferences().getBoolean(EvergreenPreferences.REFORMAT_ON_SAVE)) {
                 ReformatFileAction.reformat(this);
@@ -703,7 +704,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
                 doBasicFormattingFixes();
             }
         }
-        textArea.getTextBuffer().writeToFile(file);
+        textArea.getTextBuffer().writeToFile(path.toFile());
     }
     
     private void doBasicFormattingFixes() {
