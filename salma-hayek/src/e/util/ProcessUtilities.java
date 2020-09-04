@@ -2,6 +2,7 @@ package e.util;
 
 import java.io.*;
 import java.lang.reflect.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.regex.*;
 import org.jessies.os.*;
@@ -337,9 +338,9 @@ public class ProcessUtilities {
             // If we want to reopen terminals in the directory they were in when closed,
             // or otherwise "bookmark" them, then we need to canonicalize on all platforms.
             // Matt Hillsdon's Eclipse embedding does this and Costantino mentioned it too.
-            File directory = FileUtilities.fileFromString(path).getCanonicalFile();
+            Path directory = FileUtilities.pathFrom(path).toRealPath();
             // If Terminator can't start a process with this as the cwd, then it's no use to us.
-            if (directory.canRead()) {
+            if (Files.isReadable(directory)) {
                 return directory.toString();
             }
         } catch (IOException ignored) {

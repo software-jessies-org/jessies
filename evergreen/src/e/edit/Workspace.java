@@ -99,8 +99,7 @@ public class Workspace extends JPanel {
     private void updateTabForWorkspace() {
         JTabbedPane tabbedPane = (JTabbedPane) SwingUtilities.getAncestorOfClass(JTabbedPane.class, this);
         if (tabbedPane != null) {
-            final File rootDirectory = FileUtilities.fileFromString(getRootDirectory());
-            final boolean rootDirectoryValid = rootDirectory.exists() && rootDirectory.isDirectory();
+            final boolean rootDirectoryValid = Files.isDirectory(getRootPath());
             final int openFileCount = leftColumn.getTextWindows().size() + getInitialFileCount();
             
             String tabTitle = getWorkspaceName();
@@ -123,10 +122,14 @@ public class Workspace extends JPanel {
         return rootDirectory;
     }
     
+    public Path getRootPath() {
+        return FileUtilities.pathFrom(rootDirectory);
+    }
+    
     public void setRootDirectory(String newRootDirectory) {
         this.rootDirectory = FileUtilities.getUserFriendlyName(newRootDirectory);
         try {
-            this.canonicalRootDirectory = FileUtilities.fileFromString(rootDirectory).getCanonicalPath() + File.separator;
+            this.canonicalRootDirectory = getRootPath().toRealPath() + File.separator;
         } catch (IOException ex) {
             Log.warn("Failed to cache canonical root directory for workspace \"" + workspaceName + "\" with new root \"" + rootDirectory + "\"", ex);
         }
