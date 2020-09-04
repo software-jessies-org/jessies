@@ -2,13 +2,13 @@ package e.edit;
 
 import e.util.*;
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.regex.*;
-import org.jessies.os.*;
 
-public class FileIgnorer implements FileFinder.Filter {
+public class FileIgnorer {
     /** The tree we're responsible for, or null. */
-    private final File rootDirectory;
+    private final Path rootDirectory;
     
     /** Extensions of files that shouldn't be indexed. */
     private final List<String> ignoredExtensions;
@@ -16,48 +16,22 @@ public class FileIgnorer implements FileFinder.Filter {
     /** Names of directories that shouldn't be entered when indexing. */
     private final Pattern uninterestingDirectoryNames;
     
-    // Whether to include symbolic links even if the link's file name is the same as that of the target.
-    private boolean includeAllSymbolicLinks = false;
-    
-    public FileIgnorer() {
-        this(null);
-    }
-    
-    public FileIgnorer(File rootDirectory) {
+    public FileIgnorer(Path rootDirectory) {
         this.rootDirectory = rootDirectory;
         this.uninterestingDirectoryNames = makeUninterestingDirectoryPattern();
         this.ignoredExtensions = Collections.unmodifiableList(makeIgnoredExtensions());
     }
     
-    public FileIgnorer includeAllSymbolicLinks(boolean includeAllSymbolicLinks) {
-        this.includeAllSymbolicLinks = includeAllSymbolicLinks;
-        return this;
+    public boolean acceptFile(Path path) {
+        return !isIgnored(path, false);
     }
     
-    private boolean isSymbolicLinkAcceptable(File file) {
-        if (includeAllSymbolicLinks) {
-            return true;
-        }
-        try {
-            // Ignoring symbolic links with different file names misleadingly suggests that name isn't available.
-            return file.getCanonicalFile().getName().equals(file.getName()) == false;
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-}
-    
-    // FileFinder.Filter API.
-    public boolean acceptFile(File file, Stat stat) {
-        return !isIgnored(file, false) && (!stat.isSymbolicLink() || isSymbolicLinkAcceptable(file));
+    public boolean enterDirectory(Path path) {
+        return !isIgnored(path, true);
     }
     
-    // FileFinder.Filter API.
-    public boolean enterDirectory(File directory, Stat stat) {
-        return !isIgnored(directory, true) && (!stat.isSymbolicLink() || isSymbolicLinkAcceptable(directory));
-    }
-    
-    private boolean isIgnored(File file, boolean isDirectory) {
-        String filename = file.getName();
+    private boolean isIgnored(Path path, boolean isDirectory) {
+        String filename = path.getFileName().toString();
         // FIXME: if it were cheap, we'd use File.isHidden. But it's unnecessarily expensive on Unix and not obviously useful on Windows.
         // (Subversion for Windows doesn't use the hidden bit for its .svn directories, for example.)
         if (filename.startsWith(".") || filename.endsWith("~")) {
@@ -118,7 +92,7 @@ public class FileIgnorer implements FileFinder.Filter {
         String[] command = ProcessUtilities.makeShellCommandArray(scriptName);
         ArrayList<String> errors = new ArrayList<>();
         // Try to run any site-local script.
-        ProcessUtilities.backQuote(rootDirectory, command, lines, errors);
+        ProcessUtilities.backQuote(rootDirectory.toFile(), command, lines, errors);
     }
     
     /**

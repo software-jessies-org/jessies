@@ -66,7 +66,7 @@ public class WorkspaceFileList {
     }
     
     private synchronized void updateFileIgnorer() {
-        fileIgnorer = new FileIgnorer(FileUtilities.fileFromString(workspace.getRootDirectory()));
+        fileIgnorer = new FileIgnorer(workspace.getRootPath());
     }
     
     public void ensureInFileList(String pathWithinWorkspace) {
@@ -175,7 +175,7 @@ public class WorkspaceFileList {
                 Files.walkFileTree(workspaceRoot.toPath(), EnumSet.of(FileVisitOption.FOLLOW_LINKS), MAX_DIR_DEPTH, new SimpleFileVisitor<Path>() {
                     @Override
                     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
-                        if (fileIgnorer.enterDirectory(dir.toFile(), new Stat())) {
+                        if (fileIgnorer.enterDirectory(dir)) {
                             return FileVisitResult.CONTINUE;
                         }
                         return FileVisitResult.SKIP_SUBTREE;
@@ -183,7 +183,7 @@ public class WorkspaceFileList {
                     
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                        if (fileIgnorer.acceptFile(file.toFile(), new Stat())) {
+                        if (fileIgnorer.acceptFile(file)) {
                             result.add(file.toString().substring(prefixCharsToSkip));
                         }
                         return FileVisitResult.CONTINUE;
