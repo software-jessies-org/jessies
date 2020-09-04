@@ -128,11 +128,11 @@ public class WorkspaceFileList {
     }
     
     private class FileListUpdater extends SwingWorker<ArrayList<String>, Object> {
-        private final File workspaceRoot;
+        private final Path workspaceRoot;
         private final int prefixCharsToSkip;
         
         public FileListUpdater() {
-            this.workspaceRoot = FileUtilities.fileFromString(workspace.getRootDirectory());
+            this.workspaceRoot = FileUtilities.pathFrom(workspace.getRootDirectory());
             // All children of the root will start with a '/', which we don't want to be part of the name.
             this.prefixCharsToSkip = workspaceRoot.toString().length() + 1;
             fireListeners(false);
@@ -172,7 +172,7 @@ public class WorkspaceFileList {
                 // 'FOLLOW_LINKS', we end up with the BasicFileAttributes of the linked-to thing, and
                 // there's no obvious way of knowing whether we got there via a link or not.
                 // Think about this.
-                Files.walkFileTree(workspaceRoot.toPath(), EnumSet.of(FileVisitOption.FOLLOW_LINKS), MAX_DIR_DEPTH, new SimpleFileVisitor<Path>() {
+                Files.walkFileTree(workspaceRoot, EnumSet.of(FileVisitOption.FOLLOW_LINKS), MAX_DIR_DEPTH, new SimpleFileVisitor<Path>() {
                     @Override
                     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
                         if (fileIgnorer.enterDirectory(dir)) {
