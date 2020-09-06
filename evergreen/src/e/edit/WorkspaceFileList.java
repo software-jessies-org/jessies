@@ -1,7 +1,6 @@
 package e.edit;
 
 import e.util.*;
-import org.jessies.os.Stat;
 import java.awt.*;
 import java.nio.charset.*;
 import java.nio.file.*;
