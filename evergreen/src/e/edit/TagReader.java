@@ -113,11 +113,23 @@ public class TagReader {
     }
     
     private void readTagsFile(Path tagsFile) throws IOException {
+        ValidHeaderChecker checker = new ValidHeaderChecker();
         try (Stream<String> stream = Files.lines(tagsFile)) {
-            // Note: this used to check that the first line starts with "!_TAG_". This is probably
-            // not necessary, so we're dropping it for now. If it turns out to be important, put
-            // the check back again.
-            stream.forEach(v -> processTagLine(v));
+            stream.forEach(v -> checker.processLine(v));
+        }
+    }
+    
+    public class ValidHeaderChecker {
+        private boolean checkedHeader = false;
+        public void processLine(String line) {
+            if (!checkedHeader) {
+                if (!line.startsWith("!_TAG_")) {
+                    throw new RuntimeException("The tags file didn't have a valid header.");
+                }
+                checkedHeader = true;
+                return;
+            }
+            processTagLine(line);
         }
     }
     
