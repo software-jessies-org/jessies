@@ -1,6 +1,6 @@
 package e.edit;
 
-import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 import e.ptextarea.*;
 import e.util.*;
@@ -14,7 +14,7 @@ public class PerlDocumentationResearcher implements WorkspaceResearcher {
         
         ArrayList<String> lines = new ArrayList<>();
         ArrayList<String> errors = new ArrayList<>();
-        File tmp = new File(System.getProperty("java.io.tmpdir"));
+        Path tmp = Paths.get(System.getProperty("java.io.tmpdir"));
         int status = ProcessUtilities.backQuote(tmp, ProcessUtilities.makeShellCommandArray(perldoc + " -u -f " + string + " | pod2html"), lines, errors);
         String result = StringUtilities.join(lines, "\n");
         

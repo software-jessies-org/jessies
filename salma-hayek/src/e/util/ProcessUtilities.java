@@ -50,9 +50,10 @@ public class ProcessUtilities {
         return arguments;
     }
     
-    private static Process exec(final List<String> command, final File directory) throws Exception {
+    private static Process exec(final List<String> command, final Path directory) throws Exception {
         String[] commandArray = prependCygwinShell(command).toArray(new String[command.size()]);
-        return Runtime.getRuntime().exec(commandArray, null, directory);
+        File dirAsFile = (directory == null) ? null : directory.toFile();
+        return Runtime.getRuntime().exec(commandArray, null, dirAsFile);
     }
     
     /**
@@ -60,7 +61,7 @@ public class ProcessUtilities {
      * Lines written to standard output are appended to 'lines'.
      * Lines written to standard error are appended to 'errors'.
      */
-    public static int backQuote(final File directory, final String[] command, final String input, final ArrayList<String> lines, final ArrayList<String> errors) {
+    public static int backQuote(final Path directory, final String[] command, final String input, final ArrayList<String> lines, final ArrayList<String> errors) {
         if (lines == null) {
             throw new IllegalArgumentException("ArrayList 'lines' may not be null");
         }
@@ -71,7 +72,7 @@ public class ProcessUtilities {
     }
     
     // Tens of users were written before we supported providing input.
-    public static int backQuote(final File directory, final String[] command, final ArrayList<String> lines, final ArrayList<String> errors) {
+    public static int backQuote(final Path directory, final String[] command, final ArrayList<String> lines, final ArrayList<String> errors) {
         return backQuote(directory, command, "", lines, errors);
     }
     
@@ -82,7 +83,7 @@ public class ProcessUtilities {
      *
      * If directory is null, the subprocess inherits our working directory.
      */
-    public static int backQuote(final File directory, final String[] commandArray, final String input, final LineListener outputLineListener, final LineListener errorLineListener) {
+    public static int backQuote(final Path directory, final String[] commandArray, final String input, final LineListener outputLineListener, final LineListener errorLineListener) {
         return runCommand(directory, commandArray, null, input, outputLineListener, errorLineListener);
     }
     
@@ -94,7 +95,7 @@ public class ProcessUtilities {
      * 
      * If directory is null, the subprocess inherits our working directory.
      */
-    public static int runCommand(final File directory, final String[] commandArray, final ProcessListener processListener, final String input, final LineListener outputLineListener, final LineListener errorLineListener) {
+    public static int runCommand(final Path directory, final String[] commandArray, final ProcessListener processListener, final String input, final LineListener outputLineListener, final LineListener errorLineListener) {
         List<String> command = Arrays.asList(commandArray);
         int status = 1; // FIXME: should we signal "something went wrong" more distinctively?
         try {
@@ -157,7 +158,7 @@ public class ProcessUtilities {
         }
     }
 
-    public static Process spawn(final File directory, String... command) {
+    public static Process spawn(final Path directory, String... command) {
         return spawn(directory, command, null);
     }
     
@@ -166,7 +167,7 @@ public class ProcessUtilities {
      * The Process corresponding to the command is returned.
      * 'listener' may be null, but if supplied will be notified when the process starts and exits.
      */
-    public static Process spawn(final File directory, final String[] commandArray, final ProcessListener listener) {
+    public static Process spawn(final Path directory, final String[] commandArray, final ProcessListener listener) {
         final List<String> command = Arrays.asList(commandArray);
         final String quotedCommand = shellQuotedFormOf(command);
         Process result = null;
@@ -279,7 +280,7 @@ public class ProcessUtilities {
         }
         ArrayList<String> result = new ArrayList<>();
         // Try to put the command in its own process group, so it's easier to kill it and its children.
-        File setsidBinary = FileUtilities.findSupportBinary("setsid");
+        Path setsidBinary = FileUtilities.findSupportBinary("setsid");
         if (setsidBinary != null) {
             result.add(setsidBinary.toString());
         } else if (OS.isWindows() && FileUtilities.findOnPath(shell) == null) {

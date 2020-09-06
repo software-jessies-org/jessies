@@ -325,7 +325,7 @@ public class TagsUpdater {
                 }
                 String charsetName = (String) getTextArea().getTextBuffer().getProperty(PTextBuffer.CHARSET_PROPERTY);
                 final File inputFile = (temporaryFile != null) ? temporaryFile : FileUtilities.fileFromString(textWindow.getFilename());
-                TagReader tagReader = new TagReader(inputFile, fileType, charsetName, this);
+                TagReader tagReader = new TagReader(inputFile.toPath(), fileType, charsetName, this);
             } catch (Exception ex) {
                 Evergreen.getInstance().getTagsPanel().showError("Couldn't make tags: " + ex.getMessage());
                 Log.warn("Couldn't make tags", ex);

@@ -434,11 +434,11 @@ public class FileUtilities {
         return System.getProperty("org.jessies.supportRoot") + File.separator + "lib" + File.separator + "scripts" + File.separator + script;
     }
     
-    public static File findSupportBinary(String binaryName) {
+    public static Path findSupportBinary(String binaryName) {
         String fileName = mapBinaryName(binaryName);
         String directory = System.getProperty("org.jessies.binaryDirectory");
-        File path = new File(directory, fileName);
-        if (path.exists() && path.canExecute()) {
+        Path path = Paths.get(directory, fileName);
+        if (Files.isExecutable(path)) {
             return path;
         }
         return null;

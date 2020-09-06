@@ -91,7 +91,7 @@ public class FileIgnorer {
         String[] command = ProcessUtilities.makeShellCommandArray(scriptName);
         ArrayList<String> errors = new ArrayList<>();
         // Try to run any site-local script.
-        ProcessUtilities.backQuote(rootDirectory.toFile(), command, lines, errors);
+        ProcessUtilities.backQuote(rootDirectory, command, lines, errors);
     }
     
     /**

@@ -2,6 +2,7 @@ package e.util;
 
 import e.ptextarea.FileType;
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.regex.*;
 
@@ -43,7 +44,7 @@ public class SpellingChecker {
     /** Establishes the connection to ispell, if possible. */
     private SpellingChecker() {
         // On Mac OS, we want to use the system's spelling checker, so try our NSSpell utility (which gives Apple's code an ispell-like interface) first.
-        File nsSpellBinary = FileUtilities.findSupportBinary("NSSpell");
+        Path nsSpellBinary = FileUtilities.findSupportBinary("NSSpell");
         if (nsSpellBinary != null && connectTo(new String[] { nsSpellBinary.toString(), "-a" })) {
             return;
         }

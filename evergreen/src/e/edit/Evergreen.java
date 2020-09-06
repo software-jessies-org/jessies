@@ -270,18 +270,23 @@ public class Evergreen {
         }
         filename = normalizeWorkspacePrefix(filename);
         filename = FileUtilities.getUserFriendlyName(filename);
+        Path path = FileUtilities.pathFrom(filename);
         
         // Refuse to open directories.
-        if (FileUtilities.fileFromString(filename).isDirectory()) {
+        if (Files.isDirectory(path)) {
             throw new RuntimeException("\"" + filename + "\" is a directory and so cannot be edited with Evergreen.");
         }
         
         // Limit ourselves (rather arbitrarily) to files under half a gigabyte. That's quite a strain on us, at present.
-        final int KB = 1024;
-        final int MB = 1024 * KB;
-        long fileLength = FileUtilities.fileFromString(filename).length();
-        if (fileLength > 512 * MB) {
-            throw new RuntimeException("The file \"" + filename + "\", which is " + fileLength + " bytes long is too large. This file will not be opened.");
+        try {
+            final int KB = 1024;
+            final int MB = 1024 * KB;
+            long fileLength = Files.size(path);
+            if (fileLength > 512 * MB) {
+                throw new RuntimeException("The file \"" + filename + "\", which is " + fileLength + " bytes long is too large. This file will not be opened.");
+            }
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
         
         // Find which workspace this file is on/should be on, and make it visible.

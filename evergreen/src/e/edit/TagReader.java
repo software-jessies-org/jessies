@@ -4,8 +4,10 @@ import e.ptextarea.FileType;
 import e.util.*;
 import java.awt.Color;
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.regex.*;
+import java.util.stream.*;
 
 public class TagReader {
     private static final Pattern TAG_LINE_PATTERN = Pattern.compile("([^\t]+)\t(?:[^\t])+\t(\\d+);\"\t(\\w)(?:\t(.*))?");
@@ -15,20 +17,27 @@ public class TagReader {
     private FileType fileType;
     private String charsetName;
     
-    public TagReader(File file, FileType fileType, String charsetName, TagListener tagListener) {
+    public TagReader(Path file, FileType fileType, String charsetName, TagListener tagListener) {
         this.listener = tagListener;
         this.fileType = fileType;
         this.charsetName = charsetName;
         
-        File tagsFile = null;
+        Path tagsFile = null;
         try {
-            tagsFile = createTagsFileFor(file);
+            // Create the tagsFile here, then pass it in, rather than relying on createTagsFile to do
+            // the actual creation. This allows us to know when the tagsFile is present (it's not null),
+            // rather than it potentially existing but the tag generation failed. So we can delete it
+            // in exactly one place.
+            tagsFile = Files.createTempFile("e.edit.TagReader-tags-", ".tags");
+            createTagsFile(file, tagsFile);
             readTagsFile(tagsFile);
         } catch (Exception ex) {
             listener.taggingFailed(ex);
         } finally {
             if (tagsFile != null) {
-                tagsFile.delete();
+                try {
+                    Files.delete(tagsFile);
+                } catch (IOException ex) {}
             }
         }
     }
@@ -44,10 +53,7 @@ public class TagReader {
         return "ctags";
     }
     
-    private File createTagsFileFor(File file) throws IOException {
-        File tagsFile = File.createTempFile("e.edit.TagReader-tags-", ".tags");
-        tagsFile.deleteOnExit();
-        
+    private void createTagsFile(Path file, Path tagsFile) throws IOException {
         ArrayList<String> command = new ArrayList<>();
         command.add(chooseCtagsBinary());
         command.add("--c++-types=+p");
@@ -60,17 +66,16 @@ public class TagReader {
             command.add("--language-force=" + ctagsLanguageForFileType(fileType));
         }
         command.add("-f");
-        command.add(tagsFile.getAbsolutePath());
-        command.add(file.getAbsolutePath());
+        command.add(tagsFile.toString());
+        command.add(file.toAbsolutePath().toString());
         
         ArrayList<String> errors = new ArrayList<>();
-        ProcessUtilities.backQuote(tagsFile.getParentFile(), command.toArray(new String[command.size()]), errors, errors);
+        ProcessUtilities.backQuote(tagsFile.getParent(), command.toArray(new String[command.size()]), errors, errors);
         // We're not actually expecting anything on stdout or stderr from ctags.
         // All the more reason to output anything it has to say!
         for (String error : errors) {
             Log.warn("ctags: " + error);
         }
-        return tagsFile;
     }
     
     public static String ctagsLanguageForFileType(FileType fileType) {
@@ -107,32 +112,17 @@ public class TagReader {
         }
     }
     
-    private void readTagsFile(File tagsFile) throws IOException {
-        BufferedReader reader = null;
+    private void readTagsFile(Path tagsFile) throws IOException {
+        Stream<String> stream = null;
         try {
-            reader = new BufferedReader(new InputStreamReader(new FileInputStream(tagsFile), charsetName));
-            String line;
-            boolean foundValidHeader = false;
-            while ((line = reader.readLine()) != null && line.startsWith("!_TAG_")) {
-                foundValidHeader = true;
-                //TODO: check the tags file is sorted? of a suitable version?
-            }
-            if (foundValidHeader == false) {
-                throw new RuntimeException("The tags file didn't have a valid header.");
-            }
-
-            if (line != null) {
-                do {
-                    processTagLine(line);
-                } while ((line = reader.readLine()) != null);
-            }
+            // Note: this used to check that the first line starts with "!_TAG_". This is probably
+            // not necessary, so we're dropping it for now. If it turns out to be important, put
+            // the check back again.
+            stream = Files.lines(tagsFile);
+            stream.forEach(v -> processTagLine(v));
         } finally {
-            try {
-                if (reader != null) {
-                    reader.close();
-                }
-            } catch (IOException ignored) {
-                // What can we do? Nothing.
+            if (stream != null) {
+                stream.close();
             }
         }
     }
