@@ -165,15 +165,6 @@ public class WorkspaceFileList {
             
             ArrayList<String> result = new ArrayList<>();
             try {
-                // TODO: In calls to fileIgnorer here, we send an empty Stat. This means that, if
-                // the file or dir is actually accessed via a symlink, the fileIgnorer is not told.
-                // We may wish to revisit this, particularly for directories, as it makes little sense
-                // to index the contents of a dir twice. On the other hand, who would do such a thing?
-                // Is filtering that out really useful?
-                // Some investigation will be needed to determine how to check for symlinks, as using
-                // 'FOLLOW_LINKS', we end up with the BasicFileAttributes of the linked-to thing, and
-                // there's no obvious way of knowing whether we got there via a link or not.
-                // Think about this.
                 Files.walkFileTree(workspaceRoot, EnumSet.of(FileVisitOption.FOLLOW_LINKS), MAX_DIR_DEPTH, new SimpleFileVisitor<Path>() {
                     @Override
                     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
