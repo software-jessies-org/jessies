@@ -113,17 +113,11 @@ public class TagReader {
     }
     
     private void readTagsFile(Path tagsFile) throws IOException {
-        Stream<String> stream = null;
-        try {
+        try (Stream<String> stream = Files.lines(tagsFile)) {
             // Note: this used to check that the first line starts with "!_TAG_". This is probably
             // not necessary, so we're dropping it for now. If it turns out to be important, put
             // the check back again.
-            stream = Files.lines(tagsFile);
             stream.forEach(v -> processTagLine(v));
-        } finally {
-            if (stream != null) {
-                stream.close();
-            }
         }
     }
     
