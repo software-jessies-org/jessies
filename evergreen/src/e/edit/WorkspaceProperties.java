@@ -4,6 +4,7 @@ import e.forms.*;
 import e.gui.*;
 import e.util.*;
 import java.io.*;
+import java.nio.file.*;
 import javax.swing.*;
 
 /**
@@ -45,7 +46,7 @@ public class WorkspaceProperties {
                 name = nameField.getText();
                 if (name.trim().length() == 0) {
                     // Default the visible workspace name to the leafname of the workspace root.
-                    name = FileUtilities.fileFromString(pathname).getName();
+                    name = FileUtilities.pathFrom(pathname).getFileName().toString();
                 }
                 rootDirectory = pathname;
                 buildTarget = buildTargetField.getText();
@@ -56,15 +57,19 @@ public class WorkspaceProperties {
     }
     
     private boolean checkPathnameIsDirectory(String pathname) {
-        File proposedDirectory = FileUtilities.fileFromString(pathname);
-        if (proposedDirectory.exists() == false) {
+        Path proposedDirectory = FileUtilities.pathFrom(pathname);
+        if (Files.exists(proposedDirectory) == false) {
             boolean createDirectory = Evergreen.getInstance().askQuestion("Create directory?", "The directory \"" + proposedDirectory + "\" doesn't exist. We can either create the directory for you, or you can go back and re-type the pathname.", "Create");
             if (createDirectory == false) {
                 return false;
             }
-            proposedDirectory.mkdirs();
+            try {
+                Files.createDirectories(proposedDirectory);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
             return true;
-        } else if (proposedDirectory.isDirectory() == false) {
+        } else if (Files.isDirectory(proposedDirectory) == false) {
             Evergreen.getInstance().showAlert("Not a directory", "The path \"" + pathname + "\" exists but does not refer to a directory.");
             return false;
         }

@@ -510,7 +510,9 @@ public class Evergreen {
             return;
         }
         
-        workspace.getFileListCacheFile().delete();
+        try {
+            Files.delete(workspace.getFileListCachePath());
+        } catch (IOException ex) {}
         
         // Removing the workspace from the index stops its windows from being moved to another workspace.
         tabbedPane.remove(workspace);

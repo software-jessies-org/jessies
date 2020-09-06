@@ -3,12 +3,14 @@ package e.edit;
 import e.util.*;
 import org.jessies.os.Stat;
 import java.awt.*;
+import java.nio.charset.*;
 import java.nio.file.*;
 import java.nio.file.attribute.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
 import java.util.regex.*;
+import java.util.stream.*;
 import javax.swing.*;
 
 public class WorkspaceFileList {
@@ -27,8 +29,9 @@ public class WorkspaceFileList {
         this.workspace = workspace;
         try {
             ArrayList<String> result = new ArrayList<>();
-            result.addAll(Arrays.asList(StringUtilities.readLinesFromFile(workspace.getFileListCacheFile())));
-            fileList = result;
+            Stream<String> lines = Files.lines(workspace.getFileListCachePath());
+            lines.forEach(v -> result.add(v));
+            lines.close();
         } catch (Exception ex) {
             // Nothing we can do. Probably just didn't exist.
         }
@@ -196,17 +199,16 @@ public class WorkspaceFileList {
                         return FileVisitResult.CONTINUE;
                     }
                 });
+                Evergreen.getInstance().showStatus("Scan of workspace \"" + workspace.getWorkspaceName() + "\" complete (" + result.size() + " files)");
+                
+                final long t1 = System.nanoTime();
+                Files.write(workspace.getFileListCachePath(), result, StandardCharsets.UTF_8);
+                final long t2 = System.nanoTime();
+                
+                Log.warn("Scan of workspace \"" + workspace.getWorkspaceName() + "\" took " + TimeUtilities.nsToString(t1 - t0) + " (plus " + TimeUtilities.nsToString(t2 - t1) + " to update cache); found " + result.size() + " files.");
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
-            
-            Evergreen.getInstance().showStatus("Scan of workspace \"" + workspace.getWorkspaceName() + "\" complete (" + result.size() + " files)");
-            
-            final long t1 = System.nanoTime();
-            StringUtilities.writeFile(workspace.getFileListCacheFile(), result);
-            final long t2 = System.nanoTime();
-            
-            Log.warn("Scan of workspace \"" + workspace.getWorkspaceName() + "\" took " + TimeUtilities.nsToString(t1 - t0) + " (plus " + TimeUtilities.nsToString(t2 - t1) + " to update cache); found " + result.size() + " files.");
             return result;
         }
         

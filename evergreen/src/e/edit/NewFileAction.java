@@ -5,6 +5,8 @@ import e.gui.*;
 import e.util.*;
 import java.awt.event.*;
 import java.io.*;
+import java.nio.charset.*;
+import java.nio.file.*;
 import java.util.*;
 import javax.swing.*;
 
@@ -55,26 +57,25 @@ public class NewFileAction extends AbstractAction {
 
     private boolean createNewFile(String filename) {
         Evergreen editor = Evergreen.getInstance();
-        File newFile = FileUtilities.fileFromString(filename);
+        Path newFile = FileUtilities.pathFrom(filename);
         try {
             if (newFile.isAbsolute() == false) {
                 // A new file, if no absolute path is specified, should be
                 // created relative to the root of the current workspace.
-                newFile = FileUtilities.fileFromParentAndString(editor.getCurrentWorkspace().getRootDirectory(), filename);
+                newFile = FileUtilities.pathFrom(editor.getCurrentWorkspace().getRootDirectory(), filename);
             }
-            File directory = newFile.getParentFile();
-            if (directory.exists() == false) {
+            Path directory = newFile.getParent();
+            if (Files.exists(directory) == false) {
                 boolean createDirectory = editor.askQuestion("Create directory?", "The directory \"" + directory + "\" doesn't exist. We can either create the directory for you, or you can go back and re-type the filename.", "Create");
                 if (createDirectory == false) {
                     return false;
                 }
-                directory.mkdirs();
+                Files.createDirectories(directory);
             }
-            boolean created = newFile.createNewFile();
-            if (created) {
-                fillWithInitialContents(newFile);
-            } else {
+            if (Files.exists(newFile)) {
                 editor.showAlert("Couldn't create new file", "File \"" + newFile + "\" already exists.");
+            } else {
+                createWithInitialContents(newFile);
             }
             editor.openFile(newFile.toString());
             return true;
@@ -84,17 +85,13 @@ public class NewFileAction extends AbstractAction {
         }
     }
     
-    private void fillWithInitialContents(File file) {
+    private void createWithInitialContents(Path file) throws IOException {
         // FIXME: we could use FileType.guessFileTypeByFilename to allow the user to specify scripts that override a single type. YAGNI.
         String defaultBoilerplateGenerator = Evergreen.getResourceFilename("lib", "scripts", "evergreen-boilerplate-generator");
         String boilerplateGenerator = Parameters.getString("boilerplateGenerator", defaultBoilerplateGenerator);
         
         ArrayList<String> lines = new ArrayList<>();
-        int status = ProcessUtilities.backQuote(null, new String[] { boilerplateGenerator, file.toString() }, lines, lines);
-        
-        String result = StringUtilities.writeFile(file, lines);
-        if (result != null) {
-            Evergreen.getInstance().showAlert("Couldn't fill new file", "There was a problem filling \"" + file + "\" with initial content: " + result + ".");
-        }
+        ProcessUtilities.backQuote(null, new String[] { boilerplateGenerator, file.toString() }, lines, lines);
+        Files.write(file, lines, StandardCharsets.UTF_8);
     }
 }

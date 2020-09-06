@@ -2,6 +2,7 @@ package e.edit;
 
 import java.io.*;
 import java.net.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.jar.*;
 import java.util.regex.*;
@@ -52,9 +53,9 @@ public class JavaDoc {
         ArrayList<URL> urls = new ArrayList<>();
         for (String classPathItem : Parameters.getListOfSemicolonSeparatedElements("java.advisor.classpath")) {
             if (classPathItem.length() > 0) {
-                File classpath = FileUtilities.fileFromString(classPathItem);
+                Path classpath = FileUtilities.pathFrom(classPathItem);
                 try {
-                    urls.add(classpath.toURI().toURL());
+                    urls.add(classpath.toUri().toURL());
                     findPackagesIn(classpath);
                 } catch (MalformedURLException ex) {
                     Log.warn("Bad URL on java.advisor.classpath (" + classpath + ")", ex);
@@ -96,8 +97,8 @@ public class JavaDoc {
     * Registers all the packages in a classpath element, either by scanning a jar file or
     * by finding the names of all interesting subdirectories..
     */
-    public static void findPackagesIn(File classpath) {
-        String path = classpath.getAbsolutePath();
+    public static void findPackagesIn(Path classpath) {
+        String path = classpath.toAbsolutePath().toString();
         if (path.endsWith(".jar")) {
             addPackagesInJarFile(classpath);
         } else {
@@ -109,24 +110,28 @@ public class JavaDoc {
     * Finds all the directories below the starting directory that haven't been marked as uninteresting,
     * and adds their names to the list of known packages.
     */
-    public static void addPackagesInDirectory(File startingDirectory, String classpath) {
-        if (startingDirectory.isDirectory() == false) { return; }
-        for (File file : startingDirectory.listFiles()) {
-            if (file.isDirectory()) {
-                String packageName = file.getAbsolutePath().substring(classpath.length() + 1).replace(File.separatorChar, '.');
-                packageNames.add(packageName);
-                addPackagesInDirectory(file, classpath);
-            }
+    public static void addPackagesInDirectory(Path startingDirectory, String classpath) {
+        if (Files.isDirectory(startingDirectory) == false) { return; }
+        try {
+            Files.list(startingDirectory)
+                .filter(v -> Files.isDirectory(v))
+                .forEach(v -> {
+                             String packageName = v.toAbsolutePath().toString().substring(classpath.length() + 1).replace(File.separatorChar, '.');
+                             packageNames.add(packageName);
+                             addPackagesInDirectory(v, classpath);
+                         });
+        } catch (IOException ex) {
+            Log.warn("Failed to add packages in dir " + startingDirectory + " / " + classpath, ex);
         }
     }
     
     /**
     * Learns the names of all the packages in a jar file.
     */
-    public static void addPackagesInJarFile(File jarFile) {
+    public static void addPackagesInJarFile(Path jarFile) {
         Log.warn("Scanning " + jarFile);
         try {
-            JarFile jar = new JarFile(jarFile);
+            JarFile jar = new JarFile(jarFile.toFile());
             for (Enumeration<JarEntry> e = jar.entries(); e.hasMoreElements(); ) {
                 ZipEntry entry = e.nextElement();
                 String name = entry.getName().replace('/', '.');
@@ -225,7 +230,7 @@ public class JavaDoc {
                     return link;
                 }
             } else {
-                if (FileUtilities.fileFromString(candidate).exists()) {
+                if (Files.exists(FileUtilities.pathFrom(candidate))) {
                     String link = formatAsDocLink("file://" + candidate, className, pkg, showPkg);
                     docLinks.put(className + "." + pkg + String.valueOf(showPkg), link);
                     return link;

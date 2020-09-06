@@ -72,10 +72,10 @@ public class Workspace extends JPanel {
         return fileList;
     }
     
-    public File getFileListCacheFile() {
+    public Path getFileListCachePath() {
         // TODO: we should probably have a standard way of escaping characters for safe use in the paths.
         String name = getWorkspaceName().replaceAll("[/\\\\]", " ");
-        return FileUtilities.fileFromString(Evergreen.getPreferenceFilename("cached-file-list-" + name));
+        return FileUtilities.pathFrom(Evergreen.getPreferenceFilename("cached-file-list-" + name));
     }
     
     public void dispose() {

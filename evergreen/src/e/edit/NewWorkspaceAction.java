@@ -22,7 +22,7 @@ public class NewWorkspaceAction extends AbstractAction {
             properties.buildTarget = workspace.getBuildTarget();
             ETextWindow textWindow = ETextAction.getFocusedTextWindow();
             if (textWindow != null) {
-                String friendlyDirectory = FileUtilities.getUserFriendlyName(FileUtilities.fileFromString(textWindow.getFilename()).getParent());
+                String friendlyDirectory = FileUtilities.getUserFriendlyName(FileUtilities.pathFrom(textWindow.getFilename()).getParent());
                 properties.rootDirectory = friendlyDirectory;
                 if (friendlyDirectory.startsWith(workspace.getRootDirectory())) {
                     int prefixCharsToSkip = workspace.getRootDirectory().length();
