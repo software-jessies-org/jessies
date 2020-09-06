@@ -27,11 +27,10 @@ public class WorkspaceFileList {
     
     public WorkspaceFileList(Workspace workspace) {
         this.workspace = workspace;
-        try {
+        try (Stream<String> stream = Files.lines(workspace.getFileListCachePath())) {
             ArrayList<String> result = new ArrayList<>();
-            Stream<String> lines = Files.lines(workspace.getFileListCachePath());
-            lines.forEach(v -> result.add(v));
-            lines.close();
+            stream.forEach(v -> result.add(v));
+            fileList = result;
         } catch (Exception ex) {
             // Nothing we can do. Probably just didn't exist.
         }

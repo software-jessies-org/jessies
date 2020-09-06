@@ -83,12 +83,10 @@ public class Parameters {
             if (!Files.exists(file)) {
                 return;
             }
-            try {
-                Stream<String> lines = Files.lines(file);
-                lines.map(v -> v.trim())
+            try (Stream<String> stream = Files.lines(file)) {
+                stream.map(v -> v.trim())
                     .filter(v -> !isCommentLine(v))
                     .forEach(v -> processPropertiesLine(v));
-                lines.close();
             } catch (IOException ex) {
                 Log.warn("Failed to read file", ex);
             }
