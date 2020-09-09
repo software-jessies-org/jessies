@@ -145,6 +145,9 @@ public class ExternalTools {
         boolean showOnPopUpMenu = false;
         
         for (String line : Files.readAllLines(file)) {
+            if (line == "" || line.startsWith("#")) {
+                continue;
+            }
             int equalsPos = line.indexOf('=');
             if (equalsPos == -1) {
                 // TODO: isn't this an error worth reporting?
