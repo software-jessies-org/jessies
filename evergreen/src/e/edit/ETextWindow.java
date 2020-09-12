@@ -687,6 +687,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
             updateWatermarkAndTitleBar();
             tagsUpdater.updateTags();
             SaveMonitor.getInstance().fireSaveListeners();
+            runSaveHook(path);
             return true;
         } catch (Exception ex) {
             editor.showStatus("");
@@ -694,6 +695,21 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
             Log.warn("Problem saving \"" + filename + "\"", ex);
         }
         return false;
+    }
+    
+    private void runSaveHook(Path path) {
+        String saveHook = Parameters.getString("saveHook", null);
+        if (saveHook == null) {
+            return;
+        }
+        ArrayList<String> output = new ArrayList<>();
+        ProcessUtilities.backQuote(null, new String[] { saveHook, path.toString() }, output, output);
+        if (!output.isEmpty()) {
+            Log.warn("SaveHook " + saveHook + " output:");
+            for (String line : output) {
+                Log.warn("  " + line);
+            }
+        }
     }
     
     private void writeToFile(Path path) {
