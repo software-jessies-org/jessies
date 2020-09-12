@@ -1007,6 +1007,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             
             PTextAreaRenderer renderer = new PTextAreaRenderer(this, (Graphics2D) oldGraphics);
             renderer.render();
+        } catch (Throwable th) {
+            Log.warn("PTextArea paint failed", th);
         } finally {
             getLock().relinquishReadLock();
         }
