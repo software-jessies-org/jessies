@@ -163,6 +163,18 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
         }
     }
     
+    // We implement the incremental update just by doing a full rescan. All we're doing is checking a
+    // regexp against a set of strings, so it should be quick anyway.
+    public void fileCreated(String filename) {
+        fileListStateChanged(true);
+    }
+    
+    public void fileChanged(String filename) {}
+    
+    public void fileDeleted(String filename) {
+        fileListStateChanged(true);
+    }
+    
     /**
      * Provides some visual feedback that we're rescanning.
      */

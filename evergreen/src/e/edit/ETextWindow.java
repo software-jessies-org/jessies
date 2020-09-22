@@ -686,7 +686,6 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
             configureForGuessedFileType();
             updateWatermarkAndTitleBar();
             tagsUpdater.updateTags();
-            SaveMonitor.getInstance().fireSaveListeners();
             runSaveHook(path);
             return true;
         } catch (Exception ex) {

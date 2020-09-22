@@ -14,7 +14,15 @@ public class FileAlterationMonitor {
     private String purpose;
     private WatchService watcher;
     private ArrayList<Listener> listeners = new ArrayList<>();
-    private HashSet<Path> addedPaths = new HashSet<>();
+    
+    // Map from registered path to the real (canonical) path.
+    private HashMap<Path, Path> realPaths = new HashMap<>();
+    
+    // Map from real (canonical) path to registered watch key.
+    private HashMap<Path, WatchKey> watchKeys = new HashMap<>();
+    
+    // Map from watch keys to the parent directories registered.
+    private HashMap<WatchKey, ArrayList<Path>> keyPaths = new HashMap<>();
     
     /**
      * Constructs a new file alteration monitor.
@@ -34,6 +42,7 @@ public class FileAlterationMonitor {
                 while (true) {
                     try {
                         WatchKey key = watcher.take();
+                        ArrayList<Path> parents = keyPaths.get(key);
                         HashSet<Path> done = new HashSet<>();
                         for (WatchEvent<?> event : key.pollEvents()) {
                             // Ugly, but safely casting in Java seems not to be possible (or at least, I've run out
@@ -41,11 +50,14 @@ public class FileAlterationMonitor {
                             @SuppressWarnings("unchecked")
                             WatchEvent<Path> pEvent = (WatchEvent<Path>)event;
                             Path path = pEvent.context();
-                            if (done.contains(path)) {
-                                continue;
+                            for (Path parent : parents) {
+                                Path fullPath = Paths.get(parent.toString(), path.toString());
+                                if (done.contains(fullPath)) {
+                                    continue;
+                                }
+                                done.add(fullPath);
+                                fireFileTouched(fullPath);
                             }
-                            done.add(path);
-                            fireFileTouched(path);
                         }
                         key.reset();
                     } catch (ClosedWatchServiceException ex) {
@@ -67,11 +79,22 @@ public class FileAlterationMonitor {
     /** Adds a directory to watch for changes (you can safely add the same path several times). */
     public synchronized void addPath(Path path) {
         try {
-            if (addedPaths.contains(path)) {
+            if (realPaths.containsKey(path)) {
+                return;  // Already registered.
+            }
+            Path realPath = path.toRealPath();
+            realPaths.put(path, realPath);
+            WatchKey key = watchKeys.get(realPath);
+            if (key != null) {
+                keyPaths.get(key).add(path);
                 return;
             }
-            path.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
-            addedPaths.add(path);
+            // We've never seen this real path before, so register.
+            key = path.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
+            watchKeys.put(realPath, key);
+            ArrayList<Path> onePath = new ArrayList<>();
+            onePath.add(path);
+            keyPaths.put(key, onePath);
         } catch (Exception ex) {
             Log.warn("Failed to watch (" + purpose + ") " + path.toString(), ex);
         }

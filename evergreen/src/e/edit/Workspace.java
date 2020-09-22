@@ -65,6 +65,9 @@ public class Workspace extends JPanel {
             public void fileListStateChanged(boolean newState) {
                 updateTabForWorkspace();
             }
+            public void fileCreated(String filename) {}
+            public void fileChanged(String filename) {}
+            public void fileDeleted(String filename) {}
         });
     }
     

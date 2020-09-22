@@ -82,6 +82,52 @@ public class WorkspaceFileList {
         if (Evergreen.getInstance().isInitialized()) updateFileList();
     }
     
+    /** Checks the status of changedPath, and updates our file list in place according to its state. */
+    private synchronized void partialUpdate(String changedPath) {
+        Path path = Paths.get(changedPath);
+        Path rootPath = FileUtilities.pathFrom(workspace.getRootDirectory());
+        String relativePath = rootPath.relativize(path).toString();
+        // NOTE: insertPoint is always negative here, because Collections.binarySearch only returns the
+        // index when the matching item is equivalent, rather than merely equal.
+        int insertPoint = Collections.binarySearch(fileList, relativePath, String.CASE_INSENSITIVE_ORDER);
+        insertPoint = (insertPoint < 0) ? (-1 - insertPoint) : insertPoint;
+        if (!Files.exists(path)) {
+            // Path has disappeared, so eliminate the given file, or if this was a directory, all
+            // the files underneath it.
+            // Note: while it'd be far more efficient to use 'removeRange', for some reason ArrayList
+            // makes that protected, so we have to remove them one by one.
+            while (insertPoint < fileList.size()) {
+                String entry = fileList.get(insertPoint);
+                if (!entry.equals(relativePath) && !entry.startsWith(relativePath + File.separator)) {
+                    break;
+                }
+                fileList.remove(insertPoint);
+                fireFileDeleted(entry);
+            }
+            return;
+        }
+        // Whatever this is (file or dir), it exists.
+        // If this is a normal, bog standard file, we just have to ensure it's in our file list.
+        // Nothing more needs doing.
+        if (Files.isRegularFile(path)) {
+            if (insertPoint < fileList.size() && !fileList.get(insertPoint).equals(relativePath)) {
+                // File isn't in our list yet. The insertPoint given is actually (-index-1), where index
+                // is the correct sorted insertion point.
+                int sizeBefore = fileList.size();
+                fileList.add(insertPoint, relativePath);
+                fireFileCreated(relativePath);
+            } else {
+                fireFileChanged(relativePath);
+            }
+            // Add a listener firing thing here, for the specific file.
+            return;
+        }
+        // This is either a new dir, or a symlink. In either case, just do a complete rescan. We could
+        // be cleverer about dealing with such situations, but they're probably rare enough that it's not
+        // worth writing the extra code to handle this case.
+        updateFileList();
+    }
+    
     /**
      * Fills the file list. It can take some time to scan for files, so we do
      * the job in the background. New requests that arrive while a scan is
@@ -121,11 +167,13 @@ public class WorkspaceFileList {
         fileAlterationMonitor = new FileAlterationMonitor(rootDirectory);
         fileAlterationMonitor.addListener(new FileAlterationMonitor.Listener() {
             public void fileTouched(String pathname) {
-                updateFileList();
+                // Ignore our own .bak files.
+                if (pathname.endsWith(".bak")) {
+                    return;
+                }
+                partialUpdate(pathname);
             }
         });
-        
-        fileAlterationMonitor.addPathname(rootDirectory);
     }
     
     private class FileListUpdater extends SwingWorker<ArrayList<String>, Object> {
@@ -168,6 +216,7 @@ public class WorkspaceFileList {
                     @Override
                     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
                         if (fileIgnorer.enterDirectory(dir)) {
+                            fileAlterationMonitor.addPath(dir);
                             return FileVisitResult.CONTINUE;
                         }
                         return FileVisitResult.SKIP_SUBTREE;
@@ -220,6 +269,45 @@ public class WorkspaceFileList {
         }
     }
     
+    private void fireFileCreated(final String filename) {
+        synchronized (listeners) {
+            for (final Listener l : listeners) {
+                // Ensure we're running on the EDT.
+                EventQueue.invokeLater(new Runnable() {
+                    public void run() {
+                        l.fileCreated(filename);
+                    }
+                });
+            }
+        }
+    }
+    
+    private void fireFileChanged(final String filename) {
+        synchronized (listeners) {
+            for (final Listener l : listeners) {
+                // Ensure we're running on the EDT.
+                EventQueue.invokeLater(new Runnable() {
+                    public void run() {
+                        l.fileChanged(filename);
+                    }
+                });
+            }
+        }
+    }
+    
+    private void fireFileDeleted(final String filename) {
+        synchronized (listeners) {
+            for (final Listener l : listeners) {
+                // Ensure we're running on the EDT.
+                EventQueue.invokeLater(new Runnable() {
+                    public void run() {
+                        l.fileDeleted(filename);
+                    }
+                });
+            }
+        }
+    }
+    
     public interface Listener {
         /**
          * Invoked to notify listeners of the file list state.
@@ -227,5 +315,23 @@ public class WorkspaceFileList {
          * This class ensures that you will be called back on the EDT.
          */
         public void fileListStateChanged(boolean isNowValid);
+
+        /**
+         * Invoked when a file has been created in an incremental update.
+         * The filename is the relative name under the workspace root.
+         */
+        public void fileCreated(String filename);
+
+        /**
+         * Invoked when a file has been changed in an incremental update.
+         * The filename is the relative name under the workspace root.
+         */
+        public void fileChanged(String filename);
+
+        /**
+         * Invoked when a file has been deleted in an incremental update.
+         * The filename is the relative name under the workspace root.
+         */
+        public void fileDeleted(String filename);
     }
 }
