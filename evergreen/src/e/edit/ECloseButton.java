@@ -3,6 +3,7 @@ package e.edit;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.*;
 
 public class ECloseButton extends EButton implements ActionListener {
     private EWindow window;
@@ -27,27 +28,14 @@ public class ECloseButton extends EButton implements ActionListener {
         return pressed ? DIRTY_COLOR.darker() : DIRTY_COLOR;
     }
 
-    public void paintCross(Graphics g, int x, int y) {
-        final int d = 2;
-        
-        // Top left.
-        g.fillRect(x, y, d, d);
-        g.fillRect(x + 1, y + 1, d, d);
-        
-        // Top right.
-        g.fillRect(x + 5, y + 1, d, d);
-        g.fillRect(x + 6, y, d, d);
-        
-        // Center.
-        g.fillRect(x + 2, y + 2, 2*d, 2*d);
-        
-        // Bottom left.
-        g.fillRect(x, y + 6, d, d);
-        g.fillRect(x + 1, y + 5, d, d);
-        
-        // Bottom right.
-        g.fillRect(x + 5, y + 5, d, d);
-        g.fillRect(x + 6, y + 6, d, d);
+    public void paintCross(Graphics oldGraphics, int x, int y) {
+        x = GuiUtilities.scaleSizeForText(x);
+        y = GuiUtilities.scaleSizeForText(y);
+        final int d = GuiUtilities.scaleSizeForText(2);
+        Graphics2D g = (Graphics2D) oldGraphics;
+        g.setStroke(new BasicStroke(d));
+        g.draw(new Line2D.Float(x, y, x * 2, y * 2));
+        g.draw(new Line2D.Float(x, y * 2, x * 2, y));
     }
     
     public void actionPerformed(ActionEvent e) {

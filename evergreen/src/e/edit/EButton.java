@@ -1,5 +1,6 @@
 package e.edit;
 
+import e.util.*;
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
@@ -52,7 +53,7 @@ public abstract class EButton extends JComponent implements ActionListener, Mous
     }
     
     public Dimension getPreferredSize() {
-        return new Dimension(20, 20);
+        return GuiUtilities.scaleDimensionForText(20, 20);
     }
     
     public Color getGlyphColor() {

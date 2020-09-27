@@ -33,7 +33,7 @@ public class ETitleBar extends JPanel {
         };
     }
     
-    public static final int TITLE_HEIGHT = 20;
+    public static final int TITLE_HEIGHT = GuiUtilities.scaleSizeForText(19);
     
     private final EWindow window;
     private final JLabel titleLabel;

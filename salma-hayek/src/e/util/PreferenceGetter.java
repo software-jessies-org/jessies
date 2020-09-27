@@ -27,7 +27,7 @@ public abstract class PreferenceGetter {
     }
     
     public Font getFont(String key) {
-        return (Font) get(key);
+        return GuiUtilities.applyFontScaling((Font) get(key));
     }
     
     public int getInt(String key) {

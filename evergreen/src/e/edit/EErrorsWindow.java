@@ -113,7 +113,7 @@ public class EErrorsWindow extends JFrame {
     
     public void initFont() {
         // Default to a fixed-pitch font in errors windows.
-        textArea.setFont(ChangeFontAction.getConfiguredFixedFont());
+        textArea.setScaledFont(ChangeFontAction.getConfiguredFixedFont());
     }
     
     private void initStatusBar() {

@@ -14,7 +14,7 @@ import javax.swing.event.*;
  * Note that you must call addComponent and not add, because our second parameter isn't an index or an abstract location, it's a y-coordinate.
  */
 public class EColumn extends JPanel {
-    private static final int MIN_HEIGHT = ETitleBar.TITLE_HEIGHT + 5;
+    private static final int MIN_HEIGHT = ETitleBar.TITLE_HEIGHT + 6;
     
     /**
      * Creates a new empty column.

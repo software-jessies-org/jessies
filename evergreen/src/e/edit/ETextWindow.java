@@ -149,7 +149,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     }
     
     private void initFont() {
-        textArea.setFont(ChangeFontAction.getAppropriateFontForContent(textArea.getTextBuffer()));
+        textArea.setScaledFont(ChangeFontAction.getAppropriateFontForContent(textArea.getTextBuffer()));
     }
     
     public void updateStatusLine() {

@@ -454,6 +454,12 @@ public class GuiUtilities {
         return new Dimension(width, height);
     }
     
+    public static int scaleSizeForText(int size) {
+        float scale = isGtk() ? getGtkTextScale() : 1.0f;
+        size = (int) (size * scale);
+        return size;
+    }
+    
     /**
      * Overrides AWT's default guess of what to use as our windows' WM_CLASS.
      * 
