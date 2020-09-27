@@ -88,6 +88,10 @@ public class FormDialog {
         dialog.setVisible(true);
     }
     
+    public boolean isShowing() {
+        return dialog.isShowing();
+    }
+    
     /**
      * Shows a dialog with a Cancel button, and a button with the given label.
      * See the note in the class documentation about why you shouldn't label

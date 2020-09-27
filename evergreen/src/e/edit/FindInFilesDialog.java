@@ -47,6 +47,10 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
     /** Holds all the UI. The actual "dialog" is in here! */
     private final FormBuilder form;
     
+    private boolean isShowing() {
+        return form.getFormDialog().isShowing();
+    }
+    
     public interface ClickableTreeItem {
         public void open();
     }
@@ -486,7 +490,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
     }
     
     public void fileCreated(String filename) {
-        if (!isDesiredFilename(filename)) {
+        if (!isShowing() || !isDesiredFilename(filename)) {
             return;
         }
         try {
@@ -565,7 +569,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
     }
     
     public void fileDeleted(String filename) {
-        if (!isDesiredFilename(filename)) {
+        if (!isShowing() || !isDesiredFilename(filename)) {
             return;
         }
         String[] pathElements = filename.split(Pattern.quote(File.separator));
