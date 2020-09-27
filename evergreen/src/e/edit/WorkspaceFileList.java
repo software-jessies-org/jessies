@@ -110,9 +110,8 @@ public class WorkspaceFileList {
         // If this is a normal, bog standard file, we just have to ensure it's in our file list.
         // Nothing more needs doing.
         if (Files.isRegularFile(path)) {
-            if (insertPoint < fileList.size() && !fileList.get(insertPoint).equals(relativePath)) {
-                // File isn't in our list yet. The insertPoint given is actually (-index-1), where index
-                // is the correct sorted insertion point.
+            if (insertPoint == fileList.size() || !fileList.get(insertPoint).equals(relativePath)) {
+                // File isn't in our list yet.
                 int sizeBefore = fileList.size();
                 fileList.add(insertPoint, relativePath);
                 fireFileCreated(relativePath);
