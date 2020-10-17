@@ -397,7 +397,7 @@ public class FormDialog {
      */
     public void cancelDialog() {
         processUserChoice(false);
-        EventQueue.invokeLater(cancelRunnable);
+        GuiUtilities.invokeLater(cancelRunnable);
     }
 
     private void processUserChoice(boolean isAcceptance) {
@@ -415,10 +415,8 @@ public class FormDialog {
             return;
         }
         // We want to restore focus to whichever component had it before we were shown, but we mustn't pass on focus until later because we may be here in response to a KeyEvent (such as the user hitting Return to accept the dialog), and it would be wrong for the original focus owner to process that event.
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                dialogFocusRedirector.restoreFocus();
-            }
+        GuiUtilities.invokeLater(() -> {
+            dialogFocusRedirector.restoreFocus();
         });
     }
     

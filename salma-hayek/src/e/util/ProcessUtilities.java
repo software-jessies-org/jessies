@@ -103,23 +103,19 @@ public class ProcessUtilities {
             if (processListener != null) {
                 processListener.processStarted(p);
             }
-            Thread inputWriterThread = new Thread(new Runnable() {
-                public void run() {
-                    try {
-                        BufferedWriter out = new BufferedWriter(new OutputStreamWriter(p.getOutputStream(), "UTF-8"));
-                        out.append(input);
-                        out.flush();
-                        out.close();
-                    } catch (Exception ex) {
-                        feedExceptionToLineListener(errorLineListener, ex);
-                    }
+            Thread inputWriterThread = new Thread(() -> {
+                try {
+                    BufferedWriter out = new BufferedWriter(new OutputStreamWriter(p.getOutputStream(), "UTF-8"));
+                    out.append(input);
+                    out.flush();
+                    out.close();
+                } catch (Exception ex) {
+                    feedExceptionToLineListener(errorLineListener, ex);
                 }
             }, "Process Input: " + shellQuotedFormOf(command));
             inputWriterThread.start();
-            Thread errorReaderThread = new Thread(new Runnable() {
-                public void run() {
-                    readLinesFromStream(errorLineListener, p.getErrorStream());
-                }
+            Thread errorReaderThread = new Thread(() -> {
+                readLinesFromStream(errorLineListener, p.getErrorStream());
             }, "Process Back-Quote: " + shellQuotedFormOf(command));
             errorReaderThread.start();
             readLinesFromStream(outputLineListener, p.getInputStream());

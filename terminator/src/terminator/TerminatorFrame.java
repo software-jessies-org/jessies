@@ -278,17 +278,15 @@ public class TerminatorFrame extends JFrame implements TerminalPaneHost {
             // do this later because otherwise Swing seems to give
             // the focus to the tab itself, rather than the
             // component on the tab.
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    if (tabbedPane == null) {
-                        return;
-                    }
-                    Component terminal = tabbedPane.getSelectedComponent();
-                    if (terminal == null) {
-                        return;
-                    }
-                    terminal.requestFocus();
+            GuiUtilities.invokeLater(() -> {
+                if (tabbedPane == null) {
+                    return;
                 }
+                Component terminal = tabbedPane.getSelectedComponent();
+                if (terminal == null) {
+                    return;
+                }
+                terminal.requestFocus();
             });
         }
     }

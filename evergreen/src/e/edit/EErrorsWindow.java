@@ -125,7 +125,7 @@ public class EErrorsWindow extends JFrame {
     }
     
     public void taskDidStart(Process process) {
-        EventQueue.invokeLater(new ClearRunnable());
+        GuiUtilities.invokeLater(new ClearRunnable());
         this.process = process;
         killButton.setEnabled(true);
     }
@@ -134,17 +134,15 @@ public class EErrorsWindow extends JFrame {
         killButton.setEnabled(false);
         this.process = null;
         if (exitStatus == 0) {
-            Thread waitThenHide = new Thread(new Runnable() {
-                public void run() {
-                    // Add a short pause before hiding, so the user gets chance to see that everything went okay.
-                    try {
-                        Thread.sleep(500);
-                    } catch (Exception ex) {
-                    }
-                    // Now hide.
-                    // We invokeLater because append does, and we might need to catch up with pending output before hiding.
-                    EventQueue.invokeLater(new HideRunnable());
+            Thread waitThenHide = new Thread(() -> {
+                // Add a short pause before hiding, so the user gets chance to see that everything went okay.
+                try {
+                    Thread.sleep(500);
+                } catch (Exception ex) {
                 }
+                // Now hide.
+                // We invokeLater because append does, and we might need to catch up with pending output before hiding.
+                GuiUtilities.invokeLater(new HideRunnable());
             });
             waitThenHide.start();
         }
@@ -303,12 +301,12 @@ public class EErrorsWindow extends JFrame {
     }
     
     public void appendLines(boolean isStdErr, List<String> lines) {
-        EventQueue.invokeLater(new AppendRunnable(isStdErr, lines));
+        GuiUtilities.invokeLater(new AppendRunnable(isStdErr, lines));
     }
     
     public void clearErrors() {
-        EventQueue.invokeLater(new ClearRunnable());
-        EventQueue.invokeLater(new HideRunnable());
+        GuiUtilities.invokeLater(new ClearRunnable());
+        GuiUtilities.invokeLater(new HideRunnable());
     }
     
     public synchronized void enableAutoScroll() {

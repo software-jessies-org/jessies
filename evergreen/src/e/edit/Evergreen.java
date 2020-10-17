@@ -539,12 +539,7 @@ public class Evergreen {
      * changes observable, so it's down to us to be careful.
      */
     public void workspaceConfigurationDidChange() {
-        Thread thread = new Thread(new Runnable() {
-            public void run() {
-                rememberState();
-            }
-        });
-        thread.start();
+        new Thread(() -> { rememberState(); }).start();
         
         // Make sure every file is on the most suitable workspace.
         for (Workspace workspace : getWorkspaces()) {
@@ -820,10 +815,8 @@ public class Evergreen {
     private void initTabbedPaneLazyInitializer() {
         final ChangeListener firstExposureListener = new ChangeListener() {
             public void stateChanged(final ChangeEvent e) {
-                EventQueue.invokeLater(new Runnable() {
-                    public void run() {
-                        getCurrentWorkspace().handlePossibleFirstExposure();
-                    }
+                GuiUtilities.invokeLater(() -> {
+                    getCurrentWorkspace().handlePossibleFirstExposure();
                 });
             }
         };
@@ -891,50 +884,44 @@ public class Evergreen {
         
         initialState.configureTagsPanel();
         
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                if (tabbedPane.getTabCount() == 0) {
-                    // If we didn't create any workspaces, give the user some help...
-                    showAlert("Welcome to Evergreen!", "This looks like the first time you've used Evergreen. You'll need to create a workspace for each project you wish to work on.<p>Choose \"New Workspace...\" from the the \"Workspace\" menu.<p>You can create as many workspaces as you like, but you'll need at least one to be able to do anything.");
-                } else {
-                    initTabbedPaneLazyInitializer();
+        GuiUtilities.invokeLater(() -> {
+            if (tabbedPane.getTabCount() == 0) {
+                // If we didn't create any workspaces, give the user some help...
+                showAlert("Welcome to Evergreen!", "This looks like the first time you've used Evergreen. You'll need to create a workspace for each project you wish to work on.<p>Choose \"New Workspace...\" from the the \"Workspace\" menu.<p>You can create as many workspaces as you like, but you'll need at least one to be able to do anything.");
+            } else {
+                initTabbedPaneLazyInitializer();
+            }
+            
+            Thread initializationDetectionThread = new Thread(() -> {
+                final long sleepStartNs = System.nanoTime();
+                try {
+                    // What I really want to say is "wait until the event queue is empty and everything's caught up".
+                    // I haven't yet found out how to do that, and the fact that using EventQueue.invokeLater here doesn't achieve the desired effect makes me think that what I want might not be that simple anyway.
+                    // Seemingly, though, if we run at MIN_PRIORITY, we don't get much of a look-in until the EDT is idle anyway.
+                    // Hans Muller's got code to wait for the event queue to clear: https://appframework.dev.java.net/source/browse/appframework/trunk/AppFramework/src/application/Application.java?rev=36&view=auto&content-type=text/vnd.viewcvs-markup
+                    // Until that's available as GPL/LGPL, or as part of the JDK, here's a simpler alternative that's good enough for our purposes here.
+                    EventQueue queue = Toolkit.getDefaultToolkit().getSystemEventQueue();
+                    while (queue.peekEvent() != null) {
+                        Thread.sleep(100);
+                    }
+                } catch (InterruptedException ex) {
                 }
                 
-                Thread initializationDetectionThread = new Thread(new Runnable() {
-                    public void run() {
-                        final long sleepStartNs = System.nanoTime();
-                        try {
-                            // What I really want to say is "wait until the event queue is empty and everything's caught up".
-                            // I haven't yet found out how to do that, and the fact that using EventQueue.invokeLater here doesn't achieve the desired effect makes me think that what I want might not be that simple anyway.
-                            // Seemingly, though, if we run at MIN_PRIORITY, we don't get much of a look-in until the EDT is idle anyway.
-                            // Hans Muller's got code to wait for the event queue to clear: https://appframework.dev.java.net/source/browse/appframework/trunk/AppFramework/src/application/Application.java?rev=36&view=auto&content-type=text/vnd.viewcvs-markup
-                            // Until that's available as GPL/LGPL, or as part of the JDK, here's a simpler alternative that's good enough for our purposes here.
-                            EventQueue queue = Toolkit.getDefaultToolkit().getSystemEventQueue();
-                            while (queue.peekEvent() != null) {
-                                Thread.sleep(100);
-                            }
-                        } catch (InterruptedException ex) {
-                        }
-                        
-                        final long sleepEndNs = System.nanoTime();
-                        Log.warn("Workers free to start after " + TimeUtilities.nsToString(sleepEndNs - t0) + " (slept for " + TimeUtilities.nsToString(sleepEndNs - sleepStartNs) + ").");
-                        startSignal.countDown();
-                    }
-                });
-                initializationDetectionThread.setPriority(Thread.MIN_PRIORITY);
-                initializationDetectionThread.start();
-            }
+                final long sleepEndNs = System.nanoTime();
+                Log.warn("Workers free to start after " + TimeUtilities.nsToString(sleepEndNs - t0) + " (slept for " + TimeUtilities.nsToString(sleepEndNs - sleepStartNs) + ").");
+                startSignal.countDown();
+            });
+            initializationDetectionThread.setPriority(Thread.MIN_PRIORITY);
+            initializationDetectionThread.start();
         });
     }
     
     public static void main(final String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                GuiUtilities.initLookAndFeel();
-                final Evergreen editor = Evergreen.getInstance();
-                for (String arg : args) {
-                    editor.openFile(arg);
-                }
+        GuiUtilities.invokeLater(() -> {
+            GuiUtilities.initLookAndFeel();
+            final Evergreen editor = Evergreen.getInstance();
+            for (String arg : args) {
+                editor.openFile(arg);
             }
         });
     }

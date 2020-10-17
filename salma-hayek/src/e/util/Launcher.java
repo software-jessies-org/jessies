@@ -21,12 +21,10 @@ public class Launcher {
         for (int i = 2; i < arguments.length; ++i) {
             appArguments.add(arguments[i]);
         }
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                GuiUtilities.initLookAndFeel();
-                app.parseCommandLine(appArguments);
-                app.startGui();
-            }
+        GuiUtilities.invokeLater(() -> {
+            GuiUtilities.initLookAndFeel();
+            app.parseCommandLine(appArguments);
+            app.startGui();
         });
     }
 }

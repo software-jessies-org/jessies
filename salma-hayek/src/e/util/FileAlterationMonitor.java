@@ -37,35 +37,33 @@ public class FileAlterationMonitor {
             Log.warn("Failed to start file watcher for " + purpose, ex);
             return;
         }
-        new Thread(new Runnable() {
-            public void run() {
-                while (true) {
-                    try {
-                        WatchKey key = watcher.take();
-                        ArrayList<Path> parents = keyPaths.get(key);
-                        HashSet<Path> done = new HashSet<>();
-                        for (WatchEvent<?> event : key.pollEvents()) {
-                            // Ugly, but safely casting in Java seems not to be possible (or at least, I've run out
-                            // of patience trying to figure out the relevant magic). This is always going to be a Path.
-                            @SuppressWarnings("unchecked")
+        new Thread(() -> {
+            while (true) {
+                try {
+                    WatchKey key = watcher.take();
+                    ArrayList<Path> parents = keyPaths.get(key);
+                    HashSet<Path> done = new HashSet<>();
+                    for (WatchEvent<?> event : key.pollEvents()) {
+                        // Ugly, but safely casting in Java seems not to be possible (or at least, I've run out
+                        // of patience trying to figure out the relevant magic). This is always going to be a Path.
+                        @SuppressWarnings("unchecked")
                             WatchEvent<Path> pEvent = (WatchEvent<Path>)event;
-                            Path path = pEvent.context();
-                            for (Path parent : parents) {
-                                Path fullPath = Paths.get(parent.toString(), path.toString());
-                                if (done.contains(fullPath)) {
-                                    continue;
-                                }
-                                done.add(fullPath);
-                                fireFileTouched(fullPath);
+                        Path path = pEvent.context();
+                        for (Path parent : parents) {
+                            Path fullPath = Paths.get(parent.toString(), path.toString());
+                            if (done.contains(fullPath)) {
+                                continue;
                             }
+                            done.add(fullPath);
+                            fireFileTouched(fullPath);
                         }
-                        key.reset();
-                    } catch (ClosedWatchServiceException ex) {
-                        // This only happens when the watcher is shut down.
-                        return;
-                    } catch (InterruptedException ex) {
-                        Log.warn("Interrupted file monitor " + purpose, ex);
                     }
+                    key.reset();
+                } catch (ClosedWatchServiceException ex) {
+                    // This only happens when the watcher is shut down.
+                    return;
+                } catch (InterruptedException ex) {
+                    Log.warn("Interrupted file monitor " + purpose, ex);
                 }
             }
         }, "FileAlterationMonitor for " + purpose).start();

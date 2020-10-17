@@ -62,32 +62,12 @@ public class Advisor extends JPanel {
 
             // Run all the researchers' initialization code in parallel.
             final ExecutorService executor = ThreadUtilities.newFixedThreadPool(8, "initResearchersOnBackgroundThread");
-            executor.execute(new Runnable() {
-                public void run() {
-                    newResearchers.add(JavaResearcher.getSharedInstance());
-                }
-            });
-            executor.execute(new Runnable() {
-                public void run() {
-                    newResearchers.add(new ManPageResearcher());
-                }
-            });
-            executor.execute(new Runnable() {
-                public void run() {
-                    newResearchers.add(new PerlDocumentationResearcher());
-                }
-            });
-            executor.execute(new Runnable() {
-                public void run() {
-                    newResearchers.add(new PythonDocumentationResearcher());
-                }
-            });
-            executor.execute(new Runnable() {
-                public void run() {
-                    newResearchers.add(new RubyDocumentationResearcher());
-                }
-            });
-
+            executor.execute(() -> { newResearchers.add(JavaResearcher.getSharedInstance()); });
+            executor.execute(() -> { newResearchers.add(new ManPageResearcher()); });
+            executor.execute(() -> { newResearchers.add(new PerlDocumentationResearcher()); });
+            executor.execute(() -> { newResearchers.add(new PythonDocumentationResearcher()); });
+            executor.execute(() -> { newResearchers.add(new RubyDocumentationResearcher()); });
+            
             // That's all we want to do with this executor.
             executor.shutdown();
             // But we don't want to unlock the collection until we've finished filling it!
@@ -238,10 +218,8 @@ public class Advisor extends JPanel {
                 }
             }
             // Hand it on to the file-opening code to work out what to do with it.
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    Evergreen.getInstance().openFile(link);
-                }
+            GuiUtilities.invokeLater(() -> {
+                Evergreen.getInstance().openFile(link);
             });
             return null;
         }

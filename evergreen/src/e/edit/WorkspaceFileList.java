@@ -259,11 +259,7 @@ public class WorkspaceFileList {
         synchronized (listeners) {
             for (final Listener l : listeners) {
                 // Ensure we're running on the EDT.
-                EventQueue.invokeLater(new Runnable() {
-                    public void run() {
-                        l.fileListStateChanged(isNowValid);
-                    }
-                });
+                GuiUtilities.invokeLater(() -> { l.fileListStateChanged(isNowValid); });
             }
         }
     }
@@ -272,11 +268,7 @@ public class WorkspaceFileList {
         synchronized (listeners) {
             for (final Listener l : listeners) {
                 // Ensure we're running on the EDT.
-                EventQueue.invokeLater(new Runnable() {
-                    public void run() {
-                        l.fileCreated(filename);
-                    }
-                });
+                GuiUtilities.invokeLater(() -> { l.fileCreated(filename); });
             }
         }
     }
@@ -285,11 +277,7 @@ public class WorkspaceFileList {
         synchronized (listeners) {
             for (final Listener l : listeners) {
                 // Ensure we're running on the EDT.
-                EventQueue.invokeLater(new Runnable() {
-                    public void run() {
-                        l.fileChanged(filename);
-                    }
-                });
+                GuiUtilities.invokeLater(() -> { l.fileChanged(filename); });
             }
         }
     }
@@ -298,11 +286,7 @@ public class WorkspaceFileList {
         synchronized (listeners) {
             for (final Listener l : listeners) {
                 // Ensure we're running on the EDT.
-                EventQueue.invokeLater(new Runnable() {
-                    public void run() {
-                        l.fileDeleted(filename);
-                    }
-                });
+                GuiUtilities.invokeLater(() -> { l.fileDeleted(filename); });
             }
         }
     }

@@ -103,12 +103,10 @@ public class StringHistory {
         
         // Make sure that we don't write to disk off the EDT.
         // FIXME: this relies on the calling code not calling us too frequently; a timer might be a better idea.
-        executor.execute(new Runnable() {
-            public void run() {
-                String error = StringUtilities.writeFile(FileUtilities.fileFromString(filename), history);
-                if (error != null) {
-                    Log.warn("Failed to write history to file \"" + filename + "\" (" + error + ").");
-                }
+        executor.execute(() -> {
+            String error = StringUtilities.writeFile(FileUtilities.fileFromString(filename), history);
+            if (error != null) {
+                Log.warn("Failed to write history to file \"" + filename + "\" (" + error + ").");
             }
         });
     }

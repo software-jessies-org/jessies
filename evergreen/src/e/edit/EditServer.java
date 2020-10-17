@@ -25,10 +25,8 @@ public final class EditServer {
         workspaceProperties.name = workspaceName;
         workspaceProperties.rootDirectory = workspaceRoot;
         
-        EventQueue.invokeAndWait(new Runnable() {
-            public void run() {
-                editor.createWorkspace(workspaceProperties);
-            }
+        EventQueue.invokeAndWait(() -> {
+            editor.createWorkspace(workspaceProperties);
         });
     }
     
@@ -40,10 +38,8 @@ public final class EditServer {
             return;
         }
         
-        EventQueue.invokeAndWait(new Runnable() {
-            public void run() {
-                editor.closeWorkspace(workspace);
-            }
+        EventQueue.invokeAndWait(() -> {
+            editor.closeWorkspace(workspace);
         });
     }
     

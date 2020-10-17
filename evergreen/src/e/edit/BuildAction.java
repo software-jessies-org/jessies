@@ -91,14 +91,6 @@ public class BuildAction extends ETextAction {
             return;
         }
         
-        tool.invoke(workspace, directory, test, new Runnable() {
-            public void run() {
-                building = true;
-            }
-        }, new Runnable() {
-            public void run() {
-                building = false;
-            }
-        });
+        tool.invoke(workspace, directory, test, () -> { building = true; }, () -> { building = false; });
     }
 }

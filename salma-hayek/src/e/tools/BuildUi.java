@@ -288,18 +288,12 @@ public class BuildUi extends JFrame {
     }
     
     public void startBuild() {
-        ThreadUtilities.newSingleThreadExecutor("build runner").execute(new Runnable() {
-            public void run() {
-                final ProcessUtilities.ProcessListener processListener = new ProcessListener();
-                final ProcessUtilities.LineListener stdoutListener = new LineListener();
-                final ProcessUtilities.LineListener stderrListener = stdoutListener; // FIXME: differentiate the two streams. different colors?
-                final int status = ProcessUtilities.runCommand(null, ProcessUtilities.makeShellCommandArray(command), processListener, "", stdoutListener, stderrListener);
-                EventQueue.invokeLater(new Runnable() {
-                    public void run() {
-                        buildFinished(status);
-                    }
-                });
-            }
+        ThreadUtilities.newSingleThreadExecutor("build runner").execute(() -> {
+            final ProcessUtilities.ProcessListener processListener = new ProcessListener();
+            final ProcessUtilities.LineListener stdoutListener = new LineListener();
+            final ProcessUtilities.LineListener stderrListener = stdoutListener; // FIXME: differentiate the two streams. different colors?
+            final int status = ProcessUtilities.runCommand(null, ProcessUtilities.makeShellCommandArray(command), processListener, "", stdoutListener, stderrListener);
+            GuiUtilities.invokeLater(() -> { buildFinished(status); });
         });
     }
     
@@ -332,10 +326,8 @@ public class BuildUi extends JFrame {
     private class ProcessListener implements ProcessUtilities.ProcessListener {
         public void processStarted(Process process) {
             runningProcess = process;
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    currentActionLabel.setText("Child started...");
-                }
+            GuiUtilities.invokeLater(() -> {
+                currentActionLabel.setText("Child started...");
             });
         }
         
@@ -420,7 +412,7 @@ public class BuildUi extends JFrame {
             }
             
             final String appendableLine = line + "\n";
-            EventQueue.invokeLater(new UiUpdater(appendableLine, newPercentage, newCurrentAction, isError || copyingMultiLineError));
+            GuiUtilities.invokeLater(new UiUpdater(appendableLine, newPercentage, newCurrentAction, isError || copyingMultiLineError));
         }
     }
     
@@ -463,13 +455,11 @@ public class BuildUi extends JFrame {
         }
         final String command = rest.get(0);
         
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                GuiUtilities.initLookAndFeel();
-                final BuildUi ui = new BuildUi(options, command);
-                ui.setVisible(true);
-                ui.startBuild();
-            }
+        GuiUtilities.invokeLater(() -> {
+            GuiUtilities.initLookAndFeel();
+            final BuildUi ui = new BuildUi(options, command);
+            ui.setVisible(true);
+            ui.startBuild();
         });
     }
 }

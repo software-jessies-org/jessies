@@ -132,10 +132,8 @@ public class EPopupMenu {
     
     private void showPopupMenuLater(final MouseEvent e) {
         try {
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    showPopupMenu(e);
-                }
+            GuiUtilities.invokeLater(() -> {
+                showPopupMenu(e);
             });
         } catch (Exception ex) {
             Log.warn("Exception while trying to show pop-up menu", ex);

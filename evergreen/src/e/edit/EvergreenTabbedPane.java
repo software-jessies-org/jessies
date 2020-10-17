@@ -49,11 +49,9 @@ public class EvergreenTabbedPane extends TabbedPane {
      */
     private static class WorkspaceFocuser implements ChangeListener {
         public void stateChanged(ChangeEvent e) {
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    Evergreen.getInstance().getTagsPanel().ensureTagsAreHidden();
-                    Evergreen.getInstance().getCurrentWorkspace().restoreFocusToRememberedTextWindow();
-                }
+            GuiUtilities.invokeLater(() -> {
+                Evergreen.getInstance().getTagsPanel().ensureTagsAreHidden();
+                Evergreen.getInstance().getCurrentWorkspace().restoreFocusToRememberedTextWindow();
             });
         }
     }

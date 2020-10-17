@@ -173,11 +173,9 @@ public class PTextAreaSpellingChecker implements PTextListener, MenuItemProvider
      * it can take a second or more for a large file.
      */
     public void checkSpelling() {
-        new Thread(new Runnable() {
-            public void run() {
-                PTextBuffer buffer = component.getTextBuffer();
-                checkSpelling(buffer, 0, buffer.length());
-            }
+        new Thread(() -> {
+            PTextBuffer buffer = component.getTextBuffer();
+            checkSpelling(buffer, 0, buffer.length());
         }, "Spell-Checker Thread").start();
     }
     

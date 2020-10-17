@@ -255,11 +255,9 @@ public class TerminatorTabbedPane extends TabbedPane {
         public void stateChanged(ChangeEvent e) {
             final JTerminalPane selected = (JTerminalPane) getSelectedComponent();
             if (selected != null) {
-                EventQueue.invokeLater(new Runnable() {
-                    public void run() {
-                        selected.requestFocus();
-                        selected.getHost().updateFrameTitle();
-                    }
+                GuiUtilities.invokeLater(() -> {
+                    selected.requestFocus();
+                    selected.getHost().updateFrameTitle();
                 });
             }
         }

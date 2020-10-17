@@ -62,7 +62,7 @@ public class ShellCommand {
         
         process = makeProcessBuilder().start();
 
-        EventQueue.invokeLater(launchRunnable);
+        GuiUtilities.invokeLater(launchRunnable);
         
         errorsWindow.showStatus("Started task \"" + command + "\"");
         errorsWindow.taskDidStart(process);
@@ -252,7 +252,7 @@ public class ShellCommand {
         errorsWindow.taskDidExit(exitStatus);
         
         // Run any user-specified completion code.
-        EventQueue.invokeLater(completionRunnable);
+        GuiUtilities.invokeLater(completionRunnable);
     }
     
     /**

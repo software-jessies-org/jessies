@@ -195,11 +195,7 @@ public class Workspace extends JPanel {
             window.ensureSufficientlyVisible();
             ETextWindow textWindow = (ETextWindow) window;
             textWindow.jumpToAddress(address);
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    window.requestFocus();
-                }
-            });
+            GuiUtilities.invokeLater(() -> { window.requestFocus(); });
             return window;
         }
         return null;
@@ -227,19 +223,11 @@ public class Workspace extends JPanel {
         leftColumn.addComponent(viewer, y);
         if (address != null) {
             final ETextWindow textWindow = (ETextWindow) viewer;
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    textWindow.jumpToAddress(address);
-                }
-            });
+            GuiUtilities.invokeLater(() -> { textWindow.jumpToAddress(address); });
         }
         
         if (Evergreen.getInstance().isInitialized()) {
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    viewer.requestFocus();
-                }
-            });
+            GuiUtilities.invokeLater(() -> { viewer.requestFocus(); });
         }
         return viewer;
     }
@@ -351,11 +339,7 @@ public class Workspace extends JPanel {
     
     public void restoreFocusToRememberedTextWindow() {
         if (rememberedTextWindow != null) {
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    rememberedTextWindow.requestFocus();
-                }
-            });
+            GuiUtilities.invokeLater(() -> { rememberedTextWindow.requestFocus(); });
         }
     }
     

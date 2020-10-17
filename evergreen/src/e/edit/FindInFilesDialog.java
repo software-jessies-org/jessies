@@ -131,12 +131,10 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
             // around a visual glitch in the absence of an approved means of
             // invalidating the JTree UI delegate's layout cache. Having the
             // source is one of the things that makes Java great!
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    matchView.setRootVisible(true);
-                    matchView.setRootVisible(false);
-                    matchView.repaint();
-                }
+            GuiUtilities.invokeLater(() -> {
+                matchView.setRootVisible(true);
+                matchView.setRootVisible(false);
+                matchView.repaint();
             });
         }
         
@@ -675,11 +673,9 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
     }
     
     private void setStatus(final String message, final boolean isError) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                status.setForeground(isError ? Color.RED : Color.BLACK);
-                status.setText(message);
-            }
+        GuiUtilities.invokeLater(() -> {
+            status.setForeground(isError ? Color.RED : Color.BLACK);
+            status.setText(message);
         });
     }
     
@@ -701,17 +697,9 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         formPanel.addRow("Whose Names Match:", filenameRegexField);
         formPanel.addWideRow(PatternUtilities.addRegularExpressionHelpToComponent(status));
         formPanel.addWideRow(new JScrollPane(matchView));
-        form.setTypingTimeoutActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                showMatches();
-            }
-        });
+        form.setTypingTimeoutActionListener((e) -> { showMatches(); });
         form.getFormDialog().setExtraButton(rescanButton);
-        form.getFormDialog().setCancelRunnable(new Runnable() {
-            public void run() {
-                stopOutstandingWork();
-            }
-        });
+        form.getFormDialog().setCancelRunnable(() -> { stopOutstandingWork(); });
         form.getFormDialog().setAcceptCallable(new java.util.concurrent.Callable<Boolean>() {
             public Boolean call() {
                 stopOutstandingWork();

@@ -20,23 +20,17 @@ public abstract class AbstractFindDialog {
         form.setStatusBar(findStatus);
         FormPanel formPanel = form.getFormPanel();
         formPanel.addRow("Find:", PatternUtilities.addRegularExpressionHelpToComponent(findField));
-        form.setTypingTimeoutActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    findField.setForeground(UIManager.getColor("TextField.foreground"));
-                    int matchCount = updateFindResults(findField.getText());
-                    findStatus.setText("Matches: " + matchCount);
-                } catch (java.util.regex.PatternSyntaxException ex) {
-                    findField.setForeground(Color.RED);
-                    findStatus.setText(ex.getDescription());
-                }
+        form.setTypingTimeoutActionListener((e) -> {
+            try {
+                findField.setForeground(UIManager.getColor("TextField.foreground"));
+                int matchCount = updateFindResults(findField.getText());
+                findStatus.setText("Matches: " + matchCount);
+            } catch (java.util.regex.PatternSyntaxException ex) {
+                findField.setForeground(Color.RED);
+                findStatus.setText(ex.getDescription());
             }
         });
-        form.getFormDialog().setCancelRunnable(new Runnable() {
-            public void run() {
-                clearFindResults();
-            }
-        });
+        form.getFormDialog().setCancelRunnable(() -> { clearFindResults(); });
         form.showNonModal();
         
         findField.selectAll();

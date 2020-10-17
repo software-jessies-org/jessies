@@ -603,18 +603,16 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     }
     
     public void setFont(final Font font) {
-        runWithoutMovingTheVisibleArea(new Runnable() {
-            public void run() {
-                PTextArea.super.setFont(font);
-                getLock().getWriteLock();
-                try {
-                    cacheFontMetrics();
-                    canShowRightHandMargin = GuiUtilities.isFontFixedWidth(font);
-                    lines.invalidateWidths();
-                    revalidateLineWrappings();
-                } finally {
-                    getLock().relinquishWriteLock();
-                }
+        runWithoutMovingTheVisibleArea(() -> {
+            PTextArea.super.setFont(font);
+            getLock().getWriteLock();
+            try {
+                cacheFontMetrics();
+                canShowRightHandMargin = GuiUtilities.isFontFixedWidth(font);
+                lines.invalidateWidths();
+                revalidateLineWrappings();
+            } finally {
+                getLock().relinquishWriteLock();
             }
         });
         repaint();
@@ -1114,11 +1112,7 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     /** Only for use by class Rewrapper. */
     void rewrap() {
         if (isShowing()) {
-            runWithoutMovingTheVisibleArea(new Runnable() {
-                public void run() {
-                    revalidateLineWrappings();
-                }
-            });
+            runWithoutMovingTheVisibleArea(() -> { revalidateLineWrappings(); });
         }
     }
     

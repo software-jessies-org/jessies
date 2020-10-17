@@ -271,10 +271,8 @@ public class TerminalControl {
 
         // If it wasn't a pane close that caused us to get here, close the pane.
         if (processHasBeenDestroyed == false) {
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    pane.doCloseAction();
-                }
+            GuiUtilities.invokeLater(() -> {
+                pane.doCloseAction();
             });
         }
     }
@@ -332,15 +330,13 @@ public class TerminalControl {
         try {
             flowControl.acquire();
             didAcquire = true;
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    try {
-                        model.processActions(actions);
-                    } catch (Throwable th) {
-                        Log.warn("Couldn't process terminal actions for " + ptyProcess, th);
-                    } finally {
-                        flowControl.release();
-                    }
+            GuiUtilities.invokeLater(() -> {
+                try {
+                    model.processActions(actions);
+                } catch (Throwable th) {
+                    Log.warn("Couldn't process terminal actions for " + ptyProcess, th);
+                } finally {
+                    flowControl.release();
                 }
             });
         } catch (Throwable th) {
@@ -592,16 +588,14 @@ public class TerminalControl {
     }
     
     public void sendUtf8String(final String s) {
-        writerExecutor.execute(new Runnable() {
-            public void run() {
-                try {
-                    if (processIsRunning) {
-                        out.write(s.getBytes(CHARSET_NAME));
-                        out.flush();
-                    }
-                } catch (IOException ex) {
-                    reportFailedSend("string", s, ex);
+        writerExecutor.execute(() -> {
+            try {
+                if (processIsRunning) {
+                    out.write(s.getBytes(CHARSET_NAME));
+                    out.flush();
                 }
+            } catch (IOException ex) {
+                reportFailedSend("string", s, ex);
             }
         });
     }

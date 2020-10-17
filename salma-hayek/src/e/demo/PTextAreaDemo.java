@@ -19,17 +19,13 @@ public class PTextAreaDemo {
             System.err.println("Syntax: PTextAreaDemo <filename...>");
             System.exit(1);
         }
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                GuiUtilities.initLookAndFeel();
-            }
+        GuiUtilities.invokeLater(() -> {
+            GuiUtilities.initLookAndFeel();
         });
         
         for (final String filename : args) {
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    makeTextViewer(filename);
-                }
+            GuiUtilities.invokeLater(() -> {
+                makeTextViewer(filename);
             });
         }
     }

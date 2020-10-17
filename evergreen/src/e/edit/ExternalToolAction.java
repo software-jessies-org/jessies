@@ -56,11 +56,9 @@ public class ExternalToolAction extends ETextAction {
         final String context = (textWindow != null) ? textWindow.getContext() : workspace.getRootDirectory();
         final ShellCommand shellCommand = workspace.makeShellCommand(textWindow, context, command, inputDisposition, outputDisposition);
         if (textWindow != null) {
-            shellCommand.setCompletionRunnable(new Runnable() {
-                public void run() {
-                    textWindow.updateWatermarkAndTitleBar();
-                    textWindow.repaint();
-                }
+            shellCommand.setCompletionRunnable(() -> {
+                textWindow.updateWatermarkAndTitleBar();
+                textWindow.repaint();
             });
         }
         runCommand(shellCommand);

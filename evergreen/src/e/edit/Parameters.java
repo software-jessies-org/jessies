@@ -38,10 +38,8 @@ public class Parameters {
             fileAlterationMonitor = new FileAlterationMonitor(MONITOR_NAME);
             fileAlterationMonitor.addListener(new FileAlterationMonitor.Listener() {
                 public void fileTouched(String pathname) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            reloadParametersFile();
-                        }
+                    GuiUtilities.invokeLater(() -> {
+                        reloadParametersFile();
                     });
                 }
             });
