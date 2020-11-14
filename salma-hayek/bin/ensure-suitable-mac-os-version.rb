@@ -29,8 +29,9 @@ tuple = $1.split(".").map() {
     |component|
     component.to_i()
 }
-if (tuple <=> [10, 4]) == -1
-    show_alert("This application requires a newer version of macOS.", "This application requires at least macOS 10.4, but you have macOS #{actual_mac_os_version}.\n\nPlease upgrade.")
+# Magic number derived from universal.make's macosx-version-min.
+if (tuple <=> [10, 9]) == -1
+    show_alert("This application requires a newer version of macOS.", "This application requires at least macOS 10.9, but you have macOS #{actual_mac_os_version}.\n\nPlease upgrade.")
     exit(1)
 end
 
