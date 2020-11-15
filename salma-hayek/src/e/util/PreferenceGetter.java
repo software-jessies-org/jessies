@@ -26,8 +26,12 @@ public abstract class PreferenceGetter {
         return (Color) get(key);
     }
     
+    public Font getUnscaledFont(String key) {
+        return (Font) get(key);
+    }
+    
     public Font getFont(String key) {
-        return GuiUtilities.applyFontScaling((Font) get(key));
+        return GuiUtilities.applyFontScaling(getUnscaledFont(key));
     }
     
     public int getInt(String key) {

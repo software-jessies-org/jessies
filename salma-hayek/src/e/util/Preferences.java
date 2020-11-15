@@ -433,7 +433,7 @@ public abstract class Preferences extends PreferenceGetter {
     private class FontHelper implements PreferencesHelper {
         public String encode(String key) {
             // Translate the Font into something Font.decode can parse. Font.toString is not suitable.
-            final Font font = getFont(key);
+            final Font font = getUnscaledFont(key);
             final String styleString = fontStyleToString(font.getStyle()).toLowerCase().replaceAll(" ", "");
             return (font.getFamily() + "-" + styleString + "-" + font.getSize());
         }
@@ -543,7 +543,7 @@ public abstract class Preferences extends PreferenceGetter {
         
         private JComboBox<Integer> makeFontSizeComboBox(String key) {
             JComboBox<Integer> fontSizeComboBox = new JComboBox<>(new Integer[] { 6, 7, 8, 9, 10, 11, 12, 13, 14, 16, 18, 20, 22, 24, 26, 28, 32, 36, 40, 48, 56, 64, 72 });
-            fontSizeComboBox.setSelectedItem(getFont(key).getSize());
+            fontSizeComboBox.setSelectedItem(getUnscaledFont(key).getSize());
             return fontSizeComboBox;
         }
         
