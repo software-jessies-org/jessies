@@ -104,11 +104,9 @@ public class ProcessUtilities {
                 processListener.processStarted(p);
             }
             Thread inputWriterThread = new Thread(() -> {
-                try {
-                    BufferedWriter out = new BufferedWriter(new OutputStreamWriter(p.getOutputStream(), "UTF-8"));
+                try (BufferedWriter out = new BufferedWriter(new OutputStreamWriter(p.getOutputStream(), "UTF-8"))) {
                     out.append(input);
                     out.flush();
-                    out.close();
                 } catch (Exception ex) {
                     feedExceptionToLineListener(errorLineListener, ex);
                 }

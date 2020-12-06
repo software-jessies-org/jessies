@@ -8,6 +8,7 @@ import java.nio.file.attribute.*;
 import java.io.*;
 import java.util.*;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.regex.*;
 import java.util.stream.*;
 import javax.swing.*;
@@ -102,7 +103,7 @@ public class WorkspaceFileList {
                     break;
                 }
                 fileList.remove(insertPoint);
-                fireFileDeleted(entry);
+                notifyListeners(l -> l.fileDeleted(entry));
             }
             return;
         }
@@ -114,9 +115,9 @@ public class WorkspaceFileList {
                 // File isn't in our list yet.
                 int sizeBefore = fileList.size();
                 fileList.add(insertPoint, relativePath);
-                fireFileCreated(relativePath);
+                notifyListeners(l -> l.fileCreated(relativePath));
             } else {
-                fireFileChanged(relativePath);
+                notifyListeners(l -> l.fileChanged(relativePath));
             }
             // Add a listener firing thing here, for the specific file.
             return;
@@ -264,29 +265,11 @@ public class WorkspaceFileList {
         }
     }
     
-    private void fireFileCreated(final String filename) {
+    private void notifyListeners(Consumer<Listener> action) {
         synchronized (listeners) {
             for (final Listener l : listeners) {
                 // Ensure we're running on the EDT.
-                GuiUtilities.invokeLater(() -> { l.fileCreated(filename); });
-            }
-        }
-    }
-    
-    private void fireFileChanged(final String filename) {
-        synchronized (listeners) {
-            for (final Listener l : listeners) {
-                // Ensure we're running on the EDT.
-                GuiUtilities.invokeLater(() -> { l.fileChanged(filename); });
-            }
-        }
-    }
-    
-    private void fireFileDeleted(final String filename) {
-        synchronized (listeners) {
-            for (final Listener l : listeners) {
-                // Ensure we're running on the EDT.
-                GuiUtilities.invokeLater(() -> { l.fileDeleted(filename); });
+                GuiUtilities.invokeLater(() -> action.accept(l));
             }
         }
     }
