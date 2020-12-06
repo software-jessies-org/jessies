@@ -306,7 +306,7 @@ public class DebugMenu {
             ELabel currentHeapUsageLabel = new ELabel();
             JPanel buttonPanel = makeButtonPanel(gcButton, histogramButton, Box.createHorizontalStrut(10), currentHeapUsageLabel);
 
-            JFrame frame = showFrameWithButtonPanel(Log.getApplicationName() + " Heap Usage", buttonPanel, new HeapView(currentHeapUsageLabel), new Dimension(400, 200));
+            JFrame frame = showFrameWithButtonPanel(Log.getApplicationName() + " Heap Usage", buttonPanel, new HeapView(currentHeapUsageLabel), GuiUtilities.scaleDimensionForText(400, 200));
             frame.setResizable(false);
         }
 

@@ -560,7 +560,7 @@ BOOT_JDK_ERROR = $(error $(BOOT_JDK_MESSAGE))
 # The *** does battle with filter-build-output.rb.
 BOOT_JDK_WARNING = $(warning *** $(BOOT_JDK_MESSAGE))
 # Feel free to downgrade the ERROR to WARNING in your local copy.
-BOOT_JDK_DIAGNOSTIC = $(BOOT_JDK_WARNING)
+BOOT_JDK_DIAGNOSTIC = $(if $(filter 8,$(JAVA_MAJOR_VERSION)),$(BOOT_JDK_WARNING))
 JAVAC_FLAGS.javac += $(if $(ALTERNATE_BOOTCLASSPATH),-bootclasspath $(ALTERNATE_BOOTCLASSPATH),$(BOOT_JDK_DIAGNOSTIC))
 
 # ----------------------------------------------------------------------------

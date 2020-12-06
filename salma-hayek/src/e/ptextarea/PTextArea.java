@@ -602,7 +602,8 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         repaint();
     }
     
-    public void setFont(final Font font) {
+    public void setFont(Font oldFont) {
+        final Font font = GuiUtilities.applyFontScaling(oldFont);
         runWithoutMovingTheVisibleArea(() -> {
             PTextArea.super.setFont(font);
             getLock().getWriteLock();

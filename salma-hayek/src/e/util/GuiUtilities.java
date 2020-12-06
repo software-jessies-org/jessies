@@ -435,6 +435,10 @@ public class GuiUtilities {
                 // In the meantime, this actually corresponds to Ubuntu's "Human" theme.
                 // If we get complaints from users of other themes, we might want to try to find the closest color already known to UIManager.
                 UIManager.put("Table.background", new Color(0xf5f2ed));
+                int defaultRowHeightForGtk = 18;
+                int rowHeight = (int)(getGtkTextScale() * defaultRowHeightForGtk + 0.5);
+                //Log.warn("Setting Table.rowHeight to " + rowHeight);
+                UIManager.put("Table.rowHeight", rowHeight);
                 fixWmClass();
             }
             
@@ -443,6 +447,27 @@ public class GuiUtilities {
         } catch (Exception ex) {
             Log.warn("Problem setting up GUI defaults.", ex);
         }
+    }
+
+    public static float getGtkTextScale() {
+        // Fix https://bugs.openjdk.java.net/browse/JDK-8029087
+        int defaultDpi = 96;
+        int dpi = ((int) Toolkit.getDefaultToolkit().getDesktopProperty("gnome.Xft/DPI")) / 1024;
+        return dpi * 1.0f / defaultDpi;
+    }
+
+    public static Font applyFontScaling(Font oldFont) {
+        if (isGtk() == false) {
+            return oldFont;
+        }
+        return oldFont.deriveFont(oldFont.getSize2D() * getGtkTextScale());
+    }
+
+    public static Dimension scaleDimensionForText(int width, int height) {
+        float scale = isGtk() ? getGtkTextScale() : 1.0f;
+        width = (int) (width * scale);
+        height = (int) (height * scale);
+        return new Dimension(width, height);
     }
     
     /**
