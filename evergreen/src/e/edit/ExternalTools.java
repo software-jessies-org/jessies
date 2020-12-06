@@ -145,7 +145,7 @@ public class ExternalTools {
         boolean showOnPopUpMenu = false;
         
         for (String line : Files.readAllLines(file)) {
-            if (line.equals("") || line.startsWith("#")) {
+            if (line.isEmpty() || line.startsWith("#")) {
                 continue;
             }
             int equalsPos = line.indexOf('=');
