@@ -471,6 +471,10 @@ public class Evergreen {
         showStatus("Added workspace \"" + name + "\" (" + workspace.getRootDirectory() + ")");
     }
 
+    public void selectWorkspace(Workspace workspace) {
+        tabbedPane.setSelectedComponent(workspace);
+    }
+
     public Workspace createWorkspace(WorkspaceProperties properties) {
         // Ensure no non-empty workspace with the given name exists.
         final Workspace existingWorkspace = findWorkspaceByName(properties.name);
@@ -626,7 +630,11 @@ public class Evergreen {
     
     /** Returns the full pathname for the given preference file. */
     public static String getPreferenceFilename(String leafname) {
-        return System.getProperty("preferencesDirectory") + File.separator + leafname;
+        return getPreferenceDir() + File.separator + leafname;
+    }
+
+    public static String getPreferenceDir() {
+        return System.getProperty("preferencesDirectory");
     }
     
     private String getDialogGeometriesPreferenceFilename() {

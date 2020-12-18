@@ -30,6 +30,12 @@ public class FileIgnorer {
     }
     
     private boolean isIgnored(Path path, boolean isDirectory) {
+        // Do not _ever_ ignore the root directory. While we generally want to avoid directories that begin with a '.',
+        // in the case of the evergreen config workspace, the top-level directory is typically $HOME/.e.edit.Edit/, which
+        // does begin with a '.'.
+        if (path.equals(rootDirectory)) {
+            return false;
+        }
         String filename = path.getFileName().toString();
         // FIXME: if it were cheap, we'd use File.isHidden. But it's unnecessarily expensive on Unix and not obviously useful on Windows.
         // (Subversion for Windows doesn't use the hidden bit for its .svn directories, for example.)

@@ -85,6 +85,10 @@ public class WorkspaceFileList {
     
     /** Checks the status of changedPath, and updates our file list in place according to its state. */
     private synchronized void partialUpdate(String changedPath) {
+        if (fileList == null) {
+            // File updates while we're rebuilding our list of files should be ignored.
+            return;
+        }
         Path path = Paths.get(changedPath);
         Path rootPath = FileUtilities.pathFrom(workspace.getRootDirectory());
         String relativePath = rootPath.relativize(path).toString();

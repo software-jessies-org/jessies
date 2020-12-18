@@ -75,6 +75,7 @@ public class EvergreenMenuBar extends EMenuBar {
 
         Evergreen.getInstance().getPreferences().initPreferencesMenuItem(menu);
         menu.add(Evergreen.getInstance().getFileTypePreferences().makeShowPreferencesAction("_Filetype Preferences..."));
+        menu.add(new NewConfigWorkspaceAction());
 
         return menu;
     }
@@ -158,6 +159,7 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.add(new NewWorkspaceAction());
         menu.add(new EditWorkspaceAction());
         menu.add(new CloseWorkspaceAction());
+        menu.add(new NewConfigWorkspaceAction());
         menu.addSeparator();
         menu.add(new BuildAction(false));
         menu.add(new BuildAction(true));
