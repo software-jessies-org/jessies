@@ -2,6 +2,7 @@ package e.util;
 
 import java.io.*;
 import java.nio.channels.*;
+import java.nio.file.*;
 import java.security.*;
 import java.util.*;
 import java.util.regex.*;
@@ -28,7 +29,12 @@ public class FileUtilities {
     public static File fileFromParentAndString(String parent, String filename) {
         return fileFromString(FileUtilities.parseUserFriendlyName(parent) + File.separator + filename);
     }
-
+    
+    /** Returns a new Path for the given filename (and optional extra parts), coping with "~/". */
+    public static Path pathFrom(String first, String... more) {
+        return Paths.get(FileUtilities.parseUserFriendlyName(first), more);
+    }
+    
     /**
      * Converts paths of the form ~/src to /Users/elliotth/src (or
      * whatever the user's home directory is). Also copes with the
@@ -90,6 +96,10 @@ public class FileUtilities {
         return getUserFriendlyName(file.getAbsolutePath());
     }
     
+    public static String getUserFriendlyName(Path path) {
+        return getUserFriendlyName(path.toAbsolutePath().toString());
+    }
+    
     /**
      * Returns the user's home directory. Assumes that on Cygwin a user
      * who's set $HOME wants it to override Windows' notion of the home
@@ -149,22 +159,6 @@ public class FileUtilities {
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
-    }
-    
-    /**
-     * Tests whether filename is a symbolic link.
-     * 
-     * FIXME: all of this should be replaced when Java 7 is in widespread use,
-     * and we can use the new JSR-203 functionality.
-     */
-    public static boolean isSymbolicLink(String filename) {
-        final Stat stat = new Stat();
-        final int result = Posix.lstat(filename, stat);
-        return result == 0 && stat.isSymbolicLink();
-    }
-    
-    public static boolean isSymbolicLink(File file) {
-        return isSymbolicLink(file.toString());
     }
     
     /**
@@ -359,6 +353,14 @@ public class FileUtilities {
         return TimeUtilities.toIsoString(new Date(file.lastModified()));
     }
     
+    public static String getLastModifiedTime(Path path) {
+        try {
+            return TimeUtilities.toIsoString(new Date(Files.getLastModifiedTime(path).toMillis()));
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+    
     public static void copyFile(File source, File destination) {
         try {
             // From http://java.sun.com/developer/JDCTechTips/2002/tt0507.html.
@@ -432,11 +434,11 @@ public class FileUtilities {
         return System.getProperty("org.jessies.supportRoot") + File.separator + "lib" + File.separator + "scripts" + File.separator + script;
     }
     
-    public static File findSupportBinary(String binaryName) {
+    public static Path findSupportBinary(String binaryName) {
         String fileName = mapBinaryName(binaryName);
         String directory = System.getProperty("org.jessies.binaryDirectory");
-        File path = new File(directory, fileName);
-        if (path.exists() && path.canExecute()) {
+        Path path = Paths.get(directory, fileName);
+        if (Files.isExecutable(path)) {
             return path;
         }
         return null;

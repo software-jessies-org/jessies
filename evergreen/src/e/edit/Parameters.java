@@ -1,8 +1,11 @@
 package e.edit;
 
 import e.util.*;
-import java.util.*;
 import java.io.*;
+import java.nio.file.*;
+import java.util.*;
+import java.util.stream.*;
+import javax.swing.*;
 
 /**
  * The format of a properties file is as follows:
@@ -17,7 +20,7 @@ import java.io.*;
  */
 public class Parameters {
     private static final String MONITOR_NAME = "configuration";
-    private static ArrayList<File> files = new ArrayList<>();
+    private static ArrayList<Path> files = new ArrayList<>();
     private static FileAlterationMonitor fileAlterationMonitor;
     
     private static HashMap<String, String> map = new HashMap<>();
@@ -26,25 +29,25 @@ public class Parameters {
     private Parameters() { /* Not instantiable. */ }
     
     public static synchronized void initParameters() {
-        files.add(FileUtilities.fileFromString(Evergreen.getResourceFilename("lib", "data", "default.properties")));
-        files.add(FileUtilities.fileFromString("/usr/lib/software.jessies.org/evergreen/evergreen.properties"));
-        files.add(FileUtilities.fileFromString("/usr/local/software.jessies.org/evergreen/evergreen.properties"));
-        files.add(FileUtilities.fileFromString(Evergreen.getUserPropertiesFilename()));
+        files.add(FileUtilities.pathFrom(Evergreen.getResourceFilename("lib", "data", "default.properties")));
+        files.add(FileUtilities.pathFrom("/usr/lib/software.jessies.org/evergreen/evergreen.properties"));
+        files.add(FileUtilities.pathFrom("/usr/local/software.jessies.org/evergreen/evergreen.properties"));
+        files.add(FileUtilities.pathFrom(Evergreen.getUserPropertiesFilename()));
         
+        try {
+            fileAlterationMonitor = new FileAlterationMonitor(MONITOR_NAME);
+            fileAlterationMonitor.addListener(new FileAlterationMonitor.Listener() {
+                public void fileTouched(String pathname) {
+                    GuiUtilities.invokeLater(() -> {
+                        reloadParametersFile();
+                    });
+                }
+            });
+        } catch (Exception ex) {
+            Log.warn("Unable to start config file monitor", ex);
+        }
         // Load the initial configuration.
         reloadParametersFile();
-    }
-    
-    private static void setFileAlterationMonitor(FileAlterationMonitor newFileAlterationMonitor) {
-        if (fileAlterationMonitor != null) {
-            fileAlterationMonitor.dispose();
-        }
-        fileAlterationMonitor = newFileAlterationMonitor;
-        fileAlterationMonitor.addListener(new FileAlterationMonitor.Listener() {
-            public void fileTouched(String pathname) {
-                reloadParametersFile();
-            }
-        });
     }
     
     private static synchronized void reloadParametersFile() {
@@ -52,7 +55,6 @@ public class Parameters {
             Loader loader = new Loader();
             loader.load(files);
             map = loader.map;
-            setFileAlterationMonitor(loader.fileAlterationMonitor);
             Evergreen.getInstance().showStatus("Configuration reloaded");
             firePreferencesChanged();
         } catch (Exception ex) {
@@ -61,35 +63,34 @@ public class Parameters {
     }
     
     private static class Loader {
-        private FileAlterationMonitor fileAlterationMonitor = new FileAlterationMonitor(MONITOR_NAME);
         private HashMap<String, String> map = new HashMap<>();
         
-        private void load(Iterable<File> files) {
-            for (File file : files) {
+        private void load(Iterable<Path> files) {
+            for (Path file : files) {
                 loadProperties(file);
             }
         }
         
-        private void loadProperties(File file) {
-            fileAlterationMonitor.addPathname(file.toString());
-            
-            if (!file.exists()) {
+        private void loadProperties(Path file) {
+            Path parent = file.getParent();
+            if (!Files.exists(parent)) {
                 return;
             }
-            
-            for (String line : StringUtilities.readLinesFromFile(file)) {
-                processPropertiesLine(line);
+            // The file alteration monitor only monitors directories.
+            fileAlterationMonitor.addPath(parent);
+            if (!Files.exists(file)) {
+                return;
+            }
+            try (Stream<String> stream = Files.lines(file)) {
+                stream.map(v -> v.trim())
+                    .filter(v -> !isCommentLine(v))
+                    .forEach(v -> processPropertiesLine(v));
+            } catch (IOException ex) {
+                Log.warn("Failed to read file", ex);
             }
         }
         
         private void processPropertiesLine(String line) {
-            // We may need an escaping or quoting mechanism if we ever need to preserve trailing spaces.
-            line = line.trim();
-            
-            if (isCommentLine(line)) {
-                return;
-            }
-            
             if (isIncludeLine(line)) {
                 processIncludeLine(line);
                 return;
@@ -117,7 +118,7 @@ public class Parameters {
         private void processIncludeLine(String line) {
             final String filename = line.substring(1);
             try {
-                loadProperties(FileUtilities.fileFromString(filename));
+                loadProperties(FileUtilities.pathFrom(filename));
             } catch (Exception ex) {
                 Log.warn("Unable to include properties file \"" + filename + "\"", ex);
             }

@@ -6,6 +6,7 @@ import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.nio.file.*;
 import java.net.*;
 import java.util.*; 
 import java.util.List;
@@ -263,30 +264,29 @@ public class Evergreen {
         }
         
         try {
-            /*
-             * Open the file a symbolic link points to, and not the link itself.
-             * This ensures that, even on case-insensitive file systems, we always use the same case.
-             * That, in turn, ensures that we won't open a second viewer on the same file.
-             * This also cleans paths like a/b/../c/d.
-             */
-            filename = FileUtilities.fileFromString(filename).getCanonicalPath();
+            filename = resolvePath(filename).toString();
         } catch (IOException ignored) {
             /* Harmless. */
         }
         filename = normalizeWorkspacePrefix(filename);
         filename = FileUtilities.getUserFriendlyName(filename);
+        Path path = FileUtilities.pathFrom(filename);
         
         // Refuse to open directories.
-        if (FileUtilities.fileFromString(filename).isDirectory()) {
+        if (Files.isDirectory(path)) {
             throw new RuntimeException("\"" + filename + "\" is a directory and so cannot be edited with Evergreen.");
         }
         
         // Limit ourselves (rather arbitrarily) to files under half a gigabyte. That's quite a strain on us, at present.
-        final int KB = 1024;
-        final int MB = 1024 * KB;
-        long fileLength = FileUtilities.fileFromString(filename).length();
-        if (fileLength > 512 * MB) {
-            throw new RuntimeException("The file \"" + filename + "\", which is " + fileLength + " bytes long is too large. This file will not be opened.");
+        try {
+            final int KB = 1024;
+            final int MB = 1024 * KB;
+            long fileLength = Files.size(path);
+            if (fileLength > 512 * MB) {
+                throw new RuntimeException("The file \"" + filename + "\", which is " + fileLength + " bytes long is too large. This file will not be opened.");
+            }
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
         
         // Find which workspace this file is on/should be on, and make it visible.
@@ -314,6 +314,51 @@ public class Evergreen {
         
         // Add an appropriate viewer for the filename to the chosen workspace.
         return workspace.addViewerForFile(filename, address, file.y);
+    }
+    
+    /**
+     * Returns the resolved path, according to the following rules:
+     * 1: If this is a symlink directly to a file, then use the canonical name. Always.
+     * 2: If one of the parent dirs is a symlink to somewhere within our workspace, resolve it.
+     * 3: If one of the parent dirs is a symlink outside the workspace, don't resolve.
+     * The rationale here is to try to avoid opening duplicate views on the same file, but
+     * if we've set up the workspace with symlinks into some larger tree, resolving everything
+     * makes the files look like their outside the tree, and opening the "find in files" does not
+     * properly populate the 'directory to search in'. In such a situation, it's helpful to
+     * maintain the illusion that we're looking at a single coherent location on disk.
+     */
+    private Path resolvePath(String filename) throws IOException {
+        // Resolve ~, but then convert to an absolute path to get rid of any /../ and other weirdness.
+        Path path = FileUtilities.pathFrom(filename).toAbsolutePath();
+        // toRealPath follows symlinks by default.
+        Path realPath = path.toRealPath();
+        // Now we have path and realPath, the latter of which is the actual path name with symlinks resolvedf.
+        // Of course, if they're identical, we can just return either without bothering to do anything else.
+        if (path.equals(realPath)) {
+            return path;
+        }
+        if (Files.isSymbolicLink(path)) {
+            // This is a symlink to a file, so always return the resolved name, so we don't end up overwriting
+            // the symlink instead of the file it points to.
+            return realPath;
+        }
+        Path workspacePath = getBestWorkspaceForFilename(path.toString(), getCurrentWorkspace()).getCanonicalRootPath();
+        // By this point, we're dealing with a filename which has a symlink somewhere up its path.
+        if (realPath.startsWith(workspacePath)) {
+            // The actual file is in the same workspace, so use the resolved name so that multiple paths
+            // within the same workspace to one file will only open one view of the file.
+            return realPath;
+        }
+        // This is a filename existing outside of the workspace, but which is reached via a symlink,
+        // probably but not necessarily linked from within the workspace to outside of it.
+        // We assume the user has done this deliberately, for example using symlinks to create a
+        // limited 'view' of a larger repository, but wants Evergreen to pretend the files are
+        // actually within the workspace location itself.
+        // Of course, this does leave the door open to people setting up two symlinks to the same directory
+        // outside the workspace, and thus being able to open several views on the same file.
+        // But if they do that, they'll just have to cope with the consequences. Or maybe they
+        // actually want to, so they can see two parts of the file at once.
+        return path;
     }
     
     /** Returns an array of all the workspaces. */
@@ -465,7 +510,9 @@ public class Evergreen {
             return;
         }
         
-        workspace.getFileListCacheFile().delete();
+        try {
+            Files.delete(workspace.getFileListCachePath());
+        } catch (IOException ex) {}
         
         // Removing the workspace from the index stops its windows from being moved to another workspace.
         tabbedPane.remove(workspace);
@@ -492,12 +539,7 @@ public class Evergreen {
      * changes observable, so it's down to us to be careful.
      */
     public void workspaceConfigurationDidChange() {
-        Thread thread = new Thread(new Runnable() {
-            public void run() {
-                rememberState();
-            }
-        });
-        thread.start();
+        new Thread(() -> { rememberState(); }).start();
         
         // Make sure every file is on the most suitable workspace.
         for (Workspace workspace : getWorkspaces()) {
@@ -773,10 +815,8 @@ public class Evergreen {
     private void initTabbedPaneLazyInitializer() {
         final ChangeListener firstExposureListener = new ChangeListener() {
             public void stateChanged(final ChangeEvent e) {
-                EventQueue.invokeLater(new Runnable() {
-                    public void run() {
-                        getCurrentWorkspace().handlePossibleFirstExposure();
-                    }
+                GuiUtilities.invokeLater(() -> {
+                    getCurrentWorkspace().handlePossibleFirstExposure();
                 });
             }
         };
@@ -844,50 +884,44 @@ public class Evergreen {
         
         initialState.configureTagsPanel();
         
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                if (tabbedPane.getTabCount() == 0) {
-                    // If we didn't create any workspaces, give the user some help...
-                    showAlert("Welcome to Evergreen!", "This looks like the first time you've used Evergreen. You'll need to create a workspace for each project you wish to work on.<p>Choose \"New Workspace...\" from the the \"Workspace\" menu.<p>You can create as many workspaces as you like, but you'll need at least one to be able to do anything.");
-                } else {
-                    initTabbedPaneLazyInitializer();
+        GuiUtilities.invokeLater(() -> {
+            if (tabbedPane.getTabCount() == 0) {
+                // If we didn't create any workspaces, give the user some help...
+                showAlert("Welcome to Evergreen!", "This looks like the first time you've used Evergreen. You'll need to create a workspace for each project you wish to work on.<p>Choose \"New Workspace...\" from the the \"Workspace\" menu.<p>You can create as many workspaces as you like, but you'll need at least one to be able to do anything.");
+            } else {
+                initTabbedPaneLazyInitializer();
+            }
+            
+            Thread initializationDetectionThread = new Thread(() -> {
+                final long sleepStartNs = System.nanoTime();
+                try {
+                    // What I really want to say is "wait until the event queue is empty and everything's caught up".
+                    // I haven't yet found out how to do that, and the fact that using EventQueue.invokeLater here doesn't achieve the desired effect makes me think that what I want might not be that simple anyway.
+                    // Seemingly, though, if we run at MIN_PRIORITY, we don't get much of a look-in until the EDT is idle anyway.
+                    // Hans Muller's got code to wait for the event queue to clear: https://appframework.dev.java.net/source/browse/appframework/trunk/AppFramework/src/application/Application.java?rev=36&view=auto&content-type=text/vnd.viewcvs-markup
+                    // Until that's available as GPL/LGPL, or as part of the JDK, here's a simpler alternative that's good enough for our purposes here.
+                    EventQueue queue = Toolkit.getDefaultToolkit().getSystemEventQueue();
+                    while (queue.peekEvent() != null) {
+                        Thread.sleep(100);
+                    }
+                } catch (InterruptedException ex) {
                 }
                 
-                Thread initializationDetectionThread = new Thread(new Runnable() {
-                    public void run() {
-                        final long sleepStartNs = System.nanoTime();
-                        try {
-                            // What I really want to say is "wait until the event queue is empty and everything's caught up".
-                            // I haven't yet found out how to do that, and the fact that using EventQueue.invokeLater here doesn't achieve the desired effect makes me think that what I want might not be that simple anyway.
-                            // Seemingly, though, if we run at MIN_PRIORITY, we don't get much of a look-in until the EDT is idle anyway.
-                            // Hans Muller's got code to wait for the event queue to clear: https://appframework.dev.java.net/source/browse/appframework/trunk/AppFramework/src/application/Application.java?rev=36&view=auto&content-type=text/vnd.viewcvs-markup
-                            // Until that's available as GPL/LGPL, or as part of the JDK, here's a simpler alternative that's good enough for our purposes here.
-                            EventQueue queue = Toolkit.getDefaultToolkit().getSystemEventQueue();
-                            while (queue.peekEvent() != null) {
-                                Thread.sleep(100);
-                            }
-                        } catch (InterruptedException ex) {
-                        }
-                        
-                        final long sleepEndNs = System.nanoTime();
-                        Log.warn("Workers free to start after " + TimeUtilities.nsToString(sleepEndNs - t0) + " (slept for " + TimeUtilities.nsToString(sleepEndNs - sleepStartNs) + ").");
-                        startSignal.countDown();
-                    }
-                });
-                initializationDetectionThread.setPriority(Thread.MIN_PRIORITY);
-                initializationDetectionThread.start();
-            }
+                final long sleepEndNs = System.nanoTime();
+                Log.warn("Workers free to start after " + TimeUtilities.nsToString(sleepEndNs - t0) + " (slept for " + TimeUtilities.nsToString(sleepEndNs - sleepStartNs) + ").");
+                startSignal.countDown();
+            });
+            initializationDetectionThread.setPriority(Thread.MIN_PRIORITY);
+            initializationDetectionThread.start();
         });
     }
     
     public static void main(final String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                GuiUtilities.initLookAndFeel();
-                final Evergreen editor = Evergreen.getInstance();
-                for (String arg : args) {
-                    editor.openFile(arg);
-                }
+        GuiUtilities.invokeLater(() -> {
+            GuiUtilities.initLookAndFeel();
+            final Evergreen editor = Evergreen.getInstance();
+            for (String arg : args) {
+                editor.openFile(arg);
             }
         });
     }

@@ -88,29 +88,27 @@ public class PIndenterTester {
     }
     
     public static void main(final String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                int errorCounter = 0;
-                for (String filename: args) {
-                    PIndenterTester tester = new PIndenterTester(filename);
-                    tester.correctIndentation();
-                    PrintWriter out = new PrintWriter(System.out);
-                    int differencesFound = tester.printDifferences(out);
-                    out.flush();
-                    errorCounter += differencesFound;
-                    if (differencesFound == 0) {
-                        System.out.println("No differences found in file " + filename);
-                    }
+        GuiUtilities.invokeLater(() -> {
+            int errorCounter = 0;
+            for (String filename: args) {
+                PIndenterTester tester = new PIndenterTester(filename);
+                tester.correctIndentation();
+                PrintWriter out = new PrintWriter(System.out);
+                int differencesFound = tester.printDifferences(out);
+                out.flush();
+                errorCounter += differencesFound;
+                if (differencesFound == 0) {
+                    System.out.println("No differences found in file " + filename);
                 }
-                if (args.length > 1) {
-                    System.out.println("" + errorCounter + " differences found in all files");
-                } else if (args.length == 0) {
-                    System.err.println("Usage: indenter <files to test>");
-                    System.exit(1);
-                }
-                if (errorCounter > 0) {
-                    System.exit(1);
-                }
+            }
+            if (args.length > 1) {
+                System.out.println("" + errorCounter + " differences found in all files");
+            } else if (args.length == 0) {
+                System.err.println("Usage: indenter <files to test>");
+                System.exit(1);
+            }
+            if (errorCounter > 0) {
+                System.exit(1);
             }
         });
     }

@@ -5,6 +5,8 @@ import e.ptextarea.*;
 import e.util.*;
 import java.awt.event.*;
 import java.io.*;
+import java.nio.charset.*;
+import java.nio.file.*;
 import java.security.MessageDigest;
 import java.util.*;
 import java.util.concurrent.*;
@@ -292,7 +294,7 @@ public class TagsUpdater {
         }
 
         public void scanTags() {
-            File temporaryFile = null;
+            Path temporaryFile = null;
             try {
                 final ETextWindow textWindow = getTextWindow();
                 final FileType fileType = textWindow.getFileType();
@@ -310,21 +312,20 @@ public class TagsUpdater {
                 }
 
                 if (textWindow.isDirty() || hasGTests()) {
-                    temporaryFile = File.createTempFile("e.edit.TagsUpdater-", "");
-                    temporaryFile.deleteOnExit();
+                    temporaryFile = Files.createTempFile("e.edit.TagsUpdater-", "");
                     if (hasGTests()) {
                         // Rewrite gtests in a way that ctags can understand, corresponding to
                         // the actual symbols the macros expand to.
                         String content = getTextArea().getTextBuffer().toString();
                         content = content.replaceAll("TEST_F\\((.*),\\s*(.*)\\)", "void $1::$2()");
                         content = content.replaceAll("TEST\\((.*),\\s*(.*)\\)", "void $1_$2_Test()");
-                        StringUtilities.writeFile(temporaryFile, content);
+                        Files.write(temporaryFile, StandardCharsets.UTF_8.encode(content).array());
                     } else {
-                    getTextArea().getTextBuffer().writeToFile(temporaryFile);
+                    getTextArea().getTextBuffer().writeTo(temporaryFile);
                 }
                 }
                 String charsetName = (String) getTextArea().getTextBuffer().getProperty(PTextBuffer.CHARSET_PROPERTY);
-                final File inputFile = (temporaryFile != null) ? temporaryFile : FileUtilities.fileFromString(textWindow.getFilename());
+                final Path inputFile = (temporaryFile != null) ? temporaryFile : FileUtilities.pathFrom(textWindow.getFilename());
                 TagReader tagReader = new TagReader(inputFile, fileType, charsetName, this);
             } catch (Exception ex) {
                 Evergreen.getInstance().getTagsPanel().showError("Couldn't make tags: " + ex.getMessage());
@@ -332,7 +333,11 @@ public class TagsUpdater {
                 successful = false;
             } finally {
                 if (temporaryFile != null) {
-                    temporaryFile.delete();
+                    try {
+                        Files.delete(temporaryFile);
+                    } catch (IOException ex) {
+                        Log.warn("Failed to delete temp file " + temporaryFile, ex);
+                    }
                 }
             }
         }

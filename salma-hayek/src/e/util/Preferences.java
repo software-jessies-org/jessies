@@ -260,11 +260,9 @@ public abstract class Preferences extends PreferenceGetter {
         
         // Restore the preferences if the user hits "Cancel".
         final HashMap<String, Object> initialPreferences = new HashMap<>(preferences);
-        form.getFormDialog().setCancelRunnable(new Runnable() {
-            public void run() {
-                preferences = initialPreferences;
-                firePreferencesChanged();
-            }
+        form.getFormDialog().setCancelRunnable(() -> {
+            preferences = initialPreferences;
+            firePreferencesChanged();
         });
         
         final JButton extraButton = getExtraButton();

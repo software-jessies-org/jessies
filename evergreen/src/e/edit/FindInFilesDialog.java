@@ -6,6 +6,7 @@ import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.*;
@@ -46,16 +47,20 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
     /** Holds all the UI. The actual "dialog" is in here! */
     private final FormBuilder form;
     
+    private boolean isShowing() {
+        return form.getFormDialog().isShowing();
+    }
+    
     public interface ClickableTreeItem {
         public void open();
     }
     
     public class MatchingLine implements ClickableTreeItem {
         private String line;
-        private File file;
+        private Path file;
         private Pattern pattern;
         
-        public MatchingLine(String line, File file, Pattern pattern) {
+        public MatchingLine(String line, Path file, Pattern pattern) {
             this.line = line;
             this.file = file;
             this.pattern = pattern;
@@ -80,7 +85,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
     }
     
     public class MatchingFile implements ClickableTreeItem {
-        private File file;
+        private Path file;
         private String name;
         private int matchCount;
         private Pattern pattern;
@@ -89,14 +94,14 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         /**
          * For matches based just on filename.
          */
-        public MatchingFile(File file, String name) {
+        public MatchingFile(Path file, String name) {
             this(file, name, 0, null);
         }
         
         /**
          * For matches based on filename and a regular expression.
          */
-        public MatchingFile(File file, String name, int matchCount, Pattern pattern) {
+        public MatchingFile(Path file, String name, int matchCount, Pattern pattern) {
             this.file = file;
             this.name = name;
             this.matchCount = matchCount;
@@ -104,6 +109,10 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
             if (pattern != null) {
                 definitionFinderExecutor.submit(new DefinitionFinder(file, pattern, this));
             }
+        }
+        
+        public String getLastPartOfName() {
+            return file.getFileName().toString();
         }
         
         public void setContainsDefinition(boolean newState) {
@@ -122,12 +131,10 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
             // around a visual glitch in the absence of an approved means of
             // invalidating the JTree UI delegate's layout cache. Having the
             // source is one of the things that makes Java great!
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    matchView.setRootVisible(true);
-                    matchView.setRootVisible(false);
-                    matchView.repaint();
-                }
+            GuiUtilities.invokeLater(() -> {
+                matchView.setRootVisible(true);
+                matchView.setRootVisible(false);
+                matchView.repaint();
             });
         }
         
@@ -145,7 +152,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         }
         
         @Override public String toString() {
-            StringBuilder result = new StringBuilder(file.getName());
+            StringBuilder result = new StringBuilder(getLastPartOfName());
             if (matchCount != 0) {
                 result.append(" (");
                 result.append(StringUtilities.pluralize(matchCount, "matching line", "matching lines"));
@@ -254,29 +261,6 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
             return node;
         }
         
-        /**
-         * Ensure that newNode is inserted at the correct index in parentNode to preserve case-insensitive alphabetical ordering.
-         * We originally just used DefaultMutableTreeNode.add, but that doesn't work when multiple threads are returning matches in no particular order.
-         * FIXME: given that on contemporary hardware matches come back "roughly" in order, should we search for the insertion position from the back?
-         */
-        private void insertNodeInAlphabeticalOrder(DefaultMutableTreeNode parentNode, DefaultMutableTreeNode newNode) {
-            // Find the index to insert at.
-            // We compare strings, because the tree nodes are a mixture of Strings (for directories) and MatchingFiles (for matching files).
-            final String newValueString = newNode.getUserObject().toString();
-            int insertionIndex = 0;
-            while (insertionIndex < parentNode.getChildCount()) {
-                DefaultMutableTreeNode thisNode = (DefaultMutableTreeNode) parentNode.getChildAt(insertionIndex);
-                String thisValueString = thisNode.getUserObject().toString();
-                if (String.CASE_INSENSITIVE_ORDER.compare(thisValueString, newValueString) >= 0) {
-                    break;
-                }
-                ++insertionIndex;
-            }
-            // Insert it, and make sure the model understands what we did.
-            parentNode.insert(newNode, insertionIndex);
-            matchTreeModel.nodesWereInserted(parentNode, new int[] { insertionIndex });
-        }
-        
         @Override
         protected void process(List<DefaultMutableTreeNode> treeNodes) {
             if (!shouldStillWorkOn(sequenceNumber)) {
@@ -337,7 +321,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
                 try {
                     final long t0 = System.nanoTime();
                     FileSearcher fileSearcher = new FileSearcher(pattern);
-                    File file = FileUtilities.fileFromParentAndString(workspace.getRootDirectory(), candidate);
+                    Path file = FileUtilities.pathFrom(workspace.getRootDirectory(), candidate);
                     
                     // Update our percentage-complete status, but only if we've
                     // taken enough time for the user to start caring, so we
@@ -393,12 +377,12 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
     }
     
     public static class DefinitionFinder implements Runnable, TagReader.TagListener {
-        private final File file;
+        private final Path file;
         private final MatchingFile matchingFile;
         private final Pattern pattern;
         private final int sequenceNumber;
         
-        public DefinitionFinder(File file, Pattern pattern, MatchingFile matchingFile) {
+        public DefinitionFinder(Path file, Pattern pattern, MatchingFile matchingFile) {
             this.file = file;
             this.matchingFile = matchingFile;
             this.pattern = pattern;
@@ -469,7 +453,30 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         ComponentUtilities.divertPageScrollingFromTo(regexField, matchView);
         ComponentUtilities.divertPageScrollingFromTo(filenameRegexField, matchView);
     }
-        
+    
+    /**
+     * Ensure that newNode is inserted at the correct index in parentNode to preserve case-insensitive alphabetical ordering.
+     * We originally just used DefaultMutableTreeNode.add, but that doesn't work when multiple threads are returning matches in no particular order.
+     * FIXME: given that on contemporary hardware matches come back "roughly" in order, should we search for the insertion position from the back?
+     */
+    private void insertNodeInAlphabeticalOrder(DefaultMutableTreeNode parentNode, DefaultMutableTreeNode newNode) {
+        // Find the index to insert at.
+        // We compare strings, because the tree nodes are a mixture of Strings (for directories) and MatchingFiles (for matching files).
+        final String newValueString = newNode.getUserObject().toString();
+        int insertionIndex = 0;
+        while (insertionIndex < parentNode.getChildCount()) {
+            DefaultMutableTreeNode thisNode = (DefaultMutableTreeNode) parentNode.getChildAt(insertionIndex);
+            String thisValueString = thisNode.getUserObject().toString();
+            if (String.CASE_INSENSITIVE_ORDER.compare(thisValueString, newValueString) >= 0) {
+                break;
+            }
+            ++insertionIndex;
+        }
+        // Insert it, and make sure the model understands what we did.
+        parentNode.insert(newNode, insertionIndex);
+        matchTreeModel.nodesWereInserted(parentNode, new int[] { insertionIndex });
+    }
+    
     public void fileListStateChanged(final boolean isNowValid) {
         if (isNowValid) {
             showMatches();
@@ -478,6 +485,136 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
             switchToFakeTree();
             matchView.setEnabled(false);
         }
+    }
+    
+    public void fileCreated(String filename) {
+        if (!isShowing() || !isDesiredFilename(filename)) {
+            return;
+        }
+        try {
+            String regex = regexField.getText();
+            Pattern pattern = null;
+            boolean addNode = false;
+            ArrayList<String> matches = new ArrayList<>();
+            Path file = FileUtilities.pathFrom(workspace.getRootDirectory(), filename);
+            if (regex == "") {
+                addNode = true;
+            } else {
+                pattern = PatternUtilities.smartCaseCompile(regex);
+                FileSearcher fileSearcher = new FileSearcher(pattern);
+                boolean wasText = fileSearcher.searchFile(file, matches);
+                if (wasText == false) {
+                    // FIXME: should we do the grep(1) thing of "binary file <x> matches"?
+                    return;
+                }
+                addNode = !matches.isEmpty();
+            }
+            if (!addNode) {
+                return;
+            }
+            String[] pathElements = filename.split(Pattern.quote(File.separator));
+            DefaultMutableTreeNode node = (DefaultMutableTreeNode) matchTreeModel.getRoot();
+            TreePath pathToExpand = new TreePath(node);
+            for (int i = 0; i < pathElements.length; i++) {
+                String name = pathElements[i];
+                boolean isLeaf = i == (pathElements.length - 1);
+                if (!isLeaf) {
+                    name += File.separator;
+                }
+                int childIndex = findChildWithName(node, name);
+                if (childIndex == -1) {
+                    // Not there yet - invent a new node of the relevant type.
+                    DefaultMutableTreeNode newNode = null;
+                    if (isLeaf) {
+                        if (matches.isEmpty()) {
+                            newNode = new DefaultMutableTreeNode(new MatchingFile(file, filename));
+                        } else {
+                            newNode = new DefaultMutableTreeNode(new MatchingFile(file, filename, matches.size(), pattern));
+                        }
+                    } else {
+                        newNode = new DefaultMutableTreeNode(name);
+                    }
+                    insertNodeInAlphabeticalOrder(node, newNode);
+                    node = newNode;
+                } else {
+                    node = (DefaultMutableTreeNode) node.getChildAt(childIndex);
+                }
+                pathToExpand = pathToExpand.pathByAddingChild(node);
+            }
+            // By this point, node points to the properly created filename node. If we have matches (so there
+            // was really a regexp and we're not merely listing files in a dir hierarchy), then add all the matches here.
+            for (String line : matches) {
+                node.add(new DefaultMutableTreeNode(new MatchingLine(line, file, pattern)));
+            }
+            int[] indices = new int[matches.size()];
+            for (int i = 0; i < indices.length; i++) {
+                indices[i] = i;
+            }
+            matchTreeModel.nodesWereInserted(node, indices);
+            // Newly-added nodes default to closed; we definitely want them to be expanded, to draw
+            // attention to the change in matches.
+            for (; pathToExpand.getPathCount() > 1; pathToExpand = pathToExpand.getParentPath()) {
+                matchView.expandPath(pathToExpand);
+            }
+        } catch (IOException ex) {
+            Log.warn("Failed to match in file " + filename, ex);
+        }
+    }
+    
+    public void fileChanged(String filename) {
+        fileDeleted(filename);
+        fileCreated(filename);
+    }
+    
+    public void fileDeleted(String filename) {
+        if (!isShowing() || !isDesiredFilename(filename)) {
+            return;
+        }
+        String[] pathElements = filename.split(Pattern.quote(File.separator));
+        DefaultMutableTreeNode node = (DefaultMutableTreeNode) matchTreeModel.getRoot();
+        DefaultMutableTreeNode toRemove = null;
+        for (int i = 0; i < pathElements.length; i++) {
+            String name = pathElements[i];
+            if (i < pathElements.length - 1) {
+                name += File.separator;
+            }
+            int childIndex = findChildWithName(node, name);
+            if (childIndex == -1) {
+                // Wasn't a match - nothing to delete.
+                return;
+            }
+            DefaultMutableTreeNode childNode = (DefaultMutableTreeNode) node.getChildAt(childIndex);
+            if (node.getChildCount() > 1 || toRemove == null) {
+                toRemove = childNode;
+            }
+            node = childNode;
+        }
+        // If we get here, we're pointing to the node that corresponds to the file (which clearly had matches).
+        // Delete the lot.
+        if (toRemove != null) {
+            matchTreeModel.removeNodeFromParent(toRemove);
+        }
+    }
+    
+    private int findChildWithName(DefaultMutableTreeNode node, String name) {
+        for (int i = 0; i < node.getChildCount(); i++) {
+            DefaultMutableTreeNode sub = (DefaultMutableTreeNode) node.getChildAt(i);
+            String subName = null;
+            Object subObj = sub.getUserObject();
+            if (subObj instanceof String) {
+                subName = (String) subObj;
+            } else if (subObj instanceof MatchingFile) {
+                subName = ((MatchingFile) subObj).getLastPartOfName();
+            }
+            if (name.equals(subName)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
+    private boolean isDesiredFilename(String filename) {
+        return PatternUtilities.smartCaseCompile(filenameRegexField.getText()).matcher(filename).find();
     }
     
     private void switchToFakeTree() {
@@ -536,11 +673,9 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
     }
     
     private void setStatus(final String message, final boolean isError) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                status.setForeground(isError ? Color.RED : Color.BLACK);
-                status.setText(message);
-            }
+        GuiUtilities.invokeLater(() -> {
+            status.setForeground(isError ? Color.RED : Color.BLACK);
+            status.setText(message);
         });
     }
     
@@ -553,8 +688,6 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         
         initMatchList();
         initForm();
-        initSaveMonitor();
-        
         workspace.getFileList().addFileListListener(this);
     }
     
@@ -564,34 +697,15 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
         formPanel.addRow("Whose Names Match:", filenameRegexField);
         formPanel.addWideRow(PatternUtilities.addRegularExpressionHelpToComponent(status));
         formPanel.addWideRow(new JScrollPane(matchView));
-        form.setTypingTimeoutActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                showMatches();
-            }
-        });
+        form.setTypingTimeoutActionListener((e) -> { showMatches(); });
         form.getFormDialog().setExtraButton(rescanButton);
-        form.getFormDialog().setCancelRunnable(new Runnable() {
-            public void run() {
-                stopOutstandingWork();
-            }
-        });
+        form.getFormDialog().setCancelRunnable(() -> { stopOutstandingWork(); });
         form.getFormDialog().setAcceptCallable(new java.util.concurrent.Callable<Boolean>() {
             public Boolean call() {
                 stopOutstandingWork();
                 return true;
             }
         });
-    }
-    
-    private void initSaveMonitor() {
-        // Register for notifications of files saved while our dialog is up, so we can update the matches.
-        final SaveMonitor.Listener saveListener = new SaveMonitor.Listener() {
-            public void fileSaved() {
-                // FIXME: Ideally, we'd be a bit more intelligent about this than re-searching the whole tree.
-                showMatches();
-            }
-        };
-        SaveMonitor.getInstance().addSaveListener(saveListener);
     }
     
     /**

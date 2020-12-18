@@ -3,6 +3,7 @@ package e.edit;
 import java.io.*;
 import java.lang.reflect.*;
 import java.nio.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.List;
 import java.util.regex.*;
@@ -70,11 +71,11 @@ public class JavaResearcher implements WorkspaceResearcher {
     }
     
     private static String gunzipTextFile(String filename) throws IOException {
-        final File file = FileUtilities.fileFromString(filename);
-        if (!file.exists()) {
+        final Path file = FileUtilities.pathFrom(filename);
+        if (!Files.exists(file)) {
             return "";
         }
-        final InputStream in = new GZIPInputStream(new FileInputStream(file));
+        final InputStream in = new GZIPInputStream(new FileInputStream(file.toFile()));
         try {
             final byte[] buf = new byte[8192];
             final ByteArrayOutputStream uncompressedBytes = new ByteArrayOutputStream();

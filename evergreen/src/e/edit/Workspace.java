@@ -6,6 +6,7 @@ import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 import java.util.List;
 import javax.swing.*;
@@ -64,6 +65,9 @@ public class Workspace extends JPanel {
             public void fileListStateChanged(boolean newState) {
                 updateTabForWorkspace();
             }
+            public void fileCreated(String filename) {}
+            public void fileChanged(String filename) {}
+            public void fileDeleted(String filename) {}
         });
     }
     
@@ -71,10 +75,10 @@ public class Workspace extends JPanel {
         return fileList;
     }
     
-    public File getFileListCacheFile() {
+    public Path getFileListCachePath() {
         // TODO: we should probably have a standard way of escaping characters for safe use in the paths.
         String name = getWorkspaceName().replaceAll("[/\\\\]", " ");
-        return FileUtilities.fileFromString(Evergreen.getPreferenceFilename("cached-file-list-" + name));
+        return FileUtilities.pathFrom(Evergreen.getPreferenceFilename("cached-file-list-" + name));
     }
     
     public void dispose() {
@@ -98,8 +102,7 @@ public class Workspace extends JPanel {
     private void updateTabForWorkspace() {
         JTabbedPane tabbedPane = (JTabbedPane) SwingUtilities.getAncestorOfClass(JTabbedPane.class, this);
         if (tabbedPane != null) {
-            final File rootDirectory = FileUtilities.fileFromString(getRootDirectory());
-            final boolean rootDirectoryValid = rootDirectory.exists() && rootDirectory.isDirectory();
+            final boolean rootDirectoryValid = Files.isDirectory(getRootPath());
             final int openFileCount = leftColumn.getTextWindows().size() + getInitialFileCount();
             
             String tabTitle = getWorkspaceName();
@@ -122,10 +125,14 @@ public class Workspace extends JPanel {
         return rootDirectory;
     }
     
+    public Path getRootPath() {
+        return FileUtilities.pathFrom(rootDirectory);
+    }
+    
     public void setRootDirectory(String newRootDirectory) {
         this.rootDirectory = FileUtilities.getUserFriendlyName(newRootDirectory);
         try {
-            this.canonicalRootDirectory = FileUtilities.fileFromString(rootDirectory).getCanonicalPath() + File.separator;
+            this.canonicalRootDirectory = getRootPath().toRealPath() + File.separator;
         } catch (IOException ex) {
             Log.warn("Failed to cache canonical root directory for workspace \"" + workspaceName + "\" with new root \"" + rootDirectory + "\"", ex);
         }
@@ -149,6 +156,11 @@ public class Workspace extends JPanel {
         // We cache this because it's called when deciding on a workspace for a newly-opened file.
         // We don't want the UI to lock up because an unrelated workspace's NFS mount is temporarily unresponsive.
         return canonicalRootDirectory;
+    }
+    
+    /** Returns the OS-canonical root directory, but as an NIO Path. */
+    public Path getCanonicalRootPath() {
+        return Paths.get(canonicalRootDirectory);
     }
     
     /** Tests whether this workspace is empty. A workspace is still considered empty if all it contains is an errors window. */
@@ -183,11 +195,7 @@ public class Workspace extends JPanel {
             window.ensureSufficientlyVisible();
             ETextWindow textWindow = (ETextWindow) window;
             textWindow.jumpToAddress(address);
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    window.requestFocus();
-                }
-            });
+            GuiUtilities.invokeLater(() -> { window.requestFocus(); });
             return window;
         }
         return null;
@@ -215,19 +223,11 @@ public class Workspace extends JPanel {
         leftColumn.addComponent(viewer, y);
         if (address != null) {
             final ETextWindow textWindow = (ETextWindow) viewer;
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    textWindow.jumpToAddress(address);
-                }
-            });
+            GuiUtilities.invokeLater(() -> { textWindow.jumpToAddress(address); });
         }
         
         if (Evergreen.getInstance().isInitialized()) {
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    viewer.requestFocus();
-                }
-            });
+            GuiUtilities.invokeLater(() -> { viewer.requestFocus(); });
         }
         return viewer;
     }
@@ -339,11 +339,7 @@ public class Workspace extends JPanel {
     
     public void restoreFocusToRememberedTextWindow() {
         if (rememberedTextWindow != null) {
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    rememberedTextWindow.requestFocus();
-                }
-            });
+            GuiUtilities.invokeLater(() -> { rememberedTextWindow.requestFocus(); });
         }
     }
     

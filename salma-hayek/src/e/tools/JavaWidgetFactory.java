@@ -268,18 +268,16 @@ public class JavaWidgetFactory extends JPanel {
     }
     
     public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                e.util.GuiUtilities.initLookAndFeel();
-                
-                JavaWidgetFactory content = new JavaWidgetFactory();
-                MainFrame frame = new MainFrame("Java Widget Factory");
-                frame.setContentPane(content);
-                frame.setJMenuBar(new MenuBar());
-                frame.getRootPane().setDefaultButton(content.defaultButton);
-                frame.pack();
-                frame.setVisible(true);
-            }
+        GuiUtilities.invokeLater(() -> {
+            e.util.GuiUtilities.initLookAndFeel();
+            
+            JavaWidgetFactory content = new JavaWidgetFactory();
+            MainFrame frame = new MainFrame("Java Widget Factory");
+            frame.setContentPane(content);
+            frame.setJMenuBar(new MenuBar());
+            frame.getRootPane().setDefaultButton(content.defaultButton);
+            frame.pack();
+            frame.setVisible(true);
         });
     }
 }

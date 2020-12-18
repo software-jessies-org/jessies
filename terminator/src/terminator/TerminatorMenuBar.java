@@ -356,10 +356,8 @@ public class TerminatorMenuBar extends EMenuBar {
             if (terminalPane != null) {
                 // We need to invokeLater to avoid a race condition where (I think) the VK_ENTER hasn't finished processing and gets dispatched again to the new terminal.
                 // Chris Reece saw this on Mac OS if he did shift-command T, tab, return with no other windows open.
-                EventQueue.invokeLater(new Runnable() {
-                    public void run() {
-                        Terminator.getSharedInstance().openFrame(terminalPane);
-                    }
+                GuiUtilities.invokeLater(() -> {
+                    Terminator.getSharedInstance().openFrame(terminalPane);
                 });
             }
         }

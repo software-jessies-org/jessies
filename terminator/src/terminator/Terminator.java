@@ -226,20 +226,18 @@ public class Terminator {
     }
     
     public static void main(final String[] argumentArray) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    GuiUtilities.initLookAndFeel();
-                    Terminator.getSharedInstance().optionsDidChange();
-                    
-                    if (Terminator.getSharedInstance().parseOriginalCommandLine(Arrays.asList(argumentArray)) == false) {
-                        // Any syntax error has already been reported.
-                        System.exit(2);
-                    }
-                } catch (Throwable th) {
-                    Log.warn("Couldn't start Terminator.", th);
-                    System.exit(1);
+        GuiUtilities.invokeLater(() -> {
+            try {
+                GuiUtilities.initLookAndFeel();
+                Terminator.getSharedInstance().optionsDidChange();
+                
+                if (Terminator.getSharedInstance().parseOriginalCommandLine(Arrays.asList(argumentArray)) == false) {
+                    // Any syntax error has already been reported.
+                    System.exit(2);
                 }
+            } catch (Throwable th) {
+                Log.warn("Couldn't start Terminator.", th);
+                System.exit(1);
             }
         });
     }

@@ -42,7 +42,7 @@ public class GoToTagAction extends ETextAction {
         // FIXME: if Evergreen knew how to regenerate the tags, we could perhaps link it to "rescan".
         ArrayList<String> lines = new ArrayList<>();
         ArrayList<String> errors = new ArrayList<>();
-        int status = ProcessUtilities.backQuote(FileUtilities.fileFromString(workspaceRoot), new String[] { findTagsExecutable, tagName }, lines, errors);
+        int status = ProcessUtilities.backQuote(FileUtilities.pathFrom(workspaceRoot), new String[] { findTagsExecutable, tagName }, lines, errors);
         if (status == 1 || errors.size() > 0) {
             Evergreen.getInstance().showAlert("Unable to go to tag", findTagsExecutable + " failed. Error output:\n" + StringUtilities.join(errors, "\n"));
             return;

@@ -2,6 +2,7 @@ package e.edit;
 
 import e.util.*;
 import java.io.*;
+import java.nio.file.*;
 
 public class BuildTool {
     // The name of the "makefile" (which may be, say, an Ant "build.xml" file).
@@ -15,7 +16,7 @@ public class BuildTool {
         this.command = command;
     }
     
-    public void invoke(Workspace workspace, File directory, boolean test, Runnable onLaunch, Runnable onCompletion) {
+    public void invoke(Workspace workspace, Path directory, boolean test, Runnable onLaunch, Runnable onCompletion) {
         String command = this.command;
                 
         // FIXME: it would be good if we better understood what was being specified here. Personally, I mainly pass "-j".

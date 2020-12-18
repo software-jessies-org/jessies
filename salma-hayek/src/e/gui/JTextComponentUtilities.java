@@ -16,18 +16,12 @@ public class JTextComponentUtilities {
     }
     
     public static void goToSelection(final JTextComponent textComponent, final int startOffset, final int endOffset) {
-        if (EventQueue.isDispatchThread()) {
-            doGoToSelection(textComponent, startOffset, endOffset);
-        } else {
-            try {
-                EventQueue.invokeLater(new Runnable() {
-                    public void run() {
-                        doGoToSelection(textComponent, startOffset, endOffset);
-                    }
-                });
-            } catch (Throwable th) {
-                Log.warn("Failure in goToSelection.", th);
-            }
+        try {
+            GuiUtilities.nowOrLater(() -> {
+                doGoToSelection(textComponent, startOffset, endOffset);
+            });
+        } catch (Throwable th) {
+            Log.warn("Failure in goToSelection.", th);
         }
     }
     

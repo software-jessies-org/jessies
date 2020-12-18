@@ -92,11 +92,9 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
         form.getFormDialog().setShouldRestoreFocus(false);
         
         // Wrestle focus back from the file we've just opened.
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                SwingUtilities.getWindowAncestor(matchList).toFront();
-                filenameField.requestFocus();
-            }
+        GuiUtilities.invokeLater(() -> {
+            SwingUtilities.getWindowAncestor(matchList).toFront();
+            filenameField.requestFocus();
         });
     }
     
@@ -161,6 +159,18 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
             switchToFakeList();
             filenameField.requestFocusInWindow();
         }
+    }
+    
+    // We implement the incremental update just by doing a full rescan. All we're doing is checking a
+    // regexp against a set of strings, so it should be quick anyway.
+    public void fileCreated(String filename) {
+        fileListStateChanged(true);
+    }
+    
+    public void fileChanged(String filename) {}
+    
+    public void fileDeleted(String filename) {
+        fileListStateChanged(true);
     }
     
     /**

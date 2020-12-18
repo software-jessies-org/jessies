@@ -29,10 +29,8 @@ public class GuiUtilities {
         "export JESSIES_WEB_BROWSER=firefox\n";
         
     static {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                e.debug.EventDispatchThreadHangMonitor.initMonitoring();
-            }
+        invokeLater(() -> {
+            e.debug.EventDispatchThreadHangMonitor.initMonitoring();
         });
     }
     
@@ -64,6 +62,24 @@ public class GuiUtilities {
     private static final int COMPONENT_SPACING = calculateComponentSpacing();
     
     private static boolean mnemonicsEnabled = true;
+    
+    public static void nowOrLater(final Runnable runnable) {
+        if (EventQueue.isDispatchThread()) {
+            runnable.run();
+        } else {
+            invokeLater(runnable);
+        }
+    }
+    
+    public static void invokeLater(final Runnable runnable) {
+        java.awt.EventQueue.invokeLater(() -> {
+            try {
+                runnable.run();
+            } catch (Throwable th) {
+                Log.warn("Failure in Swing invocation", th);
+            }
+        });
+    }
     
     /**
      * Guesses whether a font is fixed-width by comparing the widths of

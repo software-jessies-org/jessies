@@ -395,11 +395,9 @@ public class FatBits extends MainFrame {
     }
     
     public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                GuiUtilities.initLookAndFeel();
-                new FatBits().setVisible(true);
-            }
+        GuiUtilities.invokeLater(() -> {
+            GuiUtilities.initLookAndFeel();
+            new FatBits().setVisible(true);
         });
     }
 }

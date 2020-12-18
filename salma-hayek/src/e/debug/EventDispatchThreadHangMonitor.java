@@ -284,25 +284,23 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
     private static class Tests {
         public static void main(final String[] args) {
             GuiUtilities.initLookAndFeel();
-            java.awt.EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    for (String arg : args) {
-                        final MainFrame frame = new MainFrame();
-                        if (arg.equals("exception")) {
-                            runExceptionTest(frame);
-                        } else if (arg.equals("focus")) {
-                            runFocusTest(frame);
-                        } else if (arg.equals("modal-hang")) {
-                            runModalTest(frame, true);
-                        } else if (arg.equals("modal-no-hang")) {
-                            runModalTest(frame, false);
-                        } else {
-                            System.err.println("unknown regression test \"" + arg + "\"");
-                            System.exit(1);
-                        }
-                        frame.pack();
-                        frame.setVisible(true);
+            GuiUtilities.invokeLater(() -> {
+                for (String arg : args) {
+                    final MainFrame frame = new MainFrame();
+                    if (arg.equals("exception")) {
+                        runExceptionTest(frame);
+                    } else if (arg.equals("focus")) {
+                        runFocusTest(frame);
+                    } else if (arg.equals("modal-hang")) {
+                        runModalTest(frame, true);
+                    } else if (arg.equals("modal-no-hang")) {
+                        runModalTest(frame, false);
+                    } else {
+                        System.err.println("unknown regression test \"" + arg + "\"");
+                        System.exit(1);
                     }
+                    frame.pack();
+                    frame.setVisible(true);
                 }
             });
         }
@@ -361,16 +359,12 @@ public final class EventDispatchThreadHangMonitor extends EventQueue {
                     dialog.setLocation(frame.getX() - 100, frame.getY());
                     
                     // Make sure the new event pump has some work to do, each unit of which is insufficient to cause a hang.
-                    new Thread(new Runnable() {
-                        public void run() {
-                            for (int i = 0; i <= 100000; ++i) {
-                                final int value = i;
-                                EventQueue.invokeLater(new Runnable() {
-                                    public void run() {
-                                        label.setText(Integer.toString(value));
-                                    }
-                                });
-                            }
+                    new Thread(() -> {
+                        for (int i = 0; i <= 100000; ++i) {
+                            final int value = i;
+                            GuiUtilities.invokeLater(() -> {
+                                label.setText(Integer.toString(value));
+                            });
                         }
                     }).start();
                     

@@ -4,6 +4,7 @@ import e.util.*;
 import java.io.*;
 import java.nio.*;
 import java.nio.charset.*;
+import java.nio.file.*;
 import java.util.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -176,6 +177,14 @@ public class PTextBuffer implements CharSequence {
         return s.replaceAll(lineEnding, "\n").toCharArray();
     }
     
+    /**
+     * Writes the contents of this buffer into the given file, replacing
+     * whatever's already there.
+     */
+    public void writeTo(Path file) {
+        writeToFile(file.toFile());
+    }
+        
     /**
      * Writes the contents of this buffer into the given file, replacing
      * whatever's already there.

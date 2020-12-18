@@ -4,6 +4,7 @@ import e.gui.*;
 import e.util.*;
 import java.awt.event.*;
 import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 
 /**
@@ -55,24 +56,30 @@ public class BuildAction extends ETextAction {
     private void buildProject() {
         // Choosing the build tool relies on the focused text window to tell us
         // where to start looking, so do it before we risk popping up dialogs.
-        File directory = FileUtilities.fileFromString(getMakefileSearchStartDirectory());
+        Path directory = FileUtilities.pathFrom(getMakefileSearchStartDirectory());
         
         // We search up from the currently-selected source file's directory,
         // stopping at the first match.
-        for (; directory != null; directory = directory.getParentFile()) {
-            for (String filename : directory.list()) {
-                final BuildTool buildTool = buildTools.get(filename);
-                if (buildTool != null) {
-                    invokeBuildTool(buildTool, directory);
+        for (; directory != null; directory = directory.getParent()) {
+            // Path.getFileName() is basically like the unix 'basename' command.
+            try {
+                Optional<BuildTool> buildTool = Files.list(directory)
+                    .map(v -> buildTools.get(v.getFileName().toString()))
+                    .filter(v -> v != null)
+                    .findFirst();
+                if (buildTool.isPresent()) {
+                    invokeBuildTool(buildTool.get(), directory);
                     return;
                 }
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
             }
         }
         
         Evergreen.getInstance().showAlert("Build instructions not found", "No " + StringUtilities.join(buildTools.keySet(), "/") + " found.");
     }
     
-    private void invokeBuildTool(BuildTool tool, File directory) {
+    private void invokeBuildTool(BuildTool tool, Path directory) {
         if (building) {
             // FIXME: work harder to recognize possibly-deliberate duplicate builds (different targets or makefiles, for example).
             Evergreen.getInstance().showAlert("A target is already being built", "Please wait for the current build to complete before starting another.");
@@ -84,14 +91,6 @@ public class BuildAction extends ETextAction {
             return;
         }
         
-        tool.invoke(workspace, directory, test, new Runnable() {
-            public void run() {
-                building = true;
-            }
-        }, new Runnable() {
-            public void run() {
-                building = false;
-            }
-        });
+        tool.invoke(workspace, directory, test, () -> { building = true; }, () -> { building = false; });
     }
 }

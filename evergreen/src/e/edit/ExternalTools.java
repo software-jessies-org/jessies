@@ -4,6 +4,8 @@ import e.gui.*;
 import e.util.*;
 import java.awt.event.*;
 import java.io.*;
+import java.nio.file.*;
+import java.nio.file.attribute.*;
 import java.util.*;
 import javax.swing.*;
 
@@ -15,6 +17,7 @@ import javax.swing.*;
  */
 public class ExternalTools {
     private static final String MONITOR_NAME = "external tools";
+    private static final int MAX_TOOLS_DIR_DEPTH = 10;
     private static final ArrayList<Listener> listeners = new ArrayList<>();
     
     private static FileAlterationMonitor fileAlterationMonitor;
@@ -67,41 +70,54 @@ public class ExternalTools {
         return Collections.unmodifiableList(popUpTools);
     }
     
-    private static void scanToolsDirectory(File directory, final FileAlterationMonitor newFileAlterationMonitor, List<ExternalToolAction> newAllTools, List<ExternalToolAction> newPopUpTools) {
-        newFileAlterationMonitor.addPathname(directory.toString());
-        
-        if (!directory.exists()) {
+    private static void scanToolsDirectory(Path directory, final FileAlterationMonitor newFileAlterationMonitor, List<ExternalToolAction> newAllTools, List<ExternalToolAction> newPopUpTools) {
+        if (!Files.isDirectory(directory)) {
             return;
         }
-        
-        List<File> files = new FileFinder().includeDirectories(true).filesUnder(directory, new FileIgnorer().includeAllSymbolicLinks(true));
-        Collections.sort(files);
-        for (File file : files) {
-            newFileAlterationMonitor.addPathname(file.toString());
-            if (file.isDirectory()) {
-                continue;
-            }
-            try {
-                parseFile(file, newAllTools, newPopUpTools);
-            } catch (Exception ex) {
-                Log.warn("Problem reading \"" + file + "\"", ex);
-            }
+        newFileAlterationMonitor.addPath(directory);
+        try {
+            Files.walkFileTree(directory, EnumSet.of(FileVisitOption.FOLLOW_LINKS), MAX_TOOLS_DIR_DEPTH, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
+                    newFileAlterationMonitor.addPath(dir);
+                    return FileVisitResult.CONTINUE;
+                }
+                
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
+                    try {
+                        parseFile(file, newAllTools, newPopUpTools);
+                    } catch (Exception ex) {
+                        Log.warn("Problem reading \"" + file + "\"", ex);
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+                
+                @Override
+                public FileVisitResult visitFileFailed(Path file, IOException ex) {
+                    // Stuff can be deleted under our feet.
+                    // This is not an error, just something we cope with and continue.
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (IOException ex) {
+            Log.warn("Failed to walk tools tree for " + directory.toString(), ex);
         }
     }
     
     private static void rescanToolConfiguration() {
-        final List<File> toolsDirectories = new ArrayList<>();
-        toolsDirectories.add(FileUtilities.fileFromString(Evergreen.getResourceFilename("lib", "data", "tools")));
-        toolsDirectories.add(FileUtilities.fileFromString("/usr/lib/software.jessies.org/evergreen/tools/"));
-        toolsDirectories.add(FileUtilities.fileFromString("/usr/local/software.jessies.org/evergreen/tools/"));
-        toolsDirectories.add(FileUtilities.fileFromString(Evergreen.getPreferenceFilename("tools")));
+        final List<Path> toolsDirectories = new ArrayList<>();
+        toolsDirectories.add(FileUtilities.pathFrom(Evergreen.getResourceFilename("lib", "data", "tools")));
+        toolsDirectories.add(FileUtilities.pathFrom("/usr/lib/software.jessies.org/evergreen/tools/"));
+        toolsDirectories.add(FileUtilities.pathFrom("/usr/local/software.jessies.org/evergreen/tools/"));
+        toolsDirectories.add(FileUtilities.pathFrom(Evergreen.getPreferenceFilename("tools")));
         
         final FileAlterationMonitor newFileAlterationMonitor = new FileAlterationMonitor(MONITOR_NAME);
         final List<ExternalToolAction> newAllTools = new ArrayList<>();
         final List<ExternalToolAction> newPopUpTools = new ArrayList<>();
         
         // FIXME: every change of directory should probably add a separator automatically. (including within a toolsDirectory?)
-        for (File toolsDirectory : toolsDirectories) {
+        for (Path toolsDirectory : toolsDirectories) {
             scanToolsDirectory(toolsDirectory, newFileAlterationMonitor, newAllTools, newPopUpTools);
         }
         // FIXME: strip duplicate and leading/trailing separators after all the directories have been scanned.
@@ -115,7 +131,7 @@ public class ExternalTools {
         fireToolsChanged();
     }
     
-    private static void parseFile(File file, List<ExternalToolAction> newAllTools, List<ExternalToolAction> newPopUpTools) {
+    private static void parseFile(Path file, List<ExternalToolAction> newAllTools, List<ExternalToolAction> newPopUpTools) throws IOException {
         String name = null;
         String command = null;
         
@@ -128,7 +144,10 @@ public class ExternalTools {
         boolean needsFile = false;
         boolean showOnPopUpMenu = false;
         
-        for (String line : StringUtilities.readLinesFromFile(file)) {
+        for (String line : Files.readAllLines(file)) {
+            if (line.isEmpty() || line.startsWith("#")) {
+                continue;
+            }
             int equalsPos = line.indexOf('=');
             if (equalsPos == -1) {
                 // TODO: isn't this an error worth reporting?

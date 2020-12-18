@@ -3,7 +3,7 @@ package e.edit;
 import e.gui.*;
 import e.util.*;
 import java.awt.*;
-import java.io.*;
+import java.nio.file.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -25,11 +25,11 @@ public class EvergreenTabbedPane extends TabbedPane {
     @Override public String getToolTipTextAt(int index) {
         // You always get this bit.
         final Workspace workspace = (Workspace) getComponentAt(index);
-        final File rootDirectory = FileUtilities.fileFromString(workspace.getRootDirectory());
+        final Path rootDirectory = workspace.getRootPath();
         String normalText = FileUtilities.getUserFriendlyName(rootDirectory);
-        if (rootDirectory.exists() == false) {
+        if (Files.exists(rootDirectory) == false) {
             normalText += "<p><font color='red'>(This directory doesn't exist.)</font>";
-        } else if (rootDirectory.isDirectory() == false) {
+        } else if (Files.isDirectory(rootDirectory) == false) {
             normalText += "<p><font color='red'>(This isn't a directory.)</font>";
         }
         
@@ -49,11 +49,9 @@ public class EvergreenTabbedPane extends TabbedPane {
      */
     private static class WorkspaceFocuser implements ChangeListener {
         public void stateChanged(ChangeEvent e) {
-            EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    Evergreen.getInstance().getTagsPanel().ensureTagsAreHidden();
-                    Evergreen.getInstance().getCurrentWorkspace().restoreFocusToRememberedTextWindow();
-                }
+            GuiUtilities.invokeLater(() -> {
+                Evergreen.getInstance().getTagsPanel().ensureTagsAreHidden();
+                Evergreen.getInstance().getCurrentWorkspace().restoreFocusToRememberedTextWindow();
             });
         }
     }
