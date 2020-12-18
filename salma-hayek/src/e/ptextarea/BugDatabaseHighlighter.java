@@ -108,7 +108,7 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
             // Assuming, of course, that they're using Evergreen, which is not guaranteed, although it's
             // rather likely.
             // At least it's better than freezing up the UI and dumping stack traces in the log.
-            return "https://github.com/software-jessies-org/jessies/wiki/EvergreenProperties#error_group_count";
+            return "https://github.com/software-jessies-org/jessies/wiki/EvergreenProperties#error-group-count";
         }
         String seed = matcher.group(2);
         String replacement = urlEncode(seed);
