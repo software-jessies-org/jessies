@@ -37,9 +37,11 @@ public class BuildAction extends ETextAction {
         result.put("meson.build", new BuildTool("meson.build", "if [ ! -d .out ]; then CXX=clang++ meson .out; fi && ninja -C `realpath .out`"));
         
         // Any user-defined build tools? TODO: does anyone use this?
-        for (Map.Entry<String, String> tool : Parameters.getStrings("build.").entrySet()) {
-            final String key = tool.getKey().substring("build.".length());
-            result.put(key, new BuildTool(key, tool.getValue()));
+        // Yes, I (philjessies) use it. This is good, useful, wholesome functionality that should be preserved.
+        // It is a horrible idea to force people to hack about with the source code just in order to support
+        // a different build tool. There are at least O(hundreds) of build tools, and new ones frequently appear.
+        for (Map.Entry<String, String> tool : Parameters.getStringsTrimmed("build.").entrySet()) {
+            result.put(tool.getKey(), new BuildTool(tool.getKey(), tool.getValue()));
         }
         return result;
     }

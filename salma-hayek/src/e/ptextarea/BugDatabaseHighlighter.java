@@ -25,7 +25,8 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
         // This is too expensive and unpredictable to do every time we configure a PTextArea, especially because we'll probably be on the EDT.
         // Really?  Well, if you say so, but it's lame to have to restart Evergreen to benefit from a script change.
         // I can imagine wanting to produce different results in different Evergreen workspaces.
-        // The script's output format is "^<pattern-to-match>\t<link-template>$" where the pattern's groups are as described in highlightBugs.
+        // The script's output format is "^<pattern-to-match>\t<link-template>$" where the pattern's groups are as described in
+        // the comments within the highlightBugs function.
         // For example, this uses only Bash, keeps the two parts distinct, and avoids escaping issues:
         //
         // #!/bin/bash
@@ -66,15 +67,20 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
         
         // Site-local bug database links.
         for (SiteLocalScriptEntry entry : siteLocalScriptEntries) {
-            highlightBug(textArea, entry.patternToMatch, entry.linkTemplate);
+            addBugHighlighting(textArea, entry.patternToMatch, entry.linkTemplate);
         }
         // Sun Java bugs.
-        highlightBug(textArea, "\\b(([4-6]\\d{6}))\\b", "http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=%s");
+        // Sun is long gone, and Oracle seems to have put the old bug site under permanent maintenance
+        // (http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=%s).
+        // A forum post suggests that the openjdk bug DB preserved the original sun bug IDs, and indeed
+        // spot checking one referred to by Evergreen (4949810) indicates that this is so.
+        addBugHighlighting(textArea, "\\b(([4-6]\\d{6}))\\b", "https://bugs.openjdk.java.net/browse/JDK-%s");
         // RFCs; not strictly bugs, but often referenced in comments.
-        highlightBug(textArea, "(?i)\\b(rfc\\s*(\\d{3,4}))\\b", "http://tools.ietf.org/html/rfc%s");
+        addBugHighlighting(textArea, "(?i)\\b(rfc\\s*(\\d{3,4}))\\b", "http://tools.ietf.org/html/rfc%s");
     }
     
-    private static void highlightBug(PTextArea textArea, String regularExpression, String urlTemplate) {
+    // Registers bug highlighting on the textArea.
+    public static void addBugHighlighting(PTextArea textArea, String regularExpression, String urlTemplate) {
         textArea.addStyleApplicator(new BugDatabaseHighlighter(textArea, regularExpression, urlTemplate));
     }
     
@@ -96,14 +102,19 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
     }
     
     private String urlForMatcher(Matcher matcher) {
+        if (matcher.groupCount() < 2) {
+            Log.warn("Regexp " + getPattern() + " did not produce the requisite 2 groups (1 for identifying what to highlight, one for the string to substitute into the bug DB link)");
+            // Send the user to the part of the evergreen docs that explain what went wrong.
+            // Assuming, of course, that they're using Evergreen, which is not guaranteed, although it's
+            // rather likely.
+            // At least it's better than freezing up the UI and dumping stack traces in the log.
+            return "https://github.com/software-jessies-org/jessies/wiki/EvergreenProperties#error_group_count";
+        }
         String seed = matcher.group(2);
         String replacement = urlEncode(seed);
-        try {
-            String section = matcher.group(3);
-            if (section != null) {
-                replacement += "#" + urlEncode(section);
-            }
-        } catch (IndexOutOfBoundsException ex) {
+        if (matcher.groupCount() > 2) {
+            // It's not clear what this is for. If someone knows, please explain.
+            replacement += "#" + urlEncode(matcher.group(3));
         }
         return urlTemplate.replaceAll("%s", replacement);
     }

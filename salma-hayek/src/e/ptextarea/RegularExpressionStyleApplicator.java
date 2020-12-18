@@ -31,8 +31,10 @@ public class RegularExpressionStyleApplicator implements StyleApplicator {
         while (matcher.find()) {
             if (isAcceptableMatch(line, matcher)) {
                 // We need exactly one group, but we accept more in case the user has used extra groups without making them non-capturing.
+                // Note also that subclasses may require extra groups to be present (eg the BugDatabaseHighlighter).
                 if (matcher.groupCount() < 1) {
                     Log.warn("RegularExpressionStyleApplicator for \"" + pattern + "\" disabled because it has no capturing group.");
+                    continue;
                 }
                 final int matchStart = matcher.start(1);
                 final int matchEnd = matcher.end(1);
@@ -76,5 +78,9 @@ public class RegularExpressionStyleApplicator implements StyleApplicator {
      * Override this to configure each matching text segment.
      */
     protected void configureSegment(PTextSegment segment, Matcher matcher) {
+    }
+
+    public Pattern getPattern() {
+        return pattern;
     }
 }

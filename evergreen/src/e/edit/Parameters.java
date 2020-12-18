@@ -130,6 +130,16 @@ public class Parameters {
         return (value != null) ? value : defaultValue;
     }
     
+    /** As getStrings, but trims the prefix from each of the keys in the returned map. */
+    public static synchronized Map<String, String> getStringsTrimmed(String prefix) {
+        Map<String, String> result = new HashMap<>();
+        final int prefixLen = prefix.length();
+        for (Map.Entry<String, String> entry : getStrings(prefix).entrySet()) {
+            result.put(entry.getKey().substring(prefixLen), entry.getValue());
+        }
+        return result;
+    }
+
     /**
      * Returns a (copy of a) subset of this map containing only those entries whose keys start with 'prefix'.
      */

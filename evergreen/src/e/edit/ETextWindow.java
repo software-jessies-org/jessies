@@ -378,6 +378,19 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         newFileType.configureTextArea(textArea, Evergreen.getInstance().getFileTypePreferences());
         
         BugDatabaseHighlighter.highlightBugs(textArea);
+        // Note: while it's called the BugDatabaseHighlighter, there's really no particular reason why
+        // the links have to be bugs. For example, in some source trees it is common to refer to changelists
+        // as "cl/1234567", which could be linked to a display of the changelist.
+        // Let's add the ability both to have parameter-defined bug highlights in general, and also to set
+        // up highlights specific to the language. For example, it makes little sense to highlight Java bug
+        // numbers in Perl code. Of course, java bug numbers are hard-coded in the BugDatabaseHighlighter right
+        // now, but it's just an example.
+        for (Map.Entry<String, String> tool : Parameters.getStringsTrimmed("default.linkRegexp.").entrySet()) {
+            BugDatabaseHighlighter.addBugHighlighting(textArea, tool.getKey(), tool.getValue());
+        }
+        for (Map.Entry<String, String> tool : Parameters.getStringsTrimmed(getFileType().getName() + ".linkRegexp.").entrySet()) {
+            BugDatabaseHighlighter.addBugHighlighting(textArea, tool.getKey(), tool.getValue());
+        }
         
         // Ensure we re-do the tags now we've changed our mind about what kind of tags we're looking for.
         tagsUpdater.updateTags();
