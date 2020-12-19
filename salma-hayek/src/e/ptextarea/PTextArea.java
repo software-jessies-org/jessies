@@ -1165,6 +1165,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     
     public int getSplitLineIndex(int lineIndex) {
         getLock().getReadLock();
+        // Ensure that the splitLines are not null before proceeding. This function can be called
+        // by the BirdView while splitLines is null, which causes really nasty painting defects
+        // if we don't do this.
         generateLineWrappings();
         try {
             if (lineIndex > getSplitLine(splitLines.size() - 1).getLineIndex()) {
