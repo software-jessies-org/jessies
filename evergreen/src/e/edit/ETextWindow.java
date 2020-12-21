@@ -319,12 +319,14 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
             private String seriousMessage = null;
             private String nonSeriousMessage = null;
             private boolean hasCounterpart = false;
+            private boolean hasTestFile = false;
             
             public void run() {
                 updateFileState();
                 GuiUtilities.invokeLater(() -> {
                     watermarkViewPort.setWatermark(seriousMessage, nonSeriousMessage);
                     getTitleBar().setShowSwitchButton(hasCounterpart);
+                    getTitleBar().setShowSwitchTestButton(hasTestFile);
                 });
             }
             
@@ -340,6 +342,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
                     seriousMessage = "(deleted)";
                 }
                 hasCounterpart = (getCounterpartFilename() != null);
+                hasTestFile = (getTestFilename() != null);
             }
         });
     }
@@ -498,32 +501,35 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
      * that when present within a workspace, it may start with "~/".
      */
     public String getCounterpartFilename() {
-        Log.warn("Filename is " + filename);
-        Workspace workspace = getWorkspace();
-        if (workspace == null) {
-            return null;
-        }
-        WorkspaceFileList files = workspace.getFileList();
-        if (files == null) {
-            return null;
-        }
         // Work out what the counterpart would be called.
         String noExt = filename.replaceAll("\\.[^.]+$", "");
         if (endsWithAny(filename, cSourceExts)) {
             for (String ext : cHeaderExts) {
-                if (files.fileExists(noExt + ext)) {
+                if (fileExistsInWorkspace(noExt + ext)) {
                     return noExt + ext;
                 }
             }
         }
         if (endsWithAny(filename, cHeaderExts)) {
             for (String ext : cSourceExts) {
-                if (files.fileExists(noExt + ext)) {
+                if (fileExistsInWorkspace(noExt + ext)) {
                     return noExt + ext;
                 }
             }
         }
         return null;
+    }
+    
+    private boolean fileExistsInWorkspace(String filename) {
+        Workspace workspace = getWorkspace();
+        if (workspace == null) {
+            return false;
+        }
+        WorkspaceFileList fileList = workspace.getFileList();
+        if (fileList == null) {
+            return false;
+        }
+        return fileList.fileExists(filename);
     }
     
     private boolean endsWithAny(String str, String[] suffices) {
@@ -546,7 +552,34 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
             Evergreen.getInstance().showAlert("Can't switch to counterpart", "File \"" + filename + "\" has no counterpart.");
         }
     }
-
+    
+    public String getTestFilename() {
+        for (Map.Entry<String, String> mapping : Parameters.getStringsTrimmed("testFilenameMapping.").entrySet()) {
+            try {
+                Matcher matcher = Pattern.compile(mapping.getKey()).matcher(filename);
+                if (!matcher.matches()) {
+                    continue;
+                }
+                String testFilename = matcher.replaceFirst(mapping.getValue());
+                if (fileExistsInWorkspace(testFilename)) {
+                    return testFilename;
+                }
+            } catch (Exception ex) {
+                Log.warn("Failed to match test file pattern", ex);
+            }
+        }
+        return null;
+    }
+    
+    public void switchToTestFile() {
+        String testFilename = getTestFilename();
+        if (testFilename != null) {
+            Evergreen.getInstance().openFile(testFilename);
+        } else {
+            Evergreen.getInstance().showAlert("Can't switch to test file", "File \"" + filename + "\" has no test.");
+        }
+    }
+    
     public FileType getFileType() {
         return textArea.getFileType();
     }

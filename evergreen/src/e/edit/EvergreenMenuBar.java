@@ -111,6 +111,7 @@ public class EvergreenMenuBar extends EMenuBar {
 
         menu.addSeparator();
         menu.add(new ShowCounterpartAction());
+        menu.add(new ShowTestFileAction());
         menu.add(new ShowDocumentationAction());
 
         menu.addSeparator();

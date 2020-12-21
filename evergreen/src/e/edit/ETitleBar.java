@@ -41,6 +41,7 @@ public class ETitleBar extends JPanel {
     private final ECloseButton closeButton;
     
     private ESwitchButton switchButton;
+    private ESwitchToTestButton switchToTestButton;
     
     private boolean isActive;
     
@@ -97,6 +98,18 @@ public class ETitleBar extends JPanel {
         } else if (switchButton != null && shouldShow == false) {
             buttonsPanel.remove(switchButton);
             this.switchButton = null;
+            forceRepaint();
+        }
+    }
+    
+    public void setShowSwitchTestButton(boolean shouldShow) {
+        if (switchToTestButton == null && shouldShow) {
+            this.switchToTestButton = new ESwitchToTestButton((ETextWindow) window);
+            buttonsPanel.add(switchToTestButton, BorderLayout.WEST);
+            forceRepaint();
+        } else if (switchToTestButton != null && shouldShow == false) {
+            buttonsPanel.remove(switchToTestButton);
+            this.switchToTestButton = null;
             forceRepaint();
         }
     }
