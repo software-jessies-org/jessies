@@ -7,7 +7,8 @@ import javax.swing.*;
 
 final class PTextAreaRenderer {
     private static final Stopwatch paintStopwatch = Stopwatch.get("PTextAreaRenderer.render");
-    
+    private static final int BIG_RED_ARROW_SIZE = 200;
+
     // Used to get help us match the native UI when we're disabled.
     private static final JLabel disabledLabel;
     static {
@@ -78,7 +79,28 @@ final class PTextAreaRenderer {
             timer.stop();
         }
     }
-    
+
+    public void drawBigRedArrowPointingAt(Point pt) {
+        // By default we're pointing down and to the right; if the point we're pointing at is too far left,
+        // or too far up, we reverse the corresponding direction.
+        int xOff = ((pt.x < BIG_RED_ARROW_SIZE) ? 1 : -1) * BIG_RED_ARROW_SIZE / 4;
+        int yOff = ((pt.y < BIG_RED_ARROW_SIZE) ? 1 : -1) * BIG_RED_ARROW_SIZE / 4;
+        int x0 = pt.x;
+        int x1 = pt.x + xOff;
+        int x2 = pt.x + 2*xOff;
+        int x3 = pt.x + 3*xOff;
+        int x4 = pt.x + 4*xOff;
+        int y0 = pt.y;
+        int y1 = pt.y + yOff;
+        int y2 = pt.y + 2*yOff;
+        int y3 = pt.y + 3*yOff;
+        int y4 = pt.y + 4*yOff;
+        int xs[] = new int[]{x0, x3, x2, x4, x3, x1, x0, x0};
+        int ys[] = new int[]{y0, y0, y1, y3, y4, y2, y3, y0};
+        g.setColor(Color.RED);
+        g.fillPolygon(xs, ys, xs.length);
+    }
+
     private void paintTextLines(int minLine, int maxLine, int startX, int startY, Color overrideColor) {
         int baseline = startY;
         int paintCharOffset = textArea.getSplitLine(minLine).getTextIndex(textArea);

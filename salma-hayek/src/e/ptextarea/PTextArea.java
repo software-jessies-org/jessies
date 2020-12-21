@@ -28,6 +28,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     private SelectionHighlight selection;
     private boolean selectionEndIsAnchor;  // Otherwise, selection start is anchor.
     
+    // When told to, we draw a big red arrow pointing at a specific location (eg the caret).
+    // This field is non-null when we should be showing such a thing.
+    // Typically this is used as a brief highlight, to show the user where the caret is.
+    private Point bigRedArrowPoint;
+
     private PLineList lines;
     // TODO: experiment with java.util.ArrayDeque in Java 6.
     // But ArrayDeque wouldn't help bulk operations in the middle.
@@ -352,7 +357,25 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         y = Math.min(y, getHeight() - height);
         viewport.setViewPosition(new Point(0, y));
     }
-    
+
+    public void brieflyShowBigRedArrowPointingAt(int offset) {
+        if (weAreTooBrokenToWaitUntilWeAreAbleToCarryThisOut()) {
+            return;
+        }
+        bigRedArrowPoint = getViewCoordinates(getCoordinates(offset));
+        repaint();
+        // Show the big red arrow for 1 second. It's big and red, so that should be enough for it to be
+        // noticed, without sticking around beyond its welcome.
+        javax.swing.Timer disappearTimer = new javax.swing.Timer(1000, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                bigRedArrowPoint = null;
+                repaint();
+            }
+        });
+        disappearTimer.setRepeats(false);
+        disappearTimer.start();
+    }
+
     public void ensureVisibilityOfOffset(int offset) {
         if (weAreTooBrokenToWaitUntilWeAreAbleToCarryThisOut()) {
             return;
@@ -1009,6 +1032,9 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
             
             PTextAreaRenderer renderer = new PTextAreaRenderer(this, (Graphics2D) oldGraphics);
             renderer.render();
+            if (bigRedArrowPoint != null) {
+                renderer.drawBigRedArrowPointingAt(bigRedArrowPoint);
+            }
         } catch (Throwable th) {
             Log.warn("PTextArea paint failed", th);
         } finally {

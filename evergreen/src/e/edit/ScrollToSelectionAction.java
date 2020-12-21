@@ -11,6 +11,8 @@ public class ScrollToSelectionAction extends PTextAction {
     }
     
     public void performOn(PTextArea textArea) {
-        textArea.centerOffsetInDisplay(textArea.getUnanchoredSelectionExtreme());
+        int offset = textArea.getUnanchoredSelectionExtreme();
+        textArea.centerOffsetInDisplay(offset);
+        textArea.brieflyShowBigRedArrowPointingAt(offset);
     }
 }
