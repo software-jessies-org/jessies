@@ -22,6 +22,8 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     // Used to update the watermark without creating and destroying an excessive number of threads.
     private static final ExecutorService WATERMARK_UPDATE_EXECUTOR = ThreadUtilities.newSingleThreadExecutor("Watermark Updater");
     
+    // This is the 'prettified' version of filename (eg, it might start with "~/").
+    // It should generally begin with the official workspace directory.
     private final String filename;
     private final Path path;
     private final PTextArea textArea;
@@ -241,7 +243,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
             }
             
             private void rememberWeHadFocusLast() {
-                Workspace workspace = (Workspace) SwingUtilities.getAncestorOfClass(Workspace.class, ETextWindow.this);
+                Workspace workspace = getWorkspace();
                 // We might be losing focus because we've just been closed, in which case we're no longer in the component hierarchy.
                 if (workspace != null) {
                     workspace.rememberFocusedTextWindow(ETextWindow.this);
@@ -492,36 +494,54 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
      * A Java .java file, for example, has no counterpart. A C++ .cpp
      * file, on the other hand, may have a .h counterpart (and vice
      * versa).
+     * The filename returned is of the same form as the 'filename' field, such
+     * that when present within a workspace, it may start with "~/".
      */
     public String getCounterpartFilename() {
+        Log.warn("Filename is " + filename);
+        Workspace workspace = getWorkspace();
+        if (workspace == null) {
+            return null;
+        }
+        WorkspaceFileList files = workspace.getFileList();
+        if (files == null) {
+            return null;
+        }
         // Work out what the counterpart would be called.
-        String basename = path.getFileName().toString().replaceAll("\\.[^.]+$", "");
-        
-        String parent = path.getParent().toString();
-        if (filename.endsWith(".cpp") || filename.endsWith(".cc") || filename.endsWith(".c")) {
-            if (FileUtilities.exists(parent, basename + ".hpp")) {
-                return basename + ".hpp";
-            } else if (FileUtilities.exists(parent, basename + ".hh")) {
-                return basename + ".hh";
-            } else if (FileUtilities.exists(parent, basename + ".h")) {
-                return basename + ".h";
+        String noExt = filename.replaceAll("\\.[^.]+$", "");
+        if (endsWithAny(filename, cSourceExts)) {
+            for (String ext : cHeaderExts) {
+                if (files.fileExists(noExt + ext)) {
+                    return noExt + ext;
+                }
             }
-        } else if (filename.endsWith(".hpp") || filename.endsWith(".hh") || filename.endsWith(".h")) {
-            if (FileUtilities.exists(parent, basename + ".cpp")) {
-                return basename + ".cpp";
-            } else if (FileUtilities.exists(parent, basename + ".cc")) {
-                    return basename + ".cc";
-            } else if (FileUtilities.exists(parent, basename + ".c")) {
-                return basename + ".c";
+        }
+        if (endsWithAny(filename, cHeaderExts)) {
+            for (String ext : cSourceExts) {
+                if (files.fileExists(noExt + ext)) {
+                    return noExt + ext;
+                }
             }
         }
         return null;
     }
+    
+    private boolean endsWithAny(String str, String[] suffices) {
+        for (String suffix : suffices) {
+            if (str.endsWith(suffix)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private static final String[] cHeaderExts = {".h", ".hh", ".hpp"};
+    private static final String[] cSourceExts = {".c", ".cc", ".cpp"};
 
     public void switchToCounterpart() {
         String counterpartFilename = getCounterpartFilename();
         if (counterpartFilename != null) {
-            Evergreen.getInstance().openFile(getContext() + File.separator + counterpartFilename);
+            Evergreen.getInstance().openFile(counterpartFilename);
         } else {
             Evergreen.getInstance().showAlert("Can't switch to counterpart", "File \"" + filename + "\" has no counterpart.");
         }

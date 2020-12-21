@@ -387,6 +387,16 @@ public class StringUtilities {
     }
     
     /**
+     * Returns 'str' with 'prefix' removed from it, or 'str' unmodified if it doesn't start with 'prefix'.
+     */
+    public static String trimPrefix(String str, String prefix) {
+        if (str.startsWith(prefix)) {
+            return str.substring(prefix.length());
+        }
+        return str;
+    }
+    
+    /**
      * A convenient wrapper around URLEncoder.encode.
      * Should perhaps have been called escapeForUrl or encodeUrl, so I stop reinventing it.
      */

@@ -160,6 +160,21 @@ public class WorkspaceFileList {
         return result;
     }
     
+    /**
+     * Returns true if the given filename exists in this workspace.
+     * The returned filename is expected to begin with the 'pretty' version of the workspace
+     * path (eg "~/dev/jessies").
+     */
+    public boolean fileExists(String filename) {
+        if (fileList == null) {
+            return false;
+        }
+        filename = StringUtilities.trimPrefix(filename, workspace.getRootDirectory());
+        // Collections.binarySearch returns the index of the element *if found*, or a negative number if it's
+        // instead telling us where we should stick it.
+        return Collections.binarySearch(fileList, filename, String.CASE_INSENSITIVE_ORDER) >= 0;
+    }
+    
     private void initFileAlterationMonitorForRoot(String rootDirectory) {
         // Get rid of any existing file alteration monitor.
         if (fileAlterationMonitor != null) {
