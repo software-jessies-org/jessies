@@ -112,9 +112,13 @@ public class BugDatabaseHighlighter extends RegularExpressionStyleApplicator {
         }
         String seed = matcher.group(2);
         String replacement = urlEncode(seed);
+        // The third group allows you to avoid URL-encoding the section-introducing #.
         if (matcher.groupCount() > 2) {
-            // It's not clear what this is for. If someone knows, please explain.
-            replacement += "#" + urlEncode(matcher.group(3));
+            String section = matcher.group(3);
+            // Guard against an optional group that matches nothing.
+            if (section != null) {
+                replacement += "#" + urlEncode(section);
+            }
         }
         return urlTemplate.replaceAll("%s", replacement);
     }
