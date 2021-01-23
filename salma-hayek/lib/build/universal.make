@@ -143,13 +143,8 @@ JDK_ROOT_SCRIPT = $(SCRIPT_PATH)/find-jdk-root.rb
 SCRIPTS_WHICH_AFFECT_COMPILER_FLAGS += $(JDK_ROOT_SCRIPT)
 JDK_ROOT := $(call findMakeFriendlyEquivalentName,$(shell ruby $(JDK_ROOT_SCRIPT)))
 
-JDK_INCLUDE.$(TARGET_OS) = $(JDK_ROOT)/include
-JDK_INCLUDE.Darwin = /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Frameworks/JavaVM.framework/Versions/A/Headers/
-JDK_INCLUDE = $(JDK_INCLUDE.$(TARGET_OS))
-
-JDK_BIN_DIR.$(TARGET_OS) = bin
-JDK_BIN_DIR.Darwin = Commands
-JDK_BIN = $(JDK_ROOT)/$(JDK_BIN_DIR.$(TARGET_OS))
+JDK_INCLUDE = $(JDK_ROOT)/include
+JDK_BIN = $(JDK_ROOT)/bin
 
 # ----------------------------------------------------------------------------
 # We use our own replacement for javah(1).
@@ -319,6 +314,8 @@ SHARED_LIBRARY_LDFLAGS.Darwin += -dynamiclib
 # The default $(LD) doesn't know about -dynamiclib on Darwin.
 # This doesn't hurt on Linux, indeed it generally saves having to specify nonsense like -lstdc++.
 LD = $(CXX)
+
+EXTRA_INCLUDE_PATH.Darwin += $(JDK_INCLUDE)/darwin
 
 # Note that our Solaris build assumes GCC rather than Sun's compiler.
 # GCC's -shared option, which we use on Linux, exists, but produces link
@@ -546,9 +543,6 @@ BOOT_JDK.FreeBSD = /usr/local/openjdk${JAVA_MAJOR_VERSION}
 
 # := deferred to ALTERNATE_BOOTCLASSPATH
 BOOT_JDK.Cygwin = $(call findMakeFriendlyEquivalentName,$(shell ruby -e 'require "$(JDK_ROOT_SCRIPT)"; puts(findBootJdkFromRegistry())'))
-
-# := deferred to ALTERNATE_BOOTCLASSPATH
-BOOT_JDK.Darwin = $(shell /usr/libexec/java_home -v $(patsubst 8,1.8,$(JAVA_MAJOR_VERSION)))
 
 BOOT_JDK = $(BOOT_JDK.$(TARGET_OS))
 ALTERNATE_BOOTCLASSPATH ?= $(BOOT_JDK)/jre/lib/rt.jar

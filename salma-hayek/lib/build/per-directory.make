@@ -67,10 +67,9 @@ JNI_CLASS_NAME = $(subst _,.,$(JNI_BASE_NAME))
 
 BUILDING_JNI = $(JNI_SOURCE)
 
-# Cocoa won't build or link for x86_64 on Mac OS X 10.4 and we use Cocoa freely except in JNI code.
-# John Russell and Andy Miller both wanted to use Terminator on 10.5 with that platform's x86_64-only JDK 6.
-LOCAL_C_AND_CXX_FLAGS.Darwin += $(if $(BUILDING_JNI),-arch x86_64,-x objective-c++)
-LOCAL_LDFLAGS.Darwin += $(if $(BUILDING_JNI),-arch x86_64 -framework JavaVM)
+# We use AppKit headers from C++, so we need to tell the compiler to assume
+# Objective C++.
+LOCAL_C_AND_CXX_FLAGS.Darwin += $(if $(BUILDING_JNI),,-x objective-c++)
 
 # ----------------------------------------------------------------------------
 # Build shared libraries.

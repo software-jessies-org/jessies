@@ -155,7 +155,11 @@ else
     if is_gentoo
       return `java-config --jdk-home`
     end
-    
+
+    if target_os() == "Darwin"
+      return `/usr/libexec/java_home`
+    end
+
     # On FreeBSD, the 'javac' family binaries are actually symlinks in /usr/local/bin/,
     # which point to the script /usr/local/bin/javavm. The actual java version will be
     # in /usr/local/openjdk<num>.
