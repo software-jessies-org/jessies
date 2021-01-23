@@ -547,13 +547,17 @@ BOOT_JDK.Cygwin = $(call findMakeFriendlyEquivalentName,$(shell ruby -e 'require
 BOOT_JDK = $(BOOT_JDK.$(TARGET_OS))
 ALTERNATE_BOOTCLASSPATH ?= $(BOOT_JDK)/jre/lib/rt.jar
 ALTERNATE_BOOTCLASSPATH := $(wildcard $(ALTERNATE_BOOTCLASSPATH))
+BOOT_JDK_MESSAGE += $(NEWLINE) $(NEWLINE)
+BOOT_JDK_MESSAGE += No JDK $(JAVA_MAJOR_VERSION) rt.jar found!
+BOOT_JDK_MESSAGE += $(NEWLINE) $(NEWLINE)
+BOOT_JDK_MESSAGE += We'll build with -source to ensure language compatibility,
 BOOT_JDK_MESSAGE += $(NEWLINE)
-# Something else adds the trailing period.
-BOOT_JDK_MESSAGE += You need to install a package that will give you a Java $(JAVA_MAJOR_VERSION) JDK, so we can use its rt.jar
-BOOT_JDK_ERROR = $(error $(BOOT_JDK_MESSAGE))
+BOOT_JDK_MESSAGE += but without rt.jar this build can't guarantee API compatibility.
+BOOT_JDK_MESSAGE += $(NEWLINE) $(NEWLINE)
+BOOT_JDK_MESSAGE += Be careful!
+BOOT_JDK_MESSAGE += $(NEWLINE)
 # The *** does battle with filter-build-output.rb.
 BOOT_JDK_WARNING = $(warning *** $(BOOT_JDK_MESSAGE))
-# Feel free to downgrade the ERROR to WARNING in your local copy.
 BOOT_JDK_DIAGNOSTIC = $(if $(filter 8,$(JAVA_MAJOR_VERSION)),$(BOOT_JDK_WARNING))
 JAVAC_FLAGS.javac += $(if $(ALTERNATE_BOOTCLASSPATH),-bootclasspath $(ALTERNATE_BOOTCLASSPATH),$(BOOT_JDK_DIAGNOSTIC))
 
