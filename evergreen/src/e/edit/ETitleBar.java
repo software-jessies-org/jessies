@@ -59,6 +59,11 @@ public class ETitleBar extends JPanel {
         }
         add(titleLabel, BorderLayout.CENTER);
         
+        // We use the BorderLayout within the buttonsPanel so as to have control over the order.
+        // The close button must always be rightmost, and the 'open header' and 'open test' should
+        // also be in a consistent order. However, BorderLayout only allows us to go up to three
+        // buttons in this way. If we want to add a further button, we're going to need to switch
+        // to GridLayout or some such.
         this.buttonsPanel = new JPanel(new BorderLayout());
         buttonsPanel.setOpaque(false);
         add(buttonsPanel, BorderLayout.EAST);
@@ -93,7 +98,7 @@ public class ETitleBar extends JPanel {
     public void setShowSwitchButton(boolean shouldShow) {
         if (switchButton == null && shouldShow) {
             this.switchButton = new ESwitchButton((ETextWindow) window);
-            buttonsPanel.add(switchButton, BorderLayout.WEST);
+            buttonsPanel.add(switchButton, BorderLayout.CENTER);
             forceRepaint();
         } else if (switchButton != null && shouldShow == false) {
             buttonsPanel.remove(switchButton);
