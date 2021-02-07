@@ -1,25 +1,27 @@
 package e.ptextarea;
 
-public class PPythonTextStyler extends PAbstractLanguageStyler {
+import java.util.*;
+
+public class PPythonTextStyler extends PGenericTextStyler {
+    private ArrayList<PSequenceMatcher> matchers = new ArrayList<>();
+    
     public PPythonTextStyler(PTextArea textArea) {
         super(textArea);
+        matchers.add(new PSequenceMatcher.ToEndOfLineComment("#"));
+        // Multiline strings *must* be added before plain strings, or the multiline bit won't be noticed.
+        matchers.add(new PSequenceMatcher.MultiLineString("'''"));
+        matchers.add(new PSequenceMatcher.MultiLineString("\"\"\""));
+        matchers.add(new PSequenceMatcher.CDoubleQuotes());
+        matchers.add(new PSequenceMatcher.PythonSingleQuotes());
     }
     
-    @Override protected boolean isStartOfCommentToEndOfLine(String line, int atIndex) {
-        return isShellComment(line, atIndex);
-    }
-    
-    @Override protected boolean supportMultiLineComments() {
-        return false;
-    }
-    
-    @Override protected boolean isQuote(char ch) {
-        return (ch == '\'' || ch == '\"' || ch == '`');
+    @Override protected List<PSequenceMatcher> getLanguageSequenceMatchers() {
+        return matchers;
     }
     
     public String[] getKeywords() {
         return new String[] {
-            // python -c 'import keyword ; print keyword.kwlist'
+            // python -c 'import keyword ; print keyword.kwlist' | tr "' []" '"\n  '
             "and",
             "as",
             "assert",

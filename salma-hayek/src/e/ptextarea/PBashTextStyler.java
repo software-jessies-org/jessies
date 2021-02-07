@@ -1,8 +1,21 @@
 package e.ptextarea;
 
-public class PBashTextStyler extends PAbstractLanguageStyler {
+import java.util.*;
+
+public class PBashTextStyler extends PGenericTextStyler {
+    private ArrayList<PSequenceMatcher> matchers = new ArrayList<>();
+    
     public PBashTextStyler(PTextArea textArea) {
         super(textArea);
+        matchers.add(new PSequenceMatcher.ToEndOfLineComment("#"));
+        matchers.add(new PSequenceMatcher.MultiLineString("'"));
+        matchers.add(new PSequenceMatcher.MultiLineString("\""));
+        matchers.add(new PSequenceMatcher.MultiLineString("`"));  // Not really a string as such, but never mind.
+        matchers.add(new PSequenceMatcher.BashHereDoc());
+    }
+    
+    @Override protected List<PSequenceMatcher> getLanguageSequenceMatchers() {
+        return matchers;
     }
     
     @Override protected String getKeywordRegularExpression() {
@@ -11,18 +24,6 @@ public class PBashTextStyler extends PAbstractLanguageStyler {
         // GtkSourceView and Vim both get both examples wrong, considering "source" and "command" to be keywords.
         // We accept anything that isn't a Bash meta-character, which seems hard to fool in practice.
         return "\\b(([^ \t<>;&|])+)\\b";
-    }
-    
-    @Override protected boolean isStartOfCommentToEndOfLine(String line, int atIndex) {
-        return isShellComment(line, atIndex);
-    }
-    
-    @Override protected boolean supportMultiLineComments() {
-        return false;
-    }
-    
-    @Override protected boolean isQuote(char ch) {
-        return (ch == '\'' || ch == '\"' || ch == '`');
     }
     
     public String[] getKeywords() {

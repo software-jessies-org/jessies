@@ -1,27 +1,32 @@
 package e.ptextarea;
 
+import java.util.*;
+
 /**
  * A PCPPTextStyler knows how to apply syntax highlighting for C++ code.
  * 
  * @author Phil Norman
  */
-public class PCPPTextStyler extends PAbstractLanguageStyler {
+public class PCPPTextStyler extends PGenericTextStyler {
+    private ArrayList<PSequenceMatcher> matchers = new ArrayList<>();
+    
     public PCPPTextStyler(PTextArea textArea) {
         super(textArea);
+        matchers.add(new PSequenceMatcher.ToEndOfLineComment("//"));
+        matchers.add(new PSequenceMatcher.SlashStarComment());
+        matchers.add(new PSequenceMatcher.CppMultiLineString());
+        matchers.add(new PSequenceMatcher.CDoubleQuotes());
+        matchers.add(new PSequenceMatcher.CSingleQuotes());
+    }
+    
+    @Override protected List<PSequenceMatcher> getLanguageSequenceMatchers() {
+        return matchers;
     }
     
     @Override public void initStyleApplicators() {
         super.initStyleApplicators();
         // "#else" is PREPROCESSOR, but "else" is KEYWORD, so we need to look for preprocessor directives first.
         textArea.addStyleApplicatorFirst(new PreprocessorStyleApplicator(textArea, false));
-    }
-    
-    @Override protected boolean isStartOfCommentToEndOfLine(String line, int atIndex) {
-        return line.startsWith("//", atIndex);
-    }
-    
-    @Override protected boolean supportMultiLineComments() {
-        return true;
     }
     
     public String[] getKeywords() {

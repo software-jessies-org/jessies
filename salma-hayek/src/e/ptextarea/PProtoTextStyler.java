@@ -1,23 +1,23 @@
 package e.ptextarea;
 
+import java.util.*;
+
 /**
  * A text styler for Google protocol buffers (http://code.google.com/p/protobuf).
  */
-public class PProtoTextStyler extends PAbstractLanguageStyler {
+public class PProtoTextStyler extends PGenericTextStyler {
+    private ArrayList<PSequenceMatcher> matchers = new ArrayList<>();
+    
     public PProtoTextStyler(PTextArea textArea) {
         super(textArea);
+        matchers.add(new PSequenceMatcher.ToEndOfLineComment("//"));
+        matchers.add(new PSequenceMatcher.SlashStarComment());
+        matchers.add(new PSequenceMatcher.CDoubleQuotes());
+        matchers.add(new PSequenceMatcher.PythonSingleQuotes());
     }
     
-    @Override protected boolean isStartOfCommentToEndOfLine(String line, int atIndex) {
-        return line.startsWith("//", atIndex);
-    }
-    
-    @Override protected boolean supportMultiLineComments() {
-        return true;
-    }
-    
-    @Override protected boolean isQuote(char ch) {
-        return (ch == '\"');
+    @Override protected List<PSequenceMatcher> getLanguageSequenceMatchers() {
+        return matchers;
     }
     
     public String[] getKeywords() {
