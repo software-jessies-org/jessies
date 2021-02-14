@@ -11,7 +11,7 @@ import javax.swing.*;
  * Offers completions for the word before the caret.
  */
 public class AutoCompleteAction extends ETextAction {
-    private JWindow completionsWindow;
+    private JFrame completionsWindow;
     
     public AutoCompleteAction() {
         // All Cocoa text components use alt-escape, but IDEA and Visual Studio both use control-space (and the window manager gets alt-escape under GNOME).
@@ -61,6 +61,9 @@ public class AutoCompleteAction extends ETextAction {
         
         String[] completions = completionsList.toArray(new String[completionsList.size()]);
         final JList<String> completionsUi = new JList<>(completions);
+        if (completions.length > 0) {
+            completionsUi.setSelectedIndex(0);
+        }
         completionsUi.addFocusListener(new FocusAdapter() {
             public void focusLost(FocusEvent e) {
                 hideCompletionsWindow();
@@ -102,8 +105,7 @@ public class AutoCompleteAction extends ETextAction {
         Point windowLocation = textArea.getViewCoordinates(textArea.getCoordinates(startPosition));
         windowLocation.translate(origin.x, origin.y);
         
-        Window owner = SwingUtilities.getWindowAncestor(textArea);
-        showCompletionsWindow(owner, windowLocation, new JScrollPane(completionsUi));
+        showCompletionsWindow(windowLocation, new JScrollPane(completionsUi));
         completionsUi.requestFocus();
     }
     
@@ -115,10 +117,11 @@ public class AutoCompleteAction extends ETextAction {
         }
     }
     
-    private void showCompletionsWindow(Window owner, Point location, Container content) {
+    private void showCompletionsWindow(Point location, Container content) {
         hideCompletionsWindow();
         
-        completionsWindow = new JWindow(owner);
+        completionsWindow = new JFrame();
+        completionsWindow.setUndecorated(true);
         completionsWindow.setContentPane(content);
         completionsWindow.setLocation(location);
         completionsWindow.pack();
