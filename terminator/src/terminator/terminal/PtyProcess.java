@@ -252,7 +252,12 @@ public class PtyProcess {
     }
     
     public void updateLoginRecord() {
-        ProcessUtilities.spawn(null, FileUtilities.findSupportBinary("update-login-record").toString(), Integer.toString(fd), Integer.toString(pid), slavePtyName);
+        Path updateLoginRecord = FileUtilities.findSupportBinary("update-login-record");
+        if (updateLoginRecord == null) {
+            Log.warn("Failed to find update-login-record.");
+            return;
+        }
+        ProcessUtilities.spawn(null, updateLoginRecord.toString(), Integer.toString(fd), Integer.toString(pid), slavePtyName);
     }
     
     private native void nativeStartProcess(String executable, String[] argv, String workingDirectory) throws IOException;
