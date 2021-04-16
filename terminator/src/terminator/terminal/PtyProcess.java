@@ -3,6 +3,7 @@ package terminator.terminal;
 import e.util.*;
 import java.awt.Dimension;
 import java.io.*;
+import java.nio.file.*;
 import java.util.concurrent.*;
 import org.jessies.os.*;
 
