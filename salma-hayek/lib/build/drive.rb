@@ -1,11 +1,5 @@
 #!/usr/bin/ruby -w
 
-# This was added to avoid an issue with the jwt gem for ruby1.8 in swiftboat's Squeeze chroot.
-# But stopped uploads from the Mac rat2.
-if RUBY_VERSION < "1.9" && File.exist?("/usr/bin/ruby1.9.1")
-  exec("ruby1.9.1", $0, *ARGV)
-end
-
 $PREVIOUS_VERBOSE = $VERBOSE
 $VERBOSE = false
 
@@ -22,30 +16,15 @@ $VERBOSE = false
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-require 'rubygems'
-require 'google/api_client'
+require 'google/apis/drive_v2'
 require 'google/api_client/client_secrets'
-require 'google/api_client/auth/file_storage'
+require 'google/api_client/auth/storage'
+require 'google/api_client/auth/storages/file_store'
 require 'google/api_client/auth/installed_app'
 require 'logger'
 
 $VERBOSE = $PREVIOUS_VERBOSE
 
-module Google
-  class APIClient
-    module ENV
-      self.send(:remove_const, :OS_VERSION)
-      # Apply the key part of:
-      # https://github.com/googleapis/google-api-ruby-client/pull/648/commits/ee8c922dbf9cef79284d4b83d16d4d73008a6e8f
-      # ... to avoid:
-      # /usr/lib/ruby/2.5.0/net/http/header.rb:23:in `block in initialize_http_header': header ("User-Agent") field value ("Ruby Drive sample/1.0.0 google-api-ruby-client/0.8.7 Linux/4.19.0-6-amd64\n (gzip)") cannot include CR/LF (ArgumentError)
-      OS_VERSION = `uname -sr`.chomp().sub(' ', '/')
-    end
-  end
-end
-
-API_VERSION = 'v2'
-CACHED_API_FILE = "drive-#{API_VERSION}.cache"
 CREDENTIAL_STORE_FILE = "#{$0}-oauth2.json"
 
 # Handles authentication and loading of the API.
@@ -55,18 +34,15 @@ def setup()
   logger = Logger.new(log_file)
   logger.level = Logger::DEBUG
 
-  client = Google::APIClient.new(:application_name => 'Ruby Drive sample',
-      :application_version => '1.0.0')
-
   $PREVIOUS_VERBOSE = $VERBOSE
   $VERBOSE = false
   # FileStorage stores auth credentials in a file, so they survive multiple runs
   # of the application. This avoids prompting the user for authorization every
   # time the access token expires, by remembering the refresh token.
   # Note: FileStorage is not suitable for multi-user applications.
-  file_storage = Google::APIClient::FileStorage.new(CREDENTIAL_STORE_FILE)
+  file_storage = Google::APIClient::Storage.new(Google::APIClient::FileStore.new(CREDENTIAL_STORE_FILE))
   $VERBOSE = $PREVIOUS_VERBOSE
-  if file_storage.authorization.nil?
+  if file_storage.authorize.nil?
     client_secrets = Google::APIClient::ClientSecrets.load
     # The InstalledAppFlow is a helper class to handle the OAuth 2.0 installed
     # application flow, which ties in with FileStorage to store credentials
@@ -83,67 +59,30 @@ def setup()
     # By turning on the debug, you get to see the requested URL, which you can copy and paste.
     # Once you click Accept in Chrome, everything else moves along automatically.
     ENV["LAUNCHY_DEBUG"] = "true"
-    client.authorization = flow.authorize(file_storage)
+    authorization = flow.authorize(file_storage)
   else
-    client.authorization = file_storage.authorization
+    authorization = file_storage.authorization
   end
 
-  drive = nil
-  # Load cached discovered API, if it exists. This prevents retrieving the
-  # discovery document on every run, saving a round-trip to API servers.
-  if File.exist?(CACHED_API_FILE)
-    File.open(CACHED_API_FILE) do |file|
-      drive = Marshal.load(file)
-    end
-  else
-    drive = client.discovered_api('drive', API_VERSION)
-    File.open(CACHED_API_FILE, 'w') do |file|
-      Marshal.dump(drive, file)
-    end
-  end
+  drive = Google::Apis::DriveV2::DriveService.new
+  drive.authorization = authorization
 
-  return client, drive
+  return drive
 end
 
-def insert_file(client, drive, title, description, parentId, mimeType, fileName)
-  file = drive.files.insert.request_schema.new({
-    "title" => title,
-    "description" => description,
-    "mimeType" => mimeType
-  })
-  file.parents = [{"id" => parentId}]
-
-  media = Google::APIClient::UploadIO.new(fileName, mimeType)
-  result = client.execute(
-    :api_method => drive.files.insert,
-    :body_object => file,
-    :media => media,
-    :parameters => {
-      "uploadType" => "multipart",
-      "alt" => "json"
-    }
-  )
-
+def insert_file(drive, title, description, parentId, mimeType, fileName)
+  parent = Google::Apis::DriveV2::ParentReference.new(id: parentId)
+  parents = [parent]
+  file_object = Google::Apis::DriveV2::File.new(title: title, description: description, mime_type: mimeType, parents: parents)
+  result = drive.insert_file(file_object, upload_source: fileName)
   #jj(result.data().to_hash())
-  if result.status() != 200
-    raise(result.inspect())
-  end
-  return result.data().id()
+  return result.id()
 end
 
-def find_file(client, drive, parentId, title)
-  parameters = {
-    "folderId" => parentId,
-    "q" => "title='#{title}'"
-  }
-  result = client.execute(
-    :api_method => drive.children.list,
-    :parameters => parameters)
-  #jj(result.data().to_hash())
-  if result.status() != 200
-    raise(result.inspect())
-  end
-  items = result.data().items()
+def find_file(drive, parentId, title)
+  result = drive.list_children(parentId, q: "title='#{title}'")
+  #jj(result.to_hash())
+  items = result.items()
   if items == []
     return nil
   end
@@ -155,45 +94,18 @@ def find_file(client, drive, parentId, title)
   return id
 end
 
-def copy_file(client, drive, title, parentId, fileId)
-  file = drive.files.copy.request_schema.new({
-    "title" => title,
-  })
-  file.parents = [{"id" => parentId}]
-  parameters = {
-    "fileId" => fileId,
-  }
-  
-  result = client.execute(
-    :api_method => drive.files.copy,
-    :body_object => file,
-    :parameters => parameters)
-  
-  #jj(result.data().to_hash())
-  if result.status() != 200
-    raise(result.inspect())
-  end
+def copy_file(drive, title, parentId, fileId)
+  parent = Google::Apis::DriveV2::ParentReference.new(id: parentId)
+  parents = [parent]
+  file_object = Google::Apis::DriveV2::File.new(title: title, parents: parents)
+  drive.copy_file(fileId, file_object)
+  #jj(result.to_hash())
 end
 
-def update_file(client, drive, mimeType, fileId, fileName)
-  file = drive.files.update.request_schema.new({
-  })
-  parameters = {
-    "fileId" => fileId,
-    "uploadType" => "multipart",
-  }
-  
-  media = Google::APIClient::UploadIO.new(fileName, mimeType)
-  result = client.execute(
-    :api_method => drive.files.update,
-    :body_object => file,
-    :media => media,
-    :parameters => parameters)
-  
-  #jj(result.data().to_hash())
-  if result.status() != 200
-    raise(result.inspect())
-  end
+def update_file(drive, mimeType, fileId, fileName)
+  file_object = Google::Apis::DriveV2::File.new(mime_type: mimeType)
+  drive.update_file(fileId, file_object, upload_source: fileName)
+  #jj(result.to_hash())
 end
 
 if __FILE__ == $0
@@ -207,16 +119,17 @@ if __FILE__ == $0
     raise("Syntax: drive.rb <description> <id of parent directory> <mime type> <filename> <latest directory> <latest link>")
   end
   title = fileName.sub(/^.*\//, "")
-  client, drive = setup()
-  if find_file(client, drive, parentId, title)
+  drive = setup()
+  if find_file(drive, parentId, title)
+    $stderr.puts("#{title} is already there")
     exit(0)
   end
-  fileId = insert_file(client, drive, title, description, parentId, mimeType, fileName)
-  latestFile = find_file(client, drive, latestDirectory, latestLink)
+  fileId = insert_file(drive, title, description, parentId, mimeType, fileName)
+  latestFile = find_file(drive, latestDirectory, latestLink)
   if latestFile
-    update_file(client, drive, mimeType, latestFile, fileName)
+    update_file(drive, mimeType, latestFile, fileName)
   else
-    copy_file(client, drive, latestLink, latestDirectory, fileId)
+    copy_file(drive, latestLink, latestDirectory, fileId)
   end
 end
 
