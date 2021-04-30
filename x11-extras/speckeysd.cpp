@@ -13,6 +13,8 @@
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
 
+#include <initializer_list>
+
 typedef struct HotKey HotKey;
 struct HotKey {
   KeySym keysym;
@@ -90,16 +92,15 @@ unsigned int parse_modifiers(char* name, const char* full_spec) {
     *separator = 0;
     modifiers |= parse_modifiers(separator + 1, full_spec);
   }
+  // We don't interpret modifies Lock (caps lock), Mod2 (num lock) or Mod3
+  // (scroll lock), because they're stateful buttons, not real modifiers in the
+  // normal hotkey sense.
   if (!strcmp(name, "Shift")) {
     modifiers |= ShiftMask;
   } else if (!strcmp(name, "Control")) {
     modifiers |= ControlMask;
   } else if (!strcmp(name, "Alt") || !strcmp(name, "Mod1")) {
     modifiers |= Mod1Mask;
-  } else if (!strcmp(name, "Mod2")) {
-    modifiers |= Mod2Mask;
-  } else if (!strcmp(name, "Mod3")) {
-    modifiers |= Mod3Mask;
   } else if (!strcmp(name, "Super") || !strcmp(name, "Mod4")) {
     modifiers |= Mod4Mask;
   } else {
@@ -109,7 +110,9 @@ unsigned int parse_modifiers(char* name, const char* full_spec) {
   return modifiers;
 }
 
-static void add_hot_key(const char* keyname, const char* command) {
+static void add_hot_key_modified(const char* keyname,
+                                 const char* command,
+                                 unsigned int base_mod) {
   char* copy = strdup(keyname);
   char* unmodified = strrchr(copy, '-');
   unsigned int modifiers = 0;
@@ -120,6 +123,7 @@ static void add_hot_key(const char* keyname, const char* command) {
     ++unmodified;
     modifiers = parse_modifiers(copy, keyname);
   }
+  modifiers |= base_mod;
 
   HotKey* new_key = new HotKey;
   new_key->keysym = XStringToKeysym(unmodified);
@@ -139,6 +143,25 @@ static void add_hot_key(const char* keyname, const char* command) {
   XSetErrorHandler(NULL);
 
   free(copy);
+}
+
+static void add_hot_key(const char* keyname, const char* command) {
+  // https://stackoverflow.com/questions/4037230/global-hotkey-with-x11-xlib/4037579
+  // Xlib is very particular about the mod key mask. Having caps lock, num lock,
+  // scroll lock etc enabled or disabled results in a different mod mask, and
+  // thus will fail to match if we don't grab that key too.
+  // In X11 terms, we want to ignore these:
+  // LockMask = caps lock
+  // Mod2Mask = num lock
+  // Mod3Mask = scroll lock
+  for (int capsMask : {0, LockMask}) {
+    for (int numLockMask : {0, Mod2Mask}) {
+      for (int scrLockMask : {0, Mod3Mask}) {
+        auto combinedMask = capsMask | numLockMask | scrLockMask;
+        add_hot_key_modified(keyname, command, combinedMask);
+      }
+    }
+  }
 }
 
 static void read_hot_key_file(const char* fname) {
