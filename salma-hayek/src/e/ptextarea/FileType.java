@@ -67,6 +67,12 @@ public class FileType {
                  PJavaScriptTextStyler.class,
                  new String[] { ".js" });
     
+    public static final FileType KOTLIN = new FileType("Kotlin",
+                 PGoIndenter.class,
+                 PKotlinTextStyler.class,
+                 new String[] { ".kt" })
+        .setLanguageDefinedIndentation("    ");
+    
     public static final FileType MAKE = new FileType("Make",
                  PNoOpIndenter.class,
                  PMakefileTextStyler.class,
