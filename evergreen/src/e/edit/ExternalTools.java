@@ -197,6 +197,10 @@ public class ExternalTools {
         // We accept a shorthand notation for specifying input/output dispositions based on Perl's "open" syntax.
         // Additionally, we support a special "|?", which is the same as | if the executed program is successful,
         // but any output on stderr is written to the errors window; only stdout is written to the document.
+        // We're also adding "|!", which runs the external tool with the entire document as input (never just
+        // the selection), and the output is interpreted as a set of commands that are used to modify the document,
+        // set the selection, or whatever else we want to provide. It's kind of a poor man's language server API,
+        // only it doesn't require all the extra work of supporting that, which I'm not going to get time for.
         ToolInputDisposition inputDisposition = ToolInputDisposition.NO_INPUT;
         ToolOutputDisposition outputDisposition = ToolOutputDisposition.ERRORS_WINDOW;
         if (command.startsWith("<")) {
@@ -212,6 +216,11 @@ public class ExternalTools {
         } else if (command.startsWith("|?")) {
             inputDisposition = ToolInputDisposition.SELECTION_OR_DOCUMENT;
             outputDisposition = ToolOutputDisposition.REPLACE_IF_OK;
+            needsFile = true;
+            command = command.substring(2);
+        } else if (command.startsWith("|!")) {
+            inputDisposition = ToolInputDisposition.DOCUMENT;
+            outputDisposition = ToolOutputDisposition.COMMANDS;
             needsFile = true;
             command = command.substring(2);
         } else if (command.startsWith("|")) {

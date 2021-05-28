@@ -11,5 +11,6 @@ public enum ToolOutputDisposition {
     ERRORS_WINDOW,
     INSERT,
     REPLACE,
-    REPLACE_IF_OK;
+    REPLACE_IF_OK,
+    COMMANDS;
 }

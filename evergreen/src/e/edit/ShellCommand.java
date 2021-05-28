@@ -173,6 +173,7 @@ public class ShellCommand {
             errorsWindow.appendLines(isStdErr, lines);
             break;
         case REPLACE_IF_OK:
+        case COMMANDS:
             if (isStdErr) {
                 errorsWindow.appendLines(isStdErr, lines);
             } else {
@@ -239,6 +240,11 @@ public class ShellCommand {
                 textArea.replaceSelection(capturedOutput);
             } else {
                 textArea.setText(capturedOutput);
+            }
+            break;
+        case COMMANDS:
+            if (exitStatus == 0) {
+                CommandInterpreter.runCommands(textArea, capturedOutput.toString());
             }
             break;
         }
