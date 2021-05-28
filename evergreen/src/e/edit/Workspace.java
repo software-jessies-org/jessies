@@ -467,11 +467,9 @@ public class Workspace extends JPanel {
         if (textWindow != null) {
             environment.put("EVERGREEN_CURRENT_FILENAME", FileUtilities.translateFilenameForShellUse(textWindow.getFilename()));
             
-            // Humans number lines from 1, text components from 0.
-            // FIXME: we should pass full selection information.
             textArea = textWindow.getTextArea();
-            final int currentLineNumber = 1 + textArea.getLineOfOffset(textArea.getSelectionStart());
-            environment.put("EVERGREEN_CURRENT_LINE_NUMBER", Integer.toString(currentLineNumber));
+            putLocationEnv(environment, textArea, "CURRENT", textArea.getSelectionStart());
+            putLocationEnv(environment, textArea, "SELECTION_END", textArea.getSelectionEnd());
             
             putIfPlainText(environment, "EVERGREEN_CURRENT_WORD", ETextAction.getWordAtCaret(textWindow));
             if (textArea.getSelectionEnd() - textArea.getSelectionStart() < 1024) {
@@ -488,6 +486,22 @@ public class Workspace extends JPanel {
             }
         }
         return new ShellCommand(textArea, errorsWindow, directory, command, environment, inputDisposition, outputDisposition);
+    }
+    
+    private static void putLocationEnv(Map<String, String> environment, PTextArea textArea, String infix, int pos) {
+        int lineIndex = textArea.getLineOfOffset(pos);
+        // We're not going to just subtract pos from the line start, as that would not cope properly
+        // with multi-char utf16 characters, like 𐐷.
+        int charOffset = pos - textArea.getLineStartOffset(lineIndex);
+        int colIndex = Character.codePointCount(textArea.getLineContents(lineIndex), 0, charOffset);
+        // Humans number lines from 1, text components from 0.
+        // For the position within the line, we use index. Some edits would use "column number", but
+        // we represent the insert position as a caret, rather than a block cursor, and indicating
+        // the character to the right of the cursor looks weird. After all, this is an insert position
+        // in most cases (where there's no selection), and an insert position is a non-space between the
+        // characters.
+        environment.put("EVERGREEN_" + infix + "_LINE_NUMBER", Integer.toString(lineIndex + 1));
+        environment.put("EVERGREEN_" + infix + "_CHAR_OFFSET", Integer.toString(colIndex));
     }
     
     // Environment variables are C strings, so we can't include NUL bytes.
