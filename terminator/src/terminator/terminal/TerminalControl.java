@@ -210,6 +210,7 @@ public class TerminalControl {
         designateCharacterSet(3, 'B');
         if (model != null) {
             model.setStyle(Style.getDefaultStyle());
+            model.setCursorVisible(true);
         }
     }
     
