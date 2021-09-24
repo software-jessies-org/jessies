@@ -48,6 +48,16 @@ public class TerminatorPreferences extends Preferences {
      * Users may wish to disable this functionality for security reasons (eg company laptops).
      */
     public static final String LOG_TERMINAL_ACTIVITY = "logTerminalActivity";
+
+    /**
+     * Whether or not to allow shell commands to alter the system clipboard via OSC control codes
+     *
+     * See https://jdhao.github.io/2021/01/05/nvim_copy_from_remote_via_osc52/
+     *
+     * This is set to disabled by default because some people perceive it to be a security threat,
+     * so it is best not to surprise them with this enabled.
+     */
+    public static final String ENABLE_TERMINAL_CLIPBOARD_ACCESS = "enableTerminalClipboardAccess";
     
     private static final Color CREAM = new Color(0xfefaea);
     private static final Color LIGHT_BLUE = new Color(0xb3d4ff);
@@ -80,6 +90,7 @@ public class TerminatorPreferences extends Preferences {
         addPreference("Behavior", VISUAL_BELL, Boolean.TRUE, "Visual bell (as opposed to no bell)");
         addPreference("Behavior", USE_ALT_AS_META, Boolean.FALSE, "Use alt key as meta key (for Emacs)");
         addPreference("Behavior", LOG_TERMINAL_ACTIVITY, Boolean.TRUE, "Log terminal activity in $HOME/.terminator/logs/");
+        addPreference("Behavior", ENABLE_TERMINAL_CLIPBOARD_ACCESS, Boolean.FALSE, "Enable clipboard access from terminal commands");
         addPreference("Behavior", ERROR_LINK_CMD, "", "Error link handling script");
         
         addPreference("Appearance", ANTI_ALIAS, Boolean.TRUE, "Anti-alias text");

@@ -2,6 +2,10 @@ package terminator.terminal.escape;
 
 import e.util.*;
 import java.awt.Color;
+import java.awt.Toolkit;
+import java.awt.datatransfer.StringSelection;
+import java.util.Base64;
+
 import terminator.*;
 import terminator.model.*;
 import terminator.terminal.*;
@@ -65,6 +69,16 @@ public class XTermEscapeAction implements TerminalAction {
                         return;
                     }
                     break;
+                case 52:
+					if(!Terminator.getPreferences().getBoolean(TerminatorPreferences.ENABLE_TERMINAL_CLIPBOARD_ACCESS))
+						return;
+                	int lastSemiColon = sequence.lastIndexOf(';');
+                	if(lastSemiColon>sequence.length()-1)
+                		return;
+                	String base64 = sequence.substring(lastSemiColon+1, sequence.length()-1);
+                	String contents = new String(Base64.getDecoder().decode(base64.getBytes()));
+                	Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(contents), null);
+                	break;
             }
         }
         Log.warn("Unsupported XTerm escape sequence \"" + StringUtilities.escapeForJava(sequence) + "\".");
