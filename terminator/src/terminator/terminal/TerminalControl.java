@@ -18,7 +18,7 @@ import terminator.terminal.escape.*;
  */
 public class TerminalControl {
     // Andrew Giddings wanted "windows-1252" for his Psion.
-    private static final String CHARSET_NAME = "UTF-8";
+    public static final String CHARSET_NAME = "UTF-8";
     
     // This should be around your system's pipe size.
     // Too much larger and you'll waste time copying unused char[].

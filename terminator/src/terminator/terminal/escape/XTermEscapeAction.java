@@ -3,7 +3,7 @@ package terminator.terminal.escape;
 import e.util.*;
 import java.awt.Color;
 import java.awt.Toolkit;
-import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.*;
 import java.util.Base64;
 
 import terminator.*;
@@ -70,15 +70,43 @@ public class XTermEscapeAction implements TerminalAction {
                     }
                     break;
                 case 52:
-					if(!Terminator.getPreferences().getBoolean(TerminatorPreferences.ENABLE_TERMINAL_CLIPBOARD_ACCESS))
-						return;
-                	int lastSemiColon = sequence.lastIndexOf(';');
-                	if(lastSemiColon>sequence.length()-1)
-                		return;
-                	String base64 = sequence.substring(lastSemiColon+1, sequence.length()-1);
-                	String contents = new String(Base64.getDecoder().decode(base64.getBytes()));
-                	Toolkit.getDefaultToolkit().getSystemClipboard().setContents(new StringSelection(contents), null);
-                	break;
+                    if (!Terminator.getPreferences().getBoolean(TerminatorPreferences.ENABLE_TERMINAL_CLIPBOARD_ACCESS)) {
+                        Log.warn("XTerm escape sequence OSC " + ps + " is disabled by preference " + TerminatorPreferences.ENABLE_TERMINAL_CLIPBOARD_ACCESS + ".");
+                        return;
+                    }
+                    String[] parts = pt.split(";", 3);
+                    if (parts.length != 2) {
+                        break;
+                    }
+                    // [cpqs0-7]* controls which clipboard/selection we should use.
+                    String pc = parts[0];
+                    Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+                    String clipboardName = "c";
+                    if (pc.equals("p")) {
+                        clipboard = Toolkit.getDefaultToolkit().getSystemSelection();
+                        clipboardName = "p";
+                    }
+                    String pd = parts[1];
+                    if (pd.equals("?")) {
+                        Object unusedRequestor = this;
+                        Transferable transferable = clipboard.getContents(unusedRequestor);
+                        try {
+                            String string = (String) transferable.getTransferData(DataFlavor.stringFlavor);
+                            String base64 = Base64.getEncoder().encodeToString(string.getBytes(TerminalControl.CHARSET_NAME));
+                            control.sendUtf8String(Ascii.ESC + "[52;" + clipboardName + ";" + base64 + Ascii.BEL);
+                        } catch (Exception ex) {
+                            Log.warn("Couldn't get clipboard contents.", ex);
+                        }
+                    } else {
+                        try {
+                            String contents = new String(Base64.getDecoder().decode(pd.getBytes(TerminalControl.CHARSET_NAME)));
+                            StringSelection selection = new StringSelection(contents);
+                            clipboard.setContents(selection, selection);
+                        } catch (Exception ex) {
+                            Log.warn("Couldn't set clipboard contents.", ex);
+                        }
+                    }
+                    return;
             }
         }
         Log.warn("Unsupported XTerm escape sequence \"" + StringUtilities.escapeForJava(sequence) + "\".");
