@@ -84,7 +84,10 @@ public class CommandInterpreter {
             if (data.charAt(pos) == '"') {
                 pos++;
                 int endPos = findClosingQuote(data, pos);
-                value = data.substring(pos, endPos);
+                // Any " characters in the value are doubled ("") so as to be able to tell the
+                // terminating " of the string apart from double-quotes in the content. So we need
+                // to turn any doubled double-quotes into single double-quotes.
+                value = data.substring(pos, endPos).replaceAll("\"\"", "\"");
                 pos = endPos;
                 int newlineAfter = data.indexOf('\n', pos);
                 if (newlineAfter != -1) {

@@ -285,6 +285,9 @@ func readEvergreenState() (*evergreen, error) {
 		return nil, err
 	}
 	caretIndex, err := findCaretIndex(contents, lineStartIndex, char)
+	if err != nil {
+		log.Printf("Error in findCaretIndex: %v", err)
+	}
 
 	return &evergreen{
 		contents:        contents,
@@ -327,7 +330,7 @@ func findCaretIndex(bs []byte, lineStart, char int) (int, error) {
 		res += s
 		curChar++
 	}
-	return 0, fmt.Errorf("file too short; no char %d in line", char)
+	return len(bs), nil
 }
 
 func parseIntEnv(name string) (int, error) {
