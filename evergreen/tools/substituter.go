@@ -129,7 +129,7 @@ func toRuneCoordinates(in string, byteOffset, line, char int) (int, int) {
 			char++
 		}
 	}
-	panic("got to end of string")
+	return line, char
 }
 
 func doubleQuotes(val string) string {
