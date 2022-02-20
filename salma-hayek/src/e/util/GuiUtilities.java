@@ -29,9 +29,16 @@ public class GuiUtilities {
         "export JESSIES_WEB_BROWSER=firefox\n";
         
     static {
-        invokeLater(() -> {
-            e.debug.EventDispatchThreadHangMonitor.initMonitoring();
-        });
+        try {
+            invokeLater(() -> {
+                e.debug.EventDispatchThreadHangMonitor.initMonitoring();
+            });
+        } catch (Throwable th) {
+            // The above invokeLater call is where awt first gets initialized.
+            // GUI invocation failures reported to stderr rather than the log
+            // don't make it to the mailing list.
+            Log.warn("Failed to install event dispatch thread hang monitor", th);
+        }
     }
     
     /**
