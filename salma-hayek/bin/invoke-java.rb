@@ -175,6 +175,7 @@ class Java
   def get_java_version(java_executable)
     # We might like to use -fullversion, but Debian's gij-wrapper Perl script only understands -version. I think for our purposes here, "-version" is accurate enough.
     java_version = `#{java_executable} -version 2>&1`.chomp()
+    java_version.force_encoding("UTF-8") unless java_version.valid_encoding?()
     # A Fedora Core 7 user reports that gij has started claiming 1.5.0, but seemingly still isn't up to the job ("Can't start up: not enough memory").
     # Now we can't ignore gij for free, let's explicitly disregard it, on the assumption that OpenJDK will replace it before it's ready.
     if java_version.match(/gij/) != nil
@@ -236,7 +237,7 @@ class Java
     # be bewildering to the uninitiated.
     suggestion = "http://java.sun.com/javase/downloads/ may link to a suitable JRE, if you can't use one provided by your OS vendor"
     if launcher_path != ""
-      message_lines << "Your #{launcher_path} claims to be #{actual_java_version}."
+      message_lines << "Your #{launcher_path} claims to be #{java_version_string.inspect()}."
       suggestion = "Please upgrade."
     end
     if File.exist?("/usr/bin/gnome-app-install")
