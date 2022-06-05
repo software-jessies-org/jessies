@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <cerrno>
 
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -33,6 +34,7 @@ Display* dpy;
 int screen_count;
 
 char* argv0;
+char* hot_key_file;
 
 const char* attempting_to_grab = 0;
 
@@ -197,8 +199,55 @@ static void keypress(XEvent* ev) {
   }
 }
 
+bool forceRestart;
+#define NullEvent -1
+
+static void getEvent(XEvent* ev) {
+  // Is there a message waiting?
+  if (QLength(dpy) > 0) {
+    XNextEvent(dpy, ev);
+    return;
+  }
+
+  // Beg...
+  XFlush(dpy);
+
+  // Wait one second to see if a message arrives.
+  int fd = ConnectionNumber(dpy);
+  fd_set readfds;
+  FD_ZERO(&readfds);
+  FD_SET(fd, &readfds);
+  struct timeval tv = {.tv_sec = 1};
+  if (select(fd + 1, &readfds, 0, 0, &tv) == 1) {
+    XNextEvent(dpy, ev);
+    return;
+  }
+
+  // No message, so we have a null event.
+  ev->type = NullEvent;
+}
+
+// If we execvp ourselves in the signal handler itself, it seems to prevent
+// future signals of the same type from being delivered. So we need this
+// convoluted use of a global variable to detect whether we need to restart,
+// along with a more complicated 'getEvent' function to ensure we frequently
+// wake up and check for forceRestart being set in the main loop.
+void RestartSelf(int signum) {
+  forceRestart = true;
+}
+
 int main(int argc, char* argv[]) {
   argv0 = argv[0];
+  hot_key_file = argv[1];
+
+  // Set SIGHUP to make us exec ourselves. This provides a nice easy way for the
+  // user to make us reload our config file.
+  struct sigaction sa = {};
+  sa.sa_handler = RestartSelf;
+  sigaddset(&(sa.sa_mask), SIGHUP);
+  if (sigaction(SIGHUP, &sa, NULL)) {
+    fprintf(stderr, "SIGHUP sigaction failed: %d\n", errno);
+  }
 
   /* Open a connection to the X server. */
   dpy = XOpenDisplay("");
@@ -207,11 +256,6 @@ int main(int argc, char* argv[]) {
   }
 
   /* Set up signal handlers. */
-#if 0
-    signal(SIGTERM, SIG_IGN);
-    signal(SIGINT, SIG_IGN);
-#endif
-  signal(SIGHUP, SIG_IGN);
   signal(SIGCHLD, sigchld_handler);
 
   screen_count = ScreenCount(dpy);
@@ -220,15 +264,15 @@ int main(int argc, char* argv[]) {
     panic("syntax: speckeysd <keys file>");
   }
 
-  read_hot_key_file(argv[1]);
+  read_hot_key_file(hot_key_file);
 
   /* Make sure all our communication to the server got through. */
   XSync(dpy, False);
 
   /* The main event loop. */
-  for (;;) {
+  while (!forceRestart) {
     XEvent ev;
-    XNextEvent(dpy, &ev);
+    getEvent(&ev);
     switch (ev.type) {
       case KeyPress:
         keypress(&ev);
@@ -241,4 +285,5 @@ int main(int argc, char* argv[]) {
         break;
     }
   }
+  execvp(argv[0], argv);
 }
