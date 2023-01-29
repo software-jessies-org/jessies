@@ -100,6 +100,7 @@ using namespace std;
 
 // The connection to the X server.
 static Display* dpy;
+
 // display_xmin can be non-zero, if we'rd using xrandr and the highest screen
 // is offset from the X=0 line. This happens, for example, if I have my laptop
 // connected to an external screen, in the following configuration (note - the
@@ -119,17 +120,22 @@ static int display_width;
 static Window window;           // Main window.
 static Window dropdown_window;  // Drop-down window.
 static int window_height;
-static GC gc;
 static GC dropdown_gc;
+static GC dropdown_highlight_gc;
 
 // Font stuff.
 static XftFont* g_font;
-static XftDraw* g_font_draw;
 static XftDraw* g_dropdown_font_draw;
 static XftColor g_font_color;
 static XftColor g_selected_font_color;
 static int g_font_height;
 static int g_font_yoff;
+
+// Colours as pulled out from the Xresources.
+static unsigned long colour_bg;
+static unsigned long colour_fg;
+static unsigned long colour_sel_bg;
+static unsigned long colour_sel_fg;
 
 class Menu;
 class MenuItem;
@@ -422,12 +428,17 @@ class DropDown {
 
   void Paint() {
     XClearWindow(dpy, dropdown_window);
+    const int y_max = items_.size() * g_font_height - 1;
+    const int x_max = width_ - 1;
+    XDrawLine(dpy, dropdown_window, dropdown_gc, 0, 0, 0, y_max);
+    XDrawLine(dpy, dropdown_window, dropdown_gc, 0, y_max, x_max, y_max);
+    XDrawLine(dpy, dropdown_window, dropdown_gc, x_max, 0, x_max, y_max);
     for (int i = 0; i < items_.size(); i++) {
       const int y = i * g_font_height;
       const string& item = items_[i];
       if (i == selected_index_) {
-        XFillRectangle(dpy, dropdown_window, dropdown_gc, 5, y, width_ - 10,
-                       g_font_height);
+        XFillRectangle(dpy, dropdown_window, dropdown_highlight_gc, 5, y,
+                       width_ - 10, g_font_height);
       }
       XftDrawStringUtf8(g_dropdown_font_draw, FontColour(i == selected_index_),
                         g_font, 10, y + g_font_yoff,
@@ -567,28 +578,29 @@ class MenuItem {
 // left-hand set, and one for the right-hand set of items.
 class MenuSet {
  public:
-  MenuSet() = default;
+  explicit MenuSet(bool rtl) : rtl_(rtl){};
   ~MenuSet() = default;
 
   // Takes ownership of item.
   void Add(MenuItem* item) { items_.push_back(item); }
 
-  void Paint(bool rtl) {
-    int x = rtl ? (display_width - 5) : 5;
+  void Paint(Drawable target, GC highlight_gc, XftDraw* g_font_draw) {
+    int x = rtl_ ? (display_width - 5) : 5;
     for (MenuItem* mi : items_) {
       const string name = mi->Name();
       const int width = 20 + TextWidth(name);
-      if (rtl) {
+      if (rtl_) {
         x -= width;
       }
       mi->SetPosition(x, width);
       if (mi == selected) {
-        XFillRectangle(dpy, window, gc, x + 5, 0, width - 10, window_height);
+        XFillRectangle(dpy, target, highlight_gc, x + 5, 0, width - 10,
+                       window_height);
       }
       XftDrawStringUtf8(
           g_font_draw, FontColour(mi == selected), g_font, x + 10, g_font_yoff,
           reinterpret_cast<const FcChar8*>(name.data()), name.size());
-      if (!rtl) {
+      if (!rtl_) {
         x += width;
       }
     }
@@ -604,22 +616,27 @@ class MenuSet {
   }
 
  private:
+  bool rtl_;
   vector<MenuItem*> items_;
 };
 
 // Menu is the thing that has the sets of left and right menu items.
 class Menu {
  public:
-  Menu() : left_(new MenuSet), right_(new MenuSet) {}
+  Menu()
+      : left_(new MenuSet(false)), right_(new MenuSet(true)), buffer_(None) {}
 
   void Add(MenuItem* item, bool is_right) {
     (is_right ? right_ : left_)->Add(item);
   }
 
   void Paint() {
-    XClearWindow(dpy, window);
-    left_->Paint(false);
-    right_->Paint(true);
+    EnsureDrawBufferExists();
+    XFillRectangle(dpy, buffer_, clear_gc_, 0, 0, display_width, window_height);
+    left_->Paint(buffer_, highlight_gc_, g_font_draw_);
+    right_->Paint(buffer_, highlight_gc_, g_font_draw_);
+    XCopyArea(dpy, buffer_, window, cp_gc_, 0, 0, display_width, window_height,
+              0, 0);
   }
 
   MenuItem* ItemAt(int mouseX) {
@@ -627,9 +644,48 @@ class Menu {
     return res ? res : right_->ItemAt(mouseX);
   }
 
+  void SizeChanged() {
+    if (buffer_ != None) {
+      XFreePixmap(dpy, buffer_);
+      XFreeGC(dpy, clear_gc_);
+      XFreeGC(dpy, highlight_gc_);
+      XFreeGC(dpy, cp_gc_);
+      buffer_ = None;
+    }
+  }
+
  private:
+  void EnsureDrawBufferExists() {
+    if (buffer_ != None) {
+      return;
+    }
+    const auto screen = DefaultScreen(dpy);
+    const auto depth = DefaultDepth(dpy, screen);
+    buffer_ = XCreatePixmap(dpy, window, display_width, window_height, depth);
+    {
+      XGCValues gv;
+      gv.foreground = colour_bg;
+      clear_gc_ = XCreateGC(dpy, buffer_, GCForeground, &gv);
+      gv.foreground = colour_sel_bg;
+      highlight_gc_ = XCreateGC(dpy, buffer_, GCForeground, &gv);
+    }
+    {
+      XGCValues gv;
+      gv.function = GXcopy;
+      cp_gc_ = XCreateGC(dpy, window, GCFunction, &gv);
+    }
+    g_font_draw_ = XftDrawCreate(dpy, buffer_, DefaultVisual(dpy, screen),
+                                 DefaultColormap(dpy, screen));
+  }
+
   MenuSet* left_;
   MenuSet* right_;
+
+  Pixmap buffer_;
+  GC clear_gc_;
+  GC highlight_gc_;
+  GC cp_gc_;
+  XftDraw* g_font_draw_;
 };
 
 static void getEvent(XEvent*);
@@ -982,6 +1038,7 @@ static void SetSizeFromXRandR() {
   display_xmin = min;
   display_width = max - min;
   XMoveResizeWindow(dpy, window, min, Y_OFFSET, display_width, window_height);
+  menu->SizeChanged();
 }
 
 static void RRScreenChange(XEvent* ev) {
@@ -1046,7 +1103,11 @@ int main(int argc, char* argv[]) {
     LOGF_IF(g_font == nullptr) << "can't find a font";
   }
 
-  const unsigned long bgColour = GetColour(x_resources[XRES_BG]);
+  // Copy colours to static constants so we can access them from everywhere.
+  colour_bg = GetColour(x_resources[XRES_BG]);
+  colour_fg = GetColour(x_resources[XRES_FG]);
+  colour_sel_bg = GetColour(x_resources[XRES_SEL_BG]);
+  colour_sel_fg = GetColour(x_resources[XRES_SEL_FG]);
 
   // Create the window.
   g_font_height = 1.2 * (g_font->ascent + g_font->descent);
@@ -1055,7 +1116,7 @@ int main(int argc, char* argv[]) {
   const Window root = DefaultRootWindow(dpy);
   XSetWindowAttributes attr;
   attr.override_redirect = False;
-  attr.background_pixel = bgColour;
+  attr.background_pixel = colour_bg;
   attr.border_pixel = BlackPixel(dpy, screen);
   attr.event_mask = ExposureMask | VisibilityChangeMask | PointerMotionMask |
                     ButtonPressMask | ButtonReleaseMask | StructureNotifyMask |
@@ -1070,8 +1131,6 @@ int main(int argc, char* argv[]) {
   SetWindowProps(window, window_height);
 
   // Create the objects needed to render text in the window.
-  g_font_draw = XftDrawCreate(dpy, window, DefaultVisual(dpy, screen),
-                              DefaultColormap(dpy, screen));
   XRenderColor xrc = GetXRenderColor(x_resources[XRES_FG]);
   XftColorAllocValue(dpy, DefaultVisual(dpy, screen),
                      DefaultColormap(dpy, screen), &xrc, &g_font_color);
@@ -1088,17 +1147,20 @@ int main(int argc, char* argv[]) {
       XftDrawCreate(dpy, dropdown_window, DefaultVisual(dpy, screen),
                     DefaultColormap(dpy, screen));
 
-  // Create GCs.
+  // Create GCs (note: the GCs for the main menu window are created in the Menu
+  // class, as we use a pixmap for drawing so as to avoid flickering when the
+  // clock updates.
   XGCValues gv;
-  // X font rendering uses its own colour system, and ignores the GC's forground
-  // colour.
-  // To implement the background highlights, we can set the foreground colour
-  // to be the selected background colour, and then just draw a foreground
-  // rectangle (before drawing the text) in order to highlight the item.
-  gv.foreground = GetColour(x_resources[XRES_SEL_BG]);
-  gv.background = bgColour;
-  gc = XCreateGC(dpy, window, GCForeground | GCBackground, &gv);
+  // dropdown_gc is used for clearing the drop-down window background, and for
+  // drawing the partial border around the edge of the window.
+  gv.foreground = colour_fg;
+  gv.background = colour_bg;
   dropdown_gc =
+      XCreateGC(dpy, dropdown_window, GCForeground | GCBackground, &gv);
+  // dropdown_highlight_gc is used to draw a rectangle behind the text of the
+  // currently-highlighted item.
+  gv.foreground = colour_sel_bg;
+  dropdown_highlight_gc =
       XCreateGC(dpy, dropdown_window, GCForeground | GCBackground, &gv);
 
   // Create the menu items.
