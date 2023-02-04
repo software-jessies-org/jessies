@@ -301,7 +301,10 @@ class UpdatableStringsSource : public StringsSource {
   // Returns true if the source was update, and that update yielded a new value.
   bool Update() {
     time_t now = time(nullptr);
-    if (now < NextUpdateTime()) {
+    // The check for now >= last_update_ is to cope with the clock going
+    // backwards, eg. when the computer's clock was messed up and ntpd wakes up
+    // and fixes it.
+    if (now >= last_update_ && now < NextUpdateTime()) {
       return false;
     }
     vector<string> new_val = source_->Get();
