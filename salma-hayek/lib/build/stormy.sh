@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 
 # BlueArc's local copy of the archive:
 DEB_DIRECTORY=/u/u154/software.jessies.org/
@@ -15,13 +16,15 @@ rm *.deb
 
 # Run the latest version of the nightly build script, rather than the version from yesterday.
 # This has the advantage that the update won't overwrite the running script - which Ruby doesn't like.
-NIGHTLY_BUILD_SCRIPT=~martind/jessies/work/salma-hayek/bin/nightly-build.rb
+JESSIES=$(realpath $(dirname $0)/../../../..)
+NIGHTLY_BUILD_SCRIPT=$JESSIES/work/salma-hayek/bin/nightly-build.rb
 # After restore-user-backup:
 # martind@sirius:~/jessies/work$ ln -s ../scm/work/scm .
 # martind@sirius:~/jessies/nightlies$ ln -s ../scm/nightlies/scm .
-NIGHTLY_BUILD_TREE=~martind/jessies/nightlies
+NIGHTLY_BUILD_TREE=$JESSIES/nightlies
 $NIGHTLY_BUILD_SCRIPT $NIGHTLY_BUILD_TREE clean
 # salma-hayek/lib/build/drive.rb explains how to get nightlies/salma-hayek/lib/build/client_secrets.json
+# sudo gem install --no-doc multi_json
 {
 echo $NIGHTLY_BUILD_SCRIPT --no-update $NIGHTLY_BUILD_TREE native-dist
 } |
