@@ -24,18 +24,34 @@ public interface PSequenceMatcher {
         }
     }
     
-    public static class SlashStarComment implements PSequenceMatcher {
+    public static class SlashStarComment extends StartEndStyle {
+        public SlashStarComment() {
+            super(PStyle.COMMENT, "/*", "*/");
+        }
+    }
+    
+    public static class StartEndStyle implements PSequenceMatcher {
+        private PStyle style;
+        private String regionStart;
+        private String regionEnd;
+        
+        public StartEndStyle(PStyle style, String regionStart, String regionEnd) {
+            this.style = style;
+            this.regionStart = regionStart;
+            this.regionEnd = regionEnd;
+        }
+        
         public RegionEnd match(String line, int fromIndex) {
-            if (!line.regionMatches(fromIndex, "/*", 0, 2)) {
+            if (!line.regionMatches(fromIndex, regionStart, 0, regionStart.length())) {
                 return null;
             }
             // If the matching */ is on the same line, return the region with its end.
-            int endIndex = line.indexOf("*/", fromIndex + 2);
+            int endIndex = line.indexOf(regionEnd, fromIndex + regionStart.length());
             if (endIndex != -1) {
-                return new RegionEnd(PStyle.COMMENT, endIndex + 2);
+                return new RegionEnd(style, endIndex + regionEnd.length());
             }
             // Comment does not end on this line, so return a RegionEnd that can find its end.
-            return new RegionEnd(PStyle.COMMENT, "*/");
+            return new RegionEnd(style, regionEnd);
         }
     }
     

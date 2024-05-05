@@ -73,6 +73,11 @@ public class FileType {
                  new String[] { ".kt" })
         .setLanguageDefinedIndentation("    ");
     
+    public static final FileType LUA = new FileType("Lua",
+                 PLuaIndenter.class,
+                 PLuaTextStyler.class,
+                 new String[] { ".lua" });
+    
     public static final FileType MAKE = new FileType("Make",
                  PNoOpIndenter.class,
                  PMakefileTextStyler.class,
