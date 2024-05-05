@@ -34,6 +34,7 @@ public class EvergreenMenuBar extends EMenuBar {
         JMenu menu = GuiUtilities.makeMenu("File", 'F');
         menu.add(new NewFileAction());
         menu.add(new OpenQuicklyAction());
+        menu.add(new ReopenLastClosedAction());
 
         menu.addSeparator();
         menu.add(new CloseWindowAction());

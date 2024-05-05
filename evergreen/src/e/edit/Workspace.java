@@ -172,6 +172,10 @@ public class Workspace extends JPanel {
         return leftColumn.getTextWindows();
     }
     
+    public ArrayList<String> getRecentlyClosedFiles() {
+        return leftColumn.getRecentlyClosedFiles();
+    }
+    
     /** Returns an array of this workspace's dirty text windows. */
     public Collection<ETextWindow> getDirtyTextWindows() {
         ArrayList<ETextWindow> dirtyTextWindows = new ArrayList<>();

@@ -16,6 +16,18 @@ import javax.swing.event.*;
 public class EColumn extends JPanel {
     private static final int MIN_HEIGHT = ETitleBar.TITLE_HEIGHT + 6;
     
+    // recentlyClosedFiles contains a limited list of the most recently closed files, including
+    // their 'address' (location of caret/selection).
+    // This allows us to reopen recently-closed files at the same place the user was looking at
+    // when the file was closed.
+    private LinkedList<String> recentlyClosedFiles = new LinkedList<>();
+    
+    // [philjessies, 2024-05-05] While we don't generally like limits, once you've got to about
+    // 10 recently closed files, scanning the list of them to find a file you want to edit again
+    // becomes more cumbersome than using 'open quickly'.
+    // However, the number 10 is a bit arbitrary; we should change it if it turns out to be wrong.
+    private static final int MAX_RECENTLY_CLOSED_FILES = 10;
+    
     /**
      * Creates a new empty column.
      */
@@ -59,6 +71,33 @@ public class EColumn extends JPanel {
             }
         }
         return null;
+    }
+    
+    // Returns the list of recently-closed files in this EColumn, most recent first.
+    // This is a copy of the internal structure, so the caller can modify it as it pleases.
+    public ArrayList<String> getRecentlyClosedFiles() {
+        ArrayList<String> result = new ArrayList<>();
+        for (String item : recentlyClosedFiles) {
+            result.add(item);
+        }
+        return result;
+    }
+    
+    private void addRecentlyClosedFile(ETextWindow window) {
+        removeRecentlyClosedFile(window);
+        recentlyClosedFiles.addFirst(window.getFilename() + window.getAddress());
+        if (recentlyClosedFiles.size() > MAX_RECENTLY_CLOSED_FILES) {
+            recentlyClosedFiles.removeLast();
+        }
+    }
+    
+    private void removeRecentlyClosedFile(ETextWindow window) {
+        // This is O(n), which is perfectly fine as we limit the list length anyway.
+        // Note that recentlyClosedFiles is a list of addresses, which include the
+        // caret position. This may not match up with the current ETextWindow's caret
+        // position, so we need to use a predicate to ensure we just check the filename
+        // portion.
+        recentlyClosedFiles.removeIf(addr -> addr.startsWith(window.getFilename() + ":"));
     }
     
     private void addListeners() {
@@ -123,6 +162,11 @@ public class EColumn extends JPanel {
             luckyBoy.requestFocus();
             reshapeAndRevalidate(luckyBoy, 0, 0, luckyBoy.getWidth(), luckyBoy.getHeight() + c.getHeight());
         }
+        // [philjessies, 2024-05-05] The Workspace should remember which windows were closed,
+        // so we can provide Chrome-like ctrl+shift+t "reopen last closed tab" functionality.
+        if (c instanceof ETextWindow) {
+            addRecentlyClosedFile((ETextWindow) c);
+        }
         getParent().repaint();
     }
     
@@ -147,6 +191,9 @@ public class EColumn extends JPanel {
     private final TitleBarMouseInputListener titleBarMouseInputListener = new TitleBarMouseInputListener();
     
     public void addComponent(final EWindow c, final int y) {
+        if (c instanceof ETextWindow) {
+            removeRecentlyClosedFile((ETextWindow) c);
+        }
         try {
             if (y == -1) {
                 addComponentHeuristically(c);
