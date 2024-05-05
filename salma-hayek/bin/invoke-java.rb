@@ -410,6 +410,12 @@ class Java
       end
     end
     
+    # Java doesn't support Wayland properly yet; without this 'non-reparenting'
+    # hack, Java windows show up blank (just white, no contents).
+    if ENV["WAYLAND_DISPLAY"] != ""
+      ENV["_JAVA_AWT_WM_NONREPARENTING"] = "1"
+    end
+    
     # Terminator becomes unreasonably unresponsive for ten minutes with 40 million lines of output
     # if we leave the JVM to its defaults in 32 GiB of RAM with Java 1.8.0_171.
     args << "-Xmx1g"
