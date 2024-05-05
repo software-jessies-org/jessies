@@ -28,10 +28,18 @@ public class CycleWindowsAction extends ETextAction {
         // other than tabs (which we use for workspaces, not windows within
         // a workspace).
         
-        // So, let's pretend everything's Mac OS...
-        String key = "BACK_QUOTE";
-        boolean shifted = (indexDelta == -1);
-        putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke(key, shifted));
+        // MacOS uses backquotes for this.
+        if (GuiUtilities.isMacOs()) {
+            String key = "BACK_QUOTE";
+            boolean shifted = (indexDelta == -1);
+            putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStroke(key, shifted));
+        } else {
+            // [philjessies, 2024-05-05]
+            // We use alt+left/right for switching workspaces (as of now, to be more similar
+            // to Terminator), so alt+up/down makes sense for switching between buffers.
+            String key = (indexDelta == -1) ? "UP" : "DOWN";
+            putValue(ACCELERATOR_KEY, GuiUtilities.makeKeyStrokeWithModifiers(InputEvent.ALT_DOWN_MASK, key));
+        }
     }
     
     public void actionPerformed(ActionEvent e) {

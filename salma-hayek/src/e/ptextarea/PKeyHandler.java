@@ -137,10 +137,26 @@ public class PKeyHandler implements KeyListener {
         }
     }
     
+    private boolean isArrowKey(int key) {
+        switch (key) {
+            case KeyEvent.VK_UP:
+            case KeyEvent.VK_DOWN:
+            case KeyEvent.VK_LEFT:
+            case KeyEvent.VK_RIGHT:
+                return true;
+        }
+        return false;
+    }
+    
     private boolean handleInvisibleKeyPressed(KeyEvent event) {
         boolean byWord = GuiUtilities.isMacOs() ? event.isAltDown() : event.isControlDown();
         boolean extendingSelection = event.isShiftDown();
         final int key = extractKeyCode(event);
+        if (!GuiUtilities.isMacOs() && event.isAltDown() && isArrowKey(key)) {
+            // If we're not on MacOS, alt+arrow keys is used to switch between tabs and files
+            // in Evergreen, so ensure we don't swallow such events here.
+            return false;
+        }
         if (textArea.isEditable() && key == KeyEvent.VK_TAB) {
             if (event.getModifiersEx() != 0) {
                 // If any modifiers are down, pass on this event.
