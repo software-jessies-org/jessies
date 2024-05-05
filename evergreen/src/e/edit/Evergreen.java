@@ -76,9 +76,9 @@ public class Evergreen {
                     splitPane.setDividerLocation(tagsPanelSplitPaneDividerLocation);
                 } else {
                     // Defaults.
-                    splitPane.setDividerLocation(0.8);
-                    splitPane.setResizeWeight(0.8);
+                    splitPane.setDividerLocation(initialState.tagsPanelOnLeft ? 0.2 : 0.8);
                 }
+                splitPane.setResizeWeight(initialState.tagsPanelOnLeft ? 0.2 : 0.8);
             } else {
                 ShowHideTagsAction.setTagsPanelVisibility(false);
                 ShowHideTagsAction.oldDividerLocation = tagsPanelSplitPaneDividerLocation;
