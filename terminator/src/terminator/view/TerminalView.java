@@ -80,10 +80,10 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
             // Used to check whether a drag has actually moved to a new character cell.
             private Location lastLocation;
             
-	    // mouseLocationInVisibleArea returns the location of the mouse within the current visible area.
-	    // This is *ONLY* for use in sending mouse control events to terminal programs.
-	    // If you use this function to determine the position of text in the TerminalModel,
-	    // it'll work only if you're not scrolled away from 0,0.
+            // mouseLocationInVisibleArea returns the location of the mouse within the current visible area.
+            // This is *ONLY* for use in sending mouse control events to terminal programs.
+            // If you use this function to determine the position of text in the TerminalModel,
+            // it'll work only if you're not scrolled away from 0,0.
             private Location mouseLocationInVisibleArea(MouseEvent e) {
                 Rectangle viewRect = getViewport().getViewRect();
                 Point p = e.getPoint();
@@ -136,11 +136,11 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
             }
             
             @Override public void mouseMoved(MouseEvent e) {
-	        // This function deals not with sending terminal escape codes to describe mouse events,
-	        // but instead with showing URLs and allowing the user to click on them to open them in
-	        // a browser. As such, it needs the *real* location of the mouse (as in, within the terminal),
-	        // not the pointer location within the visible area, which is what the terminal program
-	        // understands.
+                // This function deals not with sending terminal escape codes to describe mouse events,
+                // but instead with showing URLs and allowing the user to click on them to open them in
+                // a browser. As such, it needs the *real* location of the mouse (as in, within the terminal),
+                // not the pointer location within the visible area, which is what the terminal program
+                // understands.
                 Location location = viewToModel(e.getPoint());
                 if (location.equals(urlMouseLocation)) {
                     return;
@@ -166,7 +166,10 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
                     terminalControl.sendSGR(e.getWheelRotation() < 0 ? 64 : 65, mouseLocationInVisibleArea(e), 'M');
                     e.consume();
                 } else {
-                    HorizontalScrollWheelListener.INSTANCE.mouseWheelMoved(e);
+                    JScrollPane scrollPane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, e.getComponent());
+                    if (scrollPane != null) {
+                        scrollPane.dispatchEvent(e);
+                    }
                 }
             }
         };
