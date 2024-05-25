@@ -375,11 +375,55 @@ public class EColumn extends JPanel {
             }
         }
         
-        // FIXME: this assumes that the resize actually increased the column's height.
-        final Component last = components[components.length - 1];
-        final int lastBottom = last.getY() + last.getHeight();
-        if (lastBottom != getHeight()) {
-            reshapeAndRevalidate(last, last.getX(), last.getY(), getWidth(), getHeight() - last.getY());
+        // Ensure the vertical space is being used properly. When height is being increased,
+        // it's given to the lowest component that isn't minimised (or, if they're all minimised,
+        // the top component). When height is being decreased, it's decreased from the lowest
+        // component, and the components are squished together if they start falling off the
+        // bottom of the screen.
+        // Note that we set the availableHeight to be either the overall component height, or
+        // the minimum height required to fit all the components in their squished form.
+        // This allows us to simplify the logic in the loop a fair bit.
+        int availableHeight = Math.max(getHeight(), components.length * MIN_HEIGHT);
+        for (int i = components.length - 1; i >= 0; i--) {
+            final Component comp = components[i];
+            int compBottom = comp.getY() + comp.getHeight();
+            if (compBottom == availableHeight) {
+                // Already in the right position - nothing more to do, and the components
+                // above this one don't need to change.
+                break;
+            }
+            if (availableHeight > compBottom) {
+                // If we're minimised but *not* the topmost component, then just move with
+                // the bottom of the window, and allow the extra height to be given another
+                // component (one that the user hasn't squished against the bottom, and probably
+                // isn't interested in right now).
+                if (i > 0 && comp.getHeight() == MIN_HEIGHT) {
+                    availableHeight -= MIN_HEIGHT;
+                    reshapeAndRevalidate(comp, comp.getX(), availableHeight, getWidth(), MIN_HEIGHT);
+                    continue;
+                }
+                // We're not minimised, so expand this component to claim all the space.
+                // This will leave this component with its minY unchanged, so we can exit
+                // early at this point.
+                reshapeAndRevalidate(comp, comp.getX(), comp.getY(), getWidth(), availableHeight - comp.getY());
+                break;
+            }
+            // The window has shrunk.
+            if (availableHeight >= comp.getY() + MIN_HEIGHT) {
+                // This component can shrink to account for the window shrinkage just by itself,
+                // so do that and exit early - no other components need move or be resized.
+                reshapeAndRevalidate(comp, comp.getX(), comp.getY(), getWidth(), availableHeight - comp.getY());
+                break;
+            }
+            // The window has shrunk, and effectively minimised this component. Ensure we minimise
+            // properly, and check if we can squish up into the next component above.
+            // As we started out with availableHeight being *at least* big enough to fit all the
+            // components in minimised form, we know that there's no possibility of us moving
+            // upwards too far, as all windows have at least enough room to be in minimised form.
+            availableHeight -= MIN_HEIGHT;
+            if (availableHeight != comp.getY() || MIN_HEIGHT != comp.getHeight()) {
+                reshapeAndRevalidate(comp, comp.getX(), availableHeight, getWidth(), MIN_HEIGHT);
+            }
         }
     }
     
