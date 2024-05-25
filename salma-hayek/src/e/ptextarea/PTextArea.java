@@ -1143,6 +1143,12 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
     void rewrap() {
         if (isShowing()) {
             runWithoutMovingTheVisibleArea(() -> { revalidateLineWrappings(); });
+        } else {
+            // We're not showing, so dump the splitLines to force regeneration next
+            // time we turn visible.
+            getLock().getWriteLock();
+            splitLines = null;
+            getLock().relinquishWriteLock();
         }
     }
     
