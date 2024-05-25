@@ -103,8 +103,9 @@ public class OpenQuicklyDialog implements WorkspaceFileList.Listener {
         matchList.addMouseListener(new MouseAdapter() {
             @Override public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {
-                    int index = matchList.locationToIndex(e.getPoint());
-                    openFileAtIndex(index);
+                    // Just tell the dialog to act as if we hit Return. This will call back
+                    // into this class to open the file, but also close the dialog.
+                    form.getFormDialog().acceptDialog();
                 }
             }
         });
