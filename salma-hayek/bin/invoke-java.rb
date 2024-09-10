@@ -412,7 +412,7 @@ class Java
     
     # Java doesn't support Wayland properly yet; without this 'non-reparenting'
     # hack, Java windows show up blank (just white, no contents).
-    if ENV["WAYLAND_DISPLAY"] != ""
+    if ENV.include?("WAYLAND_DISPLAY")
       ENV["_JAVA_AWT_WM_NONREPARENTING"] = "1"
     end
     
