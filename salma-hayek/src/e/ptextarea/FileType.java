@@ -111,7 +111,7 @@ public class FileType {
     public static final FileType PYTHON = new FileType("Python",
                  PPythonIndenter.class,
                  PPythonTextStyler.class,
-                 new String[] { ".py" });
+                 new String[] { ".py", "BUILD", ".bzl" });
     
     public static final FileType RUBY = new FileType("Ruby",
                  PRubyIndenter.class,
