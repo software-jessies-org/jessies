@@ -281,6 +281,64 @@ public class EColumn extends JPanel {
         getComponent(newIndex).requestFocus();
     }
     
+    public boolean canMoveWindow(EWindow c, int indexDelta) {
+        int index = getComponentIndex(c);
+        if (index == -1) {
+            return false;
+        }
+        int newIndex = index + indexDelta;
+        return newIndex > -1 && newIndex < getComponentCount();
+    }
+        
+    public void moveWindow(EWindow c, int indexDelta) {
+        int index = getComponentIndex(c);
+        if (index == -1) {
+            return;
+        }
+        int newIndex = index + indexDelta;
+        // Don't do anything if we hit the top or bottom. This is not consistent with the
+        // behaviour of the cycleWindow, as that will cycle between bottom and top, but
+        // it seems to me like it's going to be more useful to allow the user to just hold
+        // down the relevant hotkey and have the window zoom to the top or bottom and stay
+        // there, than flipping windows between top and bottom.
+        // We may want to revisit this if that turns out not to be the case. If we do, then
+        // we'll need more complex logic to move components around, as while moving only
+        // up or down one place involves just switching two windows' positions, flipping
+        // between top and bottom moves everything.
+        if (newIndex == -1 || newIndex == getComponentCount()) {
+            return;
+        }
+        // First of all, switch the Y position of the two components.
+        Component me = getComponent(index);
+        Component them = getComponent(newIndex);
+        Rectangle myBounds = me.getBounds();
+        Rectangle theirBounds = them.getBounds();
+        
+        int topY = Math.min(me.getY(), them.getY());
+        // Note: these look reversed, as the top and bottom we _want_ are the top and bottom
+        // _final_ positions, which are currently in the opposite order to how they will be.
+        Component top = getComponent(Math.max(index, newIndex));
+        Component bottom = getComponent(Math.min(index, newIndex));
+        Rectangle topRect = top.getBounds();
+        Rectangle bottomRect = bottom.getBounds();
+        topRect.y = topY;
+        // The bottom rectangle's top Y position is going to change, as when we swap the windows
+        // we keep their respective heights the same as they were. The divider's position
+        // therefore changes.
+        bottomRect.y = topY + topRect.height;
+        
+        // Now switch the components in the container's order. Unfortunately we can't do this
+        // by just swapping the two things in the list - we have to remove a component and
+        // re-add it, which is probably going to copy the latter part of the list twice.
+        // That said, the list is short, so who cares?
+        remove(index);
+        add(me, newIndex);
+        // Finally, set the bounds.
+        top.setBounds(topRect);
+        bottom.setBounds(bottomRect);
+        getComponent(newIndex).requestFocus();
+    }
+    
     private boolean isThereAnySpaceAboveComponent(int which) {
         for (int i = 0; i < which; i++) {
             if (getComponent(i).getHeight() > MIN_HEIGHT) {

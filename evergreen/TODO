@@ -21,10 +21,6 @@ UI
 
 + Add a menu item to sort a column's windows alphabetically. Would need a keyboard equivalent to see any use, I think.
 
-+ Make it possible to reorder windows, maybe with some kind of draggable widget at the left-hand edge.
-
-+ Fix the fact that you can slide windows off the bottom of the column, or behind the others at the bottom of a column. (this was fixed recently, but at the cost of making it really hard to scrunch a group of windows against the top or bottom.)
-
 + We've removed most uses of "new File" in favor of FileUtilities.fileFromString, but should probably have something similar in the other direction, where special JFilenameField components would let us always show the user-friendly forms.
 
 + acme used to support an arbitrary number of columns. I never really saw the use for that at the time, but now the combination of 30" displays all round and an 80-column limit on code at work means I could probably make use of two (or maybe three) columns of code. I don't know it wouldn't be confusing, though. Why don't I just have a tall but narrow Evergreen window? Because I have a lot of workspaces, and wrapped tabs are unusable. (And I'd be able to open 2 or 3 times as many windows if I had 2 or 3 columns.)
@@ -317,12 +313,6 @@ AUTO COMPLETION
 + need to make auto-completion useful enough that it actually sees some use. maybe attack prose first, since that doesn't require type information? or is the trouble there that people don't necessarily know the prefix? i.e. i might want help with "rhythm", but it's the first 'h' i have trouble with. in which case, i'm better off misspelling and asking the spelling checker for corrections. if that's the common case, prose would be better served by a "show auto-corrections for previous misspelling" action. though we'd need a snappier name.
 
 + auto-completion should work for languages other than Java. We can collect all the identifiers from the current file and sort them, at the very least.
-
-
-
-UNDO
-
-+ why do we sometimes claim the document is dirty, yet revert says "no non-whitespace changes"?
 
 
 

@@ -122,7 +122,9 @@ public class EvergreenMenuBar extends EMenuBar {
         menu.addSeparator();
         menu.add(new CycleWindowsAction(1));
         menu.add(new CycleWindowsAction(-1));
-
+        menu.add(new MoveWindowAction(1));
+        menu.add(new MoveWindowAction(-1));
+        
         menu.addSeparator();
         menu.add(new ExpandWindowAction());
 
