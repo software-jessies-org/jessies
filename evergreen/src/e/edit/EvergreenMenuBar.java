@@ -56,6 +56,7 @@ public class EvergreenMenuBar extends EMenuBar {
         JMenu menu = GuiUtilities.makeMenu("Edit", 'E');
         menu.add(PActionFactory.makeUndoAction());
         menu.add(PActionFactory.makeRedoAction());
+        menu.add(new DumpUndoBufferAction());
 
         menu.addSeparator();
         menu.add(PActionFactory.makeCutAction());

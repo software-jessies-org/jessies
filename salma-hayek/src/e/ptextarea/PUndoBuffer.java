@@ -62,4 +62,7 @@ public interface PUndoBuffer {
      * whether a text should be considered dirty/modified.
      */
     public void addChangeListener(javax.swing.event.ChangeListener listener);
+    
+    /** Dumps the undo buffer contents to the warning debug log. */
+    public void dumpUndoList();
 }

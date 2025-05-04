@@ -537,10 +537,11 @@ public class PTextBuffer implements CharSequence {
         }
         
         private void addAndDo(SelectionSetter beforeCaret, int position, CharSequence removeChars, CharSequence insertChars, SelectionSetter afterCaret) {
-            // FIXME: use ArrayList.removeRange.
             while (undoList.size() > undoPosition) {
+                undoList.remove(undoList.size() - 1);
+            }
+            if (cleanPosition > undoList.size()) {
                 cleanPosition = -1;  // We can never be clean again until we save.
-                undoList.remove(undoPosition);
             }
             
             int id = (compoundingDepth == 0) ? NOT_COMPOUND : compoundId;
@@ -553,11 +554,15 @@ public class PTextBuffer implements CharSequence {
             ++compoundingDepth;
         }
         
-        private void dumpUndoList() {
-            Log.warn("Dumping PTextBuffer undo list:");
+        public void dumpUndoList() {
+            Log.warn("UndoBuffer " + (isClean() ? "clean" : "dirty") + "; clean pos = " + cleanPosition + "; undo pos = " + undoPosition);
             int i = 0;
             for (Doable edit : undoList) {
-                Log.warn(i++ + ": " + edit);
+                String positionMarker = (i == undoPosition) ? "-->  " : "     ";
+                Log.warn(positionMarker + i++ + ": " + edit);
+            }
+            if (undoPosition == undoList.size()) {
+                Log.warn("-->  (current)");
             }
         }
         
