@@ -145,6 +145,15 @@ public class PTextBuffer implements CharSequence {
      * Replaces the contents of this buffer with the entire contents of 'file'.
      */
     public void readFromFile(File file) {
+        readFromFile(file, null, null);
+    }
+    
+    /**
+     * Replaces the contents of this buffer with the entire contents of 'file', but implemented
+     * as an undoable operation (with appropriate selection setters for before and after the
+     * operation).
+     */
+    public void readFromFile(File file, SelectionSetter undoSelSetter, SelectionSetter doSelSetter) {
         getLock().getWriteLock();
         try {
             // Read all the bytes in.
@@ -162,7 +171,11 @@ public class PTextBuffer implements CharSequence {
             
             // Use the characters and the inferred encoding.
             putProperty(CHARSET_PROPERTY, encoding);
-            setText(chars);
+            setText(chars, undoSelSetter, doSelSetter);
+            // For newly-opened files the following is a no-op, but it becomes important when we
+            // revert to disk. In any case, after we've just filled the buffer from whatever the
+            // file contents are on disk, it's guaranteed to be clean. So set it so.
+            getUndoBuffer().setCurrentStateClean();
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         } finally {
@@ -270,13 +283,23 @@ public class PTextBuffer implements CharSequence {
      * Sets the text, replacing anything that was here before.
      * Note that this method does not copy the given char[].
      */
-    private void setText(char[] text) {
+    private void setText(char[] text, SelectionSetter undoSelSetter, SelectionSetter doSelSetter) {
         getLock().getWriteLock();
         try {
-            this.text = text;
-            gapPosition = 0;
-            gapLength = 0;
-            fireTextEvent(new PTextEvent(this, PTextEvent.COMPLETE_REPLACEMENT, 0, new CharArrayCharSequence(text)));
+            CharSequence charSeq = new CharArrayCharSequence(text);
+            if (undoSelSetter == null) {
+                // If we have no undo selection setter, we don't want to even consider this an
+                // undoable action (presumably because it's the first time we've opened this file,
+                // and undoing that would result in us having an empty buffer, which is just weird).
+                this.text = text;
+                gapPosition = 0;
+                gapLength = 0;
+            } else {
+                // If we have an undo selection setter, that's a clear indication that we want to
+                // consider the text replacement as an undoable action, so let's do that.
+                replace(undoSelSetter, 0, length(), charSeq, doSelSetter);
+            }
+            fireTextEvent(new PTextEvent(this, PTextEvent.COMPLETE_REPLACEMENT, 0, charSeq));
         } finally {
             getLock().relinquishWriteLock();
         }

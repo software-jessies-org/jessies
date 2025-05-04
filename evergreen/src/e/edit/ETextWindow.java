@@ -350,13 +350,11 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     private void fillWithContent() {
         try {
             lastModifiedTime = Files.getLastModifiedTime(path);
-            textArea.getTextBuffer().readFromFile(path.toFile());
+            textArea.readFromFile(path.toFile());
             
             configureForGuessedFileType();
             updateWatermarkAndTitleBar();
             highlightMergeConflicts();
-            textArea.getTextBuffer().getUndoBuffer().resetUndoBuffer();
-            textArea.getTextBuffer().getUndoBuffer().setCurrentStateClean();
             getTitleBar().repaint();
         } catch (Throwable th) {
             Log.warn("in ContentLoader exception handler", th);
@@ -404,12 +402,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     }
     
     private void uncheckedRevertToSaved() {
-        // FIXME - work with non-empty selection
-        int originalCaretPosition = textArea.getSelectionStart();
         fillWithContent();
-        int newCaretPosition = Math.min(originalCaretPosition, textArea.getTextBuffer().length());
-        textArea.setCaretPosition(newCaretPosition);
-        tagsUpdater.updateTags();
         Evergreen.getInstance().showStatus("Reverted to saved version of " + filename);
     }
     

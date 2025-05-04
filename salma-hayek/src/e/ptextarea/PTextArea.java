@@ -3,6 +3,7 @@ package e.ptextarea;
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
+import java.io.*;
 import java.util.*;
 import java.util.List;
 import java.util.regex.*;
@@ -495,7 +496,11 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
         
         public void modifySelection() {
             if (start != DO_NOT_CHANGE && end != DO_NOT_CHANGE) {
-                select(start, end);
+                // We bounds-check the length for the case when we're using a SelectionSetter
+                // during 'revert to saved', where we use the selection in the pre-reverted
+                // file on the newly-loaded contents (which might be shorter).
+                int len = getTextBuffer().length();
+                select(Math.min(start, len), Math.min(end, len));
             }
         }
     }
@@ -1336,6 +1341,32 @@ public class PTextArea extends JComponent implements PLineListener, Scrollable, 
      */
     public void setText(CharSequence newText) {
         getTextBuffer().replace(new SelectionSetter(), 0, getTextBuffer().length(), newText, new SelectionSetter(guessTargetCaretPos(newText)));
+    }
+    
+    /**
+     * Replaces the contents of the buffer with whatever's in the given file.
+     * If the undo buffer is empty, this is treated as the initial load of a file, and so the
+     * action will not be undoable (otherwise, the initial load of a file would have an undo
+     * action that would present the user with an empty file, which would be considered identical
+     * to what's on disk - clearly wrong). If we can undo something, however, then we execute
+     * this as an undoable action, so that a 'revert to file' can be undone.
+     */
+    public void readFromFile(File file) {
+        SelectionSetter oldSel = null;
+        SelectionSetter newSel = null;
+        if (getTextBuffer().getUndoBuffer().canUndo()) {
+            oldSel = new SelectionSetter();
+            // Try to maintain the same selection as before, so we're in roughly the same area
+            // of the file. And trust the SelectionSetter to check the bounds of the file to
+            // ensure we're not exceeding them.
+            // We could do a better job of this by using the 'guessTargetCaretPos' function below,
+            // although we'd have to do that lazily as at this point we don't know what the new
+            // contents is going to be.
+            // Alternatively we could refactor the whole kaboodle so that the file handling isn't
+            // done within the PTextBuffer (which is really the wrong place for it, after all).
+            newSel = new SelectionSetter();
+        }
+        getTextBuffer().readFromFile(file, oldSel, newSel);
     }
     
     /**
