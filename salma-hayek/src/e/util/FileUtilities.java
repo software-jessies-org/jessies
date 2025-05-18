@@ -437,6 +437,9 @@ public class FileUtilities {
     public static Path findSupportBinary(String binaryName) {
         String fileName = mapBinaryName(binaryName);
         String directory = System.getProperty("org.jessies.binaryDirectory");
+        if (directory == null) {
+            return null;
+        }
         Path path = Paths.get(directory, fileName);
         if (Files.isExecutable(path)) {
             return path;
