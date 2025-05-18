@@ -26,125 +26,129 @@ public class FileType {
         return result;
     }
     
-    public static final FileType ASSEMBLER = new FileType("Assembler",
+    // The lspLanguage fields are copied from here:
+    // https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#textDocumentItem
+    public static final FileType ASSEMBLER = new FileType("Assembler", null,
                  PNoOpIndenter.class,
                  PAssemblerTextStyler.class,
                  new String[] { ".s", ".S" });
     
-    public static final FileType BASH = new FileType("Bash",
+    public static final FileType BASH = new FileType("Bash", null,
                  PBashIndenter.class,
                  PBashTextStyler.class,
                  new String[] { ".sh", "bash.bashrc", "bash.logout", ".bash_profile", ".bashrc", ".bash_logout" });
     
-    public static final FileType C_PLUS_PLUS = new FileType("C++",
+    public static final FileType C_PLUS_PLUS = new FileType("C++", "cpp",
                  PCppIndenter.class,
                  PCPPTextStyler.class,
                  new String[] { ".cpp", ".hpp", ".c", ".h", ".m", ".mm", ".hh", ".cc", ".strings" });
     
-    public static final FileType C_SHARP = new FileType("C#",
+    public static final FileType C_SHARP = new FileType("C#", "csharp",
                  PJavaIndenter.class,
                  PCSharpTextStyler.class,
                  new String[] { ".cs" });
     
-    public static final FileType EMAIL = new FileType("Email",
+    public static final FileType EMAIL = new FileType("Email", null,
                  PNoOpIndenter.class,
                  PEmailTextStyler.class,
                  new String[] { ".email" });
     
-    public static final FileType GO = new FileType("Go",
+    public static final FileType GO = new FileType("Go", "go",
                  PGoIndenter.class,
                  PGoTextStyler.class,
                  new String[] { ".go" })
         .setLanguageDefinedIndentation("\t");
     
-    public static final FileType JAVA = new FileType("Java",
+    public static final FileType JAVA = new FileType("Java", "java",
                  PJavaIndenter.class,
                  PJavaTextStyler.class,
                  new String[] { ".java" });
     
-    public static final FileType JAVA_SCRIPT = new FileType("JavaScript",
+    public static final FileType JAVA_SCRIPT = new FileType("JavaScript", "javascript",
                  PNoOpIndenter.class,
                  PJavaScriptTextStyler.class,
                  new String[] { ".js" });
     
-    public static final FileType KOTLIN = new FileType("Kotlin",
+    public static final FileType KOTLIN = new FileType("Kotlin", "kotlin",  // LSP name is a guess.
                  PGoIndenter.class,
                  PKotlinTextStyler.class,
                  new String[] { ".kt" })
         .setLanguageDefinedIndentation("    ");
     
-    public static final FileType LUA = new FileType("Lua",
+    public static final FileType LUA = new FileType("Lua", "lua",
                  PLuaIndenter.class,
                  PLuaTextStyler.class,
                  new String[] { ".lua" });
     
-    public static final FileType MAKE = new FileType("Make",
+    public static final FileType MAKE = new FileType("Make", "makefile",
                  PNoOpIndenter.class,
                  PMakefileTextStyler.class,
                  new String[] { "Makefile", "GNUmakefile", "makefile", ".make", ".mk" });
     
-    public static final FileType PATCH = new FileType("Patch",
+    public static final FileType PATCH = new FileType("Patch", "diff",  // Presumably LSP name is this one.
                  PNoOpIndenter.class,
                  PPatchTextStyler.class,
                  new String[] { ".diff", ".patch" });
     
-    public static final FileType PERL = new FileType("Perl",
+    public static final FileType PERL = new FileType("Perl", "perl",
                  PPerlIndenter.class,
                  PPerlTextStyler.class,
                  new String[] { ".pl", ".pm" });
     
-    public static final FileType PHP = new FileType("PHP",
+    public static final FileType PHP = new FileType("PHP", "php",
                  PNoOpIndenter.class,
                  PPhpTextStyler.class,
                  new String[] { ".php" });
     
-    public static final FileType PLAIN_TEXT = new FileType("Plain Text",
+    public static final FileType PLAIN_TEXT = new FileType("Plain Text", null,
                  PNoOpIndenter.class,
                  PPlainTextStyler.class,
                  new String[] { ".txt" });
     
-    public static final FileType PROTO = new FileType("Protocol Buffer",
+    public static final FileType PROTO = new FileType("Protocol Buffer", null,
                  PCppIndenter.class,
                  PProtoTextStyler.class,
                  new String[] { ".proto" });
     
-    public static final FileType PYTHON = new FileType("Python",
+    public static final FileType PYTHON = new FileType("Python", "python",
                  PPythonIndenter.class,
                  PPythonTextStyler.class,
                  new String[] { ".py", "BUILD", ".bzl" });
     
-    public static final FileType RUBY = new FileType("Ruby",
+    public static final FileType RUBY = new FileType("Ruby", "ruby",
                  PRubyIndenter.class,
                  PRubyTextStyler.class,
                  new String[] { ".rb" });
     
-    public static final FileType RUST = new FileType("Rust",
+    public static final FileType RUST = new FileType("Rust", "rust",
                  PCppIndenter.class,
                  PRustTextStyler.class,
                  new String[] { ".rs" });
     
-    public static final FileType VHDL = new FileType("VHDL",
+    public static final FileType VHDL = new FileType("VHDL", null,
                  PNoOpIndenter.class,
                  PVhdlTextStyler.class,
                  new String[] { ".vhd" });
     
-    public static final FileType XML = new FileType("XML",
+    public static final FileType XML = new FileType("XML", "xml",
                  PNoOpIndenter.class,
                  PXmlTextStyler.class,
                  new String[] { ".xml", ".html", ".shtml", ".vm" });
     
     private final String name;
+    private final String lspLanguage;
     private final Class<? extends PIndenter> indenterClass;
     private final Class<? extends PTextStyler> stylerClass;
     private final String[] extensions;
     private String languageDefinedIndentation;
     
-    private FileType(String name, Class<? extends PIndenter> defaultIndenterClass, Class<? extends PTextStyler> defaultStylerClass, String[] extensions) {
+    private FileType(String name, String lspLanguage, Class<? extends PIndenter> defaultIndenterClass, Class<? extends PTextStyler> defaultStylerClass, String[] extensions) {
         synchronized (ALL_FILE_TYPES) {
             if (ALL_FILE_TYPES.containsKey(name)) {
                 throw new RuntimeException("Attempt to redefine FileType \"" + name + "\"");
             }
             this.name = name;
+            this.lspLanguage = lspLanguage;
             this.indenterClass = selectClass(name + ".indenterClass", defaultIndenterClass);
             this.stylerClass = selectClass(name + ".stylerClass", defaultStylerClass);
             this.extensions = extensions;
@@ -213,6 +217,11 @@ public class FileType {
     
     public String getName() {
         return name;
+    }
+    
+    /** getLspLanguage returns the name of this language according to the language server protocol. */
+    public String getLspLanguage() {
+        return lspLanguage;
     }
     
     public static Set<String> getAllFileTypeNames() {
