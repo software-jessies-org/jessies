@@ -10,7 +10,7 @@ public class PTextEvent {
     private int eventType;
     private int offset;
     private CharSequence characters;
-     
+
     public PTextEvent(PTextBuffer pText, int eventType, int offset, CharSequence characters) {
         this.pText = pText;
         this.eventType = eventType;
@@ -20,6 +20,16 @@ public class PTextEvent {
     
     public PTextBuffer getTextBuffer() {
         return pText;
+    }
+    
+    public String toString() {
+        if (isCompleteReplacement()) {
+            return "PTextEvent[COMPLETE_REPLACEMENT]";
+        }
+        if (isInsert()) {
+            return "PTextEvent[@" + offset + " add \"" + characters + "\"]";
+        }
+        return "PTextEvent[@" + offset + " del \"" + characters + "\"]";
     }
     
     public boolean isInsert() {
