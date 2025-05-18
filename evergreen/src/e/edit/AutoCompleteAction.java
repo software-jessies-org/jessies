@@ -4,26 +4,21 @@ import e.ptextarea.*;
 import e.util.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.*;
 import java.util.List;
 import javax.swing.*;
+import javax.swing.event.*;
 
 /**
  * Offers completions for the word before the caret.
  */
 public class AutoCompleteAction extends ETextAction {
-    private JFrame completionsWindow;
+    private JPanel completionsWindow;
     
     public AutoCompleteAction() {
         // All Cocoa text components use alt-escape, but IDEA and Visual Studio both use control-space (and the window manager gets alt-escape under GNOME).
         super("Complete", GuiUtilities.isMacOs() ? KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, InputEvent.ALT_DOWN_MASK)
                                                  : KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, InputEvent.CTRL_DOWN_MASK));
-    }
-    
-    public void actionPerformed(ActionEvent e) {
-        PTextArea textArea = getFocusedTextArea();
-        if (textArea != null) {
-            offerCompletions(textArea);
-        }
     }
     
     /**
@@ -45,25 +40,50 @@ public class AutoCompleteAction extends ETextAction {
         return chars.subSequence(start, end).toString();
     }
     
-    public void offerCompletions(final PTextArea textArea) {
-        String prefix = getWordUpToCaret(textArea);
-        // FIXME - selection
-        final int endPosition = textArea.getSelectionStart();
-        final int startPosition = endPosition - prefix.length();
+    public void actionPerformed(ActionEvent e) {
+        final PTextArea textArea = getFocusedTextArea();
+        if (textArea == null) {
+            return;
+        }
+        List<LSP.Completion> completionsList;
         
-        // FIXME: we should be able to offer completions for other languages.
-        JavaResearcher javaResearcher = JavaResearcher.getSharedInstance();
-        List<String> completionsList = javaResearcher.listIdentifiersStartingWith(prefix);
+        final LSP.FileClient lspClient = getFocusedTextWindow().getLspClient();
+        String prefix = "";
+        if (lspClient != null) {
+            completionsList = lspClient.suggestCompletionsAt(textArea.getCoordinates(textArea.getSelectionStart()));
+        } else {
+            prefix = getWordUpToCaret(textArea);
+            // FIXME - selection
+            final int end = textArea.getSelectionStart();
+            final int start = end - prefix.length();
+            
+            // We should probably ditch this eventually, and just use LSPs. It would be nice
+            // to find a Java LSP that copes with Evergreen's rather particular build system.
+            // For now, just adapt the old JavaResearcher interface to generate LSP.Completion
+            // structs from it. 
+            JavaResearcher javaResearcher = JavaResearcher.getSharedInstance();
+            completionsList = new ArrayList<LSP.Completion>();
+            for (String text : javaResearcher.listIdentifiersStartingWith(prefix)) {
+                completionsList.add(new LSP.Completion(new LSP.CompletionEdit(start, end, text), null, null));
+            }
+        }
+        
+        for (LSP.Completion comp : completionsList) {
+            Log.warn("Completion " + comp.edit.text + " with doc " + comp.documentation);
+        }
+        
         boolean noCompletions = completionsList.isEmpty();
         if (noCompletions) {
-            completionsList.add("No completions found.");
+            int pos = textArea.getSelectionStart();
+            completionsList.add(new LSP.Completion(new LSP.CompletionEdit(pos, pos, "No completions found."), null, null));
         }
+        final LSP.Completion[] completions = completionsList.toArray(new LSP.Completion[completionsList.size()]);
+        final JList<LSP.Completion> completionsUi = new JList<>(completions);
+        final JTextArea docViewer = new JTextArea();
+        docViewer.setBackground(new Color(230, 230, 230));
+        docViewer.setEditable(false);
+        docViewer.setLineWrap(true);
         
-        String[] completions = completionsList.toArray(new String[completionsList.size()]);
-        final JList<String> completionsUi = new JList<>(completions);
-        if (completions.length > 0) {
-            completionsUi.setSelectedIndex(0);
-        }
         completionsUi.addFocusListener(new FocusAdapter() {
             public void focusLost(FocusEvent e) {
                 hideCompletionsWindow();
@@ -72,7 +92,7 @@ public class AutoCompleteAction extends ETextAction {
         completionsUi.addKeyListener(new KeyAdapter() {
             public void keyTyped(KeyEvent e) {
                 if (e.getKeyChar() == '\n') {
-                    textArea.replaceRange(completionsUi.getSelectedValue(), startPosition, endPosition);
+                    applyCompletion(textArea, completionsUi.getSelectedValue());
                     hideCompletionsWindow();
                     textArea.requestFocus();
                     e.consume();
@@ -89,48 +109,117 @@ public class AutoCompleteAction extends ETextAction {
         completionsUi.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 int index = completionsUi.locationToIndex(e.getPoint());
-                textArea.replaceRange(completionsUi.getModel().getElementAt(index), startPosition, endPosition);
+                applyCompletion(textArea, completionsUi.getModel().getElementAt(index));
                 hideCompletionsWindow();
                 textArea.requestFocus();
                 e.consume();
             }
         });
+        completionsUi.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                LSP.Completion sel = completionsUi.getSelectedValue();
+                if (sel == null) {
+                    docViewer.setText("no selection");
+                    return;
+                }
+                String doc = sel.documentation;
+                if (doc == null || doc.equals("")) {
+                    docViewer.setText("no documentation for this entry");
+                } else {
+                    docViewer.setText(doc);
+                }
+            }
+        });
+        if (completions.length > 0) {
+            completionsUi.setSelectedIndex(0);
+        }
         if (noCompletions) {
             completionsUi.setForeground(Color.GRAY);
         }
         completionsUi.setFont(textArea.getFont());
         completionsUi.setVisibleRowCount(Math.min(20, completionsUi.getModel().getSize()));
         
-        Point origin = textArea.getLocationOnScreen();
-        Point windowLocation = textArea.getViewCoordinates(textArea.getCoordinates(startPosition));
-        windowLocation.translate(origin.x, origin.y);
+        Point windowLocation = textArea.getViewCoordinates(textArea.getCoordinates(textArea.getSelectionStart()));
+        Dimension desiredSize = pickReasonableSize(completionsUi, completions);
         
-        showCompletionsWindow(windowLocation, new JScrollPane(completionsUi));
+        showCompletionsWindow(textArea, windowLocation, desiredSize, new JScrollPane(completionsUi), docViewer);
         completionsUi.requestFocus();
+    }
+    
+    // These size adjustments seem to be what we need to avoid scrollbars appearing in the autocomplete popup.
+    // Of course, they'll depend on the look and feel, so they're likely wrong on Mac, for example. It would
+    // be great to do this properly, but I don't see how to get Swing to properly compute the size of the
+    // component without putting it in a JFrame and calling pack(). As we want to sneakily insert the component
+    // inside a PTextArea (to avoid problems with tiling window managers), we're not able to do this.
+    // I don't like this, it's ugly as hell, but sometimes you just have to do ugly stuff to make things work.
+    // If anyone knows of a better way, please let me know.
+    private static final int EXTRA_LIST_WIDTH = 50;
+    private static final int EXTRA_LIST_ITEM_HEIGHT = 3;
+    
+    private Dimension pickReasonableSize(JList<LSP.Completion> completionsUi, LSP.Completion[] completions) {
+        FontMetrics metrics = completionsUi.getFontMetrics(completionsUi.getFont());
+        int width = 100;
+        for (LSP.Completion comp : completions) {
+            width = Math.max(width, metrics.stringWidth(comp.toString()) + EXTRA_LIST_WIDTH);
+        }
+        completionsUi.revalidate();
+        int height = completions.length * (metrics.getMaxAscent() + metrics.getMaxDescent() + EXTRA_LIST_ITEM_HEIGHT);
+        return new Dimension(width, height);
+    }
+    
+    private void applyCompletion(PTextArea textArea, LSP.Completion completion) {
+        if (completion == null) {
+            return;
+        }
+        ArrayList<LSP.CompletionEdit> allEdits = new ArrayList<>();
+        allEdits.add(completion.edit);
+        allEdits.addAll(completion.otherEdits);
+        // Sort the edits into reverse order (latest in file first). This means we can
+        // just go through the list and apply them, and the ones we apply first won't
+        // affect the positions of the ones we apply later.
+        Collections.sort(allEdits, new Comparator<LSP.CompletionEdit>() {
+            public int compare(LSP.CompletionEdit left, LSP.CompletionEdit right) {
+                return right.start - left.start;
+            }
+        });
+        if (allEdits.size() > 1) {
+            textArea.getTextBuffer().getUndoBuffer().startCompoundEdit();
+        }
+        for (LSP.CompletionEdit edit : allEdits) {
+            Log.warn("Applying completion " + edit.text + " between " + edit.start + " and " + edit.end);
+            textArea.replaceRange(edit.text, edit.start, edit.end);
+        }
+        if (allEdits.size() > 1) {
+            textArea.getTextBuffer().getUndoBuffer().finishCompoundEdit();
+        }
     }
     
     private void hideCompletionsWindow() {
         if (completionsWindow != null) {
-            completionsWindow.setVisible(false);
-            completionsWindow.dispose();
+            PTextArea textArea = (PTextArea) SwingUtilities.getAncestorOfClass(PTextArea.class, completionsWindow);
+            if (textArea != null) {
+                textArea.remove(completionsWindow);
+            }
             completionsWindow = null;
         }
     }
     
-    private void showCompletionsWindow(Point location, Container content) {
+    private void showCompletionsWindow(PTextArea textArea, Point location, Dimension desiredSize, Container content, Container docViewer) {
         hideCompletionsWindow();
         
-        completionsWindow = new JFrame();
-        completionsWindow.setUndecorated(true);
-        completionsWindow.setContentPane(content);
+        completionsWindow = new JPanel(new BorderLayout());
+        completionsWindow.add(content, BorderLayout.CENTER);
+        completionsWindow.add(docViewer, BorderLayout.EAST);
         completionsWindow.setLocation(location);
-        completionsWindow.pack();
         
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int docViewerWidth = textArea.getWidth() / 3;
+        docViewer.setPreferredSize(new Dimension(docViewerWidth, 50));
+        docViewer.setSize(new Dimension(docViewerWidth, 50));
         final int maxHeight = screenSize.height - location.y;
-        Dimension windowSize = completionsWindow.getSize();
+        Dimension windowSize = desiredSize;
         if (windowSize.height > maxHeight) {
-            windowSize.height= maxHeight;
+            windowSize.height = maxHeight;
             if (content instanceof JScrollPane) {
                 // By making the window shorter, we will have introduced a
                 // vertical scroll bar, so we have to increase the width to
@@ -142,9 +231,9 @@ public class AutoCompleteAction extends ETextAction {
         }
         // The trailing margin on a JList is the same as the leading margin,
         // but lists look better with a slightly wider trailing margin.
-        windowSize.width += 8;
+        windowSize.width += 8 + docViewerWidth;
         completionsWindow.setSize(windowSize);
-        
-        completionsWindow.setVisible(true);
+        textArea.add(completionsWindow);
+        completionsWindow.validate();
     }
 }

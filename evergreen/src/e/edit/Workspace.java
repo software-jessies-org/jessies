@@ -83,6 +83,7 @@ public class Workspace extends JPanel {
     
     public void dispose() {
         fileList.dispose();
+        LSP.workspaceClosed(this);
     }
     
     public String getWorkspaceName() {
@@ -522,5 +523,6 @@ public class Workspace extends JPanel {
         alreadyExposed = true;
         getFileList().updateFileList();
         openRememberedFiles();
+        LSP.workspaceOpened(this);
     }
 }

@@ -1,0 +1,53 @@
+UI:
+
+# Support multiple views on the same PTextBuffer.
+
+This should be feasible, as the connection from the PTextBuffer (which contains the file data) to the PTextArea (which has all the view support) was deliberately written with this in mind in the first place. The biggest challenge is likely to be ensuring that scroll offsets update when newlines are added and removed. Maybe using something like a PAnchor to record the current view position would allow this to be accommodated cleanly.
+
+
+# Support LSPs, or at least a subset of the functionality.
+
+To do:
+* Add support for "file saved" notifications, and whatever else seems to be a good idea.
+* Add "jump to definition" support - this one is really useful.
+* Look at other LSP functionality to see what would be nice to add.
+* Add documentation explaining how to configure LSPs.
+
+
+# Support multi-copy pasting.
+
+Emacs does this with C-y (yank) and M-y (cycle through the yank buffer). Something similar would be good, as it's often the case that I have several things I'm copy/pasting between and the normal system copy/paste buffer has a size of 1. Which is stupid. So if I want this, it's going to need to be implemented in Evergreen itself (or in the PTextArea parts). I'm thinking that the way this would work is that if we store a list of all the things copied or cut from within Evergreen (across all buffers? within a workspace? probably globally across Evergreen, TBH). Then, if you hit ctrl-shift-v (instead of ctrl-v), we paste the last of these, but in a way that the pasted text remains highlighted. If the user then hits ctrl-shift-v again we replace the highlighted text with the previous item on the copy buffer list. We'll need to do some funky stuff with the undo buffer, so that as you cycle through the pastes we don't end up adding _all_ of them as undoable edits. Presumably it would make sense to implement the cycling as an 'undo' followed by a 'paste next thing'. That way, once you've cycled to the right pasted thing, an undo will undo the whole paste.
+
+Items should be placed into the paste list under two conditions:
+1: It's been cut or copied from within Evergreen.
+2: Text has been pasted in from outside which is not the last cut/copied text from within Evergreen.
+
+We may want an upper limit on the number of pastes to keep (or possibly the max RAM size, in case some pastes are particularly large).
+
+An alternative implementation of this would be to, on ctrl-shift-v, open a selection box so you can scroll through the options. This widget could be shared with the autocomplete selector.
+
+
+# Improve the auto-complete GUI widget.
+
+The old widget was an undecorated hovering window that appears next to where you're typing. This fails to work properly under Sway (tiling Wayland compositor), as it opens in a separate, full-size window.
+
+I've replaced this with a JPanel which is just dumped directly into the PTextArea. It's not a very Swingy way of doing things, but it works better at least. This should be revisited, tweaked, and made much nicer.
+
+
+# Revisit where 'find in files', 'open quickly' results etc open.
+
+Also stuff like the errors caused by scripts not working. On a tiled window manager having all these as popups is kind of ugly. It would be better to have them as buffers embedded in the main Evergreen window, like Emacs's Errors window (and a similar thing in Wily).
+
+Also, the find in files should not be modal - it should be possible to open it up, and then keep it around, possibly editing its contents, and treating it as a 'to-do' list.
+
+
+# Add multiple columns.
+
+Unsure how exactly this would work. Columns could potentially even show different workspaces at the same time, next to each other. Not sure. We could also potentially allow multiple windows.
+
+
+# DONE
+
+2025-05-18:
+* Changed the auto-complete GUI widget so it's a JPanel instead of a JFrame. It's a bit ugly, but it means we always get what looks like a floating window in the right kind of place, rather than a JFrame, which some window managers (including Sway) insist on tiling, and positioning according to their own rules. This looks and acts awfully.
+* Added initial LSP support: basic management of workspaces, file open and modify notifications, and LSP-based autocomplete. Lots to do still, but this seems to kind of work.

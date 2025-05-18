@@ -33,6 +33,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     private final WatermarkViewPort watermarkViewPort;
     private final BirdView birdView;
     private final TagsUpdater tagsUpdater;
+    private LSP.FileClient lspClient;
     
     private FileTime lastModifiedTime;
     
@@ -87,6 +88,7 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         fillWithContent();
         initUserConfigurableDefaults();
         initFindResultsUpdater();
+        lspClient = LSP.clientFor(this);
     }
     
     private void initTextArea() {
@@ -262,6 +264,10 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
     
     public String getFilename() {
         return filename;
+    }
+    
+    public LSP.FileClient getLspClient() {
+        return lspClient;
     }
     
     /** Returns the grep-style ":<line>:<column>" address for the caret position. */
@@ -464,6 +470,9 @@ public class ETextWindow extends EWindow implements Comparable<ETextWindow>, PTe
         }
         Evergreen.getInstance().getTagsPanel().ensureTagsAreHidden();
         super.closeWindow();
+        if (lspClient != null) {
+            lspClient.dispose();
+        }
     }
     
     private void initTextAreaPopupMenu() {

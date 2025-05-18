@@ -772,6 +772,9 @@ public class Evergreen {
         
         // Indentation preferences (currently done just by editing text files).
         this.fileTypePreferences = FileType.preferencesFromFile(getPreferenceFilename("file-type-preferences"));
+        
+        // Set up the LSP stuff. This must happen after the Parameters init.
+        LSP.init();
     }
     
     private void initStatusArea() {

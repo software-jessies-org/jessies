@@ -497,7 +497,7 @@ public class FindInFilesDialog implements WorkspaceFileList.Listener {
             boolean addNode = false;
             ArrayList<String> matches = new ArrayList<>();
             Path file = FileUtilities.pathFrom(workspace.getRootDirectory(), filename);
-            if (regex == "") {
+            if (regex.equals("")) {
                 addNode = true;
             } else {
                 pattern = PatternUtilities.smartCaseCompile(regex);

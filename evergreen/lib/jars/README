@@ -1,0 +1,19 @@
+This directory contains .jar files that Evergreen uses. They are updated
+manually when required.
+
+The jars contained in here are released under open source licenses that are
+compatible with Evergreen's use of them.
+
+Licenses for each jar:
+
+gson-2.13.1.jar:
+License type: Apache License v2.0 (http://www.apache.org/licenses/)
+Project page: https://github.com/google/gson/tree/main
+
+org.eclipse.jsonrpc-1.0.0.jar:
+License type: Eclipse Public License v2.0 (http://www.eclipse.org/legal/epl-2.0)
+Project page: https://github.com/eclipse-lsp4j/lsp4j
+
+org.eclipse.lsp4j-0.24.0.jar
+License type: Eclipse Public License v2.0 (http://www.eclipse.org/legal/epl-2.0)
+Project page: https://github.com/eclipse-lsp4j/lsp4j
