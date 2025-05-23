@@ -198,7 +198,7 @@ public class LSP {
                 return null;
             }
             if (replace != null) {
-                remotePath = Paths.get(matcher.replaceFirst(remotePath.toString()));
+                remotePath = Paths.get(matcher.replaceFirst(replace));
             }
             FileClientImpl res = openFiles.get(remotePath);
             if (res != null) {
