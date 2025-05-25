@@ -520,7 +520,7 @@ JAVAC_FLAGS.javac += -g
 
 # Turn on warnings.
 JAVAC_FLAGS.javac += -deprecation
-JAVAC_FLAGS.javac += -Xlint:all -Xlint:-serial
+JAVAC_FLAGS.javac += -Xlint:all -Xlint:-serial -Xlint:-this-escape
 
 JAVA_MAJOR_VERSION := $(shell ruby -e 'require "$(JDK_ROOT_SCRIPT)"; puts(JAVA_MAJOR_VERSION)')
 
