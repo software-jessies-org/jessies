@@ -365,13 +365,14 @@ public class EColumn extends JPanel {
     
     /**
      * Moves the given component to the given absolute Y position in the column.
-     * Returns true on success, false on failure.
+     * Returns the actual new absolute Y position achieved, which will be that requested,
+     * but limited so that no components get squished off the top or bottom of the container.
      */
-    private boolean moveTo(Component c, int y) {
+    private int moveTo(Component c, int y) {
         final int which = getComponentIndex(c);
         if (which < 1) {
             // You can't move the top-most window in a column.
-            return false;
+            return 0;
         }
         
         // Dramatis personae.
@@ -380,44 +381,31 @@ public class EColumn extends JPanel {
         final Component next = isValidComponentIndex(which + 1) ? getComponent(which + 1) : null;
         int newY = y;
         
-        // What happens to the window above us?
+        // If we're squishing up into the item above us, then ask it to move too. It will
+        // then report back on how much it's _actually_ moved, and we can use that to determine
+        // how much we move ourselves.
         int newPreviousHeight = newY - previous.getY();
-        // If it would get squished...
         if (newPreviousHeight < MIN_HEIGHT) {
-            // FIXME: wrong test. we're really interested in knowing whether there's room.
-            if (isThereAnySpaceAboveComponent(which)) {
-                // ...budge it up a bit if possible.
-                if (!moveTo(previous, newY - MIN_HEIGHT)) {
-                    return false;
-                }
-                newPreviousHeight = newY - previous.getY();
-            } else {
-                // ...or refuse to squish it.
-                return false;
-            }
+            newY = moveTo(previous, newY - MIN_HEIGHT) + MIN_HEIGHT;
+            newPreviousHeight = MIN_HEIGHT;
         }
         
         // What happens to us?
         int newHeight = (next != null) ? next.getY() - newY : getHeight() - newY;
-        // If we would get squished...
+        // If we would get squished, then try to ask the component below us to squish downwards.
+        // As with the 'previous' case above, we allow our location to be updated to sit just
+        // above the 'next' item.
         if (newHeight < MIN_HEIGHT) {
-            if (next != null) {
-                // ...budge the window below us down a bit if possible.
-                if (!moveTo(next, newY + MIN_HEIGHT)) {
-                    return false;
-                }
-                newHeight = next.getY() - newY;
-            } else {
-                // ... or refuse to be squished.
-                return false;
-            }
+            newY = ((next != null) ? moveTo(next, newY + MIN_HEIGHT) : getHeight()) - MIN_HEIGHT;
+            newHeight = MIN_HEIGHT;
+            newPreviousHeight = newY - previous.getY();
         }
         
         // Make the decided-upon changes to the window above...
         reshapeAndRevalidate(previous, previous.getX(), previous.getY(), previous.getWidth(), newPreviousHeight);
         // ...and to this window.
         reshapeAndRevalidate(current, current.getX(), newY, current.getWidth(), newHeight);
-        return true;
+        return newY;
     }
     
     private void relayoutAfterResize() {

@@ -556,24 +556,24 @@ public class LSP {
         //
         
         public void logMessage(MessageParams message) {
-            System.err.println("logMessage");
+            Log.warn("logMessage: " + message.toString());
         }
         
         public void showMessage(MessageParams message) {
-            System.err.println("showMessage");
+            Log.warn("showMessage: " + message.toString());
         }
         
         public CompletableFuture<MessageActionItem> showMessageRequest(ShowMessageRequestParams params) {
-            System.err.println("showMessageRequest : " + params);
+            Log.warn("showMessageRequest : " + params.toString());
             return null;
         }
         
         public void telemetryEvent(Object obj) {
-            System.err.println("telemetryEvent");
+            Log.warn("telemetryEvent: " + obj.toString());
         }
         
         public void publishDiagnostics(PublishDiagnosticsParams diagnostics) {
-            System.err.println("publishDiagnostics");
+            Log.warn("publishDiagnostics: " + diagnostics.toString());
         }
     }
 }

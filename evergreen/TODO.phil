@@ -1,4 +1,17 @@
-UI:
+# Small bugs:
+* The birdview sometimes doesn't clear out old markers. I've not yet managed to find some simple steps to reproduce this, but it happens somewhat frequently.
+* Search 'jump to next/prev' (^g, ^d) sometimes act on multiple PTextAreas.
+* With focus in PTextArea 1, hit ^f (find in file). Then click on PTextArea 2 to give it focus and cancel the search. PTA2 briefly gets focus, but the closing find text widget gives focus back to PTA1. This is _REALLY_ annoying.
+
+
+# Language support:
+* Add matched bracket insertion to Go. It's missing, but present in Java and others.
+* Fix the Java indenter so it doesn't continually strip javadoc-style comments.
+* Change the Java indenter (and others) so they auto-continue line comments (like in the Go support). This should be consistent across languages.
+* There seems to be a bug with rendering python multi-line strings if the first 3 characters of the file are quotes.
+
+
+# Bigger changes:
 
 # Support multiple views on the same PTextBuffer.
 
@@ -47,6 +60,12 @@ Unsure how exactly this would work. Columns could potentially even show differen
 
 
 # DONE
+
+2025-05-25:
+* Fixed EColumn dragging so that dragging a title bar quickly past the top or bottom edge correctly squishes windows.
+
+2025-05-23:
+* Fixed a silly bug in the LSP filename replacement (was using the wrong variable).
 
 2025-05-18:
 * Changed the auto-complete GUI widget so it's a JPanel instead of a JFrame. It's a bit ugly, but it means we always get what looks like a floating window in the right kind of place, rather than a JFrame, which some window managers (including Sway) insist on tiling, and positioning according to their own rules. This looks and acts awfully.
