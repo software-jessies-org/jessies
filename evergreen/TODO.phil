@@ -1,7 +1,6 @@
 # Small bugs:
 * The birdview sometimes doesn't clear out old markers. I've not yet managed to find some simple steps to reproduce this, but it happens somewhat frequently.
 * Search 'jump to next/prev' (^g, ^d) sometimes act on multiple PTextAreas.
-* With focus in PTextArea 1, hit ^f (find in file). Then click on PTextArea 2 to give it focus and cancel the search. PTA2 briefly gets focus, but the closing find text widget gives focus back to PTA1. This is _REALLY_ annoying.
 
 
 # Language support:
@@ -63,6 +62,7 @@ Unsure how exactly this would work. Columns could potentially even show differen
 
 2025-05-25:
 * Fixed EColumn dragging so that dragging a title bar quickly past the top or bottom edge correctly squishes windows.
+* Fixed the Minibuffer so that it doesn't try to force focus to the previous PTextArea when it's closing due to the user clicking somewhere else (and thus requesting focus somewhere specific).
 
 2025-05-23:
 * Fixed a silly bug in the LSP filename replacement (was using the wrong variable).

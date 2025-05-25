@@ -29,7 +29,7 @@ public class Minibuffer extends JPanel implements FocusListener {
         typingTimer.setRepeats(false);
         
         addListeners();
-        deactivate();
+        deactivate(false);
     }
     
     public void showComponents() {
@@ -73,7 +73,7 @@ public class Minibuffer extends JPanel implements FocusListener {
                 if (e.getModifiers() == 0) {
                     boolean shouldHide = handleEnterAndEsc(e);
                     if (shouldHide) {
-                        deactivate();
+                        deactivate(true);
                     }
                 } else if ((e.getModifiers() & Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()) != 0) {
                     // Ensure everything's up to date.
@@ -99,7 +99,7 @@ public class Minibuffer extends JPanel implements FocusListener {
                     
                     // Cancel the minibuffer and see if the menu bar has an action for us.
                     addToHistory();
-                    deactivate();
+                    deactivate(true);
                     GuiUtilities.invokeLater(() -> {
                         EvergreenMenuBar menuBar = (EvergreenMenuBar) Evergreen.getInstance().getFrame().getJMenuBar();
                         // FIXME: PTextAction.isEnabled often returns false, disabling Find Next and Find Previous, because the focus transition initiated by deactivate, above, hasn't completed yet.
@@ -156,7 +156,7 @@ public class Minibuffer extends JPanel implements FocusListener {
         
     public void activate(MinibufferUser newUser) {
         if (minibufferUser != null) {
-            deactivate();
+            deactivate(false);
         }
         
         previousFocusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
@@ -188,7 +188,7 @@ public class Minibuffer extends JPanel implements FocusListener {
         notifyMinibufferUserOfTyping();
     }
     
-    public void deactivate() {
+    public void deactivate(boolean restorePreviousFocus) {
         typingTimer.stop();
         minibufferUser = null;
         
@@ -197,10 +197,16 @@ public class Minibuffer extends JPanel implements FocusListener {
         
         hideComponents();
         
-        if (previousFocusOwner != null) {
+        // We only restore the previous focus owner when we're closing ourselves (due to the user hitting
+        // Escape, for example). If we lose focus (eg because the user clicked somewhere to give it focus),
+        // we must not restore focus, as the user just deliberately gave focus to someone else.
+        // However, it's important to restore the previous focus owner in other cases, as otherwise when
+        // the minibuffer disappears focus is simply given to the first component in the parent window
+        // (which will be the topmost ETextArea), which is weird and confusing.
+        if (previousFocusOwner != null && restorePreviousFocus) {
             previousFocusOwner.requestFocusInWindow();
-            previousFocusOwner = null;
         }
+        previousFocusOwner = null;
     }
     
     //
@@ -215,6 +221,9 @@ public class Minibuffer extends JPanel implements FocusListener {
      * UI where it's not obvious whether the focus is in a text or in the minibuffer.
      */
     public void focusLost(FocusEvent e) {
-        deactivate();
+        // Deactivate _without_ restoring the previous focus owner, in the case where we
+        // lose focus due to, for example, the user clicking in another PTextArea. Otherwise
+        // we'll be effectively overriding what the user wanted to do.
+        deactivate(false);
     }
 }
