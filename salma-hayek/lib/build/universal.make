@@ -520,7 +520,11 @@ JAVAC_FLAGS.javac += -g
 
 # Turn on warnings.
 JAVAC_FLAGS.javac += -deprecation
-JAVAC_FLAGS.javac += -Xlint:all -Xlint:-serial -Xlint:-this-escape
+JAVAC_FLAGS.javac += -Xlint:all -Xlint:-serial
+# Phil wants to disable a warning that is only available from Java 21.
+# Java 11: error: invalid flag: --help-lint
+JAVAC_LINT_HELP := $(shell javac --help-lint 2>&1)
+JAVAC_FLAGS.javac += $(if $(filter this-escape,$(JAVAC_LINT_HELP)),-Xlint:-this-escape)
 
 JAVA_MAJOR_VERSION := $(shell ruby -e 'require "$(JDK_ROOT_SCRIPT)"; puts(JAVA_MAJOR_VERSION)')
 
