@@ -67,7 +67,10 @@ public abstract class PGenericTextStyler implements PTextStyler {
     }
     
     private void initLineEndContexts() {
-        lastGoodLine = 0;
+        // The last good line is the index of the last line where we're sure the end state
+        // is correctly stored in lineEndContexts. When we init, we're not even sure about
+        // the first line, so the last good line is -1.
+        lastGoodLine = -1;
         lineEndContexts = new TreeMap<Integer, PSequenceMatcher.RegionEnd>();
     }
     
