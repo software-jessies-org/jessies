@@ -1,6 +1,6 @@
 # Small bugs:
 * The birdview sometimes doesn't clear out old markers. I've not yet managed to find some simple steps to reproduce this, but it happens somewhat frequently.
-* Search 'jump to next/prev' (^g, ^d) sometimes act on multiple PTextAreas.
+* Search 'jump to next/prev' (^g, ^d) sometimes act on multiple PTextAreas. This is proving tricky to reproduce.
 
 
 # Language support:
