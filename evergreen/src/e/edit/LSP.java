@@ -266,8 +266,9 @@ public class LSP {
             }
             
             public List<Completion> suggestCompletionsAt(PCoordinates coords) {
+                Log.warn("suggestCompletionsAt " + coords);
                 Position pos = new Position(coords.getLineIndex(), coords.getCharOffset());
-                CompletionParams params = new CompletionParams(new TextDocumentIdentifier(uri()), pos);
+                CompletionParams params = new CompletionParams(new TextDocumentIdentifier(uri()), pos, new CompletionContext(CompletionTriggerKind.Invoked));
                 CompletableFuture<Either<List<CompletionItem>, CompletionList>> blockingRes = langServer.getTextDocumentService().completion(params);
                 // Warning: the '.get()' here will block! Consider doing something more clever and adding something
                 // that can be cancelled. For example, some visual display that we're waiting for the LSP, and if
@@ -286,7 +287,8 @@ public class LSP {
                 // whether the list is complete or not. Just pull out the list, as we don't care about anything else.
                 List<CompletionItem> items = resp.isLeft() ? resp.getLeft() : resp.getRight().getItems();
                 ArrayList<Completion> res = new ArrayList<>();
-                for (CompletionItem item : items) {
+                for (CompletionItem item : sortAndFilter(items)) {
+                    Log.warn("CompletionItem " + item.toString());
                     ArrayList<CompletionEdit> otherEdits = new ArrayList<>();
                     if (item.getAdditionalTextEdits() != null) {
                         for (TextEdit edit : item.getAdditionalTextEdits()) {
@@ -318,11 +320,37 @@ public class LSP {
                         // have support for formatting markup.
                         doc = item.getDocumentation().getRight().getValue();
                     }
+                    if (doc == null || doc.equals("")) {
+                        doc = item.getDetail();
+                    }
+
                     String text = item.getInsertText();
                     if (text == null || text.equals("")) {
                         text = item.getLabel();
                     }
                     res.add(new Completion(mainEdit, doc, otherEdits));
+                }
+                return res;
+            }
+            
+            private static final int MAX_COMPLETIONS = 50;
+            
+            private List<CompletionItem> sortAndFilter(List<CompletionItem> in) {
+                ArrayList<CompletionItem> res = new ArrayList<>(in);
+                Collections.sort(res, new Comparator<CompletionItem>() {
+                    public int compare(CompletionItem left, CompletionItem right) {
+                        // Only rely on the sort text; don't sort on the label. Otherwise the
+                        // top match might not even start with the text we passed in for completion.
+                        return left.getSortText().compareTo(right.getSortText());
+                    }
+                });
+                // There's absolutely no point in returning a billion gazillion completions.
+                while (res.size() > MAX_COMPLETIONS) {
+                    // ArrayList has a 'removeRange(int fromIndex, int toIndex)' function that would be
+                    // _perfect_ for this, but for some reason it has protected access. I mean, *why*?
+                    // Seriously, what possible reason is there to force me to loop here? Java winds me
+                    // up sometimes.
+                    res.remove(res.size() - 1);
                 }
                 return res;
             }
@@ -573,7 +601,8 @@ public class LSP {
         }
         
         public void publishDiagnostics(PublishDiagnosticsParams diagnostics) {
-            Log.warn("publishDiagnostics: " + diagnostics.toString());
+            // Enable this later - it's _really_ spammy.
+            // Log.warn("publishDiagnostics: " + diagnostics.toString());
         }
     }
 }

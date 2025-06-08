@@ -68,10 +68,6 @@ public class AutoCompleteAction extends ETextAction {
             }
         }
         
-        for (LSP.Completion comp : completionsList) {
-            Log.warn("Completion " + comp.edit.text + " with doc " + comp.documentation);
-        }
-        
         boolean noCompletions = completionsList.isEmpty();
         if (noCompletions) {
             int pos = textArea.getSelectionStart();
@@ -142,7 +138,9 @@ public class AutoCompleteAction extends ETextAction {
         Point windowLocation = textArea.getViewCoordinates(textArea.getCoordinates(textArea.getSelectionStart()));
         Dimension desiredSize = pickReasonableSize(completionsUi, completions);
         
+        // TODO(phil): Improve how the size and y location is generated.
         showCompletionsWindow(textArea, windowLocation, desiredSize, new JScrollPane(completionsUi), docViewer);
+        Log.warn("showCompletionsWindow at " + windowLocation + " with size " + desiredSize);
         completionsUi.requestFocus();
     }
     
@@ -155,6 +153,7 @@ public class AutoCompleteAction extends ETextAction {
     // If anyone knows of a better way, please let me know.
     private static final int EXTRA_LIST_WIDTH = 50;
     private static final int EXTRA_LIST_ITEM_HEIGHT = 3;
+    private static final int MAX_VISIBLE_COMPLETIONS = 20;
     
     private Dimension pickReasonableSize(JList<LSP.Completion> completionsUi, LSP.Completion[] completions) {
         FontMetrics metrics = completionsUi.getFontMetrics(completionsUi.getFont());
@@ -163,7 +162,7 @@ public class AutoCompleteAction extends ETextAction {
             width = Math.max(width, metrics.stringWidth(comp.toString()) + EXTRA_LIST_WIDTH);
         }
         completionsUi.revalidate();
-        int height = completions.length * (metrics.getMaxAscent() + metrics.getMaxDescent() + EXTRA_LIST_ITEM_HEIGHT);
+        int height = Math.min(completions.length, MAX_VISIBLE_COMPLETIONS) * (metrics.getMaxAscent() + metrics.getMaxDescent() + EXTRA_LIST_ITEM_HEIGHT);
         return new Dimension(width, height);
     }
     
@@ -216,7 +215,7 @@ public class AutoCompleteAction extends ETextAction {
         int docViewerWidth = textArea.getWidth() / 3;
         docViewer.setPreferredSize(new Dimension(docViewerWidth, 50));
         docViewer.setSize(new Dimension(docViewerWidth, 50));
-        final int maxHeight = screenSize.height - location.y;
+        final int maxHeight = screenSize.height;
         Dimension windowSize = desiredSize;
         if (windowSize.height > maxHeight) {
             windowSize.height = maxHeight;
