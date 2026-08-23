@@ -953,7 +953,11 @@ static void SetWindowProps(Window window, unsigned long height) {
   // _NET_WM_STRUT provides left, right, top, bottom. As our window only appears
   // at the top, we only set top to the height of the window.
   unsigned long val[4] = {0, 0, height, 0};
-  Atom strutAtom = XInternAtom(dpy, "_NET_WM_STRUT", true);
+  // Note the false: only_if_exists=true returns None whenever gummiband starts
+  // before the window manager, because nothing has interned _NET_WM_STRUT yet.
+  // We'd then silently skip setting the strut, and the WM would keep windows
+  // off us only when it happened to start first.
+  Atom strutAtom = XInternAtom(dpy, "_NET_WM_STRUT", false);
   if (strutAtom == None) {
     LOGE() << "no strut property";
     return;
