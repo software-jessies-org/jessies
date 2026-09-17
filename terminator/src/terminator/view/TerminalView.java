@@ -80,6 +80,9 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
             // Used to check whether a drag has actually moved to a new character cell.
             private Location lastLocation;
             
+            // Fractional wheel rotation not yet reported to the terminal program (see mouseWheelMoved).
+            private double wheelRotationRemainder;
+            
             // mouseLocationInVisibleArea returns the location of the mouse within the current visible area.
             // This is *ONLY* for use in sending mouse control events to terminal programs.
             // If you use this function to determine the position of text in the TerminalModel,
@@ -163,7 +166,27 @@ public class TerminalView extends JComponent implements FocusListener, Scrollabl
             
             @Override public void mouseWheelMoved(MouseWheelEvent e) {
                 if (model.isMouseTrackingEnabled()) {
-                    terminalControl.sendSGR(e.getWheelRotation() < 0 ? 64 : 65, mouseLocationInVisibleArea(e), 'M');
+                    if (e.isShiftDown()) {
+                        // Java delivers horizontal scrolling (trackpads, tilt wheels) as a wheel event with
+                        // shift down. We have no vertical movement to report, and mustn't let the horizontal
+                        // component of a slightly diagonal trackpad gesture disturb the accumulator below.
+                        e.consume();
+                        return;
+                    }
+                    // On macOS, a trackpad delivers many small events whose integer getWheelRotation()
+                    // is 0, so using that would report every one of them as wheel-down, regardless of
+                    // direction. Accumulate the precise rotation instead, and report one wheel event per
+                    // whole unit (which is what JScrollPane does for us when mouse tracking is off).
+                    double rotation = e.getPreciseWheelRotation();
+                    if (rotation * wheelRotationRemainder < 0) {
+                        // Direction changed; don't let the old remainder cancel out the new movement.
+                        wheelRotationRemainder = 0.0;
+                    }
+                    wheelRotationRemainder += rotation;
+                    while (Math.abs(wheelRotationRemainder) >= 1.0) {
+                        terminalControl.sendSGR(wheelRotationRemainder < 0 ? 64 : 65, mouseLocationInVisibleArea(e), 'M');
+                        wheelRotationRemainder -= Math.signum(wheelRotationRemainder);
+                    }
                     e.consume();
                 } else {
                     JScrollPane scrollPane = (JScrollPane) SwingUtilities.getAncestorOfClass(JScrollPane.class, e.getComponent());
